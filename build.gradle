@@ -12,8 +12,8 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 
 version = "1.0"
-group = "com.yourname.modid" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "modid"
+group = "com.mrcrayfish" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "controllable"
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
@@ -73,5 +73,14 @@ processResources {
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+
+    rename '(.+_at.cfg)', 'META-INF/$1'
+}
+
+jar {
+    manifest {
+        attributes 'FMLAT': 'controllable_at.cfg'
+        attributes 'FMLCorePlugin': 'com.mrcrayfish.obfuscate.asm.ObfuscatePlugin'
     }
 }
