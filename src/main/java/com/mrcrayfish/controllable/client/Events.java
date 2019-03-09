@@ -233,11 +233,11 @@ public class Events
                     mc.player.inventory.changeCurrentItem(-1);
                 }
             }
-            else if(button == Buttons.A)
+            else if(button == Buttons.A && mc.currentScreen != null)
             {
                 invokeMouseClick(mc.currentScreen, 0);
             }
-            else if(button == Buttons.X)
+            else if(button == Buttons.X && mc.currentScreen != null)
             {
                 invokeMouseClick(mc.currentScreen, 1);
             }
@@ -264,6 +264,14 @@ public class Events
                 }
             }
         }
+        else if(button == Buttons.A && mc.currentScreen != null)
+        {
+            invokeMouseReleased(mc.currentScreen, 0);
+        }
+        else if(button == Buttons.X && mc.currentScreen != null)
+        {
+            invokeMouseReleased(mc.currentScreen, 1);
+        }
     }
 
     /**
@@ -283,7 +291,6 @@ public class Events
 
             try
             {
-                long start = System.nanoTime();
                 Class<?> clazz = GuiScreen.class;
                 Field eventButton = clazz.getDeclaredField("eventButton");
                 eventButton.setAccessible(true);
@@ -296,14 +303,40 @@ public class Events
                 Method mouseClicked = clazz.getDeclaredMethod("mouseClicked", int.class, int.class, int.class);
                 mouseClicked.setAccessible(true);
                 mouseClicked.invoke(gui, guiX, guiY, button);
+            }
+            catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException | NoSuchFieldException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Invokes a mouse released in a GUI. This is modified version that is designed for controllers.
+     * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
+     *
+     * @param gui the gui instance
+     * @param button the button to click with
+     */
+    private void invokeMouseReleased(GuiScreen gui, int button)
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        if(gui != null)
+        {
+            int guiX = Mouse.getX() * gui.width / mc.displayWidth;
+            int guiY = gui.height - Mouse.getY() * gui.height / mc.displayHeight - 1;
+
+            try
+            {
+                Class<?> clazz = GuiScreen.class;
+                Field eventButton = clazz.getDeclaredField("eventButton");
+                eventButton.setAccessible(true);
+                eventButton.set(gui, -1);
 
                 //Resets the mouse straight away
-                eventButton.set(gui, -1);
                 Method mouseReleased = clazz.getDeclaredMethod("mouseReleased", int.class, int.class, int.class);
                 mouseReleased.setAccessible(true);
                 mouseReleased.invoke(gui, guiX, guiY, button);
-
-                System.out.println(System.nanoTime() - start);
             }
             catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException | NoSuchFieldException e)
             {
