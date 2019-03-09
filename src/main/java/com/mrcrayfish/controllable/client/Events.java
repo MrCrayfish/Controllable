@@ -10,7 +10,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.InputUpdateEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -240,11 +239,6 @@ public class Events
         Minecraft mc = Minecraft.getMinecraft();
         if(state)
         {
-            if(button == Buttons.DPAD_UP)
-            {
-                System.out.println("YAY");
-            }
-
             if(button == Buttons.Y)
             {
                 if(mc.currentScreen == null)
@@ -295,6 +289,10 @@ public class Events
             {
                 invokeMouseClick(mc.currentScreen, 1);
             }
+            else if(button == Buttons.DPAD_UP)
+            {
+                cycleThirdPersonView();
+            }
             else
             {
                 Controller controller = Controllable.getController();
@@ -325,6 +323,29 @@ public class Events
         else if(button == Buttons.X && mc.currentScreen != null)
         {
             invokeMouseReleased(mc.currentScreen, 1);
+        }
+    }
+
+    /**
+     * Cycles the third person view. Minecraft doesn't have this code in a convenient method.
+     */
+    private void cycleThirdPersonView()
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        mc.gameSettings.thirdPersonView++;
+        if(mc.gameSettings.thirdPersonView > 2)
+        {
+            mc.gameSettings.thirdPersonView = 0;
+        }
+
+        if(mc.gameSettings.thirdPersonView == 0)
+        {
+            mc.entityRenderer.loadEntityShader(mc.getRenderViewEntity());
+        }
+        else if(mc.gameSettings.thirdPersonView == 1)
+        {
+            mc.entityRenderer.loadEntityShader(null);
         }
     }
 
