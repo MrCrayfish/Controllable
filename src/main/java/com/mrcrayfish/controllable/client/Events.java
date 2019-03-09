@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -48,8 +49,8 @@ public class Events
     {
         if(event.phase == TickEvent.Phase.START)
         {
-            this.prevTargetMouseX = targetMouseX;
-            this.prevTargetMouseY = targetMouseY;
+            prevTargetMouseX = targetMouseX;
+            prevTargetMouseY = targetMouseY;
 
             Controller controller = Controllable.getController();
             if(controller == null)
@@ -59,19 +60,40 @@ public class Events
             if(mc.inGameHasFocus)
                 return;
 
+            /* Only need to run code if left thumb stick has input */
             if(controller.getXAxisValue() != 0.0F || controller.getYAxisValue() != 0.0F)
             {
+                /* Updates the target mouse position when the initial thumb stick movement is
+                 * detected. This fixes an issue when the user moves the cursor with the mouse then
+                 * switching back to controller, the cursor would jump to old target mouse position. */
                 if(prevXAxis == 0.0F && prevYAxis == 0.0F)
                 {
                     prevTargetMouseX = targetMouseX = Mouse.getX();
                     prevTargetMouseY = targetMouseY = Mouse.getY();
                 }
+
+                /* Moves the target mouse position based on the left thumb stick position. */
                 targetMouseX += 20 * (controller.getXAxisValue() > 0.0F ? 1 : -1) * Math.abs(controller.getXAxisValue());
                 targetMouseY += 20 * (controller.getYAxisValue() > 0.0F ? -1 : 1) * Math.abs(controller.getYAxisValue());
             }
 
             prevXAxis = controller.getXAxisValue();
             prevYAxis = controller.getYAxisValue();
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderScreen(GuiScreenEvent.DrawScreenEvent.Pre event)
+    {
+        /* Makes the cursor movement appear smooth between ticks. This will only run if the target
+         * mouse position is different to the previous tick's position. This allows for the mouse
+         * to still be used as input. */
+        if(Minecraft.getMinecraft().currentScreen != null && (targetMouseX != prevTargetMouseX || targetMouseY != prevTargetMouseY))
+        {
+            float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
+            int mouseX = (int) (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * partialTicks + 0.5F);
+            int mouseY = (int) (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * partialTicks + 0.5F);
+            Mouse.setCursorPosition(mouseX, mouseY);
         }
     }
 
@@ -88,10 +110,7 @@ public class Events
             {
                 int button = Controllers.getEventControlIndex();
                 boolean state = Controllers.getEventButtonState();
-                if(!MinecraftForge.EVENT_BUS.post(new ControllerInputEvent(button, state)))
-                {
-                    handleMinecraftInput(button, state);
-                }
+                handleButtonInput(button, state);
             }
         }
 
@@ -117,17 +136,6 @@ public class Events
                     player.turn(rotationYaw, -rotationPitch);
                 }
             }
-        }
-    }
-
-    @SubscribeEvent
-    public void onRenderScreen(RenderWorldLastEvent event)
-    {
-        if(Minecraft.getMinecraft().currentScreen != null && (targetMouseX != prevTargetMouseX || targetMouseY != prevTargetMouseY))
-        {
-            int mouseX = (int) (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * event.getPartialTicks() + 0.5F);
-            int mouseY = (int) (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * event.getPartialTicks() + 0.5F);
-            Mouse.setCursorPosition(mouseX, mouseY);
         }
     }
 
@@ -209,12 +217,12 @@ public class Events
             if(pressedDpadX == -1)
             {
                 pressedDpadX = povX > 0.0F ? Buttons.DPAD_RIGHT : Buttons.DPAD_LEFT;
-                handleMinecraftInput(pressedDpadX, true);
+                handleButtonInput(pressedDpadX, true);
             }
         }
         else if(pressedDpadX != -1)
         {
-            handleMinecraftInput(pressedDpadX, false);
+            handleButtonInput(pressedDpadX, false);
             pressedDpadX = -1;
         }
 
@@ -224,18 +232,21 @@ public class Events
             if(pressedDpadY == -1)
             {
                 pressedDpadY = povY > 0.0F ? Buttons.DPAD_DOWN : Buttons.DPAD_UP;
-                handleMinecraftInput(pressedDpadY, true);
+                handleButtonInput(pressedDpadY, true);
             }
         }
         else if(pressedDpadY != -1)
         {
-            handleMinecraftInput(pressedDpadY, false);
+            handleButtonInput(pressedDpadY, false);
             pressedDpadY = -1;
         }
     }
 
-    private void handleMinecraftInput(int button, boolean state)
+    private void handleButtonInput(int button, boolean state)
     {
+        if(MinecraftForge.EVENT_BUS.post(new ControllerInputEvent(button, state)))
+            return;
+
         Minecraft mc = Minecraft.getMinecraft();
         if(state)
         {
@@ -243,7 +254,7 @@ public class Events
             {
                 if(mc.currentScreen == null)
                 {
-                    if (mc.playerController.isRidingHorse())
+                    if(mc.playerController.isRidingHorse())
                     {
                         mc.player.sendHorseInventory();
                     }
@@ -305,11 +316,11 @@ public class Events
                     {
                         mc.clickMouse();
                     }
-                    if(button == Buttons.LEFT_TRIGGER)
+                    else if(button == Buttons.LEFT_TRIGGER)
                     {
                         mc.rightClickMouse();
                     }
-                    if(button == Buttons.X)
+                    else if(button == Buttons.X)
                     {
                         mc.middleClickMouse();
                     }

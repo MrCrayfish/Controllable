@@ -58,7 +58,6 @@ public class ControllableTransformer implements IClassTransformer
                 ObfName method_onStoppedUsingItem = new ObfName("func_78766_c", "onStoppedUsingItem");
                 ObfName method_isKeyDown = new ObfName("func_100015_a", "isKeyDown");
 
-                InsnNode target;
                 for(AbstractInsnNode node : method.instructions.toArray())
                 {
                     if(node instanceof MethodInsnNode && method_onStoppedUsingItem.equals(((MethodInsnNode) node).name))
