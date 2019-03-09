@@ -266,15 +266,6 @@ public class Events
         }
     }
 
-    public static boolean isLeftClicking()
-    {
-        Minecraft mc = Minecraft.getMinecraft();
-        boolean isLeftClicking = mc.gameSettings.keyBindAttack.isKeyDown();
-        Controller controller = Controllable.getController();
-        if(controller != null) isLeftClicking |= controller.isButtonPressed(Buttons.RIGHT_TRIGGER);
-        return mc.currentScreen == null && isLeftClicking && mc.inGameHasFocus;
-    }
-
     /**
      * Invokes a mouse click in a GUI. This is modified version that is designed for controllers.
      * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
@@ -319,5 +310,29 @@ public class Events
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Used in order to fix block breaking progress. This method is linked via ASM.
+     */
+    public static boolean isLeftClicking()
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        boolean isLeftClicking = mc.gameSettings.keyBindAttack.isKeyDown();
+        Controller controller = Controllable.getController();
+        if(controller != null) isLeftClicking |= controller.isButtonPressed(Buttons.RIGHT_TRIGGER);
+        return mc.currentScreen == null && isLeftClicking && mc.inGameHasFocus;
+    }
+
+    /**
+     * Used in order to fix actions like eating or pulling bow back. This method is linked via ASM.
+     */
+    public static boolean isRightClicking()
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        boolean isRightClicking = mc.gameSettings.keyBindUseItem.isKeyDown();
+        Controller controller = Controllable.getController();
+        if(controller != null) isRightClicking |= controller.isButtonPressed(Buttons.LEFT_TRIGGER);
+        return isRightClicking;
     }
 }
