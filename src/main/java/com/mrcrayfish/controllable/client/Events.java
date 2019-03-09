@@ -41,6 +41,9 @@ public class Events
     private int targetMouseX;
     private int targetMouseY;
 
+    private int pressedDpadX = -1;
+    private int pressedDpadY = -1;
+
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event)
     {
@@ -92,6 +95,8 @@ public class Events
                 }
             }
         }
+
+        this.handleDpadInput(controller);
 
         if(event.phase == TickEvent.Phase.END)
             return;
@@ -197,11 +202,49 @@ public class Events
         }
     }
 
+    private void handleDpadInput(Controller controller)
+    {
+        float povX = controller.getPovX();
+        if(povX != 0.0F)
+        {
+            if(pressedDpadX == -1)
+            {
+                pressedDpadX = povX > 0.0F ? Buttons.DPAD_RIGHT : Buttons.DPAD_LEFT;
+                handleMinecraftInput(pressedDpadX, true);
+            }
+        }
+        else if(pressedDpadX != -1)
+        {
+            handleMinecraftInput(pressedDpadX, false);
+            pressedDpadX = -1;
+        }
+
+        float povY = controller.getPovY();
+        if(povY != 0.0F)
+        {
+            if(pressedDpadY == -1)
+            {
+                pressedDpadY = povY > 0.0F ? Buttons.DPAD_DOWN : Buttons.DPAD_UP;
+                handleMinecraftInput(pressedDpadY, true);
+            }
+        }
+        else if(pressedDpadY != -1)
+        {
+            handleMinecraftInput(pressedDpadY, false);
+            pressedDpadY = -1;
+        }
+    }
+
     private void handleMinecraftInput(int button, boolean state)
     {
         Minecraft mc = Minecraft.getMinecraft();
         if(state)
         {
+            if(button == Buttons.DPAD_UP)
+            {
+                System.out.println("YAY");
+            }
+
             if(button == Buttons.Y)
             {
                 if(mc.currentScreen == null)
