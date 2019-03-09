@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 @SideOnly(Side.CLIENT)
 public class Events
 {
+    private boolean keyboardSneaking = false;
     private boolean sneaking = false;
 
     private float prevXAxis;
@@ -41,11 +42,40 @@ public class Events
     private int targetMouseY;
 
     @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event)
+    {
+        if(event.phase == TickEvent.Phase.START)
+        {
+            this.prevTargetMouseX = targetMouseX;
+            this.prevTargetMouseY = targetMouseY;
+
+            Controller controller = Controllable.getController();
+            if(controller == null)
+                return;
+
+            Minecraft mc = Minecraft.getMinecraft();
+            if(mc.inGameHasFocus)
+                return;
+
+            if(controller.getXAxisValue() != 0.0F || controller.getYAxisValue() != 0.0F)
+            {
+                if(prevXAxis == 0.0F && prevYAxis == 0.0F)
+                {
+                    prevTargetMouseX = targetMouseX = Mouse.getX();
+                    prevTargetMouseY = targetMouseY = Mouse.getY();
+                }
+                targetMouseX += 20 * (controller.getXAxisValue() > 0.0F ? 1 : -1) * Math.abs(controller.getXAxisValue());
+                targetMouseY += 20 * (controller.getYAxisValue() > 0.0F ? -1 : 1) * Math.abs(controller.getYAxisValue());
+            }
+
+            prevXAxis = controller.getXAxisValue();
+            prevYAxis = controller.getYAxisValue();
+        }
+    }
+
+    @SubscribeEvent
     public void onRender(TickEvent.RenderTickEvent event)
     {
-        this.prevTargetMouseX = targetMouseX;
-        this.prevTargetMouseY = targetMouseY;
-
         Controller controller = Controllable.getController();
         if(controller == null)
             return;
@@ -84,38 +114,6 @@ public class Events
                 }
             }
         }
-        else
-        {
-            if(controller.getXAxisValue() != 0.0F || controller.getYAxisValue() != 0.0F)
-            {
-                if(prevXAxis == 0.0F && prevYAxis == 0.0F)
-                {
-                    prevTargetMouseX = targetMouseX = Mouse.getX();
-                    prevTargetMouseY = targetMouseY = Mouse.getY();
-                }
-                targetMouseX += 20 * (controller.getXAxisValue() > 0.0F ? 1 : -1) * Math.abs(controller.getXAxisValue());
-                targetMouseY += 20 * (controller.getYAxisValue() > 0.0F ? -1 : 1) * Math.abs(controller.getYAxisValue());
-            }
-            /*if(controller.getXAxisValue() != 0.0F)
-            {
-                if(prevXAxis == 0.0F)
-                {
-                    prevTargetMouseX = targetMouseX = Mouse.getX();
-                }
-                targetMouseX += 20 * (controller.getXAxisValue() > 0.0F ? 1 : -1) * Math.abs(controller.getXAxisValue());
-            }
-            if(controller.getYAxisValue() != 0.0F)
-            {
-                if(prevYAxis == 0.0F)
-                {
-                    System.out.println("YO");
-                    prevTargetMouseY = targetMouseY = Mouse.getY();
-                }
-                targetMouseY += 20 * (controller.getYAxisValue() > 0.0F ? -1 : 1) * Math.abs(controller.getYAxisValue());
-            }*/
-            prevXAxis = controller.getXAxisValue();
-            prevYAxis = controller.getYAxisValue();
-        }
     }
 
     @SubscribeEvent
@@ -140,9 +138,23 @@ public class Events
         if(controller == null)
             return;
 
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if(keyboardSneaking && !mc.gameSettings.keyBindSneak.isKeyDown())
+        {
+            sneaking = false;
+            keyboardSneaking = false;
+        }
+
+        if(mc.gameSettings.keyBindSneak.isKeyDown())
+        {
+            sneaking = true;
+            keyboardSneaking = true;
+        }
+
         event.getMovementInput().sneak = sneaking;
 
-        if(Minecraft.getMinecraft().currentScreen == null)
+        if(mc.currentScreen == null)
         {
             if(!MinecraftForge.EVENT_BUS.post(new ControllerMoveEvent()))
             {
@@ -179,7 +191,6 @@ public class Events
             }
         }
 
-        Minecraft mc = Minecraft.getMinecraft();
         if(controller.isButtonPressed(Buttons.LEFT_TRIGGER) && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
         {
             mc.rightClickMouse();
