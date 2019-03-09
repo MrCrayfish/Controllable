@@ -320,7 +320,7 @@ public class Events
                     {
                         mc.rightClickMouse();
                     }
-                    else if(button == Buttons.X)
+                    else if(button == Buttons.RIGHT_THUMB_STICK)
                     {
                         mc.middleClickMouse();
                     }
