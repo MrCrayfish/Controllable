@@ -33,6 +33,7 @@ public class Events
 {
     private boolean keyboardSneaking = false;
     private boolean sneaking = false;
+    private boolean isFlying = false;
 
     private float prevXAxis;
     private float prevYAxis;
@@ -164,6 +165,17 @@ public class Events
             keyboardSneaking = true;
         }
 
+        if(mc.player.capabilities.isFlying)
+        {
+            sneaking = mc.gameSettings.keyBindSneak.isKeyDown() || controller.isButtonPressed(Buttons.LEFT_THUMB_STICK);
+            isFlying = true;
+        }
+        else if(isFlying)
+        {
+            sneaking = false;
+            isFlying = false;
+        }
+
         event.getMovementInput().sneak = sneaking;
 
         if(mc.currentScreen == null)
@@ -273,7 +285,7 @@ public class Events
             }
             else if(button == Buttons.LEFT_THUMB_STICK)
             {
-                if(mc.currentScreen == null)
+                if(mc.currentScreen == null && mc.player != null && !mc.player.capabilities.isFlying)
                 {
                     sneaking = !sneaking;
                 }
