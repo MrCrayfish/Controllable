@@ -21,6 +21,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Controller;
 import org.lwjgl.input.Controllers;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.lang.reflect.Field;
@@ -124,8 +125,8 @@ public class Events
                 double closestDistance = -1.0;
                 for(Slot slot : guiContainer.inventorySlots.inventorySlots)
                 {
-                    int posX = guiLeft + slot.xPos + 8 + 1;
-                    int posY = guiTop + slot.yPos + 8 - 1;
+                    int posX = guiLeft + slot.xPos + 8;
+                    int posY = guiTop + slot.yPos + 8;
 
                     double distance = Math.sqrt(Math.pow(posX - mouseX, 2) + Math.pow(posY - mouseY, 2));
                     if((closestDistance == -1.0 || distance < closestDistance) && distance <= 14.0)
@@ -137,8 +138,8 @@ public class Events
 
                 if(closestSlot != null && (closestSlot.getHasStack() || !mc.player.inventory.getItemStack().isEmpty()))
                 {
-                    int slotCenterX = guiLeft + closestSlot.xPos + 8 + 1;
-                    int slotCenterY = guiTop + closestSlot.yPos + 8 - 1;
+                    int slotCenterX = guiLeft + closestSlot.xPos + 8;
+                    int slotCenterY = guiTop + closestSlot.yPos + 8;
                     int realMouseX = (int) (slotCenterX / ((float) guiContainer.width / (float) mc.displayWidth));
                     int realMouseY = (int) (-(slotCenterY + 1 - guiContainer.height) / ((float) guiContainer.width / (float) mc.displayWidth));
                     int deltaX = targetMouseX - realMouseX;
@@ -150,8 +151,8 @@ public class Events
                     {
                         if(targetMouseXScaled != slotCenterX || targetMouseYScaled != slotCenterY)
                         {
-                            targetMouseX -= deltaX * 0.75;
-                            targetMouseY -= deltaY * 0.75;
+                            targetMouseX -= deltaX * 0.5;
+                            targetMouseY -= deltaY * 0.5;
                         }
                         else
                         {
@@ -346,6 +347,9 @@ public class Events
             handleButtonInput(pressedDpadY, false);
             pressedDpadY = -1;
         }
+
+        int k = 0;
+        boolean flag1 = k != -999 && (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54) || controller.isButtonPressed(Buttons.LEFT_BUMPER));
     }
 
     private void handleButtonInput(int button, boolean state)
@@ -559,5 +563,16 @@ public class Events
         Controller controller = Controllable.getController();
         if(controller != null) isRightClicking |= controller.isButtonPressed(Buttons.LEFT_TRIGGER);
         return isRightClicking;
+    }
+
+    /**
+     * Used in order to fix actions like eating or pulling bow back. This method is linked via ASM.
+     */
+    public static boolean canQuickMove()
+    {
+        boolean isSneaking = (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
+        Controller controller = Controllable.getController();
+        if(controller != null) isSneaking |= controller.isButtonPressed(Buttons.LEFT_BUMPER);
+        return isSneaking;
     }
 }
