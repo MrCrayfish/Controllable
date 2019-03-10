@@ -7,8 +7,10 @@ import com.mrcrayfish.controllable.event.ControllerMoveEvent;
 import com.mrcrayfish.controllable.event.ControllerTurnEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -41,6 +43,8 @@ public class Events
     private int prevTargetMouseY;
     private int targetMouseX;
     private int targetMouseY;
+    private float mouseSpeedX;
+    private float mouseSpeedY;
 
     private int pressedDpadX = -1;
     private int pressedDpadY = -1;
@@ -62,7 +66,8 @@ public class Events
                 return;
 
             /* Only need to run code if left thumb stick has input */
-            if(controller.getXAxisValue() != 0.0F || controller.getYAxisValue() != 0.0F)
+            boolean moving = controller.getXAxisValue() != 0.0F || controller.getYAxisValue() != 0.0F;
+            if(moving)
             {
                 /* Updates the target mouse position when the initial thumb stick movement is
                  * detected. This fixes an issue when the user moves the cursor with the mouse then
@@ -73,13 +78,102 @@ public class Events
                     prevTargetMouseY = targetMouseY = Mouse.getY();
                 }
 
-                /* Moves the target mouse position based on the left thumb stick position. */
-                targetMouseX += 20 * (controller.getXAxisValue() > 0.0F ? 1 : -1) * Math.abs(controller.getXAxisValue());
-                targetMouseY += 20 * (controller.getYAxisValue() > 0.0F ? -1 : 1) * Math.abs(controller.getYAxisValue());
+                float xAxis = (controller.getXAxisValue() > 0.0F ? 1 : -1) * Math.abs(controller.getXAxisValue());
+                if(Math.abs(xAxis) > 0.35F)
+                {
+                    mouseSpeedX = xAxis;
+                }
+                else
+                {
+                    mouseSpeedX = 0.0F;
+                }
+
+                float yAxis = (controller.getYAxisValue() > 0.0F ? -1 : 1) * Math.abs(controller.getYAxisValue());
+                if(Math.abs(yAxis) > 0.35F)
+                {
+                    mouseSpeedY = yAxis;
+                }
+                else
+                {
+                    mouseSpeedY = 0.0F;
+                }
+            }
+
+            if(Math.abs(mouseSpeedX) > 0.05F || Math.abs(mouseSpeedY) > 0.05F)
+            {
+                targetMouseX += 30 * mouseSpeedX;
+                targetMouseY += 30 * mouseSpeedY;
             }
 
             prevXAxis = controller.getXAxisValue();
             prevYAxis = controller.getYAxisValue();
+
+            /* Makes the mouse attracted to slots. This helps with selecting items when using
+             * a controller. */
+            GuiScreen screen = mc.currentScreen;
+            if(screen instanceof GuiContainer)
+            {
+                GuiContainer guiContainer = (GuiContainer) screen;
+                int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
+                int guiTop = (guiContainer.height - guiContainer.getYSize()) / 2;
+                int mouseX = targetMouseX * guiContainer.width / mc.displayWidth;
+                int mouseY = guiContainer.height - targetMouseY * guiContainer.height / mc.displayHeight - 1;
+
+                /* Finds the closest slot in the GUI within 14 pixels (inclusive) */
+                Slot closestSlot = null;
+                double closestDistance = -1.0;
+                for(Slot slot : guiContainer.inventorySlots.inventorySlots)
+                {
+                    int posX = guiLeft + slot.xPos + 8 + 1;
+                    int posY = guiTop + slot.yPos + 8 - 1;
+
+                    double distance = Math.sqrt(Math.pow(posX - mouseX, 2) + Math.pow(posY - mouseY, 2));
+                    if((closestDistance == -1.0 || distance < closestDistance) && distance <= 14.0)
+                    {
+                        closestSlot = slot;
+                        closestDistance = distance;
+                    }
+                }
+
+                if(closestSlot != null && (closestSlot.getHasStack() || !mc.player.inventory.getItemStack().isEmpty()))
+                {
+                    int slotCenterX = guiLeft + closestSlot.xPos + 8 + 1;
+                    int slotCenterY = guiTop + closestSlot.yPos + 8 - 1;
+                    int realMouseX = (int) (slotCenterX / ((float) guiContainer.width / (float) mc.displayWidth));
+                    int realMouseY = (int) (-(slotCenterY + 1 - guiContainer.height) / ((float) guiContainer.width / (float) mc.displayWidth));
+                    int deltaX = targetMouseX - realMouseX;
+                    int deltaY = targetMouseY - realMouseY;
+                    int targetMouseXScaled = targetMouseX * guiContainer.width / mc.displayWidth;
+                    int targetMouseYScaled = guiContainer.height - targetMouseY * guiContainer.height / mc.displayHeight - 1;
+
+                    if(!moving)
+                    {
+                        if(targetMouseXScaled != slotCenterX || targetMouseYScaled != slotCenterY)
+                        {
+                            targetMouseX -= deltaX * 0.75;
+                            targetMouseY -= deltaY * 0.75;
+                        }
+                        else
+                        {
+                            mouseSpeedX = 0.0F;
+                            mouseSpeedY = 0.0F;
+                        }
+                    }
+
+                    mouseSpeedX *= 0.75F;
+                    mouseSpeedY *= 0.75F;
+                }
+                else
+                {
+                    mouseSpeedX *= 0.1F;
+                    mouseSpeedY *= 0.1F;
+                }
+            }
+            else
+            {
+                mouseSpeedX = 0.0F;
+                mouseSpeedY = 0.0F;
+            }
         }
     }
 
@@ -421,8 +515,8 @@ public class Events
         Minecraft mc = Minecraft.getMinecraft();
         if(gui != null)
         {
-            int guiX = Mouse.getX() * gui.width / mc.displayWidth;
-            int guiY = gui.height - Mouse.getY() * gui.height / mc.displayHeight - 1;
+            int mouseX = Mouse.getX() * gui.width / mc.displayWidth;
+            int mouseY = gui.height - Mouse.getY() * gui.height / mc.displayHeight - 1;
 
             try
             {
@@ -434,7 +528,7 @@ public class Events
                 //Resets the mouse straight away
                 Method mouseReleased = clazz.getDeclaredMethod("mouseReleased", int.class, int.class, int.class);
                 mouseReleased.setAccessible(true);
-                mouseReleased.invoke(gui, guiX, guiY, button);
+                mouseReleased.invoke(gui, mouseX, mouseY, button);
             }
             catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException | NoSuchFieldException e)
             {
