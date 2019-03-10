@@ -8,12 +8,13 @@ import com.mrcrayfish.controllable.event.ControllerTurnEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -109,71 +110,11 @@ public class Events
             prevXAxis = controller.getXAxisValue();
             prevYAxis = controller.getYAxisValue();
 
-            /* Makes the mouse attracted to slots. This helps with selecting items when using
-             * a controller. */
-            GuiScreen screen = mc.currentScreen;
-            if(screen instanceof GuiContainer)
+            this.moveMouseToClosestSlot(moving, mc.currentScreen);
+
+            if(mc.currentScreen instanceof GuiContainerCreative)
             {
-                GuiContainer guiContainer = (GuiContainer) screen;
-                int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
-                int guiTop = (guiContainer.height - guiContainer.getYSize()) / 2;
-                int mouseX = targetMouseX * guiContainer.width / mc.displayWidth;
-                int mouseY = guiContainer.height - targetMouseY * guiContainer.height / mc.displayHeight - 1;
-
-                /* Finds the closest slot in the GUI within 14 pixels (inclusive) */
-                Slot closestSlot = null;
-                double closestDistance = -1.0;
-                for(Slot slot : guiContainer.inventorySlots.inventorySlots)
-                {
-                    int posX = guiLeft + slot.xPos + 8;
-                    int posY = guiTop + slot.yPos + 8;
-
-                    double distance = Math.sqrt(Math.pow(posX - mouseX, 2) + Math.pow(posY - mouseY, 2));
-                    if((closestDistance == -1.0 || distance < closestDistance) && distance <= 14.0)
-                    {
-                        closestSlot = slot;
-                        closestDistance = distance;
-                    }
-                }
-
-                if(closestSlot != null && (closestSlot.getHasStack() || !mc.player.inventory.getItemStack().isEmpty()))
-                {
-                    int slotCenterX = guiLeft + closestSlot.xPos + 8;
-                    int slotCenterY = guiTop + closestSlot.yPos + 8;
-                    int realMouseX = (int) (slotCenterX / ((float) guiContainer.width / (float) mc.displayWidth));
-                    int realMouseY = (int) (-(slotCenterY + 1 - guiContainer.height) / ((float) guiContainer.width / (float) mc.displayWidth));
-                    int deltaX = targetMouseX - realMouseX;
-                    int deltaY = targetMouseY - realMouseY;
-                    int targetMouseXScaled = targetMouseX * guiContainer.width / mc.displayWidth;
-                    int targetMouseYScaled = guiContainer.height - targetMouseY * guiContainer.height / mc.displayHeight - 1;
-
-                    if(!moving)
-                    {
-                        if(targetMouseXScaled != slotCenterX || targetMouseYScaled != slotCenterY)
-                        {
-                            targetMouseX -= deltaX * 0.5;
-                            targetMouseY -= deltaY * 0.5;
-                        }
-                        else
-                        {
-                            mouseSpeedX = 0.0F;
-                            mouseSpeedY = 0.0F;
-                        }
-                    }
-
-                    mouseSpeedX *= 0.75F;
-                    mouseSpeedY *= 0.75F;
-                }
-                else
-                {
-                    mouseSpeedX *= 0.1F;
-                    mouseSpeedY *= 0.1F;
-                }
-            }
-            else
-            {
-                mouseSpeedX = 0.0F;
-                mouseSpeedY = 0.0F;
+                this.handleCreativeScrolling((GuiContainerCreative) mc.currentScreen, controller);
             }
         }
     }
@@ -410,7 +351,7 @@ public class Events
             {
                 invokeMouseClick(mc.currentScreen, 1);
             }
-            else if(button == Buttons.DPAD_UP)
+            else if(button == Buttons.DPAD_UP && mc.currentScreen == null)
             {
                 cycleThirdPersonView();
             }
@@ -467,6 +408,108 @@ public class Events
         else if(mc.gameSettings.thirdPersonView == 1)
         {
             mc.entityRenderer.loadEntityShader(null);
+        }
+    }
+
+    private void moveMouseToClosestSlot(boolean moving, GuiScreen screen)
+    {
+        /* Makes the mouse attracted to slots. This helps with selecting items when using
+         * a controller. */
+        if(screen instanceof GuiContainer)
+        {
+            Minecraft mc = Minecraft.getMinecraft();
+            GuiContainer guiContainer = (GuiContainer) screen;
+            int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
+            int guiTop = (guiContainer.height - guiContainer.getYSize()) / 2;
+            int mouseX = targetMouseX * guiContainer.width / mc.displayWidth;
+            int mouseY = guiContainer.height - targetMouseY * guiContainer.height / mc.displayHeight - 1;
+
+            /* Finds the closest slot in the GUI within 14 pixels (inclusive) */
+            Slot closestSlot = null;
+            double closestDistance = -1.0;
+            for(Slot slot : guiContainer.inventorySlots.inventorySlots)
+            {
+                int posX = guiLeft + slot.xPos + 8;
+                int posY = guiTop + slot.yPos + 8;
+
+                double distance = Math.sqrt(Math.pow(posX - mouseX, 2) + Math.pow(posY - mouseY, 2));
+                if((closestDistance == -1.0 || distance < closestDistance) && distance <= 14.0)
+                {
+                    closestSlot = slot;
+                    closestDistance = distance;
+                }
+            }
+
+            if(closestSlot != null && (closestSlot.getHasStack() || !mc.player.inventory.getItemStack().isEmpty()))
+            {
+                int slotCenterX = guiLeft + closestSlot.xPos + 8;
+                int slotCenterY = guiTop + closestSlot.yPos + 8;
+                int realMouseX = (int) (slotCenterX / ((float) guiContainer.width / (float) mc.displayWidth));
+                int realMouseY = (int) (-(slotCenterY + 1 - guiContainer.height) / ((float) guiContainer.width / (float) mc.displayWidth));
+                int deltaX = targetMouseX - realMouseX;
+                int deltaY = targetMouseY - realMouseY;
+                int targetMouseXScaled = targetMouseX * guiContainer.width / mc.displayWidth;
+                int targetMouseYScaled = guiContainer.height - targetMouseY * guiContainer.height / mc.displayHeight - 1;
+
+                if(!moving)
+                {
+                    if(targetMouseXScaled != slotCenterX || targetMouseYScaled != slotCenterY)
+                    {
+                        targetMouseX -= deltaX * 0.5;
+                        targetMouseY -= deltaY * 0.5;
+                    }
+                    else
+                    {
+                        mouseSpeedX = 0.0F;
+                        mouseSpeedY = 0.0F;
+                    }
+                }
+
+                mouseSpeedX *= 0.75F;
+                mouseSpeedY *= 0.75F;
+            }
+            else
+            {
+                mouseSpeedX *= 0.1F;
+                mouseSpeedY *= 0.1F;
+            }
+        }
+        else
+        {
+            mouseSpeedX = 0.0F;
+            mouseSpeedY = 0.0F;
+        }
+    }
+
+    private void handleCreativeScrolling(GuiContainerCreative creative, Controller controller)
+    {
+        try
+        {
+            int i = (((GuiContainerCreative.ContainerCreative) creative.inventorySlots).itemList.size() + 9 - 1) / 9 - 5;
+            int dir = 0;
+
+            if(controller.getPovY() < -0.8F || controller.getRZAxisValue() < -0.8F)
+            {
+                dir = 1;
+            }
+            else if(controller.getPovY() > 0.8F || controller.getRZAxisValue() > 0.8F)
+            {
+                dir = -1;
+            }
+
+            Class<?> clazz = GuiContainerCreative.class;
+            Field field = clazz.getDeclaredField("currentScroll");
+            field.setAccessible(true);
+
+            float currentScroll = field.getFloat(creative);
+            currentScroll = (float) ((double) currentScroll - (double) dir / (double) i);
+            currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
+            field.setFloat(creative, currentScroll);
+            ((GuiContainerCreative.ContainerCreative) creative.inventorySlots).scrollTo(currentScroll);
+        }
+        catch(NoSuchFieldException | IllegalAccessException e)
+        {
+            e.printStackTrace();
         }
     }
 
