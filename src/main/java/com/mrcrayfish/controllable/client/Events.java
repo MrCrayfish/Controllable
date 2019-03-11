@@ -54,6 +54,8 @@ public class Events
     private int pressedDpadX = -1;
     private int pressedDpadY = -1;
 
+    private int dropCounter = -1;
+
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event)
     {
@@ -176,6 +178,31 @@ public class Events
                     player.turn(rotationYaw, -rotationPitch);
                 }
             }
+        }
+
+        if(mc.currentScreen == null)
+        {
+            if(controller.isButtonPressed(Buttons.DPAD_DOWN))
+            {
+                dropCounter++;
+            }
+        }
+
+        if(dropCounter > 40)
+        {
+            if (!mc.player.isSpectator())
+            {
+                mc.player.dropItem(true);
+            }
+            dropCounter = 0;
+        }
+        else if(dropCounter > 0 && !controller.isButtonPressed(Buttons.DPAD_DOWN))
+        {
+            if (!mc.player.isSpectator())
+            {
+                mc.player.dropItem(false);
+            }
+            dropCounter = 0;
         }
     }
 
