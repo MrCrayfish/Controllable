@@ -610,7 +610,7 @@ public class Events
     }
 
     /**
-     * Used in order to fix actions like eating or pulling bow back. This method is linked via ASM.
+     * Used in order to fix the quick move check in inventories. This method is linked via ASM.
      */
     public static boolean canQuickMove()
     {
