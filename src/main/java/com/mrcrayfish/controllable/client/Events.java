@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Buttons;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.Controller;
 import com.mrcrayfish.controllable.event.ControllerInputEvent;
 import com.mrcrayfish.controllable.event.ControllerMoveEvent;
 import com.mrcrayfish.controllable.event.ControllerTurnEvent;
@@ -20,7 +21,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Controller;
 import org.lwjgl.input.Controllers;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -68,7 +68,7 @@ public class Events
                 return;
 
             /* Only need to run code if left thumb stick has input */
-            boolean moving = controller.getXAxisValue() != 0.0F || controller.getYAxisValue() != 0.0F;
+            boolean moving = controller.getLThumbStickXValue() != 0.0F || controller.getLThumbStickYValue() != 0.0F;
             if(moving)
             {
                 /* Updates the target mouse position when the initial thumb stick movement is
@@ -80,7 +80,7 @@ public class Events
                     prevTargetMouseY = targetMouseY = Mouse.getY();
                 }
 
-                float xAxis = (controller.getXAxisValue() > 0.0F ? 1 : -1) * Math.abs(controller.getXAxisValue());
+                float xAxis = (controller.getLThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickXValue());
                 if(Math.abs(xAxis) > 0.35F)
                 {
                     mouseSpeedX = xAxis;
@@ -90,7 +90,7 @@ public class Events
                     mouseSpeedX = 0.0F;
                 }
 
-                float yAxis = (controller.getYAxisValue() > 0.0F ? -1 : 1) * Math.abs(controller.getYAxisValue());
+                float yAxis = (controller.getLThumbStickYValue() > 0.0F ? -1 : 1) * Math.abs(controller.getLThumbStickYValue());
                 if(Math.abs(yAxis) > 0.35F)
                 {
                     mouseSpeedY = yAxis;
@@ -107,8 +107,8 @@ public class Events
                 targetMouseY += 30 * mouseSpeedY;
             }
 
-            prevXAxis = controller.getXAxisValue();
-            prevYAxis = controller.getYAxisValue();
+            prevXAxis = controller.getLThumbStickXValue();
+            prevYAxis = controller.getLThumbStickYValue();
 
             this.moveMouseToClosestSlot(moving, mc.currentScreen);
 
@@ -143,7 +143,7 @@ public class Events
 
         while(Controllers.next())
         {
-            if(Controllers.isEventButton() && Controllers.getEventSource() == controller)
+            if(Controllers.isEventButton() && Controllers.getEventSource() == controller.getRawController())
             {
                 int button = Controllers.getEventControlIndex();
                 boolean state = Controllers.getEventButtonState();
@@ -166,10 +166,10 @@ public class Events
             if(!MinecraftForge.EVENT_BUS.post(new ControllerTurnEvent()))
             {
                 /* Handles rotating the yaw of player */
-                if(controller.getZAxisValue() != 0.0F || controller.getRZAxisValue() != 0.0F)
+                if(controller.getRThumbStickXValue() != 0.0F || controller.getRThumbStickYValue() != 0.0F)
                 {
-                    float rotationYaw = 20.0F * (controller.getZAxisValue() > 0.0F ? 1 : -1) * Math.abs(controller.getZAxisValue());
-                    float rotationPitch = 15.0F * (controller.getRZAxisValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRZAxisValue());
+                    float rotationYaw = 20.0F * (controller.getRThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickXValue());
+                    float rotationPitch = 15.0F * (controller.getRThumbStickYValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickYValue());
                     player.turn(rotationYaw, -rotationPitch);
                 }
             }
@@ -218,12 +218,12 @@ public class Events
         {
             if(!MinecraftForge.EVENT_BUS.post(new ControllerMoveEvent()))
             {
-                if(controller.getYAxisValue() != 0.0F)
+                if(controller.getLThumbStickYValue() != 0.0F)
                 {
-                    int dir = controller.getYAxisValue() > 0.0F ? -1 : 1;
+                    int dir = controller.getLThumbStickYValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().forwardKeyDown = dir > 0;
                     event.getMovementInput().backKeyDown = dir < 0;
-                    event.getMovementInput().moveForward = dir * Math.abs(controller.getYAxisValue());
+                    event.getMovementInput().moveForward = dir * Math.abs(controller.getLThumbStickYValue());
 
                     if(event.getMovementInput().sneak)
                     {
@@ -231,12 +231,12 @@ public class Events
                     }
                 }
 
-                if(controller.getXAxisValue() != 0.0F)
+                if(controller.getLThumbStickXValue() != 0.0F)
                 {
-                    int dir = controller.getXAxisValue() > 0.0F ? -1 : 1;
+                    int dir = controller.getLThumbStickXValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().rightKeyDown = dir < 0;
                     event.getMovementInput().leftKeyDown = dir > 0;
-                    event.getMovementInput().moveStrafe = dir * Math.abs(controller.getXAxisValue());
+                    event.getMovementInput().moveStrafe = dir * Math.abs(controller.getLThumbStickXValue());
 
                     if(event.getMovementInput().sneak)
                     {
@@ -259,12 +259,12 @@ public class Events
 
     private void handleDpadInput(Controller controller)
     {
-        float povX = controller.getPovX();
-        if(povX != 0.0F)
+        float x = controller.getDpadXValue();
+        if(x != 0.0F)
         {
             if(pressedDpadX == -1)
             {
-                pressedDpadX = povX > 0.0F ? Buttons.DPAD_RIGHT : Buttons.DPAD_LEFT;
+                pressedDpadX = x > 0.0F ? Buttons.DPAD_RIGHT : Buttons.DPAD_LEFT;
                 handleButtonInput(pressedDpadX, true);
             }
         }
@@ -274,12 +274,12 @@ public class Events
             pressedDpadX = -1;
         }
 
-        float povY = controller.getPovY();
-        if(povY != 0.0F)
+        float y = controller.getDpadYValue();
+        if(y != 0.0F)
         {
             if(pressedDpadY == -1)
             {
-                pressedDpadY = povY > 0.0F ? Buttons.DPAD_DOWN : Buttons.DPAD_UP;
+                pressedDpadY = y > 0.0F ? Buttons.DPAD_DOWN : Buttons.DPAD_UP;
                 handleButtonInput(pressedDpadY, true);
             }
         }
@@ -288,9 +288,6 @@ public class Events
             handleButtonInput(pressedDpadY, false);
             pressedDpadY = -1;
         }
-
-        int k = 0;
-        boolean flag1 = k != -999 && (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54) || controller.isButtonPressed(Buttons.LEFT_BUMPER));
     }
 
     private void handleButtonInput(int button, boolean state)
@@ -488,11 +485,11 @@ public class Events
             int i = (((GuiContainerCreative.ContainerCreative) creative.inventorySlots).itemList.size() + 9 - 1) / 9 - 5;
             int dir = 0;
 
-            if(controller.getPovY() < -0.8F || controller.getRZAxisValue() < -0.8F)
+            if(controller.getDpadYValue() < -0.8F || controller.getRThumbStickYValue() < -0.8F)
             {
                 dir = 1;
             }
-            else if(controller.getPovY() > 0.8F || controller.getRZAxisValue() > 0.8F)
+            else if(controller.getDpadYValue() > 0.8F || controller.getRThumbStickYValue() > 0.8F)
             {
                 dir = -1;
             }

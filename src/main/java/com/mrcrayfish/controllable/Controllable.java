@@ -13,7 +13,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Controller;
 import org.lwjgl.input.Controllers;
 
 import javax.annotation.Nullable;
@@ -65,6 +64,7 @@ public class Controllable extends DummyModContainer
             {
                 try
                 {
+                    LOGGER.info("Initializing controllers");
                     Controllers.create();
                 }
                 catch(LWJGLException e)
@@ -74,22 +74,32 @@ public class Controllable extends DummyModContainer
 
                 Controllers.poll();
 
+                LOGGER.info("Scanning for a controller...");
                 int count = Controllers.getControllerCount();
                 for(int i = 0; i < count; i++)
                 {
-                    Controller controller = Controllers.getController(i);
+                    org.lwjgl.input.Controller controller = Controllers.getController(i);
                     for(int j = 0; j < VALID_CONTROLLERS.length; j++)
                     {
                         if(VALID_CONTROLLERS[j].equals(controller.getName()))
                         {
-                            Controllable.controller = controller;
+                            Controllable.controller = new Controller(controller);
+                            LOGGER.info("Found controller: " + controller.getName());
                         }
                     }
                 }
                 initialized = true;
             }
 
-            MinecraftForge.EVENT_BUS.register(new Events());
+            if(Controllable.controller != null)
+            {
+                LOGGER.info("Registering controller events");
+                MinecraftForge.EVENT_BUS.register(new Events());
+            }
+            else
+            {
+                LOGGER.info("Failed to find a controller. You will need to restart the game if you plug in a controller. If you don't want a controller, it is safe to ignore this message.");
+            }
         }
     }
 }

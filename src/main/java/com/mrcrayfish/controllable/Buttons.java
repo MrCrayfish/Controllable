@@ -5,6 +5,7 @@ package com.mrcrayfish.controllable;
  */
 public class Buttons
 {
+    /* Physics Buttons */
     public static final int X = 0;
     public static final int A = 1;
     public static final int B = 2;
@@ -20,6 +21,7 @@ public class Buttons
     public static final int HOME = 12;
     public static final int TOUCH_PAD = 13;
 
+    /* Virtual Buttons */
     public static final int DPAD_UP = 14;
     public static final int DPAD_DOWN = 15;
     public static final int DPAD_LEFT = 16;
