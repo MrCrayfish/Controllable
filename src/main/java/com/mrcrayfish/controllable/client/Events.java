@@ -13,6 +13,9 @@ import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
+import net.minecraft.network.play.client.CPacketPlayerDigging;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
@@ -344,9 +347,16 @@ public class Events
             {
                 invokeMouseClick(mc.currentScreen, 0);
             }
-            else if(button == Buttons.X && mc.currentScreen != null)
+            else if(button == Buttons.X)
             {
-                invokeMouseClick(mc.currentScreen, 1);
+                if(mc.currentScreen != null)
+                {
+                    invokeMouseClick(mc.currentScreen, 1);
+                }
+                else if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
+                {
+                    mc.getConnection().sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.SWAP_HELD_ITEMS, BlockPos.ORIGIN, EnumFacing.DOWN));
+                }
             }
             else if(button == Buttons.B && mc.currentScreen != null)
             {
