@@ -348,6 +348,10 @@ public class Events
             {
                 invokeMouseClick(mc.currentScreen, 1);
             }
+            else if(button == Buttons.B && mc.currentScreen != null)
+            {
+                invokeMouseClick(mc.currentScreen, 0);
+            }
             else if(button == Buttons.DPAD_UP && mc.currentScreen == null)
             {
                 cycleThirdPersonView();
@@ -612,7 +616,7 @@ public class Events
     {
         boolean isSneaking = (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
         Controller controller = Controllable.getController();
-        if(controller != null) isSneaking |= controller.isButtonPressed(Buttons.LEFT_BUMPER);
+        if(controller != null) isSneaking |= controller.isButtonPressed(Buttons.B);
         return isSneaking;
     }
 }
