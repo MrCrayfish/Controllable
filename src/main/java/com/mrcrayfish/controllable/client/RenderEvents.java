@@ -201,6 +201,11 @@ public class RenderEvents
                     rightIndex++;
                 }
             }
+
+            if(mc.player != null)
+            {
+                GuiInventory.drawEntityOnScreen(20, 45, 20, 0, 0, mc.player);
+            }
         }
         GlStateManager.popMatrix();
     }
