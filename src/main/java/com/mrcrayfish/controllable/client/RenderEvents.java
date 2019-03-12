@@ -1,20 +1,21 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Buttons;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
-import com.mrcrayfish.controllable.event.ControllerActionsEvent;
+import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -151,7 +152,7 @@ public class RenderEvents
                 }
             }
 
-            MinecraftForge.EVENT_BUS.post(new ControllerActionsEvent(actions));
+            MinecraftForge.EVENT_BUS.post(new ControllerEvent.AvailableActions(Controllable.getController(), actions));
         }
     }
 

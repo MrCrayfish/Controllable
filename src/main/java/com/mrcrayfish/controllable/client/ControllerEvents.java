@@ -3,9 +3,7 @@ package com.mrcrayfish.controllable.client;
 import com.mrcrayfish.controllable.Buttons;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Controller;
-import com.mrcrayfish.controllable.event.ControllerInputEvent;
-import com.mrcrayfish.controllable.event.ControllerMoveEvent;
-import com.mrcrayfish.controllable.event.ControllerTurnEvent;
+import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -153,7 +151,7 @@ public class ControllerEvents
             {
                 int button = Controllers.getEventControlIndex();
                 boolean state = Controllers.getEventButtonState();
-                handleButtonInput(button, state);
+                handleButtonInput(controller, button, state);
             }
         }
 
@@ -169,7 +167,7 @@ public class ControllerEvents
 
         if(mc.currentScreen == null)
         {
-            if(!MinecraftForge.EVENT_BUS.post(new ControllerTurnEvent()))
+            if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ControllerTurnEvent(controller)))
             {
                 /* Handles rotating the yaw of player */
                 if(controller.getRThumbStickXValue() != 0.0F || controller.getRThumbStickYValue() != 0.0F)
@@ -247,7 +245,7 @@ public class ControllerEvents
 
         if(mc.currentScreen == null)
         {
-            if(!MinecraftForge.EVENT_BUS.post(new ControllerMoveEvent()))
+            if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.Move(controller)))
             {
                 if(controller.getLThumbStickYValue() != 0.0F)
                 {
@@ -296,12 +294,12 @@ public class ControllerEvents
             if(pressedDpadX == -1)
             {
                 pressedDpadX = x > 0.0F ? Buttons.DPAD_RIGHT : Buttons.DPAD_LEFT;
-                handleButtonInput(pressedDpadX, true);
+                handleButtonInput(controller, pressedDpadX, true);
             }
         }
         else if(pressedDpadX != -1)
         {
-            handleButtonInput(pressedDpadX, false);
+            handleButtonInput(controller, pressedDpadX, false);
             pressedDpadX = -1;
         }
 
@@ -311,19 +309,19 @@ public class ControllerEvents
             if(pressedDpadY == -1)
             {
                 pressedDpadY = y > 0.0F ? Buttons.DPAD_DOWN : Buttons.DPAD_UP;
-                handleButtonInput(pressedDpadY, true);
+                handleButtonInput(controller, pressedDpadY, true);
             }
         }
         else if(pressedDpadY != -1)
         {
-            handleButtonInput(pressedDpadY, false);
+            handleButtonInput(controller, pressedDpadY, false);
             pressedDpadY = -1;
         }
     }
 
-    private void handleButtonInput(int button, boolean state)
+    private void handleButtonInput(Controller controller, int button, boolean state)
     {
-        if(MinecraftForge.EVENT_BUS.post(new ControllerInputEvent(button, state)))
+        if(MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, button, state)))
             return;
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -404,10 +402,6 @@ public class ControllerEvents
             }
             else
             {
-                Controller controller = Controllable.getController();
-                if(controller == null)
-                    return;
-
                 if(!mc.player.isHandActive() && mc.currentScreen == null)
                 {
                     if(button == Buttons.RIGHT_TRIGGER)
