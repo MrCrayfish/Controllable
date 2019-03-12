@@ -36,7 +36,7 @@ import java.lang.reflect.Method;
  * Author: MrCrayfish
  */
 @SideOnly(Side.CLIENT)
-public class Events
+public class ControllerEvents
 {
     private boolean keyboardSneaking = false;
     private boolean sneaking = false;
@@ -231,7 +231,7 @@ public class Events
             keyboardSneaking = true;
         }
 
-        if(mc.player.capabilities.isFlying)
+        if(mc.player.capabilities.isFlying || mc.player.isRiding())
         {
             sneaking = mc.gameSettings.keyBindSneak.isKeyDown() || controller.isButtonPressed(Buttons.LEFT_THUMB_STICK);
             isFlying = true;
@@ -351,7 +351,7 @@ public class Events
             }
             else if(button == Buttons.LEFT_THUMB_STICK)
             {
-                if(mc.currentScreen == null && mc.player != null && !mc.player.capabilities.isFlying)
+                if(mc.currentScreen == null && mc.player != null && !mc.player.capabilities.isFlying && !mc.player.isRiding())
                 {
                     sneaking = !sneaking;
                 }
@@ -385,7 +385,7 @@ public class Events
                     mc.getConnection().sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.SWAP_HELD_ITEMS, BlockPos.ORIGIN, EnumFacing.DOWN));
                 }
             }
-            else if(button == Buttons.B && mc.currentScreen != null)
+            else if(button == Buttons.B && mc.currentScreen != null && mc.player.inventory.getItemStack().isEmpty())
             {
                 invokeMouseClick(mc.currentScreen, 0);
             }

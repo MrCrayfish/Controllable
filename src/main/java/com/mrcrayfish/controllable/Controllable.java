@@ -1,15 +1,12 @@
 package com.mrcrayfish.controllable;
 
-import com.google.common.collect.Lists;
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.mrcrayfish.controllable.client.Events;
+import com.mrcrayfish.controllable.client.ControllerEvents;
+import com.mrcrayfish.controllable.client.RenderEvents;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.DummyModContainer;
-import net.minecraftforge.fml.common.LoadController;
-import net.minecraftforge.fml.common.ModMetadata;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.LWJGLException;
@@ -20,7 +17,8 @@ import javax.annotation.Nullable;
 /**
  * Author: MrCrayfish
  */
-public class Controllable extends DummyModContainer
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, acceptedMinecraftVersions = Reference.MOD_COMPATIBILITY, clientSideOnly = true)
+public class Controllable
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
@@ -28,78 +26,55 @@ public class Controllable extends DummyModContainer
     private static Controller controller;
     private boolean initialized = false;
 
-    public Controllable()
-    {
-        super(new ModMetadata());
-        ModMetadata meta = getMetadata();
-        meta.modId = Reference.MOD_ID;
-        meta.name = Reference.MOD_NAME;
-        meta.version = Reference.MOD_VERSION;
-        meta.description = "Adds in the ability to use a controller to play Minecraft";
-        meta.version = Reference.MOD_VERSION;
-        meta.authorList = Lists.newArrayList("MrCrayfish");
-        meta.url = "https://mrcrayfish.com/mods?id=controllable";
-        meta.updateJSON = "https://raw.githubusercontent.com/MrCrayfish/Controllable/master/update.json";
-    }
-
-    @Override
-    public boolean registerBus(EventBus bus, LoadController controller)
-    {
-        bus.register(this);
-        return true;
-    }
-
     @Nullable
     public static Controller getController()
     {
         return controller;
     }
 
-    @Subscribe
+    @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event)
     {
-        if(event.getSide() == Side.CLIENT)
+        if(!initialized)
         {
-            if(!initialized)
+            try
             {
-                try
-                {
-                    LOGGER.info("Initializing controllers");
-                    Controllers.create();
-                }
-                catch(LWJGLException e)
-                {
-                    e.printStackTrace();
-                }
+                LOGGER.info("Initializing controllers");
+                Controllers.create();
+            }
+            catch(LWJGLException e)
+            {
+                e.printStackTrace();
+            }
 
-                Controllers.poll();
+            Controllers.poll();
 
-                LOGGER.info("Scanning for a controller...");
-                int count = Controllers.getControllerCount();
-                for(int i = 0; i < count; i++)
+            LOGGER.info("Scanning for a controller...");
+            int count = Controllers.getControllerCount();
+            for(int i = 0; i < count; i++)
+            {
+                org.lwjgl.input.Controller controller = Controllers.getController(i);
+                for(int j = 0; j < VALID_CONTROLLERS.length; j++)
                 {
-                    org.lwjgl.input.Controller controller = Controllers.getController(i);
-                    for(int j = 0; j < VALID_CONTROLLERS.length; j++)
+                    if(VALID_CONTROLLERS[j].equals(controller.getName()))
                     {
-                        if(VALID_CONTROLLERS[j].equals(controller.getName()))
-                        {
-                            Controllable.controller = new Controller(controller);
-                            LOGGER.info("Found controller: " + controller.getName());
-                        }
+                        Controllable.controller = new Controller(controller);
+                        LOGGER.info("Found controller: " + controller.getName());
                     }
                 }
-                initialized = true;
             }
+            initialized = true;
+        }
 
-            if(Controllable.controller != null)
-            {
-                LOGGER.info("Registering controller events");
-                MinecraftForge.EVENT_BUS.register(new Events());
-            }
-            else
-            {
-                LOGGER.info("Failed to find a controller. You will need to restart the game if you plug in a controller. If you don't want a controller, it is safe to ignore this message.");
-            }
+        if(Controllable.controller != null)
+        {
+            LOGGER.info("Registering controller events");
+            MinecraftForge.EVENT_BUS.register(new ControllerEvents());
+            MinecraftForge.EVENT_BUS.register(new RenderEvents());
+        }
+        else
+        {
+            LOGGER.info("Failed to find a controller. You will need to restart the game if you plug in a controller. If you don't want a controller, it is safe to ignore this message.");
         }
     }
 }

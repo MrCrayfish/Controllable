@@ -51,7 +51,7 @@ public class ControllableTransformer implements IClassTransformer
                 Controllable.LOGGER.info("Patching #sendClickBlockToController");
 
                 method.instructions.insert(new VarInsnNode(Opcodes.ISTORE, 1));
-                method.instructions.insert(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Events", "isLeftClicking", "()Z", false));
+                method.instructions.insert(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerEvents", "isLeftClicking", "()Z", false));
 
                 Controllable.LOGGER.info("Successfully patched #sendClickBlockToController");
             }
@@ -98,7 +98,7 @@ public class ControllableTransformer implements IClassTransformer
                                 method.instructions.remove(foundNode.getPrevious().getPrevious());
                                 method.instructions.remove(foundNode.getPrevious());
                                 method.instructions.remove(foundNode);
-                                method.instructions.insertBefore(next, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Events", "isRightClicking", "()Z", false));
+                                method.instructions.insertBefore(next, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerEvents", "isRightClicking", "()Z", false));
 
                                 Controllable.LOGGER.info("Successfully patched #processKeyBinds");
                             }
@@ -220,7 +220,7 @@ public class ControllableTransformer implements IClassTransformer
             method.instructions.remove(foundNode.getNext().getNext());
             method.instructions.remove(foundNode.getNext());
             method.instructions.remove(foundNode);
-            method.instructions.insert(previous, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Events", "canQuickMove", "()Z", false));
+            method.instructions.insert(previous, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerEvents", "canQuickMove", "()Z", false));
             return true;
         }
         return false;

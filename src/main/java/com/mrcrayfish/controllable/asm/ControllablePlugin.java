@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.Controllable;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -23,7 +24,7 @@ public class ControllablePlugin implements IFMLLoadingPlugin
     @Override
     public String getModContainerClass()
     {
-        return Controllable.class.getName();
+        return null;
     }
 
     @Nullable
@@ -34,10 +35,7 @@ public class ControllablePlugin implements IFMLLoadingPlugin
     }
 
     @Override
-    public void injectData(Map<String, Object> data)
-    {
-
-    }
+    public void injectData(Map<String, Object> data) {}
 
     @Override
     public String getAccessTransformerClass()
