@@ -3,7 +3,9 @@ package com.mrcrayfish.controllable.client;
 import com.mrcrayfish.controllable.Buttons;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
-import com.mrcrayfish.controllable.event.ControllerEvent;
+import com.mrcrayfish.controllable.event.AvailableActionsEvent;
+import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
+import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -152,7 +154,7 @@ public class RenderEvents
                 }
             }
 
-            MinecraftForge.EVENT_BUS.post(new ControllerEvent.AvailableActions(Controllable.getController(), actions));
+            MinecraftForge.EVENT_BUS.post(new AvailableActionsEvent(actions));
         }
     }
 
@@ -166,45 +168,51 @@ public class RenderEvents
         {
             Minecraft mc = Minecraft.getMinecraft();
 
-            int leftIndex = 0;
-            int rightIndex = 0;
-            for(Integer button : actions.keySet())
+            if(!MinecraftForge.EVENT_BUS.post(new RenderAvailableActionsEvent()))
             {
-                Action action = actions.get(button);
-                Action.Side side = action.getSide();
-
-                float texU = (button % 19) * 13F;
-                float texV = (button / 19) * 13F;
-                int size = 13;
-
-                ScaledResolution resolution = new ScaledResolution(mc);
-                int x = side == Action.Side.LEFT ? 5 : resolution.getScaledWidth() - 5 - size;
-                int y = resolution.getScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
-
-                mc.getTextureManager().bindTexture(CONTROLLER_BUTTONS);
-                GlStateManager.color(1.0F, 1.0F, 1.0F);
-                GlStateManager.disableLighting();
-
-                /* Draw buttons icon */
-                Gui.drawScaledCustomSizeModalRect(x, y, texU, texV, size, size, size, size, 256, 256);
-
-                /* Draw description text */
-                if(side == Action.Side.LEFT)
+                int leftIndex = 0;
+                int rightIndex = 0;
+                for(Integer button : actions.keySet())
                 {
-                    mc.fontRenderer.drawString(action.getDescription(), x + 18, y + 3, Color.WHITE.getRGB());
-                    leftIndex++;
-                }
-                else
-                {
-                    int width = mc.fontRenderer.getStringWidth(action.getDescription());
-                    mc.fontRenderer.drawString(action.getDescription(), x - 5 - width, y + 3, Color.WHITE.getRGB());
-                    rightIndex++;
+                    Action action = actions.get(button);
+                    Action.Side side = action.getSide();
+
+                    float texU = (button % 19) * 13F;
+                    float texV = (button / 19) * 13F;
+                    int size = 13;
+
+                    ScaledResolution resolution = new ScaledResolution(mc);
+                    int x = side == Action.Side.LEFT ? 5 : resolution.getScaledWidth() - 5 - size;
+                    int y = resolution.getScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
+
+                    mc.getTextureManager().bindTexture(CONTROLLER_BUTTONS);
+                    GlStateManager.color(1.0F, 1.0F, 1.0F);
+                    GlStateManager.disableLighting();
+
+                    /* Draw buttons icon */
+                    Gui.drawScaledCustomSizeModalRect(x, y, texU, texV, size, size, size, size, 256, 256);
+
+                    /* Draw description text */
+                    if(side == Action.Side.LEFT)
+                    {
+                        mc.fontRenderer.drawString(action.getDescription(), x + 18, y + 3, Color.WHITE.getRGB());
+                        leftIndex++;
+                    }
+                    else
+                    {
+                        int width = mc.fontRenderer.getStringWidth(action.getDescription());
+                        mc.fontRenderer.drawString(action.getDescription(), x - 5 - width, y + 3, Color.WHITE.getRGB());
+                        rightIndex++;
+                    }
                 }
             }
 
-            if(mc.player != null)
+            if(mc.player != null && mc.currentScreen == null)
             {
-                GuiInventory.drawEntityOnScreen(20, 45, 20, 0, 0, mc.player);
+                if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
+                {
+                    GuiInventory.drawEntityOnScreen(20, 45, 20, 0, 0, mc.player);
+                }
             }
         }
         GlStateManager.popMatrix();

@@ -75,22 +75,4 @@ public abstract class ControllerEvent extends Event
         }
     }
 
-    /**
-     * Author: MrCrayfish
-     */
-    public static class AvailableActions extends ControllerEvent
-    {
-        private Map<Integer, Action> actions;
-
-        public AvailableActions(Controller controller, Map<Integer, Action> actions)
-        {
-            super(controller);
-            this.actions = actions;
-        }
-
-        public Map<Integer, Action> getActions()
-        {
-            return actions;
-        }
-    }
 }
