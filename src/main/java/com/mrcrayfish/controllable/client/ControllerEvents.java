@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.network.play.client.CPacketPlayerDigging;
@@ -362,12 +363,20 @@ public class ControllerEvents
                 {
                     mc.player.inventory.changeCurrentItem(1);
                 }
+                else if(mc.currentScreen instanceof GuiContainerCreative)
+                {
+                    scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, -1);
+                }
             }
             else if(button == Buttons.RIGHT_BUMPER)
             {
                 if(mc.currentScreen == null)
                 {
                     mc.player.inventory.changeCurrentItem(-1);
+                }
+                else if(mc.currentScreen instanceof GuiContainerCreative)
+                {
+                    scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, 1);
                 }
             }
             else if(button == Buttons.A && mc.currentScreen != null)
@@ -446,6 +455,33 @@ public class ControllerEvents
         else if(mc.gameSettings.thirdPersonView == 1)
         {
             mc.entityRenderer.loadEntityShader(null);
+        }
+    }
+
+    private void scrollCreativeTabs(GuiContainerCreative creative, int dir)
+    {
+        try
+        {
+            Method method = GuiContainerCreative.class.getDeclaredMethod("setCurrentCreativeTab", CreativeTabs.class);
+            method.setAccessible(true);
+            if(dir > 0)
+            {
+                if(creative.getSelectedTabIndex() < CreativeTabs.CREATIVE_TAB_ARRAY.length - 1)
+                {
+                    method.invoke(creative, CreativeTabs.CREATIVE_TAB_ARRAY[creative.getSelectedTabIndex() + 1]);
+                }
+            }
+            else if(dir < 0)
+            {
+                if(creative.getSelectedTabIndex() > 0)
+                {
+                    method.invoke(creative, CreativeTabs.CREATIVE_TAB_ARRAY[creative.getSelectedTabIndex() - 1]);
+                }
+            }
+        }
+        catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
+        {
+            e.printStackTrace();
         }
     }
 
