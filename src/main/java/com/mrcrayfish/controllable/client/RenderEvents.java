@@ -69,7 +69,7 @@ public class RenderEvents
             }
             else if(mc.currentScreen == null)
             {
-                boolean blockHit = mc.objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK;
+                boolean blockHit = mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK;
                 boolean canOpenBlock = false;
                 if(blockHit)
                 {
