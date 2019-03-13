@@ -21,6 +21,7 @@ import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Controllers;
@@ -456,7 +457,7 @@ public class ControllerEvents
     {
         try
         {
-            Method method = GuiContainerCreative.class.getDeclaredMethod("setCurrentCreativeTab", CreativeTabs.class);
+            Method method = ReflectionHelper.findMethod(GuiContainerCreative.class, "setCurrentCreativeTab", "func_147050_b", CreativeTabs.class);
             method.setAccessible(true);
             if(dir > 0)
             {
@@ -473,7 +474,7 @@ public class ControllerEvents
                 }
             }
         }
-        catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException e)
+        catch(IllegalAccessException | InvocationTargetException e)
         {
             e.printStackTrace();
         }
@@ -565,8 +566,7 @@ public class ControllerEvents
                 dir = -1;
             }
 
-            Class<?> clazz = GuiContainerCreative.class;
-            Field field = clazz.getDeclaredField("currentScroll");
+            Field field = ReflectionHelper.findField(GuiContainerCreative.class, "currentScroll", "field_147067_x");
             field.setAccessible(true);
 
             float currentScroll = field.getFloat(creative);
@@ -575,7 +575,7 @@ public class ControllerEvents
             field.setFloat(creative, currentScroll);
             ((GuiContainerCreative.ContainerCreative) creative.inventorySlots).scrollTo(currentScroll);
         }
-        catch(NoSuchFieldException | IllegalAccessException e)
+        catch(IllegalAccessException e)
         {
             e.printStackTrace();
         }
@@ -598,20 +598,19 @@ public class ControllerEvents
 
             try
             {
-                Class<?> clazz = GuiScreen.class;
-                Field eventButton = clazz.getDeclaredField("eventButton");
+                Field eventButton = ReflectionHelper.findField(GuiScreen.class, "eventButton", "field_146287_f");
                 eventButton.setAccessible(true);
                 eventButton.set(gui, button);
 
-                Field lastMouseEvent = clazz.getDeclaredField("lastMouseEvent");
+                Field lastMouseEvent = ReflectionHelper.findField(GuiScreen.class, "lastMouseEvent", "field_146288_g");
                 lastMouseEvent.setAccessible(true);
                 lastMouseEvent.set(gui, System.currentTimeMillis());
 
-                Method mouseClicked = clazz.getDeclaredMethod("mouseClicked", int.class, int.class, int.class);
+                Method mouseClicked = ReflectionHelper.findMethod(GuiScreen.class, "mouseClicked", "func_73864_a", int.class, int.class, int.class);
                 mouseClicked.setAccessible(true);
                 mouseClicked.invoke(gui, guiX, guiY, button);
             }
-            catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException | NoSuchFieldException e)
+            catch(IllegalAccessException | InvocationTargetException e)
             {
                 e.printStackTrace();
             }
@@ -635,17 +634,16 @@ public class ControllerEvents
 
             try
             {
-                Class<?> clazz = GuiScreen.class;
-                Field eventButton = clazz.getDeclaredField("eventButton");
+                Field eventButton = ReflectionHelper.findField(GuiScreen.class, "eventButton", "field_146287_f");
                 eventButton.setAccessible(true);
                 eventButton.set(gui, -1);
 
                 //Resets the mouse straight away
-                Method mouseReleased = clazz.getDeclaredMethod("mouseReleased", int.class, int.class, int.class);
+                Method mouseReleased = ReflectionHelper.findMethod(GuiScreen.class, "mouseReleased", "func_146286_b", int.class, int.class, int.class);
                 mouseReleased.setAccessible(true);
                 mouseReleased.invoke(gui, mouseX, mouseY, button);
             }
-            catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException | NoSuchFieldException e)
+            catch(IllegalAccessException | InvocationTargetException e)
             {
                 e.printStackTrace();
             }

@@ -1,11 +1,8 @@
 package com.mrcrayfish.controllable.event;
 
 import com.mrcrayfish.controllable.Controller;
-import com.mrcrayfish.controllable.client.Action;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
-
-import java.util.Map;
 
 /**
  * Author: MrCrayfish
