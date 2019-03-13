@@ -1,3 +1,7 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.function.Consumer
+
 buildscript {
     repositories {
         jcenter()
@@ -11,7 +15,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = "1.0"
+version = "0.1.0"
 group = "com.mrcrayfish" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "controllable"
 
@@ -81,6 +85,27 @@ processResources {
 jar {
     manifest {
         attributes 'FMLAT': 'controllable_at.cfg'
-        attributes 'FMLCorePlugin': 'com.mrcrayfish.obfuscate.asm.ObfuscatePlugin'
+        attributes 'FMLCorePlugin': 'com.mrcrayfish.controllable.asm.ControllablePlugin'
     }
 }
+
+Properties keyStoreProperties = new Properties()
+File file = new File("C:/dev/keystore.properties")
+if(file.exists()) {
+    InputStream ins = new FileInputStream(file)
+    keyStoreProperties.load(ins)
+    ins.close()
+}
+
+task signJar(type: SignJar, dependsOn: jar) {
+    onlyIf {
+        keyStoreProperties.containsKey("keyStore")
+    }
+    keyStore = keyStoreProperties.get('keyStore')
+    alias = keyStoreProperties.get('alias')
+    storePass = keyStoreProperties.get('keyPass')
+    keyPass = keyStoreProperties.get('storePass')
+    inputFile = jar.archivePath
+    outputFile = jar.archivePath
+}
+build.dependsOn signJar
