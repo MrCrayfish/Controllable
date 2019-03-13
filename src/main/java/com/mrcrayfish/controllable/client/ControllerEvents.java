@@ -38,6 +38,8 @@ import java.lang.reflect.Method;
 @SideOnly(Side.CLIENT)
 public class ControllerEvents
 {
+    public static int lastUse = 0;
+
     private boolean keyboardSneaking = false;
     private boolean sneaking = false;
     private boolean isFlying = false;
@@ -64,6 +66,11 @@ public class ControllerEvents
             prevTargetMouseX = targetMouseX;
             prevTargetMouseY = targetMouseY;
 
+            if(lastUse > 0)
+            {
+                lastUse--;
+            }
+
             Controller controller = Controllable.getController();
             if(controller == null)
                 return;
@@ -76,6 +83,8 @@ public class ControllerEvents
             boolean moving = controller.getLThumbStickXValue() != 0.0F || controller.getLThumbStickYValue() != 0.0F;
             if(moving)
             {
+                lastUse = 100;
+
                 /* Updates the target mouse position when the initial thumb stick movement is
                  * detected. This fixes an issue when the user moves the cursor with the mouse then
                  * switching back to controller, the cursor would jump to old target mouse position. */
@@ -168,10 +177,11 @@ public class ControllerEvents
 
         if(mc.currentScreen == null)
         {
-            if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ControllerTurnEvent(controller)))
+            /* Handles rotating the yaw of player */
+            if(controller.getRThumbStickXValue() != 0.0F || controller.getRThumbStickYValue() != 0.0F)
             {
-                /* Handles rotating the yaw of player */
-                if(controller.getRThumbStickXValue() != 0.0F || controller.getRThumbStickYValue() != 0.0F)
+                lastUse = 100;
+                if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ControllerTurnEvent(controller)))
                 {
                     float rotationYaw = 20.0F * (controller.getRThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickXValue());
                     float rotationPitch = 15.0F * (controller.getRThumbStickYValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickYValue());
@@ -184,6 +194,7 @@ public class ControllerEvents
         {
             if(controller.isButtonPressed(Buttons.DPAD_DOWN))
             {
+                lastUse = 100;
                 dropCounter++;
             }
         }
@@ -233,7 +244,12 @@ public class ControllerEvents
 
         if(mc.player.capabilities.isFlying || mc.player.isRiding())
         {
-            sneaking = mc.gameSettings.keyBindSneak.isKeyDown() || controller.isButtonPressed(Buttons.LEFT_THUMB_STICK);
+            sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
+            if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.LEFT_THUMB_STICK, true)))
+            {
+                lastUse = 100;
+                sneaking |= controller.isButtonPressed(Buttons.LEFT_THUMB_STICK);
+            }
             isFlying = true;
         }
         else if(isFlying)
@@ -250,6 +266,7 @@ public class ControllerEvents
             {
                 if(controller.getLThumbStickYValue() != 0.0F)
                 {
+                    lastUse = 100;
                     int dir = controller.getLThumbStickYValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().forwardKeyDown = dir > 0;
                     event.getMovementInput().backKeyDown = dir < 0;
@@ -263,6 +280,7 @@ public class ControllerEvents
 
                 if(controller.getLThumbStickXValue() != 0.0F)
                 {
+                    lastUse = 100;
                     int dir = controller.getLThumbStickXValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().rightKeyDown = dir < 0;
                     event.getMovementInput().leftKeyDown = dir > 0;
@@ -277,7 +295,11 @@ public class ControllerEvents
 
             if(controller.isButtonPressed(Buttons.A))
             {
-                event.getMovementInput().jump = true;
+                lastUse = 100;
+                if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.A, true)))
+                {
+                    event.getMovementInput().jump = true;
+                }
             }
         }
 
@@ -322,6 +344,8 @@ public class ControllerEvents
 
     private void handleButtonInput(Controller controller, int button, boolean state)
     {
+        lastUse = 100;
+
         if(MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, button, state)))
             return;
 
@@ -455,6 +479,8 @@ public class ControllerEvents
 
     private void scrollCreativeTabs(GuiContainerCreative creative, int dir)
     {
+        lastUse = 100;
+
         try
         {
             Method method = ReflectionHelper.findMethod(GuiContainerCreative.class, "setCurrentCreativeTab", "func_147050_b", CreativeTabs.class);

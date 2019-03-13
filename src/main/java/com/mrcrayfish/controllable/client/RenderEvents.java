@@ -164,6 +164,9 @@ public class RenderEvents
         if(event.phase != TickEvent.Phase.END)
             return;
 
+        if(ControllerEvents.lastUse <= 0)
+            return;
+
         GlStateManager.pushMatrix();
         {
             Minecraft mc = Minecraft.getMinecraft();
