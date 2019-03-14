@@ -417,15 +417,15 @@ public class ControllerEvents
                     mc.getConnection().sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.SWAP_HELD_ITEMS, BlockPos.ORIGIN, EnumFacing.DOWN));
                 }
             }
-            else if(button == Buttons.B && mc.currentScreen != null && mc.player.inventory.getItemStack().isEmpty())
+            else if(button == Buttons.B && mc.currentScreen != null && mc.player != null && mc.player.inventory.getItemStack().isEmpty())
             {
                 invokeMouseClick(mc.currentScreen, 0);
             }
-            else if(button == Buttons.DPAD_UP && mc.currentScreen == null)
+            else if(button == Buttons.DPAD_UP && mc.inGameHasFocus && mc.currentScreen == null)
             {
                 cycleThirdPersonView();
             }
-            else
+            else if(mc.player != null)
             {
                 if(!mc.player.isHandActive() && mc.currentScreen == null)
                 {
