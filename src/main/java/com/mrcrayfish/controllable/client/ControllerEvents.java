@@ -305,7 +305,10 @@ public class ControllerEvents
 
         if(controller.isButtonPressed(Buttons.LEFT_TRIGGER) && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
         {
-            mc.rightClickMouse();
+            if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.LEFT_TRIGGER, true)))
+            {
+                mc.rightClickMouse();
+            }
         }
     }
 
@@ -684,7 +687,16 @@ public class ControllerEvents
         Minecraft mc = Minecraft.getMinecraft();
         boolean isLeftClicking = mc.gameSettings.keyBindAttack.isKeyDown();
         Controller controller = Controllable.getController();
-        if(controller != null) isLeftClicking |= controller.isButtonPressed(Buttons.RIGHT_TRIGGER);
+        if(controller != null)
+        {
+            if(controller.isButtonPressed(Buttons.RIGHT_TRIGGER))
+            {
+                if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.RIGHT_TRIGGER, true)))
+                {
+                    isLeftClicking = true;
+                }
+            }
+        }
         return mc.currentScreen == null && isLeftClicking && mc.inGameHasFocus;
     }
 
@@ -696,7 +708,16 @@ public class ControllerEvents
         Minecraft mc = Minecraft.getMinecraft();
         boolean isRightClicking = mc.gameSettings.keyBindUseItem.isKeyDown();
         Controller controller = Controllable.getController();
-        if(controller != null) isRightClicking |= controller.isButtonPressed(Buttons.LEFT_TRIGGER);
+        if(controller != null)
+        {
+            if(controller.isButtonPressed(Buttons.LEFT_TRIGGER))
+            {
+                if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.LEFT_TRIGGER, true)))
+                {
+                    isRightClicking = true;
+                }
+            }
+        }
         return isRightClicking;
     }
 
@@ -707,7 +728,16 @@ public class ControllerEvents
     {
         boolean isSneaking = (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
         Controller controller = Controllable.getController();
-        if(controller != null) isSneaking |= controller.isButtonPressed(Buttons.B);
+        if(controller != null)
+        {
+            if(controller.isButtonPressed(Buttons.B))
+            {
+                if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.B, true)))
+                {
+                    isSneaking = true;
+                }
+            }
+        }
         return isSneaking;
     }
 }
