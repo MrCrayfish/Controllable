@@ -100,10 +100,11 @@ public class Controllable extends DummyModContainer
                 org.lwjgl.input.Controller controller = Controllers.getController(i);
                 for(String validController : VALID_CONTROLLERS)
                 {
+                    LOGGER.info("Analysing Device: " + controller.getName());
                     if(validController.equals(controller.getName()))
                     {
                         Controllable.controller = new Controller(controller);
-                        LOGGER.info("Found controller: " + controller.getName());
+                        LOGGER.info("Found Controller: " + controller.getName());
                     }
                 }
             }
