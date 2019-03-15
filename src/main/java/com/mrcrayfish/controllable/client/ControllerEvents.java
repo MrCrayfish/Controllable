@@ -244,12 +244,9 @@ public class ControllerEvents
 
         if(mc.player.capabilities.isFlying || mc.player.isRiding())
         {
+            lastUse = 100;
             sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
-            if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.LEFT_THUMB_STICK, true)))
-            {
-                lastUse = 100;
-                sneaking |= controller.isButtonPressed(Buttons.LEFT_THUMB_STICK);
-            }
+            sneaking |= controller.isButtonPressed(Buttons.LEFT_THUMB_STICK);
             isFlying = true;
         }
         else if(isFlying)
@@ -296,19 +293,13 @@ public class ControllerEvents
             if(controller.isButtonPressed(Buttons.A))
             {
                 lastUse = 100;
-                if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.A, true)))
-                {
-                    event.getMovementInput().jump = true;
-                }
+                event.getMovementInput().jump = true;
             }
         }
 
         if(controller.isButtonPressed(Buttons.LEFT_TRIGGER) && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
         {
-            if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.LEFT_TRIGGER, true)))
-            {
-                mc.rightClickMouse();
-            }
+            mc.rightClickMouse();
         }
     }
 
@@ -351,6 +342,8 @@ public class ControllerEvents
 
         if(MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, button, state)))
             return;
+
+        controller.setButtonState(button, state);
 
         Minecraft mc = Minecraft.getMinecraft();
         if(state)
@@ -691,10 +684,7 @@ public class ControllerEvents
         {
             if(controller.isButtonPressed(Buttons.RIGHT_TRIGGER))
             {
-                if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.RIGHT_TRIGGER, true)))
-                {
-                    isLeftClicking = true;
-                }
+                isLeftClicking = true;
             }
         }
         return mc.currentScreen == null && isLeftClicking && mc.inGameHasFocus;
@@ -712,10 +702,7 @@ public class ControllerEvents
         {
             if(controller.isButtonPressed(Buttons.LEFT_TRIGGER))
             {
-                if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.LEFT_TRIGGER, true)))
-                {
-                    isRightClicking = true;
-                }
+                isRightClicking = true;
             }
         }
         return isRightClicking;
@@ -732,10 +719,7 @@ public class ControllerEvents
         {
             if(controller.isButtonPressed(Buttons.B))
             {
-                if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, Buttons.B, true)))
-                {
-                    isSneaking = true;
-                }
+                isSneaking = true;
             }
         }
         return isSneaking;

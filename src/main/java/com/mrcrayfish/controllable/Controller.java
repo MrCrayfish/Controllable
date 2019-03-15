@@ -12,10 +12,12 @@ package com.mrcrayfish.controllable;
 public class Controller
 {
     private org.lwjgl.input.Controller controller;
+    private boolean[] states;
 
     Controller(org.lwjgl.input.Controller controller)
     {
         this.controller = controller;
+        this.states = new boolean[controller.getButtonCount() + 4]; //The extra 4 is for dpad buttons
     }
 
     /**
@@ -117,26 +119,11 @@ public class Controller
      */
     public boolean isButtonPressed(int button)
     {
-        if(button == Buttons.DPAD_UP)
-        {
-            return controller.getPovY() == -1.0F;
-        }
-        else if(button == Buttons.DPAD_DOWN)
-        {
-            return controller.getPovY() == 1.0F;
-        }
-        else if(button == Buttons.DPAD_LEFT)
-        {
-            return controller.getPovX() == -1.0F;
-        }
-        else if(button == Buttons.DPAD_RIGHT)
-        {
-            return controller.getPovX() == 1.0F;
-        }
-        if(button >= 0 && button < controller.getButtonCount())
-        {
-            return controller.isButtonPressed(button);
-        }
-        return false;
+        return states[button];
+    }
+
+    public void setButtonState(int button, boolean state)
+    {
+        states[button] = state;
     }
 }

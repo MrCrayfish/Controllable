@@ -21,9 +21,6 @@ public abstract class ControllerEvent extends Event
         return controller;
     }
 
-    /**
-     * Author: MrCrayfish
-     */
     @Cancelable
     public static class ButtonInput extends ControllerEvent
     {
@@ -48,9 +45,6 @@ public abstract class ControllerEvent extends Event
         }
     }
 
-    /**
-     * Author: MrCrayfish
-     */
     @Cancelable
     public static class Move extends ControllerEvent
     {
@@ -60,9 +54,6 @@ public abstract class ControllerEvent extends Event
         }
     }
 
-    /**
-     * Author: MrCrayfish
-     */
     @Cancelable
     public static class ControllerTurnEvent extends ControllerEvent
     {
@@ -71,5 +62,4 @@ public abstract class ControllerEvent extends Event
             super(controller);
         }
     }
-
 }
