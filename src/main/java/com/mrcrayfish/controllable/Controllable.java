@@ -96,16 +96,17 @@ public class Controllable extends DummyModContainer
 
             LOGGER.info("Scanning for a controller...");
             int count = Controllers.getControllerCount();
-            for(int i = 0; i < count; i++)
+            search: for(int i = 0; i < count; i++)
             {
                 org.lwjgl.input.Controller controller = Controllers.getController(i);
+                LOGGER.info("Analysing Device: " + controller.getName());
                 for(String validController : VALID_CONTROLLERS)
                 {
-                    LOGGER.info("Analysing Device: " + controller.getName());
                     if(validController.equals(controller.getName()))
                     {
                         Controllable.controller = new Controller(controller);
                         LOGGER.info("Found Controller: " + controller.getName());
+                        break search;
                     }
                 }
             }
