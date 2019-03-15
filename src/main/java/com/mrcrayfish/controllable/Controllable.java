@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mrcrayfish.controllable.asm.ControllablePlugin;
+import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.ControllerEvents;
 import com.mrcrayfish.controllable.client.RenderEvents;
 import net.minecraftforge.common.MinecraftForge;

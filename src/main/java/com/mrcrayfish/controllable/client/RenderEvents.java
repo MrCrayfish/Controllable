@@ -1,6 +1,5 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mrcrayfish.controllable.Buttons;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.event.AvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;

@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable;
+package com.mrcrayfish.controllable.client;
 
 /**
  * A wrapper class for {@link org.lwjgl.input.Controller} to make method names more modern. Instead
@@ -122,7 +122,14 @@ public class Controller
         return states[button];
     }
 
-    public void setButtonState(int button, boolean state)
+    /**
+     * Sets the state of the specified button. This is whether it is pressed or not. This is an
+     * internal method and should not be called.
+     *
+     * @param button the buttons index
+     * @param state the state of the button (pressed or not)
+     */
+    void setButtonState(int button, boolean state)
     {
         states[button] = state;
     }

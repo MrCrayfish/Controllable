@@ -1,8 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mrcrayfish.controllable.Buttons;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.Controller;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

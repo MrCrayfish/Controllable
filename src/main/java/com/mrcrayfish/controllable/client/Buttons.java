@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable;
+package com.mrcrayfish.controllable.client;
 
 /**
  * Author: MrCrayfish
