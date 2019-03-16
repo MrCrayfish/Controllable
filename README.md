@@ -20,7 +20,7 @@ I noticed a lack of support for controller for the Java Edition of Minecraft, th
 ### Developers:
 If you are a developer and want to add Controllable support to your own mod, you can simply do so by adding this to your build.gradle file.
 
-```java
+```gradle
 repositories {
     maven {
         name = "CurseForge"
