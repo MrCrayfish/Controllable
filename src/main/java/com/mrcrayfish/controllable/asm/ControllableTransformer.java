@@ -59,55 +59,41 @@ public class ControllableTransformer implements IClassTransformer
             {
                 Controllable.LOGGER.info("Patching #processKeyBinds");
 
-                ObfName method_onStoppedUsingItem = new ObfName("func_78766_c", "onStoppedUsingItem");
-                ObfName method_isKeyDown = new ObfName("func_100015_a", "isKeyDown");
+                //ObfName method_onStoppedUsingItem = new ObfName("func_78766_c", "onStoppedUsingItem");
+                ObfName method_isKeyDown = new ObfName("func_151470_d", "isKeyDown");
+                String params_isKeyDown = "()Z";
 
+                AbstractInsnNode foundNode = null;
                 for(AbstractInsnNode node : method.instructions.toArray())
                 {
-                    if(node instanceof MethodInsnNode && method_onStoppedUsingItem.equals(((MethodInsnNode) node).name))
+                    if(node.getOpcode() == Opcodes.INVOKEVIRTUAL && node.getNext().getOpcode() == Opcodes.IFNE)
                     {
-                        if(node.getPrevious().getOpcode() == Opcodes.GETFIELD)
+                        if(node instanceof MethodInsnNode && method_isKeyDown.equals(((MethodInsnNode) node).name) && params_isKeyDown.equals(((MethodInsnNode) node).desc))
                         {
-                            AbstractInsnNode foundNode = null;
-                            AbstractInsnNode currentNode = node;
-                            while(true)
+                            if(node.getPrevious().getOpcode() == Opcodes.GETFIELD && node.getPrevious().getPrevious().getOpcode() == Opcodes.GETFIELD && node.getPrevious().getPrevious().getPrevious().getOpcode() == Opcodes.ALOAD)
                             {
-                                currentNode = currentNode.getPrevious();
-
-                                if(currentNode == null)
-                                    break;
-
-                                if(currentNode.getOpcode() == Opcodes.INVOKEVIRTUAL && currentNode.getNext().getOpcode() == Opcodes.IFNE)
-                                {
-                                    if(currentNode instanceof MethodInsnNode && method_isKeyDown.equals(((MethodInsnNode) currentNode).name))
-                                    {
-                                        if(currentNode.getPrevious().getOpcode() == Opcodes.GETFIELD && currentNode.getPrevious().getPrevious().getOpcode() == Opcodes.GETFIELD)
-                                        {
-                                            //Pretty sure we found it at this point otherwise another code mod has changed something :/
-                                            foundNode = currentNode;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-
-                            if(foundNode != null)
-                            {
-                                AbstractInsnNode next = foundNode.getNext();
-                                method.instructions.remove(foundNode.getPrevious().getPrevious().getPrevious());
-                                method.instructions.remove(foundNode.getPrevious().getPrevious());
-                                method.instructions.remove(foundNode.getPrevious());
-                                method.instructions.remove(foundNode);
-                                method.instructions.insertBefore(next, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerEvents", "isRightClicking", "()Z", false));
-
-                                Controllable.LOGGER.info("Successfully patched #processKeyBinds");
-                            }
-                            else
-                            {
-                                Controllable.LOGGER.info("Failed to patch #processKeyBinds");
+                                //Pretty sure we found it at this point otherwise another code mod has changed something :/
+                                foundNode = node;
+                                break;
                             }
                         }
                     }
+                }
+
+                if(foundNode != null)
+                {
+                    AbstractInsnNode next = foundNode.getNext();
+                    method.instructions.remove(foundNode.getPrevious().getPrevious().getPrevious());
+                    method.instructions.remove(foundNode.getPrevious().getPrevious());
+                    method.instructions.remove(foundNode.getPrevious());
+                    method.instructions.remove(foundNode);
+                    method.instructions.insertBefore(next, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerEvents", "isRightClicking", "()Z", false));
+
+                    Controllable.LOGGER.info("Successfully patched #processKeyBinds");
+                }
+                else
+                {
+                    Controllable.LOGGER.info("Failed to patch #processKeyBinds");
                 }
             }
         }
