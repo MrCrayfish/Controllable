@@ -39,7 +39,7 @@ public class RenderEvents
     public void onClientTick(TickEvent.ClientTickEvent event)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        if(event.phase == TickEvent.Phase.START && mc.player != null)
+        if(event.phase == TickEvent.Phase.START && mc.player != null && !mc.gameSettings.hideGUI)
         {
             actions = new HashMap<>();
 
@@ -191,9 +191,12 @@ public class RenderEvents
         if(ControllerEvents.lastUse <= 0)
             return;
 
+        Minecraft mc = Minecraft.getMinecraft();
+        if(mc.gameSettings.hideGUI)
+            return;
+
         GlStateManager.pushMatrix();
         {
-            Minecraft mc = Minecraft.getMinecraft();
             if(!MinecraftForge.EVENT_BUS.post(new RenderAvailableActionsEvent()))
             {
                 GuiIngame guiIngame = mc.ingameGUI;
