@@ -17,7 +17,7 @@ public class Controller
     public Controller(org.lwjgl.input.Controller controller)
     {
         this.controller = controller;
-        this.states = new boolean[controller.getButtonCount() + 4]; //The extra 4 is for dpad buttons
+        this.states = new boolean[14 + 4]; //The extra 4 is for dpad buttons
     }
 
     /**

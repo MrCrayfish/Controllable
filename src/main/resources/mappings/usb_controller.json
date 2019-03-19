@@ -1,0 +1,22 @@
+{
+    "id": "USB Controller",
+    "name": "Generic",
+    "reassign": [
+        {
+            "index": 3,
+            "with": 0
+        },
+        {
+            "index": 2,
+            "with": 1
+        },
+        {
+            "index": 1,
+            "with": 2
+        },
+        {
+            "index": 0,
+            "with": 3
+        }
+    ]
+}

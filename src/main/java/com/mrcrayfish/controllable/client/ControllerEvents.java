@@ -157,9 +157,10 @@ public class ControllerEvents
         {
             if(Controllers.isEventButton() && Controllers.getEventSource() == controller.getRawController())
             {
-                int button = Controllers.getEventControlIndex();
+                int button = Mappings.remap(controller, Controllers.getEventControlIndex());
                 boolean state = Controllers.getEventButtonState();
                 handleButtonInput(controller, button, state);
+                return;
             }
         }
 

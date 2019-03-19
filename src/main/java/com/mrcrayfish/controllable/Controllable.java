@@ -5,14 +5,12 @@ import com.google.common.eventbus.Subscribe;
 import com.mrcrayfish.controllable.asm.ControllablePlugin;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.ControllerEvents;
+import com.mrcrayfish.controllable.client.Mappings;
 import com.mrcrayfish.controllable.client.RenderEvents;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLFileResourcePack;
 import net.minecraftforge.fml.client.FMLFolderResourcePack;
-import net.minecraftforge.fml.common.DummyModContainer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.LoadController;
-import net.minecraftforge.fml.common.ModMetadata;
+import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +29,7 @@ public class Controllable extends DummyModContainer
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
-    private static final String[] VALID_CONTROLLERS = { "Wireless Controller" };
+    private static final String[] VALID_CONTROLLERS = { "Wireless Controller", "USB Controller", "Twin USB Joystick" };
     private static Controller controller;
     private boolean initialized = false;
 
@@ -110,6 +108,9 @@ public class Controllable extends DummyModContainer
                     }
                 }
             }
+
+            Mappings.load(event.getModConfigurationDirectory());
+
             initialized = true;
         }
 
