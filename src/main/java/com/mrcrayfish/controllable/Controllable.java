@@ -3,10 +3,7 @@ package com.mrcrayfish.controllable;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mrcrayfish.controllable.asm.ControllablePlugin;
-import com.mrcrayfish.controllable.client.Controller;
-import com.mrcrayfish.controllable.client.ControllerEvents;
-import com.mrcrayfish.controllable.client.Mappings;
-import com.mrcrayfish.controllable.client.RenderEvents;
+import com.mrcrayfish.controllable.client.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLFileResourcePack;
 import net.minecraftforge.fml.client.FMLFolderResourcePack;
@@ -119,6 +116,7 @@ public class Controllable extends DummyModContainer
             LOGGER.info("Registering controller events");
             MinecraftForge.EVENT_BUS.register(new ControllerEvents());
             MinecraftForge.EVENT_BUS.register(new RenderEvents());
+            MinecraftForge.EVENT_BUS.register(new GuiEvents());
         }
         else
         {
