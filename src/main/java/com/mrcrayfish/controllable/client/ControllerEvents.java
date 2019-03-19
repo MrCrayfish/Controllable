@@ -363,7 +363,7 @@ public class ControllerEvents
                     prevTargetMouseX = targetMouseX = Mouse.getX();
                     prevTargetMouseY = targetMouseY = Mouse.getY();
                 }
-                else
+                else if(mc.player != null)
                 {
                     mc.player.closeScreen();
                 }
