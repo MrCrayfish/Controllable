@@ -31,6 +31,11 @@ public class ControllerAxis extends ControllerButton
                     GlStateManager.translate(controller.getRThumbStickXValue() * 5, controller.getRThumbStickYValue() * 5, 0);
                     break;
             }
+
+            if(!controller.isButtonPressed(button))
+            {
+                GlStateManager.translate(0, -2.5, 0);
+            }
         }
         super.draw(x, y, mouseX, mouseY);
         GlStateManager.popMatrix();
