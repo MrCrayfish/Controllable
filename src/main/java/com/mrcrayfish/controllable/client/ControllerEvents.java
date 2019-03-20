@@ -1,8 +1,10 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.gui.GuiControllerLayout;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
@@ -77,6 +79,9 @@ public class ControllerEvents
             if(mc.inGameHasFocus)
                 return;
 
+            if(mc.currentScreen instanceof GuiControllerLayout)
+                return;
+
             /* Only need to run code if left thumb stick has input */
             boolean moving = controller.getLThumbStickXValue() != 0.0F || controller.getLThumbStickYValue() != 0.0F;
             if(moving)
@@ -139,10 +144,13 @@ public class ControllerEvents
          * to still be used as input. */
         if(Minecraft.getMinecraft().currentScreen != null && (targetMouseX != prevTargetMouseX || targetMouseY != prevTargetMouseY))
         {
-            float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
-            int mouseX = (int) (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * partialTicks + 0.5F);
-            int mouseY = (int) (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * partialTicks + 0.5F);
-            Mouse.setCursorPosition(mouseX, mouseY);
+            if(!(Minecraft.getMinecraft().currentScreen instanceof GuiControllerLayout))
+            {
+                float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
+                int mouseX = (int) (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * partialTicks + 0.5F);
+                int mouseY = (int) (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * partialTicks + 0.5F);
+                Mouse.setCursorPosition(mouseX, mouseY);
+            }
         }
     }
 
