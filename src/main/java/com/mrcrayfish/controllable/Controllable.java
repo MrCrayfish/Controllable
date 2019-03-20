@@ -123,4 +123,9 @@ public class Controllable extends DummyModContainer
             LOGGER.info("Failed to find a controller. You will need to restart the game if you plug in a controller. If you don't want a controller, it is safe to ignore this message.");
         }
     }
+
+    public static void setController(Controller controller)
+    {
+        Controllable.controller = controller;
+    }
 }

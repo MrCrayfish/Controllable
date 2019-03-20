@@ -11,6 +11,7 @@ package com.mrcrayfish.controllable.client;
  */
 public class Controller
 {
+    private Mappings.Entry mapping = Mappings.DEFAULT_MAPPING;
     private org.lwjgl.input.Controller controller;
     private boolean[] states;
 
@@ -132,5 +133,18 @@ public class Controller
     void setButtonState(int button, boolean state)
     {
         states[button] = state;
+    }
+
+    void setMapping(Mappings.Entry mapping)
+    {
+        if(mapping != null)
+        {
+            this.mapping = mapping;
+        }
+    }
+
+    public Mappings.Entry getMappings()
+    {
+        return mapping;
     }
 }

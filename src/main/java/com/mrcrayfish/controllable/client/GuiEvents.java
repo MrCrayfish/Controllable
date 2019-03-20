@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.client.gui.GuiButtonController;
-import com.mrcrayfish.controllable.client.gui.GuiControllerLayout;
+import com.mrcrayfish.controllable.client.gui.GuiControllerSelection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraftforge.client.event.GuiScreenEvent;
@@ -29,7 +29,7 @@ public class GuiEvents
         {
             if(event.getButton().id == 6969)
             {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiControllerLayout());
+                Minecraft.getMinecraft().displayGuiScreen(new GuiControllerSelection());
             }
         }
     }

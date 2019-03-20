@@ -165,7 +165,7 @@ public class ControllerEvents
         {
             if(Controllers.isEventButton() && Controllers.getEventSource() == controller.getRawController())
             {
-                int button = Mappings.remap(controller, Controllers.getEventControlIndex());
+                int button = controller.getMappings().remap(Controllers.getEventControlIndex());
                 boolean state = Controllers.getEventButtonState();
                 handleButtonInput(controller, button, state);
                 return;
@@ -732,3 +732,35 @@ public class ControllerEvents
         return isSneaking;
     }
 }
+
+//SCUFFED PS3
+//X = 3
+//A = 2
+//B = 1
+//Y = 0
+
+//Official PS3
+//X = 0
+//A = 1
+//B = 2
+//Y = 3
+//LEFT_BUMPER = 4
+//RIGHT_BUMPER = 5
+//LEFT_TRIGGER = 6
+//RIGHT_TRIGGER = 7
+//SELECT = 8
+//START = 9
+//LEFT_THUMB_STICK = 10
+//RIGHT_THUMB_STICK = 11
+//HOME = 12
+//TOUCH_PAD = 13
+
+//Official PS1
+//X = 3
+//A = 2
+//B = 1
+//Y = 0
+//LEFT_BUMPER = 6
+//RIGHT_BUMPER = 7
+//LEFT_TRIGGER = 4
+//RIGHT_TRIGGER = 5

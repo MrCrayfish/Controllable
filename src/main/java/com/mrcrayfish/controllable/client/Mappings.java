@@ -5,30 +5,32 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mrcrayfish.controllable.Controllable;
 
+import javax.annotation.Nullable;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Author: MrCrayfish
  */
 public class Mappings
 {
-    private static final Map<String, Map<Integer, Integer>> MAPPINGS = new HashMap<>();
+    static final Entry DEFAULT_MAPPING = new Entry("Default", "Default", new HashMap<>());
+    private static final Map<String, Entry> MAPPINGS = new HashMap<>();
 
     private static boolean loaded = false;
 
     public static void load(File configFolder)
     {
-        if(loaded) return;
+        if(loaded)
+            return;
 
         loadInternalMapping("ps4_controller");
         loadInternalMapping("usb_controller");
 
         File folder = new File(configFolder, "controllable/mappings");
-        if(folder.mkdirs())
+        if(!folder.mkdirs())
         {
-            Controllable.LOGGER.info("Successfully created mappings folder in config");
+            Controllable.LOGGER.error("Failed to created Controllable config folder");
         }
 
         File[] files = folder.listFiles();
@@ -43,14 +45,71 @@ public class Mappings
             }
         }
 
+        loadPreferences(configFolder);
+
         loaded = true;
+    }
+
+    private static void loadPreferences(File configFolder)
+    {
+        try
+        {
+            Properties properties = new Properties();
+            File file = new File(configFolder, "controllable/controller.prefs");
+            if(!file.createNewFile())
+            {
+                Controllable.LOGGER.error("Failed to create controller preferences");
+            }
+            if(file.exists())
+            {
+                properties.load(new FileInputStream(file));
+
+                String currentController = properties.getProperty("CurrentController", "");
+                String selectedMapping = properties.getProperty("SelectedMapping", "");
+
+                boolean changed = false;
+                Controller controller = Controllable.getController();
+                if(controller != null)
+                {
+                    boolean sameController = controller.getRawController().getName().equals(currentController);
+                    if(currentController.trim().isEmpty() || !sameController)
+                    {
+                        properties.setProperty("CurrentController", controller.getRawController().getName());
+                        changed = true;
+                    }
+
+                    if(selectedMapping.trim().isEmpty() || !sameController)
+                    {
+                        String mapping = controller.getRawController().getName();
+                        Entry entry = MAPPINGS.get(mapping);
+                        controller.setMapping(entry);
+                        properties.setProperty("SelectedMapping", mapping);
+                        changed = true;
+                    }
+                    else
+                    {
+                        Entry entry = MAPPINGS.get(selectedMapping);
+                        controller.setMapping(entry);
+                    }
+                }
+
+                if(changed)
+                {
+                    properties.store(new FileOutputStream(file), "Controller Preferences");
+                }
+            }
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private static void loadInternalMapping(String mappingName)
     {
         try(Reader reader = new InputStreamReader(Mappings.class.getResourceAsStream("/mappings/" + mappingName + ".json")))
         {
-            loadMapping(reader);
+            loadMapping(reader).internal = true;
         }
         catch(IOException e)
         {
@@ -70,10 +129,11 @@ public class Mappings
         }
     }
 
-    private static void loadMapping(Reader reader)
+    private static Entry loadMapping(Reader reader)
     {
         JsonElement element = new JsonParser().parse(reader);
-        String name = element.getAsJsonObject().get("id").getAsString();
+        String id = element.getAsJsonObject().get("id").getAsString();
+        String name = element.getAsJsonObject().get("name").getAsString();
         Map<Integer, Integer> reassignments = new HashMap<>();
         if(element.getAsJsonObject().has("reassign"))
         {
@@ -85,21 +145,59 @@ public class Mappings
                 reassignments.put(index, with);
             });
         }
-        MAPPINGS.put(name, reassignments);
+        Entry entry = new Entry(id, name, reassignments);
+        MAPPINGS.put(id, entry);
+        return entry;
     }
 
-    public static int remap(Controller controller, int button)
+    @Nullable
+    public static void updateControllerMappings(Controller controller)
     {
-        String name = controller.getRawController().getName();
-        if(MAPPINGS.containsKey(name))
+        controller.setMapping(MAPPINGS.get(controller.getRawController().getName()));
+    }
+
+    public static class Entry
+    {
+        private String id;
+        private String name;
+        private Map<Integer, Integer> reassignments;
+        private boolean internal;
+
+        public Entry(String id, String name, Map<Integer, Integer> reassignments)
         {
-            Map<Integer, Integer> reassignments = MAPPINGS.get(name);
+            this.id = id;
+            this.name = name;
+            this.reassignments = reassignments;
+        }
+
+        public String getId()
+        {
+            return id;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public Map<Integer, Integer> getReassignments()
+        {
+            return reassignments;
+        }
+
+        public boolean isInternal()
+        {
+            return internal;
+        }
+
+        public int remap(int button)
+        {
             Integer value = reassignments.get(button);
             if(value != null)
             {
                 return value;
             }
+            return button;
         }
-        return button;
     }
 }
