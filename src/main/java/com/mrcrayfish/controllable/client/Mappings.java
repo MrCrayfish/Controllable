@@ -71,16 +71,16 @@ public class Mappings
                 Controller controller = Controllable.getController();
                 if(controller != null)
                 {
-                    boolean sameController = controller.getRawController().getName().equals(currentController);
+                    boolean sameController = controller.getName().equals(currentController);
                     if(currentController.trim().isEmpty() || !sameController)
                     {
-                        properties.setProperty("CurrentController", controller.getRawController().getName());
+                        properties.setProperty("CurrentController", controller.getName());
                         changed = true;
                     }
 
                     if(selectedMapping.trim().isEmpty() || !sameController)
                     {
-                        String mapping = controller.getRawController().getName();
+                        String mapping = controller.getName();
                         Entry entry = MAPPINGS.get(mapping);
                         controller.setMapping(entry);
                         properties.setProperty("SelectedMapping", mapping);
@@ -153,7 +153,7 @@ public class Mappings
     @Nullable
     public static void updateControllerMappings(Controller controller)
     {
-        controller.setMapping(MAPPINGS.get(controller.getRawController().getName()));
+        controller.setMapping(MAPPINGS.get(controller.getName()));
     }
 
     public static class Entry

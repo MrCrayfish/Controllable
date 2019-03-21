@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.client.gui.GuiButtonController;
 import com.mrcrayfish.controllable.client.gui.GuiControllerSelection;
+import com.studiohartman.jamepad.ControllerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraftforge.client.event.GuiScreenEvent;
@@ -12,6 +13,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  */
 public class GuiEvents
 {
+    private ControllerManager manager;
+
+    public GuiEvents(ControllerManager manager)
+    {
+        this.manager = manager;
+    }
+
     @SubscribeEvent
     public void onOpenGui(GuiScreenEvent.InitGuiEvent event)
     {
@@ -29,7 +37,7 @@ public class GuiEvents
         {
             if(event.getButton().id == 6969)
             {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiControllerSelection());
+                Minecraft.getMinecraft().displayGuiScreen(new GuiControllerSelection(manager));
             }
         }
     }

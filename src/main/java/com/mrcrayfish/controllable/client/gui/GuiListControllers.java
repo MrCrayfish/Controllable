@@ -1,22 +1,16 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.Controller;
+import com.studiohartman.jamepad.ControllerIndex;
+import com.studiohartman.jamepad.ControllerManager;
+import com.studiohartman.jamepad.ControllerUnpluggedException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiListExtended;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiBeacon;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Controllers;
-import org.lwjgl.opengl.GL11;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,48 +21,29 @@ import java.util.List;
 @SideOnly(Side.CLIENT)
 public class GuiListControllers extends GuiListExtended
 {
+    private ControllerManager manager;
     private List<ControllerEntry> controllers = new ArrayList<>();
 
-    public GuiListControllers(Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
+    public GuiListControllers(ControllerManager manager, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
     {
         super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
-        this.init();
-    }
-
-    private void init()
-    {
-        int count = Controllers.getControllerCount();
-        for(int i = 0; i < count; i++)
-        {
-            org.lwjgl.input.Controller controller = Controllers.getController(i);
-            controllers.add(new ControllerEntry(controller));
-            if(Controllable.getController() != null && Controllable.getController().getRawController() == controller)
-            {
-                selectedElement = i;
-            }
-        }
+        this.manager = manager;
+        this.selectedElement = Controllable.getSelectedControllerIndex();
+        this.reload();
     }
 
     public void reload()
     {
         controllers.clear();
-        selectedElement = -1;
-        Controllable.setController(null);
-        int count = Controllers.getControllerCount();
-        for(int i = 0; i < count; i++)
+        for(int i = 0; i < manager.getNumControllers(); i++)
         {
-            org.lwjgl.input.Controller controller = Controllers.getController(i);
-            controllers.add(new ControllerEntry(controller));
-            if(Controllable.getController() != null && Controllable.getController().getRawController() == controller)
-            {
-                selectedElement = i;
-            }
+            controllers.add(new ControllerEntry(manager.getControllerIndex(i)));
         }
+    }
 
-        if(Controllers.getControllerCount() > 0)
-        {
-            Controllable.setController(new Controller(Controllers.getController(0)));
-        }
+    public void setSelectedElement(int index)
+    {
+        this.selectedElement = index;
     }
 
     @Override
@@ -89,21 +64,16 @@ public class GuiListControllers extends GuiListExtended
         return selectedElement == slotIndex;
     }
 
-    @Nullable
-    public org.lwjgl.input.Controller getSelectedController()
+    public int getSelectedIndex()
     {
-        if(selectedElement >= 0 && selectedElement < controllers.size())
-        {
-            return controllers.get(selectedElement).controller;
-        }
-        return null;
+        return selectedElement;
     }
 
     public class ControllerEntry implements IGuiListEntry
     {
-        private org.lwjgl.input.Controller controller;
+        private ControllerIndex controller;
 
-        public ControllerEntry(org.lwjgl.input.Controller controller)
+        public ControllerEntry(ControllerIndex controller)
         {
             this.controller = controller;
         }
@@ -117,11 +87,21 @@ public class GuiListControllers extends GuiListExtended
         @Override
         public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
         {
-            Minecraft.getMinecraft().fontRenderer.drawString(controller.getName(), x + 20, y + 4, Color.WHITE.getRGB());
-            if(selectedElement == slotIndex)
+            try
             {
-                Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("textures/gui/container/beacon.png"));
-                GuiScreen.drawModalRectWithCustomSizedTexture(x + 2, y + 2, 91, 224, 14, 12, 256, 256);
+                if(!controller.isConnected())
+                    return;
+
+                Minecraft.getMinecraft().fontRenderer.drawString(controller.getName(), x + 20, y + 4, Color.WHITE.getRGB());
+                if(selectedElement == slotIndex)
+                {
+                    Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("textures/gui/container/beacon.png"));
+                    GuiScreen.drawModalRectWithCustomSizedTexture(x + 2, y + 2, 91, 224, 14, 12, 256, 256);
+                }
+            }
+            catch(ControllerUnpluggedException e)
+            {
+                e.printStackTrace();
             }
         }
 

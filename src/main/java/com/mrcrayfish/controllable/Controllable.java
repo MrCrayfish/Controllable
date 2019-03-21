@@ -4,19 +4,23 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mrcrayfish.controllable.asm.ControllablePlugin;
 import com.mrcrayfish.controllable.client.*;
+import com.studiohartman.jamepad.*;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLFileResourcePack;
 import net.minecraftforge.fml.client.FMLFolderResourcePack;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Controllers;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Author: MrCrayfish
@@ -26,9 +30,11 @@ public class Controllable extends DummyModContainer
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
-    private static final String[] VALID_CONTROLLERS = { "Wireless Controller", "USB Controller", "Twin USB Joystick" };
+    private static ControllerManager manager;
     private static Controller controller;
-    private boolean initialized = false;
+    private static ControllerInput input;
+    private static boolean[] buttonStates;
+    private static int selectedControllerIndex;
 
     public Controllable()
     {
@@ -45,6 +51,11 @@ public class Controllable extends DummyModContainer
     public static Controller getController()
     {
         return controller;
+    }
+
+    public static int getSelectedControllerIndex()
+    {
+        return selectedControllerIndex;
     }
 
     @Override
@@ -75,57 +86,89 @@ public class Controllable extends DummyModContainer
     @Subscribe
     public void onPreInit(FMLPreInitializationEvent event)
     {
-        if(!initialized)
-        {
-            try
-            {
-                LOGGER.info("Initializing controllers");
-                Controllers.create();
-            }
-            catch(LWJGLException e)
-            {
-                e.printStackTrace();
-            }
+        //ControllerProperties.load(event.getModConfigurationDirectory());
 
-            Controllers.poll();
+        Controllable.manager = new ControllerManager();
+        Controllable.manager.initSDLGamepad();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> Controllable.manager.quitSDLGamepad()));
 
-            LOGGER.info("Scanning for a controller...");
-            int count = Controllers.getControllerCount();
-            search: for(int i = 0; i < count; i++)
-            {
-                org.lwjgl.input.Controller controller = Controllers.getController(i);
-                LOGGER.info("Analysing Device: " + controller.getName());
-                for(String validController : VALID_CONTROLLERS)
-                {
-                    if(validController.equals(controller.getName()))
-                    {
-                        Controllable.controller = new Controller(controller);
-                        LOGGER.info("Found Controller: " + controller.getName());
-                        break search;
-                    }
-                }
-            }
-
-            Mappings.load(event.getModConfigurationDirectory());
-
-            initialized = true;
-        }
-
-        if(Controllable.controller != null)
-        {
-            LOGGER.info("Registering controller events");
-            MinecraftForge.EVENT_BUS.register(new ControllerEvents());
-            MinecraftForge.EVENT_BUS.register(new RenderEvents());
-            MinecraftForge.EVENT_BUS.register(new GuiEvents());
-        }
-        else
-        {
-            LOGGER.info("Failed to find a controller. You will need to restart the game if you plug in a controller. If you don't want a controller, it is safe to ignore this message.");
-        }
+        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(input = new ControllerInput());
+        MinecraftForge.EVENT_BUS.register(new RenderEvents());
+        MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
     }
 
     public static void setController(Controller controller)
     {
         Controllable.controller = controller;
+        selectedControllerIndex = controller.getIndex();
+        buttonStates = new boolean[Buttons.LENGTH];
+        controller.updateState(manager.getState(selectedControllerIndex));
+    }
+
+    @SubscribeEvent
+    public void handleButtonInput(TickEvent.RenderTickEvent event)
+    {
+        if(event.phase != TickEvent.Phase.START)
+            return;
+
+        manager.update();
+
+        ControllerState state = manager.getState(selectedControllerIndex);
+
+        if(!state.isConnected)
+        {
+            if(controller != null)
+            {
+                controller = null;
+            }
+            if(selectedControllerIndex >= 0)
+            {
+                selectedControllerIndex--;
+            }
+            return;
+        }
+        else if(controller == null)
+        {
+            controller = new Controller(null);
+            buttonStates = new boolean[Buttons.LENGTH];
+        }
+
+        controller.updateState(state);
+
+        processButton(Buttons.A, state.a);
+        processButton(Buttons.B, state.b);
+        processButton(Buttons.X, state.x);
+        processButton(Buttons.Y, state.y);
+        processButton(Buttons.SELECT, state.back);
+        processButton(Buttons.HOME, state.guide);
+        processButton(Buttons.START, state.start);
+        processButton(Buttons.LEFT_THUMB_STICK, state.leftStickClick);
+        processButton(Buttons.RIGHT_THUMB_STICK, state.rightStickClick);
+        processButton(Buttons.LEFT_BUMPER, state.lb);
+        processButton(Buttons.RIGHT_BUMPER, state.rb);
+        processButton(Buttons.LEFT_TRIGGER, Math.abs(state.leftTrigger) >= 0.1);
+        processButton(Buttons.RIGHT_TRIGGER, Math.abs(state.rightTrigger) >= 0.1);
+        processButton(Buttons.DPAD_UP, state.dpadUp);
+        processButton(Buttons.DPAD_DOWN, state.dpadDown);
+        processButton(Buttons.DPAD_LEFT, state.dpadLeft);
+        processButton(Buttons.DPAD_RIGHT, state.dpadRight);
+    }
+
+    private static void processButton(int index, boolean state)
+    {
+        if(state)
+        {
+            if(!buttonStates[index])
+            {
+                buttonStates[index] = true;
+                input.handleButtonInput(controller, index, true);
+            }
+        }
+        else if(buttonStates[index])
+        {
+            buttonStates[index] = false;
+            input.handleButtonInput(controller, index, false);
+        }
     }
 }

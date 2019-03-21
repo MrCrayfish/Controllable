@@ -25,10 +25,10 @@ public class ControllerAxis extends ControllerButton
             switch(button)
             {
                 case Buttons.LEFT_THUMB_STICK:
-                    GlStateManager.translate(controller.getLThumbStickXValue() * 5, controller.getLThumbStickYValue() * 5, 0);
+                    GlStateManager.translate(controller.getLThumbStickXValue() * 5, -controller.getLThumbStickYValue() * 5, 0);
                     break;
                 case Buttons.RIGHT_THUMB_STICK:
-                    GlStateManager.translate(controller.getRThumbStickXValue() * 5, controller.getRThumbStickYValue() * 5, 0);
+                    GlStateManager.translate(controller.getRThumbStickXValue() * 5, -controller.getRThumbStickYValue() * 5, 0);
                     break;
             }
 

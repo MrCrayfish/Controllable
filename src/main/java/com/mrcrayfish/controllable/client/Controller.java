@@ -1,5 +1,9 @@
 package com.mrcrayfish.controllable.client;
 
+import com.studiohartman.jamepad.ControllerIndex;
+import com.studiohartman.jamepad.ControllerState;
+import com.studiohartman.jamepad.ControllerUnpluggedException;
+
 /**
  * A wrapper class for {@link org.lwjgl.input.Controller} to make method names more modern. Instead
  * of methods like {@link org.lwjgl.input.Controller#getXAxisValue()}, this class turns that into
@@ -12,13 +16,24 @@ package com.mrcrayfish.controllable.client;
 public class Controller
 {
     private Mappings.Entry mapping = Mappings.DEFAULT_MAPPING;
-    private org.lwjgl.input.Controller controller;
+    private ControllerIndex index;
+    private ControllerState state;
     private boolean[] states;
 
-    public Controller(org.lwjgl.input.Controller controller)
+    public Controller(ControllerIndex index)
     {
-        this.controller = controller;
-        this.states = new boolean[14 + 4]; //The extra 4 is for dpad buttons
+        this.index = index;
+        this.states = new boolean[Buttons.LENGTH];
+    }
+
+    public int getIndex()
+    {
+        return index.getIndex();
+    }
+
+    public void updateState(ControllerState state)
+    {
+        this.state = state;
     }
 
     /**
@@ -26,9 +41,20 @@ public class Controller
      *
      * @return the lwjgl controller instance of this controller
      */
-    public org.lwjgl.input.Controller getRawController()
+    public String getName()
     {
-        return controller;
+        if(index.isConnected())
+        {
+            try
+            {
+                return index.getName();
+            }
+            catch(ControllerUnpluggedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return "";
     }
 
     /**
@@ -38,7 +64,7 @@ public class Controller
      */
     public float getLTriggerValue()
     {
-        return (controller.getRXAxisValue() + 1.0F) / 2F;
+        return state.leftTrigger > 0.05F ? state.leftTrigger : 0F;
     }
 
     /**
@@ -48,7 +74,7 @@ public class Controller
      */
     public float getRTriggerValue()
     {
-        return (controller.getRYAxisValue() + 1.0F) / 2F;
+        return state.rightTrigger > 0.05F ? state.rightTrigger : 0F;
     }
 
     /**
@@ -58,7 +84,7 @@ public class Controller
      */
     public float getLThumbStickXValue()
     {
-        return controller.getXAxisValue();
+        return Math.abs(state.leftStickX) > 0.05F ? state.leftStickX : 0F;
     }
 
     /**
@@ -68,7 +94,7 @@ public class Controller
      */
     public float getLThumbStickYValue()
     {
-        return controller.getYAxisValue();
+        return Math.abs(state.leftStickY) > 0.05F ? state.leftStickY : 0F;
     }
 
     /**
@@ -78,7 +104,7 @@ public class Controller
      */
     public float getRThumbStickXValue()
     {
-        return controller.getZAxisValue();
+        return Math.abs(state.rightStickX) > 0.05F ? state.rightStickX : 0F;
     }
 
     /**
@@ -88,27 +114,7 @@ public class Controller
      */
     public float getRThumbStickYValue()
     {
-        return controller.getRZAxisValue();
-    }
-
-    /**
-     * Gets the directional pad x value
-     *
-     * @return the directional pad x value
-     */
-    public float getDpadXValue()
-    {
-        return controller.getPovX();
-    }
-
-    /**
-     * Gets the directional pad y value
-     *
-     * @return the directional pad y value
-     */
-    public float getDpadYValue()
-    {
-        return controller.getPovY();
+        return Math.abs(state.rightStickY) > 0.05F ? state.rightStickY : 0F;
     }
 
     /**
@@ -143,7 +149,7 @@ public class Controller
         }
     }
 
-    public Mappings.Entry getMappings()
+    Mappings.Entry getMappings()
     {
         return mapping;
     }

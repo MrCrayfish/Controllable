@@ -19,12 +19,9 @@ public class GuiControllerLayout extends GuiScreen
 
     private List<ControllerButton> controllerButtons = new ArrayList<>();
 
-    private GuiListControllers listControllers;
-
     @Override
     public void initGui()
     {
-        listControllers = new GuiListControllers(mc, this.width, this.height, 32, this.height - 64, 36);
         controllerButtons.add(new ControllerButton(Buttons.A, 29, 9, 7, 0, 3, 3, 5));
         controllerButtons.add(new ControllerButton(Buttons.B, 32, 6, 13, 0, 3, 3, 5));
         controllerButtons.add(new ControllerButton(Buttons.X, 26, 6, 16, 0, 3, 3, 5));
@@ -49,9 +46,7 @@ public class GuiControllerLayout extends GuiScreen
     {
         this.drawDefaultBackground();
 
-        listControllers.drawScreen(mouseX, mouseY, partialTicks);
-
-       /* GlStateManager.enableBlend();
+        GlStateManager.enableBlend();
         mc.getTextureManager().bindTexture(TEXTURE);
         int width = 38 * 5;
         int height = 29 * 5;
@@ -59,6 +54,6 @@ public class GuiControllerLayout extends GuiScreen
         int y = this.height / 2 - 50;
         drawScaledCustomSizeModalRect(x, y, 50, 0, 38, 29, width, height, 256, 256);
         GlStateManager.disableBlend();
-        controllerButtons.forEach(controllerButton -> controllerButton.draw(x, y, mouseX, mouseY));*/
+        controllerButtons.forEach(controllerButton -> controllerButton.draw(x, y, mouseX, mouseY));
     }
 }
