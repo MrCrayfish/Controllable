@@ -19,6 +19,10 @@ public class GuiControllerSelection extends GuiScreen
     private ControllerManager manager;
     private GuiListControllers listControllers;
 
+    private GuiButton btnSelect;
+    private GuiButton btnConfigure;
+    private GuiButton btnCancel;
+
     public GuiControllerSelection(ControllerManager manager)
     {
         this.manager = manager;
@@ -29,9 +33,10 @@ public class GuiControllerSelection extends GuiScreen
     public void initGui()
     {
         listControllers = new GuiListControllers(manager, mc, this.width, this.height, 32, this.height - 44, 20);
-        this.addButton(new GuiButton(0, this.width / 2 - 154, this.height - 32, 100, 20, "Select")); //TODO localize I18n.format("selectWorld.select")
-        this.addButton(new GuiButton(1, this.width / 2 - 50, this.height - 32, 100, 20, "Configure"));
-        this.addButton(new GuiButton(2, this.width / 2 + 54, this.height - 32, 100, 20, "Cancel"));
+        this.addButton(btnSelect = new GuiButton(0, this.width / 2 - 154, this.height - 32, 100, 20, "Select")); //TODO localize I18n.format("selectWorld.select")
+        this.addButton(btnConfigure = new GuiButton(1, this.width / 2 - 50, this.height - 32, 100, 20, "Configure"));
+        this.addButton(btnCancel = new GuiButton(2, this.width / 2 + 54, this.height - 32, 100, 20, "Cancel"));
+        btnConfigure.enabled = Controllable.getSelectedControllerIndex() != -1;
     }
 
     @Override
@@ -48,6 +53,9 @@ public class GuiControllerSelection extends GuiScreen
     @Override
     protected void actionPerformed(GuiButton button) throws IOException
     {
+        if(!button.enabled)
+            return;
+
         if(button.id == 0)
         {
             ControllerIndex index = manager.getControllerIndex(listControllers.getSelectedIndex());
