@@ -250,7 +250,6 @@ public class ControllerInput
         {
             if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.Move(controller)))
             {
-                System.out.println(controller.getLThumbStickXValue());
                 if(controller.getLThumbStickYValue() != 0.0F)
                 {
                     lastUse = 100;

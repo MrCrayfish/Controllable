@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.client.Mappings;
 import com.studiohartman.jamepad.ControllerIndex;
 import com.studiohartman.jamepad.ControllerManager;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiScreen;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.io.IOException;
 public class GuiControllerSelection extends GuiScreen
 {
     private int controllerCount;
+    private boolean mainMenu;
     private ControllerManager manager;
     private GuiListControllers listControllers;
 
@@ -23,9 +25,10 @@ public class GuiControllerSelection extends GuiScreen
     private GuiButton btnConfigure;
     private GuiButton btnCancel;
 
-    public GuiControllerSelection(ControllerManager manager)
+    public GuiControllerSelection(ControllerManager manager, boolean mainMenu)
     {
         this.manager = manager;
+        this.mainMenu = mainMenu;
         this.controllerCount = manager.getNumControllers();
     }
 
@@ -36,7 +39,8 @@ public class GuiControllerSelection extends GuiScreen
         this.addButton(btnSelect = new GuiButton(0, this.width / 2 - 154, this.height - 32, 100, 20, "Select")); //TODO localize I18n.format("selectWorld.select")
         this.addButton(btnConfigure = new GuiButton(1, this.width / 2 - 50, this.height - 32, 100, 20, "Configure"));
         this.addButton(btnCancel = new GuiButton(2, this.width / 2 + 54, this.height - 32, 100, 20, "Cancel"));
-        btnConfigure.enabled = Controllable.getSelectedControllerIndex() != -1;
+        //btnConfigure.enabled = Controllable.getSelectedControllerIndex() != -1;
+        btnConfigure.enabled = false;
     }
 
     @Override
@@ -70,7 +74,14 @@ public class GuiControllerSelection extends GuiScreen
         }
         else if(button.id == 2)
         {
-            this.mc.displayGuiScreen(null);
+            if(mainMenu)
+            {
+                this.mc.displayGuiScreen(null);
+            }
+            else
+            {
+                this.mc.displayGuiScreen(new GuiIngameMenu());
+            }
         }
     }
 

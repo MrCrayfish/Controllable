@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.client.gui.GuiButtonController;
 import com.mrcrayfish.controllable.client.gui.GuiControllerSelection;
 import com.studiohartman.jamepad.ControllerManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -28,6 +29,11 @@ public class GuiEvents
             int y = (event.getGui().height / 4 + 48) + 24 * 2;
             event.getButtonList().add(new GuiButtonController(6969, (event.getGui().width / 2) - 124, y));
         }
+        else if(event.getGui() instanceof GuiIngameMenu)
+        {
+            int y = (event.getGui().height / 4 + 32) + 24 * 2;
+            event.getButtonList().add(new GuiButtonController(6969, (event.getGui().width / 2) - 124, y));
+        }
     }
 
     @SubscribeEvent
@@ -37,7 +43,14 @@ public class GuiEvents
         {
             if(event.getButton().id == 6969)
             {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiControllerSelection(manager));
+                Minecraft.getMinecraft().displayGuiScreen(new GuiControllerSelection(manager, true));
+            }
+        }
+        else if(event.getGui() instanceof GuiIngameMenu)
+        {
+            if(event.getButton().id == 6969)
+            {
+                Minecraft.getMinecraft().displayGuiScreen(new GuiControllerSelection(manager, false));
             }
         }
     }
