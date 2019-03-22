@@ -6,7 +6,6 @@ import com.mrcrayfish.controllable.asm.ControllablePlugin;
 import com.mrcrayfish.controllable.client.*;
 import com.studiohartman.jamepad.*;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLFileResourcePack;
 import net.minecraftforge.fml.client.FMLFolderResourcePack;
@@ -19,9 +18,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Author: MrCrayfish
@@ -36,6 +33,7 @@ public class Controllable extends DummyModContainer
     private static ControllerInput input;
     private static boolean[] buttonStates;
     private static int selectedControllerIndex;
+    private static int currentControllerCount;
 
     public Controllable()
     {
@@ -92,6 +90,7 @@ public class Controllable extends DummyModContainer
         /* Loads up the controller manager and setup shutdown cleanup */
         Controllable.manager = new ControllerManager();
         Controllable.manager.initSDLGamepad();
+        Controllable.currentControllerCount = manager.getNumControllers();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> Controllable.manager.quitSDLGamepad()));
 
         /* Attempts to load the first controller connected */
@@ -126,8 +125,18 @@ public class Controllable extends DummyModContainer
 
         manager.update();
 
-        ControllerState state = manager.getState(selectedControllerIndex);
+        Minecraft mc = Minecraft.getMinecraft();
+        int controllersCount = manager.getNumControllers();
+        if(controllersCount != currentControllerCount)
+        {
+            if(mc.player != null)
+            {
+                Minecraft.getMinecraft().getToastGui().add(new ControllerToast(controllersCount > currentControllerCount));
+            }
+            currentControllerCount = manager.getNumControllers();
+        }
 
+        ControllerState state = manager.getState(selectedControllerIndex);
         if(!state.isConnected)
         {
             if(controller != null)
