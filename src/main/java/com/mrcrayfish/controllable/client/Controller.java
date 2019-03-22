@@ -4,6 +4,8 @@ import com.studiohartman.jamepad.ControllerIndex;
 import com.studiohartman.jamepad.ControllerState;
 import com.studiohartman.jamepad.ControllerUnpluggedException;
 
+import javax.annotation.Nullable;
+
 /**
  * A wrapper class for {@link org.lwjgl.input.Controller} to make method names more modern. Instead
  * of methods like {@link org.lwjgl.input.Controller#getXAxisValue()}, this class turns that into
@@ -15,7 +17,7 @@ import com.studiohartman.jamepad.ControllerUnpluggedException;
  */
 public class Controller
 {
-    private Mappings.Entry mapping = Mappings.DEFAULT_MAPPING;
+    private Mappings.Entry mapping = null;
     private ControllerIndex index;
     private ControllerState state;
     private boolean[] states;
@@ -143,13 +145,11 @@ public class Controller
 
     void setMapping(Mappings.Entry mapping)
     {
-        if(mapping != null)
-        {
-            this.mapping = mapping;
-        }
+        this.mapping = mapping;
     }
 
-    Mappings.Entry getMappings()
+    @Nullable
+    public Mappings.Entry getMapping()
     {
         return mapping;
     }

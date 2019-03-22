@@ -1,0 +1,18 @@
+{
+    "id": "Defender Game Racer X7",
+    "name": "Defender Game Racer X7",
+    "reassign": [
+        {
+            "index": 0,
+            "with": 3
+        },
+        {
+            "index": 2,
+            "with": 0
+        },
+        {
+            "index": 3,
+            "with": 2
+        }
+    ]
+}

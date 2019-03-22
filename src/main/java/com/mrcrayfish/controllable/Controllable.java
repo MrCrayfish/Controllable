@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import com.mrcrayfish.controllable.asm.ControllablePlugin;
 import com.mrcrayfish.controllable.client.*;
 import com.studiohartman.jamepad.*;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLFileResourcePack;
@@ -88,10 +89,21 @@ public class Controllable extends DummyModContainer
     {
         //ControllerProperties.load(event.getModConfigurationDirectory());
 
+        /* Loads up the controller manager and setup shutdown cleanup */
         Controllable.manager = new ControllerManager();
         Controllable.manager.initSDLGamepad();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> Controllable.manager.quitSDLGamepad()));
 
+        /* Attempts to load the first controller connected */
+        ControllerIndex index = manager.getControllerIndex(0);
+        if(index.isConnected())
+        {
+            setController(new Controller(index));
+        }
+
+        Mappings.load(event.getModConfigurationDirectory());
+
+        /* Registers events */
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(input = new ControllerInput());
         MinecraftForge.EVENT_BUS.register(new RenderEvents());
@@ -130,7 +142,7 @@ public class Controllable extends DummyModContainer
         }
         else if(controller == null)
         {
-            controller = new Controller(null);
+            controller = new Controller(manager.getControllerIndex(selectedControllerIndex));
             buttonStates = new boolean[Buttons.LENGTH];
         }
 
@@ -157,6 +169,11 @@ public class Controllable extends DummyModContainer
 
     private static void processButton(int index, boolean state)
     {
+        if(controller.getMapping() != null)
+        {
+            index = controller.getMapping().remap(index);
+        }
+
         if(state)
         {
             if(!buttonStates[index])

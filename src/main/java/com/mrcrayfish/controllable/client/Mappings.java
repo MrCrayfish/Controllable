@@ -14,18 +14,21 @@ import java.util.*;
  */
 public class Mappings
 {
-    static final Entry DEFAULT_MAPPING = new Entry("Default", "Default", new HashMap<>());
     private static final Map<String, Entry> MAPPINGS = new HashMap<>();
 
     private static boolean loaded = false;
+
+    static
+    {
+        MAPPINGS.put("Default", null);
+    }
 
     public static void load(File configFolder)
     {
         if(loaded)
             return;
 
-        loadInternalMapping("ps4_controller");
-        loadInternalMapping("usb_controller");
+        loadInternalMapping("defender_game_racer_x7");
 
         File folder = new File(configFolder, "controllable/mappings");
         if(!folder.mkdirs())
