@@ -18,7 +18,11 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Author: MrCrayfish
@@ -33,6 +37,7 @@ public class Controllable extends DummyModContainer
     private static ControllerInput input;
     private static boolean[] buttonStates;
     private static int selectedControllerIndex;
+    private static List<String> connectedControllerNames;
     private static int currentControllerCount;
 
     public Controllable()
@@ -56,6 +61,7 @@ public class Controllable extends DummyModContainer
     {
         return selectedControllerIndex;
     }
+
 
     @Override
     public boolean registerBus(final EventBus bus, final LoadController controller)
@@ -91,6 +97,7 @@ public class Controllable extends DummyModContainer
         Controllable.manager = new ControllerManager();
         Controllable.manager.initSDLGamepad();
         Controllable.currentControllerCount = manager.getNumControllers();
+        Controllable.connectedControllerNames = getConnectedControllerNames();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> Controllable.manager.quitSDLGamepad()));
 
         /* Attempts to load the first controller connected */
@@ -117,6 +124,25 @@ public class Controllable extends DummyModContainer
         controller.updateState(manager.getState(selectedControllerIndex));
     }
 
+    public static List<String> getConnectedControllerNames()
+    {
+        /* Adds all the connected controller's names to a list. Used to determine which controller was
+         * connected or disconnected */
+        List<String> names = new ArrayList<>();
+        for(int i = 0; i < manager.getNumControllers(); i++)
+        {
+            try
+            {
+                names.add(manager.getControllerIndex(i).getName());
+            }
+            catch(ControllerUnpluggedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return names;
+    }
+
     @SubscribeEvent
     public void handleButtonInput(TickEvent.RenderTickEvent event)
     {
@@ -129,9 +155,27 @@ public class Controllable extends DummyModContainer
         int controllersCount = manager.getNumControllers();
         if(controllersCount != currentControllerCount)
         {
+            boolean connected = controllersCount > currentControllerCount;
+            List<String> newControllers = connected ? getConnectedControllerNames() : connectedControllerNames;
+            List<String> oldControllers = connected ? connectedControllerNames : getConnectedControllerNames();
+            for(String name : oldControllers)
+            {
+                Iterator<String> it = newControllers.iterator();
+                while(it.hasNext())
+                {
+                    if(it.next().equals(name))
+                    {
+                        it.remove();
+                        break;
+                    }
+                }
+            }
+            connectedControllerNames = getConnectedControllerNames();
+
             if(mc.player != null)
             {
-                Minecraft.getMinecraft().getToastGui().add(new ControllerToast(controllersCount > currentControllerCount));
+                String controllerName = newControllers.size() > 0 ? newControllers.get(0) : "Controller";
+                Minecraft.getMinecraft().getToastGui().add(new ControllerToast(connected, controllerName));
             }
             currentControllerCount = manager.getNumControllers();
         }

@@ -12,10 +12,12 @@ import net.minecraft.util.text.TextFormatting;
 public class ControllerToast implements IToast
 {
     private boolean connected;
+    private String controllerName;
 
-    public ControllerToast(boolean connected)
+    public ControllerToast(boolean connected, String controllerName)
     {
         this.connected = connected;
+        this.controllerName = controllerName;
     }
 
     @Override
@@ -28,7 +30,8 @@ public class ControllerToast implements IToast
         toastGui.getMinecraft().getTextureManager().bindTexture(GuiControllerLayout.TEXTURE);
         toastGui.drawTexturedModalRect(8, 8, 20, 43, 20, 16);
 
-        toastGui.getMinecraft().fontRenderer.drawString(TextFormatting.DARK_GRAY + "Controller", 35, 7, 0);
+        String title = toastGui.getMinecraft().fontRenderer.trimStringToWidth(controllerName, 120);
+        toastGui.getMinecraft().fontRenderer.drawString(TextFormatting.DARK_GRAY + title, 35, 7, 0);
 
         String message = connected ?
                 TextFormatting.DARK_GREEN.toString() + TextFormatting.BOLD.toString() + "Connected" :
