@@ -28,11 +28,44 @@ public class Controller
         this.states = new boolean[Buttons.LENGTH];
     }
 
-    public int getIndex()
+    /**
+     * Gets the number of this controller
+     *
+     * @return the number of this controller
+     */
+    public int getNumber()
     {
         return index.getIndex();
     }
 
+    /**
+     * Gets the {@link ControllerIndex} instance of this controller. This allows for more raw access
+     * to the controller. It is also useful for making controller rumble.
+     *
+     * @return the {@link ControllerIndex} instance of this controller
+     */
+    public ControllerIndex getIndex()
+    {
+        return index;
+    }
+
+    /**
+     * Gets the {@link ControllerState} instance of this controller. This provides the current state
+     * of all the buttons. This is useful for bypassing {@link #states} as a state can be false
+     * (because it was cancelled) but is actually pressed down.
+     *
+     * @return the {@link ControllerState} instance of this controller
+     */
+    public ControllerState getState()
+    {
+        return state;
+    }
+
+    /**
+     * Updates the {@link ControllerState} of this controller
+     *
+     * @param state the new {@link ControllerState} for this controller
+     */
     public void updateState(ControllerState state)
     {
         this.state = state;
@@ -143,11 +176,21 @@ public class Controller
         states[button] = state;
     }
 
+    /**
+     * Sets the mapping for this controller
+     *
+     * @param mapping the mapping to assign
+     */
     void setMapping(Mappings.Entry mapping)
     {
         this.mapping = mapping;
     }
 
+    /**
+     * Gets the mapping of this controller
+     *
+     * @return the mapping of this controller or null if not present
+     */
     @Nullable
     public Mappings.Entry getMapping()
     {

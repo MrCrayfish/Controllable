@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Author: MrCrayfish
@@ -119,7 +118,7 @@ public class Controllable extends DummyModContainer
     public static void setController(Controller controller)
     {
         Controllable.controller = controller;
-        selectedControllerIndex = controller.getIndex();
+        selectedControllerIndex = controller.getNumber();
         buttonStates = new boolean[Buttons.LENGTH];
         controller.updateState(manager.getState(selectedControllerIndex));
     }
