@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.GuiButtonController;
 import com.mrcrayfish.controllable.client.gui.GuiControllerSelection;
 import com.studiohartman.jamepad.ControllerManager;
@@ -24,6 +25,13 @@ public class GuiEvents
     @SubscribeEvent
     public void onOpenGui(GuiScreenEvent.InitGuiEvent event)
     {
+        /* Resets the controller button states */
+        Controller controller = Controllable.getController();
+        if(controller != null)
+        {
+            controller.resetButtonStates();
+        }
+
         if(event.getGui() instanceof GuiMainMenu)
         {
             int y = (event.getGui().height / 4 + 48) + 24 * 2;

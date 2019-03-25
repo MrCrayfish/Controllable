@@ -177,6 +177,17 @@ public class Controller
     }
 
     /**
+     * Resets all buttons states. Called when a GUI is opened.
+     */
+    void resetButtonStates()
+    {
+        for(int i = 0; i < states.length; i++)
+        {
+            states[i] = false;
+        }
+    }
+
+    /**
      * Sets the mapping for this controller
      *
      * @param mapping the mapping to assign
