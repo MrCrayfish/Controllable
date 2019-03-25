@@ -7,5 +7,5 @@ public class Reference
 {
     public static final String MOD_ID = "controllable";
     public static final String MOD_NAME = "Controllable";
-    public static final String MOD_VERSION = "0.2.1";
+    public static final String MOD_VERSION = "0.2.2";
 }
