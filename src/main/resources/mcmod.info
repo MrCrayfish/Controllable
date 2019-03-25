@@ -3,7 +3,7 @@
   "modid": "controllable",
   "name": "Controllable",
   "description": "Adds in the ability to use a controller to play Minecraft",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "mcversion": "1.12.2",
   "url": "https://mrcrayfish.com/mods?id=controllable",
   "updateJSON": "https://raw.githubusercontent.com/MrCrayfish/Controllable/master/update.json",
