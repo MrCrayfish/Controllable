@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
@@ -170,10 +171,11 @@ public class ControllerInput
             if(controller.getRThumbStickXValue() != 0.0F || controller.getRThumbStickYValue() != 0.0F)
             {
                 lastUse = 100;
-                if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.ControllerTurnEvent(controller)))
+                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, 20.0F, 15.0F);
+                if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
-                    float rotationYaw = 20.0F * (controller.getRThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickXValue());
-                    float rotationPitch = 15.0F * (controller.getRThumbStickYValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickYValue());
+                    float rotationYaw = turnEvent.getYawSpeed() * (controller.getRThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickXValue());
+                    float rotationPitch = turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickYValue());
                     player.turn(rotationYaw, rotationPitch);
                 }
             }
@@ -281,7 +283,6 @@ public class ControllerInput
 
             if(controller.isButtonPressed(Buttons.A))
             {
-                lastUse = 100;
                 event.getMovementInput().jump = true;
             }
         }
@@ -296,9 +297,11 @@ public class ControllerInput
     {
         lastUse = 100;
 
-        if(MinecraftForge.EVENT_BUS.post(new ControllerEvent.ButtonInput(controller, button, state)))
+        ControllerEvent.ButtonInput event = new ControllerEvent.ButtonInput(controller, button, state);
+        if(MinecraftForge.EVENT_BUS.post(event))
             return;
 
+        button = event.getModifiedButton();
         controller.setButtonState(button, state);
 
         Minecraft mc = Minecraft.getMinecraft();
