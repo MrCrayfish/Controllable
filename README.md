@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    compile 'controllable:Controllable:1.12.1:0.1.1'
+    compile 'controllable:Controllable:1.12.1:0.2.1'
 }
 
 minecraft {
