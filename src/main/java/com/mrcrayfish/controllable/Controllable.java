@@ -125,6 +125,9 @@ public class Controllable extends DummyModContainer
 
     public static List<String> getConnectedControllerNames()
     {
+        /* Ensures that the number of controllers matches the controller index size */
+        manager.update();
+
         /* Adds all the connected controller's names to a list. Used to determine which controller was
          * connected or disconnected */
         List<String> names = new ArrayList<>();
