@@ -585,7 +585,7 @@ public class ControllerInput
 
                 Field lastMouseEvent = ReflectionHelper.findField(GuiScreen.class, "lastMouseEvent", "field_146288_g");
                 lastMouseEvent.setAccessible(true);
-                lastMouseEvent.set(gui, System.currentTimeMillis());
+                lastMouseEvent.set(gui, Minecraft.getSystemTime());
 
                 Method mouseClicked = ReflectionHelper.findMethod(GuiScreen.class, "mouseClicked", "func_73864_a", int.class, int.class, int.class);
                 mouseClicked.setAccessible(true);
