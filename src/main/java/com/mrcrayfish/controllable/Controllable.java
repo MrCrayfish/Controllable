@@ -173,14 +173,21 @@ public class Controllable extends DummyModContainer
                     }
                 }
             }
+
+            /* If no controllers were plugged in, make the new controller the active one */
+            if(currentControllerCount == 0 && controllersCount > 0)
+            {
+                setController(new Controller(manager.getControllerIndex(controllersCount - 1)));
+            }
+
             connectedControllerNames = getConnectedControllerNames();
+            currentControllerCount = manager.getNumControllers();
 
             if(mc.player != null)
             {
                 String controllerName = newControllers.size() > 0 ? newControllers.get(0) : I18n.format("controllable.toast.controller");
                 Minecraft.getMinecraft().getToastGui().add(new ControllerToast(connected, controllerName));
             }
-            currentControllerCount = manager.getNumControllers();
         }
 
         ControllerState state = manager.getState(selectedControllerIndex);
