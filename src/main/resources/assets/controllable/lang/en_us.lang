@@ -27,4 +27,4 @@ controllable.gui.cancel=Cancel
 
 controllable.toast.controller=Controller
 controllable.toast.connected=Connected
-controllable.toast.disconnected=Connected
+controllable.toast.disconnected=Disconnected
