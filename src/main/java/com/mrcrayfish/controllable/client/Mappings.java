@@ -73,6 +73,7 @@ public class Mappings
                 String mapping = controller.getName();
                 Entry entry = MAPPINGS.get(mapping);
                 controller.setMapping(entry);
+                if(entry != null)
                 ControllerProperties.setSelectedMapping(mapping);
                 changed = true;
             }
