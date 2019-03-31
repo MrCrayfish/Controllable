@@ -25,7 +25,7 @@ public class ControllerProperties
             {
                 if(file.createNewFile())
                 {
-                    Controllable.LOGGER.error("Successfully created controller properties");
+                    Controllable.LOGGER.info("Successfully created controller properties");
                 }
                 if(file.exists())
                 {

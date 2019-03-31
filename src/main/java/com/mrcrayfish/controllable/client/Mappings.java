@@ -32,9 +32,9 @@ public class Mappings
         loadInternalMapping("defender_game_racer_x7");
 
         File folder = new File(configFolder, "controllable/mappings");
-        if(!folder.mkdirs())
+        if(folder.mkdirs())
         {
-            Controllable.LOGGER.error("Failed to created Controllable config folder");
+            Controllable.LOGGER.info("Successfully created Controllable config folder");
         }
 
         File[] files = folder.listFiles();
