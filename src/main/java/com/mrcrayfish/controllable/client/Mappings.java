@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -145,14 +146,14 @@ public class Mappings
     {
         private String id;
         private String name;
-        private Map<Integer, Integer> reassignments;
+        private ImmutableMap<Integer, Integer> reassignments;
         private boolean internal;
 
         public Entry(String id, String name, Map<Integer, Integer> reassignments)
         {
             this.id = id;
             this.name = name;
-            this.reassignments = reassignments;
+            this.reassignments = ImmutableMap.copyOf(reassignments);
         }
 
         public String getId()
@@ -165,7 +166,7 @@ public class Mappings
             return name;
         }
 
-        public Map<Integer, Integer> getReassignments()
+        public ImmutableMap<Integer, Integer> getReassignments()
         {
             return reassignments;
         }
