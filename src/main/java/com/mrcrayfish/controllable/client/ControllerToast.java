@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.client.gui.GuiControllerLayout;
 import net.minecraft.client.gui.toasts.GuiToast;
 import net.minecraft.client.gui.toasts.IToast;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
 
 /**
@@ -34,8 +35,8 @@ public class ControllerToast implements IToast
         toastGui.getMinecraft().fontRenderer.drawString(TextFormatting.DARK_GRAY + title, 35, 7, 0);
 
         String message = connected ?
-                TextFormatting.DARK_GREEN.toString() + TextFormatting.BOLD.toString() + "Connected" :
-                TextFormatting.RED.toString() + TextFormatting.BOLD.toString() + "Disconnected";
+                TextFormatting.DARK_GREEN.toString() + TextFormatting.BOLD.toString() + I18n.format("controllable.toast.connected") :
+                TextFormatting.RED.toString() + TextFormatting.BOLD.toString() + I18n.format("controllable.toast.disconnected");
         toastGui.getMinecraft().fontRenderer.drawString(TextFormatting.BOLD + message, 35, 18, 0);
 
         return delta >= 3000L ? IToast.Visibility.HIDE : IToast.Visibility.SHOW;

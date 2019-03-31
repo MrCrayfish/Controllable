@@ -8,6 +8,7 @@ import com.studiohartman.jamepad.ControllerManager;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
 
 import java.io.IOException;
 
@@ -36,9 +37,9 @@ public class GuiControllerSelection extends GuiScreen
     public void initGui()
     {
         listControllers = new GuiListControllers(manager, mc, this.width, this.height, 32, this.height - 44, 20);
-        this.addButton(btnSelect = new GuiButton(0, this.width / 2 - 154, this.height - 32, 100, 20, "Select")); //TODO localize I18n.format("selectWorld.select")
-        this.addButton(btnConfigure = new GuiButton(1, this.width / 2 - 50, this.height - 32, 100, 20, "Configure"));
-        this.addButton(btnCancel = new GuiButton(2, this.width / 2 + 54, this.height - 32, 100, 20, "Cancel"));
+        this.addButton(btnSelect = new GuiButton(0, this.width / 2 - 154, this.height - 32, 100, 20, I18n.format("controllable.gui.select"))); //TODO localize I18n.format("selectWorld.select")
+        this.addButton(btnConfigure = new GuiButton(1, this.width / 2 - 50, this.height - 32, 100, 20, I18n.format("controllable.gui.configure")));
+        this.addButton(btnCancel = new GuiButton(2, this.width / 2 + 54, this.height - 32, 100, 20, I18n.format("controllable.gui.cancel")));
         //btnConfigure.enabled = Controllable.getSelectedControllerIndex() != -1;
         btnConfigure.enabled = false;
     }
@@ -92,7 +93,7 @@ public class GuiControllerSelection extends GuiScreen
     {
         this.drawDefaultBackground();
         listControllers.drawScreen(mouseX, mouseY, partialTicks);
-        this.drawCenteredString(this.fontRenderer, "Select a Controller", this.width / 2, 20, 16777215);
+        this.drawCenteredString(this.fontRenderer, I18n.format("controllable.gui.title.select_controller"), this.width / 2, 20, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 

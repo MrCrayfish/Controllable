@@ -12,6 +12,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemBlock;
@@ -53,19 +54,19 @@ public class RenderEvents
                         Slot slot = container.getSlotUnderMouse();
                         if(slot.getHasStack())
                         {
-                            actions.put(Buttons.A, new Action("Pickup Stack", Action.Side.LEFT));
-                            actions.put(Buttons.X, new Action("Pickup Item", Action.Side.LEFT));
-                            actions.put(Buttons.B, new Action("Quick Move", Action.Side.LEFT));
+                            actions.put(Buttons.A, new Action(I18n.format("controllable.action.pickup_stack"), Action.Side.LEFT));
+                            actions.put(Buttons.X, new Action(I18n.format("controllable.action.pickup_item"), Action.Side.LEFT));
+                            actions.put(Buttons.B, new Action(I18n.format("controllable.action.quick_move"), Action.Side.LEFT));
                         }
                     }
                 }
                 else
                 {
-                    actions.put(Buttons.A, new Action("Place Stack", Action.Side.LEFT));
-                    actions.put(Buttons.X, new Action("Place Item", Action.Side.LEFT));
+                    actions.put(Buttons.A, new Action(I18n.format("controllable.action.place_stack"), Action.Side.LEFT));
+                    actions.put(Buttons.X, new Action(I18n.format("controllable.action.place_item"), Action.Side.LEFT));
                 }
 
-                actions.put(Buttons.Y, new Action("Close Inventory", Action.Side.RIGHT));
+                actions.put(Buttons.Y, new Action(I18n.format("controllable.action.close_inventory"), Action.Side.RIGHT));
             }
             else if(mc.currentScreen == null)
             {
@@ -80,11 +81,11 @@ public class RenderEvents
                 {
                     if(blockHit)
                     {
-                        actions.put(Buttons.RIGHT_TRIGGER, new Action("Break", Action.Side.RIGHT));
+                        actions.put(Buttons.RIGHT_TRIGGER, new Action(I18n.format("controllable.action.break"), Action.Side.RIGHT));
                     }
                     else
                     {
-                        actions.put(Buttons.RIGHT_TRIGGER, new Action("Attack", Action.Side.RIGHT));
+                        actions.put(Buttons.RIGHT_TRIGGER, new Action(I18n.format("controllable.action.attack"), Action.Side.RIGHT));
                     }
                 }
 
@@ -96,17 +97,17 @@ public class RenderEvents
                         case EAT:
                             if(mc.player.getFoodStats().needFood())
                             {
-                                actions.put(Buttons.LEFT_TRIGGER, new Action("Eat", Action.Side.RIGHT));
+                                actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
                             }
                             break;
                         case DRINK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action("Drink", Action.Side.RIGHT));
+                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
                             break;
                         case BLOCK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action("Block", Action.Side.RIGHT));
+                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
                             break;
                         case BOW:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action("Pull Bow", Action.Side.RIGHT));
+                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
                             break;
                     }
                 }
@@ -119,17 +120,17 @@ public class RenderEvents
                         case EAT:
                             if(mc.player.getFoodStats().needFood())
                             {
-                                actions.put(Buttons.LEFT_TRIGGER, new Action("Eat", Action.Side.RIGHT));
+                                actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
                             }
                             break;
                         case DRINK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action("Drink", Action.Side.RIGHT));
+                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
                             break;
                         case BLOCK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action("Block", Action.Side.RIGHT));
+                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
                             break;
                         case BOW:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action("Pull Bow", Action.Side.RIGHT));
+                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
                             break;
                     }
                 }
@@ -140,41 +141,41 @@ public class RenderEvents
                         ItemBlock block = (ItemBlock) currentItem.getItem();
                         if(block.getBlock().canPlaceBlockAt(mc.world, mc.objectMouseOver.getBlockPos().offset(mc.objectMouseOver.sideHit)))
                         {
-                            actions.put(Buttons.LEFT_TRIGGER, new Action("Place Block", Action.Side.RIGHT));
+                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
                         }
                     }
                 }
                 else if(!currentItem.isEmpty() && !mc.player.isHandActive())
                 {
-                    actions.put(Buttons.LEFT_TRIGGER, new Action("Use Item", Action.Side.RIGHT));
+                    actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.use_item"), Action.Side.RIGHT));
                 }
 
                 if(!mc.player.isSneaking() && blockHit && canOpenBlock && !mc.player.isHandActive())
                 {
-                    actions.put(Buttons.LEFT_TRIGGER, new Action("Interact", Action.Side.RIGHT));
+                    actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.interact"), Action.Side.RIGHT));
                 }
 
-                //actions.put(Buttons.A, new Action("Jump", Action.Side.LEFT)); //TODO make a verbose action config option
+                //actions.put(Buttons.A, new Action(I18n.format("controllable.action.jump"), Action.Side.LEFT)); //TODO make a verbose action config option
 
-                actions.put(Buttons.Y, new Action("Inventory", Action.Side.LEFT));
+                actions.put(Buttons.Y, new Action(I18n.format("controllable.action.inventory"), Action.Side.LEFT));
 
                 if(!mc.player.getHeldItemOffhand().isEmpty() || !mc.player.inventory.getCurrentItem().isEmpty())
                 {
-                    //actions.put(Buttons.X, new Action("Swap Hands", Action.Side.LEFT));  //TODO make a verbose action config option
+                    //actions.put(Buttons.X, new Action(I18n.format("controllable.action.swap_hands"), Action.Side.LEFT));  //TODO make a verbose action config option
                 }
 
                 if(mc.player.isRiding())
                 {
-                    actions.put(Buttons.LEFT_THUMB_STICK, new Action("Dismount", Action.Side.RIGHT));
+                    actions.put(Buttons.LEFT_THUMB_STICK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
                 }
                 else
                 {
-                    //actions.put(Buttons.LEFT_THUMB_STICK, new Action("Sneak", Action.Side.RIGHT));  //TODO make a verbose action config option
+                    //actions.put(Buttons.LEFT_THUMB_STICK, new Action(I18n.format("controllable.action.sneak"), Action.Side.RIGHT));  //TODO make a verbose action config option
                 }
 
                 if(!mc.player.inventory.getCurrentItem().isEmpty())
                 {
-                    actions.put(Buttons.DPAD_DOWN, new Action("Drop Item", Action.Side.LEFT));
+                    actions.put(Buttons.DPAD_DOWN, new Action(I18n.format("controllable.action.drop_item"), Action.Side.LEFT));
                 }
             }
 

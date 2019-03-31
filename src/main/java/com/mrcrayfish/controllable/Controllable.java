@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.asm.ControllablePlugin;
 import com.mrcrayfish.controllable.client.*;
 import com.studiohartman.jamepad.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLFileResourcePack;
 import net.minecraftforge.fml.client.FMLFolderResourcePack;
@@ -176,7 +177,7 @@ public class Controllable extends DummyModContainer
 
             if(mc.player != null)
             {
-                String controllerName = newControllers.size() > 0 ? newControllers.get(0) : "Controller";
+                String controllerName = newControllers.size() > 0 ? newControllers.get(0) : I18n.format("controllable.toast.controller");
                 Minecraft.getMinecraft().getToastGui().add(new ControllerToast(connected, controllerName));
             }
             currentControllerCount = manager.getNumControllers();
