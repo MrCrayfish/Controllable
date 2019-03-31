@@ -42,7 +42,7 @@ public class ControllerProperties
         }
     }
 
-    public static void save()
+    static void save()
     {
         if(!loaded)
             return;
