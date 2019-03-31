@@ -48,63 +48,44 @@ public class Mappings
             }
         }
 
-        loadPreferences(configFolder);
+        initProperties();
 
         loaded = true;
     }
 
-    private static void loadPreferences(File configFolder)
+    private static void initProperties()
     {
-        try
+        boolean changed = false;
+        Controller controller = Controllable.getController();
+        if(controller != null)
         {
-            Properties properties = new Properties();
-            File file = new File(configFolder, "controllable/controller.prefs");
-            if(!file.createNewFile())
+            String lastController = ControllerProperties.getLastController();
+            boolean sameController = controller.getName().equals(lastController);
+            if(lastController.trim().isEmpty() || !sameController)
             {
-                Controllable.LOGGER.error("Failed to create controller preferences");
+                ControllerProperties.setLastController(controller.getName());
+                changed = true;
             }
-            if(file.exists())
+
+            String selectedMapping = ControllerProperties.getSelectedMapping();
+            if(selectedMapping.trim().isEmpty() || !sameController)
             {
-                properties.load(new FileInputStream(file));
-
-                String currentController = properties.getProperty("CurrentController", "");
-                String selectedMapping = properties.getProperty("SelectedMapping", "");
-
-                boolean changed = false;
-                Controller controller = Controllable.getController();
-                if(controller != null)
-                {
-                    boolean sameController = controller.getName().equals(currentController);
-                    if(currentController.trim().isEmpty() || !sameController)
-                    {
-                        properties.setProperty("CurrentController", controller.getName());
-                        changed = true;
-                    }
-
-                    if(selectedMapping.trim().isEmpty() || !sameController)
-                    {
-                        String mapping = controller.getName();
-                        Entry entry = MAPPINGS.get(mapping);
-                        controller.setMapping(entry);
-                        properties.setProperty("SelectedMapping", mapping);
-                        changed = true;
-                    }
-                    else
-                    {
-                        Entry entry = MAPPINGS.get(selectedMapping);
-                        controller.setMapping(entry);
-                    }
-                }
-
-                if(changed)
-                {
-                    properties.store(new FileOutputStream(file), "Controller Preferences");
-                }
+                String mapping = controller.getName();
+                Entry entry = MAPPINGS.get(mapping);
+                controller.setMapping(entry);
+                ControllerProperties.setSelectedMapping(mapping);
+                changed = true;
+            }
+            else
+            {
+                Entry entry = MAPPINGS.get(selectedMapping);
+                controller.setMapping(entry);
             }
         }
-        catch(IOException e)
+
+        if(changed)
         {
-            e.printStackTrace();
+            ControllerProperties.save();
         }
     }
 

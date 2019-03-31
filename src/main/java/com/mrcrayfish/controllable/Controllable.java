@@ -100,6 +100,8 @@ public class Controllable extends DummyModContainer
         Controllable.connectedControllerNames = getConnectedControllerNames();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> Controllable.manager.quitSDLGamepad()));
 
+        ControllerProperties.load(event.getModConfigurationDirectory());
+
         /* Attempts to load the first controller connected */
         ControllerIndex index = manager.getControllerIndex(0);
         if(index.isConnected())
