@@ -83,6 +83,15 @@ public abstract class ControllerEvent extends Event
     }
 
     @Cancelable
+    public static class Button extends ControllerEvent
+    {
+        public Button(Controller controller)
+        {
+            super(controller);
+        }
+    }
+
+    @Cancelable
     public static class Move extends ControllerEvent
     {
         public Move(Controller controller)

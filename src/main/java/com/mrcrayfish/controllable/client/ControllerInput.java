@@ -8,7 +8,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
@@ -183,7 +182,7 @@ public class ControllerInput
 
         if(mc.currentScreen == null)
         {
-            if(controller.isButtonPressed(Buttons.DPAD_DOWN))
+            if(ButtonBindings.DROP_ITEM.isButtonDown())
             {
                 lastUse = 100;
                 dropCounter++;
@@ -198,7 +197,7 @@ public class ControllerInput
             }
             dropCounter = 0;
         }
-        else if(dropCounter > 0 && !controller.isButtonPressed(Buttons.DPAD_DOWN))
+        else if(dropCounter > 0 && !ButtonBindings.DROP_ITEM.isButtonDown())
         {
             if (!mc.player.isSpectator())
             {
@@ -237,7 +236,7 @@ public class ControllerInput
         {
             lastUse = 100;
             sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
-            sneaking |= controller.isButtonPressed(Buttons.LEFT_THUMB_STICK);
+            sneaking |= ButtonBindings.SNEAK.isButtonDown();
             isFlying = true;
         }
         else if(isFlying)
@@ -281,13 +280,13 @@ public class ControllerInput
                 }
             }
 
-            if(controller.isButtonPressed(Buttons.A))
+            if(ButtonBindings.JUMP.isButtonDown())
             {
                 event.getMovementInput().jump = true;
             }
         }
 
-        if(controller.isButtonPressed(Buttons.LEFT_TRIGGER) && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
+        if(ButtonBindings.USE_ITEM.isButtonDown() && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
         {
             mc.rightClickMouse();
         }
@@ -297,19 +296,23 @@ public class ControllerInput
     {
         lastUse = 100;
 
-        ControllerEvent.ButtonInput event = new ControllerEvent.ButtonInput(controller, button, state);
-        if(MinecraftForge.EVENT_BUS.post(event))
+        ControllerEvent.ButtonInput eventInput = new ControllerEvent.ButtonInput(controller, button, state);
+        if(MinecraftForge.EVENT_BUS.post(eventInput))
             return;
 
-        button = event.getModifiedButton();
-        controller.setButtonState(button, state);
+        button = eventInput.getModifiedButton();
+        ButtonBinding.setButtonState(button, state);
+
+        ControllerEvent.Button event = new ControllerEvent.Button(controller);
+        if(MinecraftForge.EVENT_BUS.post(event))
+            return;
 
         Minecraft mc = Minecraft.getMinecraft();
         if(state)
         {
-            if(button == Buttons.Y)
+            if(mc.currentScreen == null)
             {
-                if(mc.currentScreen == null)
+                if(ButtonBindings.INVENTORY.isButtonPressed())
                 {
                     if(mc.playerController.isRidingHorse())
                     {
@@ -323,89 +326,108 @@ public class ControllerInput
                     prevTargetMouseX = targetMouseX = Mouse.getX();
                     prevTargetMouseY = targetMouseY = Mouse.getY();
                 }
-                else if(mc.player != null)
+                else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
-                    mc.player.closeScreen();
+                    if(mc.player != null && !mc.player.capabilities.isFlying && !mc.player.isRiding())
+                    {
+                        sneaking = !sneaking;
+                    }
                 }
-            }
-            else if(button == Buttons.LEFT_THUMB_STICK)
-            {
-                if(mc.currentScreen == null && mc.player != null && !mc.player.capabilities.isFlying && !mc.player.isRiding())
+                else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
                 {
-                    sneaking = !sneaking;
+                    if(mc.player != null)
+                    {
+                        mc.player.inventory.changeCurrentItem(-1);
+                    }
                 }
-            }
-            else if(button == Buttons.LEFT_BUMPER)
-            {
-                if(mc.currentScreen == null)
+                else if(ButtonBindings.SCROLL_LEFT.isButtonPressed())
                 {
-                    mc.player.inventory.changeCurrentItem(1);
+                    if(mc.player != null)
+                    {
+                        mc.player.inventory.changeCurrentItem(1);
+                    }
                 }
-                else if(mc.currentScreen instanceof GuiContainerCreative)
+                else if(ButtonBindings.SWAP_HANDS.isButtonPressed())
                 {
-                    scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, -1);
+                    if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
+                    {
+                        mc.getConnection().sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.SWAP_HELD_ITEMS, BlockPos.ORIGIN, EnumFacing.DOWN));
+                    }
                 }
-            }
-            else if(button == Buttons.RIGHT_BUMPER)
-            {
-                if(mc.currentScreen == null)
+                else if(ButtonBindings.TOGGLE_PERSPECTIVE.isButtonPressed() && mc.inGameHasFocus)
                 {
-                    mc.player.inventory.changeCurrentItem(-1);
+                    cycleThirdPersonView();
                 }
-                else if(mc.currentScreen instanceof GuiContainerCreative)
+                else if(mc.player != null && !mc.player.isHandActive())
                 {
-                    scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, 1);
-                }
-            }
-            else if(button == Buttons.A && mc.currentScreen != null)
-            {
-                invokeMouseClick(mc.currentScreen, 0);
-            }
-            else if(button == Buttons.X)
-            {
-                if(mc.currentScreen != null)
-                {
-                    invokeMouseClick(mc.currentScreen, 1);
-                }
-                else if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
-                {
-                    mc.getConnection().sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.SWAP_HELD_ITEMS, BlockPos.ORIGIN, EnumFacing.DOWN));
-                }
-            }
-            else if(button == Buttons.B && mc.currentScreen != null && mc.player != null && mc.player.inventory.getItemStack().isEmpty())
-            {
-                invokeMouseClick(mc.currentScreen, 0);
-            }
-            else if(button == Buttons.DPAD_UP && mc.inGameHasFocus && mc.currentScreen == null)
-            {
-                cycleThirdPersonView();
-            }
-            else if(mc.player != null)
-            {
-                if(!mc.player.isHandActive() && mc.currentScreen == null)
-                {
-                    if(button == Buttons.RIGHT_TRIGGER)
+                    if(ButtonBindings.ATTACK.isButtonPressed())
                     {
                         mc.clickMouse();
                     }
-                    else if(button == Buttons.LEFT_TRIGGER)
+                    else if(ButtonBindings.USE_ITEM.isButtonPressed())
                     {
                         mc.rightClickMouse();
                     }
-                    else if(button == Buttons.RIGHT_THUMB_STICK)
+                    else if(ButtonBindings.PICK_BLOCK.isButtonPressed())
                     {
                         mc.middleClickMouse();
                     }
                 }
             }
+            else
+            {
+                if(ButtonBindings.INVENTORY.isButtonPressed())
+                {
+                    if(mc.player != null)
+                    {
+                        mc.player.closeScreen();
+                    }
+                }
+                else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
+                {
+                    if(mc.currentScreen instanceof GuiContainerCreative)
+                    {
+                        scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, 1);
+                    }
+                }
+                else if(ButtonBindings.SCROLL_LEFT.isButtonPressed())
+                {
+                    if(mc.currentScreen instanceof GuiContainerCreative)
+                    {
+                        scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, -1);
+                    }
+                }
+                else if(button == Buttons.A)
+                {
+                    invokeMouseClick(mc.currentScreen, 0);
+                }
+                else if(button == Buttons.X)
+                {
+                    invokeMouseClick(mc.currentScreen, 1);
+                }
+                else if(button == Buttons.B && mc.player != null && mc.player.inventory.getItemStack().isEmpty())
+                {
+                    invokeMouseClick(mc.currentScreen, 0);
+                }
+            }
         }
-        else if(button == Buttons.A && mc.currentScreen != null)
+        else
         {
-            invokeMouseReleased(mc.currentScreen, 0);
-        }
-        else if(button == Buttons.X && mc.currentScreen != null)
-        {
-            invokeMouseReleased(mc.currentScreen, 1);
+            if(mc.currentScreen == null)
+            {
+
+            }
+            else
+            {
+                if(button == Buttons.A)
+                {
+                    invokeMouseReleased(mc.currentScreen, 0);
+                }
+                else if(button == Buttons.X)
+                {
+                    invokeMouseReleased(mc.currentScreen, 1);
+                }
+            }
         }
     }
 
@@ -538,11 +560,11 @@ public class ControllerInput
             int i = (((GuiContainerCreative.ContainerCreative) creative.inventorySlots).itemList.size() + 9 - 1) / 9 - 5;
             int dir = 0;
 
-            if(controller.isButtonPressed(Buttons.DPAD_UP) || controller.getRThumbStickYValue() >= 0.8F)
+            if(controller.getState().dpadUp || controller.getRThumbStickYValue() >= 0.8F)
             {
                 dir = 1;
             }
-            else if(controller.isButtonPressed(Buttons.DPAD_DOWN) || controller.getRThumbStickYValue() <= -0.8F)
+            else if(controller.getState().dpadDown || controller.getRThumbStickYValue() <= -0.8F)
             {
                 dir = -1;
             }
@@ -641,7 +663,7 @@ public class ControllerInput
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            if(controller.isButtonPressed(Buttons.RIGHT_TRIGGER))
+            if(ButtonBindings.ATTACK.isButtonDown())
             {
                 isLeftClicking = true;
             }
@@ -659,7 +681,7 @@ public class ControllerInput
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            if(controller.isButtonPressed(Buttons.LEFT_TRIGGER))
+            if(ButtonBindings.USE_ITEM.isButtonDown())
             {
                 isRightClicking = true;
             }
@@ -676,7 +698,7 @@ public class ControllerInput
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            if(controller.isButtonPressed(Buttons.B))
+            if(controller.getState().b)
             {
                 isSneaking = true;
             }

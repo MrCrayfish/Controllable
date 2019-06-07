@@ -42,7 +42,7 @@ public class ControllerButton extends Gui
         {
             buttonV += this.height * 2;
         }
-        else if(Controllable.getController() != null && Controllable.getController().isButtonPressed(button))
+        else if(Controllable.getController() != null && Controllable.isButtonPressed(button))
         {
             buttonV += this.height;
         }

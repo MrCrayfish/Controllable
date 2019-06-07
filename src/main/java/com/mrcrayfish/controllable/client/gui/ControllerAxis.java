@@ -32,7 +32,7 @@ public class ControllerAxis extends ControllerButton
                     break;
             }
 
-            if(!controller.isButtonPressed(button))
+            if(!Controllable.isButtonPressed(button))
             {
                 GlStateManager.translate(0, -2.5, 0);
             }

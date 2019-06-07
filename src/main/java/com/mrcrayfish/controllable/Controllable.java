@@ -213,6 +213,8 @@ public class Controllable extends DummyModContainer
 
         controller.updateState(state);
 
+        ButtonBinding.tick();
+
         processButton(Buttons.A, state.a);
         processButton(Buttons.B, state.b);
         processButton(Buttons.X, state.x);
@@ -252,5 +254,21 @@ public class Controllable extends DummyModContainer
             buttonStates[index] = false;
             input.handleButtonInput(controller, index, false);
         }
+    }
+
+    /**
+     * Returns whether a button on the controller is pressed or not. This is a raw approach to
+     * getting whether a button is pressed or not. You should use a {@link ButtonBinding} instead.
+     *
+     * @param button the button to check if pressed
+     * @return
+     */
+    public static boolean isButtonPressed(int button)
+    {
+        if(button >= 0 && button < buttonStates.length)
+        {
+            return buttonStates[button];
+        }
+        return false;
     }
 }
