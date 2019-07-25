@@ -21,11 +21,13 @@ public class Controller
     private ControllerIndex index;
     private ControllerState state;
     private boolean[] states;
+    private boolean[] statesOld;
 
     public Controller(ControllerIndex index)
     {
         this.index = index;
         this.states = new boolean[Buttons.LENGTH];
+        this.statesOld = new boolean[Buttons.LENGTH];
     }
 
     /**
@@ -163,6 +165,18 @@ public class Controller
     {
         return states[button];
     }
+    
+    /**
+     * Gets whether or not a button was pressed on the controller when the old state map was last updated. Mappings can be found in
+     * {@link Buttons} to get the index of a button.
+     *
+     * @param button the button to test for
+     * @return if the button is pressed
+     */
+    public boolean wasButtonPressed(int button)
+    {
+        return statesOld[button];
+    }
 
     /**
      * Sets the state of the specified button. This is whether it is pressed or not. This is an
@@ -184,7 +198,19 @@ public class Controller
         for(int i = 0; i < states.length; i++)
         {
             states[i] = false;
+            statesOld[i] = false;
         }
+    }
+    
+    /**
+     * Push current states to the old state map.
+     */
+    void pushOldStates()
+    {
+    	for (int i = 0; i < states.length; i++)
+    	{
+    		statesOld[i] = states[i];
+    	}
     }
 
     /**

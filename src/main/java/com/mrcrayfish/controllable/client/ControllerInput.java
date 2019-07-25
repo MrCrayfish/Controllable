@@ -283,7 +283,17 @@ public class ControllerInput
 
             if(controller.isButtonPressed(Buttons.A))
             {
-                event.getMovementInput().jump = true;
+            	if (!controller.wasButtonPressed(Buttons.A))
+            	{
+            		KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode(), true);
+            	}
+            }
+            else
+            {
+            	if (controller.wasButtonPressed(Buttons.A))
+            	{
+            		KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode(), false);
+            	}
             }
         }
 
@@ -291,6 +301,8 @@ public class ControllerInput
         {
             mc.rightClickMouse();
         }
+        
+        controller.pushOldStates();
     }
 
     public void handleButtonInput(Controller controller, int button, boolean state)
