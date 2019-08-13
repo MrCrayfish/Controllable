@@ -65,7 +65,7 @@ public class GuiControllerSelection extends GuiScreen
         if(!button.enabled)
             return;
 
-        if(button.id == 0)
+        if(button.id == 0 && listControllers.getSelectedIndex() > -1)
         {
             ControllerIndex index = manager.getControllerIndex(listControllers.getSelectedIndex());
             Controller controller = new Controller(index);
