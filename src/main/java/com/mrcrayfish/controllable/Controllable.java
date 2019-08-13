@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.mrcrayfish.controllable.asm.ControllablePlugin;
 import com.mrcrayfish.controllable.client.*;
 import com.studiohartman.jamepad.*;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, acceptedMinecraftVersions = "1.12.2", clientSideOnly = true)
+//@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, acceptedMinecraftVersions = "1.12.2", clientSideOnly = true)
 public class Controllable extends DummyModContainer
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
@@ -88,7 +89,7 @@ public class Controllable extends DummyModContainer
         return this.getSource().isDirectory() ? FMLFolderResourcePack.class : FMLFileResourcePack.class;
     }
 
-    @Mod.EventHandler
+    @Subscribe
     public void onPreInit(FMLPreInitializationEvent event)
     {
         //ControllerProperties.load(event.getModConfigurationDirectory());
