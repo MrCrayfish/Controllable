@@ -121,7 +121,7 @@ public class Controller
      */
     public float getLThumbStickXValue()
     {
-        return Math.abs(state.leftStickX) > 0.05F ? state.leftStickX : 0F;
+        return Math.abs(state.leftStickX) > 0.15F || Math.abs(state.leftStickY) > 0.15F ? state.leftStickX : 0F;
     }
 
     /**
@@ -131,7 +131,7 @@ public class Controller
      */
     public float getLThumbStickYValue()
     {
-        return Math.abs(state.leftStickY) > 0.05F ? state.leftStickY : 0F;
+        return Math.abs(state.leftStickX) > 0.15F || Math.abs(state.leftStickY) > 0.15F ? state.leftStickY : 0F;
     }
 
     /**
@@ -141,7 +141,7 @@ public class Controller
      */
     public float getRThumbStickXValue()
     {
-        return Math.abs(state.rightStickX) > 0.05F ? state.rightStickX : 0F;
+        return Math.abs(state.rightStickX) > 0.15F || Math.abs(state.rightStickY) > 0.15F ? state.rightStickX : 0F;
     }
 
     /**
@@ -151,7 +151,7 @@ public class Controller
      */
     public float getRThumbStickYValue()
     {
-        return Math.abs(state.rightStickY) > 0.05F ? state.rightStickY : 0F;
+        return Math.abs(state.rightStickX) > 0.15F || Math.abs(state.rightStickY) > 0.15F ? state.rightStickY : 0F;
     }
 
     /**
