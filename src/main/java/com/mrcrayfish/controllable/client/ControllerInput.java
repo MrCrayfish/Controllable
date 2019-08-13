@@ -658,6 +658,7 @@ public class ControllerInput
         {
             if(controller.isButtonPressed(Buttons.RIGHT_TRIGGER))
             {
+            	lastUse = 100;
                 isLeftClicking = true;
             }
         }
@@ -676,6 +677,7 @@ public class ControllerInput
         {
             if(controller.isButtonPressed(Buttons.LEFT_TRIGGER))
             {
+            	lastUse = 100;
                 isRightClicking = true;
             }
         }
