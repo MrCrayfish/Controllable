@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.GuiControllerLayout;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
@@ -341,6 +342,21 @@ public class ControllerInput
                 else if(mc.player != null)
                 {
                     mc.player.closeScreen();
+                }
+            }
+            else if(button == Buttons.START)
+            {
+            	if(mc.currentScreen == null)
+                {
+                    mc.displayInGameMenu();
+                }
+                else if(mc.player != null)
+                {
+                    mc.player.closeScreen();
+                }
+                else if(mc.currentScreen instanceof GuiIngameMenu)
+                {
+                	mc.displayGuiScreen(null);
                 }
             }
             else if(button == Buttons.LEFT_THUMB_STICK)
