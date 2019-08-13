@@ -2,7 +2,6 @@ package com.mrcrayfish.controllable;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.mrcrayfish.controllable.asm.ControllablePlugin;
 import com.mrcrayfish.controllable.client.*;
 import com.studiohartman.jamepad.*;
@@ -89,7 +88,7 @@ public class Controllable extends DummyModContainer
         return this.getSource().isDirectory() ? FMLFolderResourcePack.class : FMLFileResourcePack.class;
     }
 
-    @Subscribe
+    @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event)
     {
         //ControllerProperties.load(event.getModConfigurationDirectory());
