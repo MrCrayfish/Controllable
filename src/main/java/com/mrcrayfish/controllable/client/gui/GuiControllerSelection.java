@@ -22,8 +22,12 @@ public class GuiControllerSelection extends GuiScreen
     private ControllerManager manager;
     private GuiListControllers listControllers;
 
-    private GuiButton btnSelect;
+    @SuppressWarnings("unused")
+	private GuiButton btnSelect;
+    
     private GuiButton btnConfigure;
+    
+    @SuppressWarnings("unused")
     private GuiButton btnCancel;
 
     public GuiControllerSelection(ControllerManager manager, boolean mainMenu)

@@ -5,8 +5,6 @@ import com.mrcrayfish.controllable.client.gui.GuiButtonController;
 import com.mrcrayfish.controllable.client.gui.GuiControllerSelection;
 import com.studiohartman.jamepad.ControllerManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiIngameMenu;
-import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiOptions;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;

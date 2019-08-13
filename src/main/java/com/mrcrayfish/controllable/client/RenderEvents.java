@@ -109,6 +109,8 @@ public class RenderEvents
                         case BOW:
                             actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
                             break;
+                        default:
+                        	break;
                     }
                 }
 
@@ -132,6 +134,8 @@ public class RenderEvents
                         case BOW:
                             actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
                             break;
+                        default:
+                        	break;
                     }
                 }
                 else if(currentItem.getItem() instanceof ItemBlock)

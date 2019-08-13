@@ -2,7 +2,6 @@ package com.mrcrayfish.controllable.client.gui;
 
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.Buttons;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
