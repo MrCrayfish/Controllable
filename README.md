@@ -13,6 +13,7 @@ I noticed a lack of support for controller for the Java Edition of Minecraft, th
 
 ### Supported Controllers:
 * Sony PS4 Wireless Controller (via USB)
+* XBox One Controller (via USB, Wireless Adapter, or Bluetooth Wireless)
 * Other controllers coming soon!
 
 **Note:** Support for other controllers will be a community effort. Once the controller mapping system is added, I will be accepting pull requests on GitHub for controller mappings. This is simply because I do not have access to different types of controllers.
