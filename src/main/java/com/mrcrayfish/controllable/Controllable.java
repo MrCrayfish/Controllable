@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable;
 
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mrcrayfish.controllable.asm.ControllablePlugin;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-//@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, acceptedMinecraftVersions = Reference.MOD_COMPATIBILITY, clientSideOnly = true, certificateFingerprint = "4d54165f7f65cf475bf13341569655b980a5b430")
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, acceptedMinecraftVersions = "1.12.2", clientSideOnly = true)
 public class Controllable extends DummyModContainer
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
@@ -47,7 +48,7 @@ public class Controllable extends DummyModContainer
         meta.modId = Reference.MOD_ID;
         meta.name = Reference.MOD_NAME;
         meta.version = Reference.MOD_VERSION;
-        meta.authorList = Collections.singletonList("MrCrayfish");
+        meta.authorList = Collections.unmodifiableList(Lists.newArrayList("MrCrayfish", "SuperKael"));
         meta.url = "https://mrcrayfish.com/mod?id=controllable";
     }
 
