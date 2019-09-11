@@ -157,7 +157,7 @@ public class Controller
      *
      * @param mapping the mapping to assign
      */
-    void setMapping(Mappings.Entry mapping)
+    public void setMapping(Mappings.Entry mapping)
     {
         this.mapping = mapping;
     }

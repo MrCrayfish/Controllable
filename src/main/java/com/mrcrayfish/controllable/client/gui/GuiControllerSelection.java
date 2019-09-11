@@ -40,8 +40,8 @@ public class GuiControllerSelection extends GuiScreen
         this.addButton(btnSelect = new GuiButton(0, this.width / 2 - 154, this.height - 32, 100, 20, I18n.format("controllable.gui.select"))); //TODO localize I18n.format("selectWorld.select")
         this.addButton(btnConfigure = new GuiButton(1, this.width / 2 - 50, this.height - 32, 100, 20, I18n.format("controllable.gui.configure")));
         this.addButton(btnCancel = new GuiButton(2, this.width / 2 + 54, this.height - 32, 100, 20, I18n.format("controllable.gui.cancel")));
-        //btnConfigure.enabled = Controllable.getSelectedControllerIndex() != -1;
-        btnConfigure.enabled = false;
+        btnConfigure.enabled = Controllable.getSelectedControllerIndex() > -1;
+        btnSelect.enabled = Controllable.getSelectedControllerIndex() > -1;
     }
 
     @Override
@@ -52,6 +52,8 @@ public class GuiControllerSelection extends GuiScreen
             controllerCount = manager.getNumControllers();
             listControllers.reload();
             listControllers.setSelectedElement(Controllable.getSelectedControllerIndex());
+            btnConfigure.enabled = listControllers.getSelectedIndex() > -1;
+            btnSelect.enabled = listControllers.getSelectedIndex() > -1;
         }
     }
 

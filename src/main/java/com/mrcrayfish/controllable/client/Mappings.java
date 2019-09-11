@@ -1,13 +1,18 @@
 package com.mrcrayfish.controllable.client;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.stream.JsonWriter;
 import com.mrcrayfish.controllable.Controllable;
+import net.minecraft.client.Minecraft;
 
 import javax.annotation.Nullable;
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -146,14 +151,14 @@ public class Mappings
     {
         private String id;
         private String name;
-        private ImmutableMap<Integer, Integer> reassignments;
+        private BiMap<Integer, Integer> reassignments;
         private boolean internal;
 
         public Entry(String id, String name, Map<Integer, Integer> reassignments)
         {
             this.id = id;
             this.name = name;
-            this.reassignments = ImmutableMap.copyOf(reassignments);
+            this.reassignments = HashBiMap.create(reassignments);
         }
 
         public String getId()
@@ -166,7 +171,7 @@ public class Mappings
             return name;
         }
 
-        public ImmutableMap<Integer, Integer> getReassignments()
+        public BiMap<Integer, Integer> getReassignments()
         {
             return reassignments;
         }
@@ -184,6 +189,47 @@ public class Mappings
                 return value;
             }
             return button;
+        }
+
+        public void save()
+        {
+            try
+            {
+                File mappingsFolder = new File(Minecraft.getMinecraft().gameDir, "config/controllable/mappings");
+                mappingsFolder.mkdirs();
+                String name = id.replaceAll("\\s+", "_").toLowerCase(Locale.ENGLISH) + ".json";
+                GsonBuilder builder = new GsonBuilder();
+                builder.registerTypeAdapter(Entry.class, new Serializer());
+                Gson gson = builder.create();
+                String json = gson.toJson(this);
+                FileOutputStream fos = new FileOutputStream(new File(mappingsFolder, name));
+                fos.write(json.getBytes());
+                fos.close();
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        public static class Serializer implements JsonSerializer<Entry>
+        {
+            @Override
+            public JsonElement serialize(Entry src, Type typeOfSrc, JsonSerializationContext context)
+            {
+                JsonObject object = new JsonObject();
+                object.addProperty("id", src.id);
+                object.addProperty("name", src.name);
+                JsonArray array = new JsonArray();
+                src.reassignments.forEach((index, with) -> {
+                    JsonObject entry = new JsonObject();
+                    entry.addProperty("index", index);
+                    entry.addProperty("with", with);
+                    array.add(entry);
+                });
+                object.add("reassign", array);
+                return object;
+            }
         }
     }
 }

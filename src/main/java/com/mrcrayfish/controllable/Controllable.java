@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mrcrayfish.controllable.asm.ControllablePlugin;
 import com.mrcrayfish.controllable.client.*;
+import com.mrcrayfish.controllable.client.gui.GuiControllerLayout;
 import com.studiohartman.jamepad.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -236,9 +237,23 @@ public class Controllable extends DummyModContainer
 
     private static void processButton(int index, boolean state)
     {
+        if(Minecraft.getMinecraft().currentScreen instanceof GuiControllerLayout && state)
+        {
+            if(((GuiControllerLayout) Minecraft.getMinecraft().currentScreen).onButtonInput(index))
+            {
+                return;
+            }
+        }
+
         if(controller.getMapping() != null)
         {
             index = controller.getMapping().remap(index);
+        }
+
+        //No binding so don't perform any action
+        if(index == -1)
+        {
+            return;
         }
 
         if(state)
