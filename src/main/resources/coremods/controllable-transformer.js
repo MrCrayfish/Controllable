@@ -49,6 +49,22 @@ function initializeCoreMod() {
 
                 return classNode;
             }
+        },
+        'forge_ingame_gui': {
+            'target': {
+                'type': 'CLASS',
+                'name': 'net.minecraftforge.client.ForgeIngameGui'
+            },
+            'transformer': function(classNode) {
+                log("Patching ForgeIngameGui...");
+
+                patch({
+                    obfName: "",
+                    name: "renderPlayerList",
+                    desc: "(II)V",
+                    patch: patch_ForgeIngameGui_renderPlayerList
+                }, classNode);
+            }
         }
     };
 }
@@ -122,9 +138,8 @@ function patch_Minecraft_processKeyBinds(method) {
 
     if(foundNode !== null) {
         var nextNode = foundNode.getNext();
-        method.instructions.remove(foundNode.getPrevious().getPrevious().getPrevious());
-        method.instructions.remove(foundNode.getPrevious().getPrevious());
-        method.instructions.remove(foundNode.getPrevious());
+        if(!removeNthNodes(method.instructions, foundNode, -3))
+            return false;
         method.instructions.remove(foundNode);
         method.instructions.insertBefore(nextNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "isRightClicking", "()Z", false));
         return true;
@@ -155,16 +170,25 @@ function patchQuickMove(method) {
     var length = instructions.length;
     for (var i = 0; i < length; i++) {
         var node = instructions[i];
-        if(node.getOpcode() != Opcodes.INVOKESTATIC) continue;
-        if(node.getNext() === null || node.getNext().getOpcode() != Opcodes.IFNE) continue;
-        if(node.getPrevious() === null || node.getPrevious().getOpcode() != Opcodes.SIPUSH) continue;
-        if(!findInstruction.matches(node.name)) continue;
-        if(!findInstruction.desc.equals(node.desc)) continue;
+        if(node.getOpcode() != Opcodes.INVOKESTATIC)
+            continue;
+        if(node.getNext() === null || node.getNext().getOpcode() != Opcodes.IFNE)
+            continue;
+        if(node.getPrevious() === null || node.getPrevious().getOpcode() != Opcodes.SIPUSH)
+            continue;
+        if(!findInstruction.matches(node.name))
+            continue;
+        if(!findInstruction.desc.equals(node.desc))
+            continue;
         var temp = getNthRelativeNode(node, 6);
-        if(temp === null) continue;
-        if(temp.getOpcode() != Opcodes.INVOKESTATIC && temp.getNext().getOpcode() != Opcodes.IFEQ && temp.getPrevious().getOpcode() != Opcodes.SIPUSH) continue;
-        if(!findInstruction.matches(temp.name)) continue;
-        if(!findInstruction.desc.equals(temp.desc)) continue;
+        if(temp === null)
+            continue;
+        if(temp.getOpcode() != Opcodes.INVOKESTATIC && temp.getNext().getOpcode() != Opcodes.IFEQ && temp.getPrevious().getOpcode() != Opcodes.SIPUSH)
+            continue;
+        if(!findInstruction.matches(temp.name))
+            continue;
+        if(!findInstruction.desc.equals(temp.desc))
+            continue;
         foundNode = node.getPrevious();
         break;
     }
@@ -172,8 +196,10 @@ function patchQuickMove(method) {
     if(foundNode !== null)
     {
         var previousNode = getNthRelativeNode(foundNode, -4);
-        removeNthNodes(method.instructions, foundNode, 7);
-        removeNthNodes(method.instructions, foundNode, -3);
+        if(!removeNthNodes(method.instructions, foundNode, 7))
+            return false;
+        if(!removeNthNodes(method.instructions, foundNode, -3))
+            return false;
         method.instructions.remove(foundNode);
         method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "canQuickMove", "()Z", false));
         return true;
@@ -181,15 +207,62 @@ function patchQuickMove(method) {
     return false;
 }
 
+function patch_ForgeIngameGui_renderPlayerList(method) {
+    var findInstruction = {
+        obfName: "func_151470_d",
+        name: "isKeyDown",
+        desc: "()Z",
+        matches: function(s) {
+            return s.equals(this.obfName) || s.equals(this.name);
+        }
+    };
+
+    var foundNode = null;
+    var instructions = method.instructions.toArray();
+    var length = instructions.length;
+    for (var i = 0; i < length; i++) {
+        var node = instructions[i];
+        if(node.getOpcode() != Opcodes.INVOKEVIRTUAL)
+            continue;
+        if(!findInstruction.matches(node.name))
+            continue;
+        if(getNthRelativeNode(node, -1) === null || getNthRelativeNode(node, -1).getOpcode() != Opcodes.GETFIELD)
+            continue;
+        if(getNthRelativeNode(node, -2) === null || getNthRelativeNode(node, -2).getOpcode() != Opcodes.GETFIELD)
+            continue;
+        if(getNthRelativeNode(node, -3) === null || getNthRelativeNode(node, -3).getOpcode() != Opcodes.GETFIELD)
+            continue;
+        if(getNthRelativeNode(node, -4) === null || getNthRelativeNode(node, -4).getOpcode() != Opcodes.ALOAD)
+            continue;
+        foundNode = node;
+        break;
+    }
+
+    if(foundNode !== null)
+    {
+        if(!removeNthNodes(method.instructions, foundNode, -3))
+            return false;
+        method.instructions.insert(foundNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "canShowPlayerList", "()Z", false));
+        method.instructions.remove(foundNode);
+        return true;
+    }
+    return false;
+}
+
 function removeNthNodes(instructions, node, n) {
     while(n > 0) {
+        if(node.getNext() === null)
+            return false;
         instructions.remove(node.getNext());
         n--;
     }
     while(n < 0) {
+        if(node.getPrevious() === null)
+            return false;
         instructions.remove(node.getPrevious());
         n++;
     }
+    return true;
 }
 
 function getNthRelativeNode(node, n) {

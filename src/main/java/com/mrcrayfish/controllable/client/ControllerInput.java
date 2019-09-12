@@ -712,6 +712,7 @@ public class ControllerInput
     /**
      * Used in order to fix actions like eating or pulling bow back. This method is linked via ASM.
      */
+    @SuppressWarnings("unused")
     public static boolean isRightClicking()
     {
         Minecraft mc = Minecraft.getInstance();
@@ -730,6 +731,7 @@ public class ControllerInput
     /**
      * Used in order to fix the quick move check in inventories. This method is linked via ASM.
      */
+    @SuppressWarnings("unused")
     public static boolean canQuickMove()
     {
         boolean canQuickMove = InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT) || InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
@@ -743,36 +745,23 @@ public class ControllerInput
         }
         return canQuickMove;
     }
+
+    /**
+     * Allows the player list to be shown. This method is linked via ASM.
+     */
+    @SuppressWarnings("unused")
+    public static boolean canShowPlayerList()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        boolean canShowPlayerList = mc.gameSettings.keyBindUseItem.isKeyDown();
+        Controller controller = Controllable.getController();
+        if(controller != null)
+        {
+            if(ButtonBindings.PLAYER_LIST.isButtonDown())
+            {
+                canShowPlayerList = true;
+            }
+        }
+        return canShowPlayerList;
+    }
 }
-
-//SCUFFED PS3
-//X = 3
-//A = 2
-//B = 1
-//Y = 0
-
-//Official PS3
-//X = 0
-//A = 1
-//B = 2
-//Y = 3
-//LEFT_BUMPER = 4
-//RIGHT_BUMPER = 5
-//LEFT_TRIGGER = 6
-//RIGHT_TRIGGER = 7
-//SELECT = 8
-//START = 9
-//LEFT_THUMB_STICK = 10
-//RIGHT_THUMB_STICK = 11
-//HOME = 12
-//TOUCH_PAD = 13
-
-//Official PS1
-//X = 3
-//A = 2
-//B = 1
-//Y = 0
-//LEFT_BUMPER = 6
-//RIGHT_BUMPER = 7
-//LEFT_TRIGGER = 4
-//RIGHT_TRIGGER = 5
