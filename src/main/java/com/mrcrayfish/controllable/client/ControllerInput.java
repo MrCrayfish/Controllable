@@ -48,10 +48,10 @@ public class ControllerInput
 
     private float prevXAxis;
     private float prevYAxis;
-    private double prevTargetMouseX;
-    private double prevTargetMouseY;
-    private double targetMouseX;
-    private double targetMouseY;
+    private int prevTargetMouseX;
+    private int prevTargetMouseY;
+    private int targetMouseX;
+    private int targetMouseY;
     private double mouseSpeedX;
     private double mouseSpeedY;
 
@@ -82,7 +82,7 @@ public class ControllerInput
                 return;
 
             /* Only need to run code if left thumb stick has input */
-            boolean moving = controller.getLThumbStickXValue() != 0.0F || controller.getLThumbStickYValue() != 0.0F;
+            boolean moving = Math.abs(controller.getLThumbStickXValue()) >= 0.35F || Math.abs(controller.getLThumbStickYValue()) >= 0.35F;
             if(moving)
             {
                 lastUse = 100;
@@ -90,10 +90,10 @@ public class ControllerInput
                 /* Updates the target mouse position when the initial thumb stick movement is
                  * detected. This fixes an issue when the user moves the cursor with the mouse then
                  * switching back to controller, the cursor would jump to old target mouse position. */
-                if(prevXAxis == 0.0F && prevYAxis == 0.0F)
+                if(Math.abs(prevXAxis) < 0.35F && Math.abs(prevYAxis) < 0.35F)
                 {
-                    prevTargetMouseX = targetMouseX = mc.mouseHelper.getMouseX();
-                    prevTargetMouseY = targetMouseY = mc.mouseHelper.getMouseY();
+                    prevTargetMouseX = targetMouseX = (int) mc.mouseHelper.getMouseX();
+                    prevTargetMouseY = targetMouseY = (int) mc.mouseHelper.getMouseY();
                 }
 
                 float xAxis = (controller.getLThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickXValue());
@@ -333,8 +333,8 @@ public class ControllerInput
                         mc.getTutorial().openInventory();
                         mc.displayGuiScreen(new InventoryScreen(mc.player));
                     }
-                    prevTargetMouseX = targetMouseX = mc.mouseHelper.getMouseX();
-                    prevTargetMouseY = targetMouseY = mc.mouseHelper.getMouseY();
+                    prevTargetMouseX = targetMouseX = (int) mc.mouseHelper.getMouseX();
+                    prevTargetMouseY = targetMouseY = (int) mc.mouseHelper.getMouseY();
                 }
                 else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
@@ -518,8 +518,10 @@ public class ControllerInput
             ContainerScreen guiContainer = (ContainerScreen) screen;
             int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
             int guiTop = (guiContainer.height - guiContainer.getYSize()) / 2;
-            double mouseX = targetMouseX * guiContainer.width / mc.mainWindow.getWidth(); //TODO needs testing. may need to change
-            double mouseY = guiContainer.height - targetMouseY * guiContainer.height / mc.mainWindow.getHeight() - 1;
+            int mouseX = (int) (targetMouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth());
+            int mouseY = (int) (targetMouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight());
+
+            //Slot closestSlot = guiContainer.getSlotUnderMouse();
 
             /* Finds the closest slot in the GUI within 14 pixels (inclusive) */
             Slot closestSlot = null;
@@ -539,21 +541,19 @@ public class ControllerInput
 
             if(closestSlot != null && (closestSlot.getHasStack() || !mc.player.inventory.getItemStack().isEmpty()))
             {
-                int slotCenterX = guiLeft + closestSlot.xPos + 8;
-                int slotCenterY = guiTop + closestSlot.yPos + 8;
-                double realMouseX = (slotCenterX / ((float) guiContainer.width / (float) mc.mainWindow.getWidth())); //TODO test this! may need changing
-                double realMouseY = (-(slotCenterY + 1 - guiContainer.height) / ((float) guiContainer.width / (float) mc.mainWindow.getWidth()));
-                double deltaX = targetMouseX - realMouseX;
-                double deltaY = targetMouseY - realMouseY;
-                double targetMouseXScaled = targetMouseX * guiContainer.width / mc.mainWindow.getWidth();
-                double targetMouseYScaled = guiContainer.height - targetMouseY * guiContainer.height / mc.mainWindow.getHeight() - 1;
+                int slotCenterXScaled = guiLeft + closestSlot.xPos + 8;
+                int slotCenterYScaled = guiTop + closestSlot.yPos + 8;
+                int slotCenterX = (int) (slotCenterXScaled / ((double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth()));
+                int slotCenterY = (int) (slotCenterYScaled / ((double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight()));
+                double deltaX = slotCenterX - targetMouseX;
+                double deltaY = slotCenterY - targetMouseY;
 
                 if(!moving)
                 {
-                    if(targetMouseXScaled != slotCenterX || targetMouseYScaled != slotCenterY)
+                    if(mouseX != slotCenterXScaled || mouseY != slotCenterYScaled)
                     {
-                        targetMouseX -= deltaX * 0.5;
-                        targetMouseY -= deltaY * 0.5;
+                        targetMouseX += deltaX * 0.75;
+                        targetMouseY += deltaY * 0.75;
                     }
                     else
                     {
