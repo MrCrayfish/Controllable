@@ -1,19 +1,17 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.Maps;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Keyboard;
+import net.minecraft.util.text.TranslationTextComponent;
+import org.lwjgl.glfw.GLFW;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,16 +19,23 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-public class GuiControllerLayout extends GuiScreen
+public class ControllerLayoutScreen extends Screen
 {
     public static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/controller.png");
 
     private List<ControllerButton> controllerButtons = new ArrayList<>();
 
     private int configureButton = -1;
+    private Screen previousScreen;
+
+    protected ControllerLayoutScreen(Screen previousScreen)
+    {
+        super(new TranslationTextComponent("controllable.controllerLayout.title"));
+        this.previousScreen = previousScreen;
+    }
 
     @Override
-    public void initGui()
+    protected void init()
     {
         controllerButtons.add(new ControllerButton(Buttons.A, 29, 9, 7, 0, 3, 3, 5));
         controllerButtons.add(new ControllerButton(Buttons.B, 32, 6, 13, 0, 3, 3, 5));
@@ -52,23 +57,23 @@ public class GuiControllerLayout extends GuiScreen
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    public void render(int mouseX, int mouseY, float partialTicks)
     {
-        this.drawDefaultBackground();
-
+        this.renderBackground();
         GlStateManager.enableBlend();
-        mc.getTextureManager().bindTexture(TEXTURE);
+        Minecraft.getInstance().getTextureManager().bindTexture(TEXTURE);
         int width = 38 * 5;
         int height = 29 * 5;
         int x = this.width / 2 - width / 2;
         int y = this.height / 2 - 50;
-        drawScaledCustomSizeModalRect(x, y, 50, 0, 38, 29, width, height, 256, 256);
+        blit(x, y, width, height, 50, 0, 38, 29, 256, 256);
         GlStateManager.disableBlend();
         controllerButtons.forEach(controllerButton -> controllerButton.draw(x, y, mouseX, mouseY, configureButton == controllerButton.button));
+        super.render(mouseX, mouseY, partialTicks);
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
     {
         if(mouseButton == 0)
         {
@@ -76,19 +81,21 @@ public class GuiControllerLayout extends GuiScreen
             if(button != null)
             {
                 configureButton = button.getButton();
+                return true;
             }
         }
+        return false;
     }
 
     @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    public boolean keyPressed(int key, int scanCode, int mods)
     {
-        if(keyCode == Keyboard.KEY_ESCAPE && configureButton != -1)
+        if(key == GLFW.GLFW_KEY_ESCAPE && configureButton != -1)
         {
             configureButton = -1;
-            return;
+            return true;
         }
-        super.keyTyped(typedChar, keyCode);
+        return super.keyPressed(key, scanCode, mods);
     }
 
     public boolean onButtonInput(int button)

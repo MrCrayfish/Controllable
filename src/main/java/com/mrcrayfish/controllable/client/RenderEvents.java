@@ -1,27 +1,28 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.event.AvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ContainerBlock;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiIngame;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.IngameGui;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.*;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -39,16 +40,16 @@ public class RenderEvents
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         if(event.phase == TickEvent.Phase.START && mc.player != null && !mc.gameSettings.hideGUI)
         {
             actions = new HashMap<>();
 
-            if(mc.currentScreen instanceof GuiContainer)
+            if(mc.currentScreen instanceof ContainerScreen)
             {
                 if(mc.player.inventory.getItemStack().isEmpty())
                 {
-                    GuiContainer container = (GuiContainer) mc.currentScreen;
+                    ContainerScreen container = (ContainerScreen) mc.currentScreen;
                     if(container.getSlotUnderMouse() != null)
                     {
                         Slot slot = container.getSlotUnderMouse();
@@ -70,11 +71,12 @@ public class RenderEvents
             }
             else if(mc.currentScreen == null)
             {
-                boolean blockHit = mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK;
+                boolean blockHit = mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.BLOCK;
                 boolean canOpenBlock = false;
                 if(blockHit)
                 {
-                    canOpenBlock = mc.world.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock() instanceof BlockContainer;
+                    BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult) mc.objectMouseOver;
+                    canOpenBlock = mc.world.getBlockState(blockRayTraceResult.getPos()).getBlock() instanceof ContainerBlock;
                 }
 
                 if(!mc.player.isHandActive())
@@ -90,9 +92,9 @@ public class RenderEvents
                 }
 
                 ItemStack offHandStack = mc.player.getHeldItemOffhand();
-                if(offHandStack.getItemUseAction() != EnumAction.NONE)
+                if(offHandStack.getUseAction() != UseAction.NONE)
                 {
-                    switch(offHandStack.getItemUseAction())
+                    switch(offHandStack.getUseAction())
                     {
                         case EAT:
                             if(mc.player.getFoodStats().needFood())
@@ -113,9 +115,9 @@ public class RenderEvents
                 }
 
                 ItemStack currentItem = mc.player.inventory.getCurrentItem();
-                if(currentItem.getItemUseAction() != EnumAction.NONE)
+                if(currentItem.getUseAction() != UseAction.NONE)
                 {
-                    switch(currentItem.getItemUseAction())
+                    switch(currentItem.getUseAction())
                     {
                         case EAT:
                             if(mc.player.getFoodStats().needFood())
@@ -134,15 +136,25 @@ public class RenderEvents
                             break;
                     }
                 }
-                else if(currentItem.getItem() instanceof ItemBlock)
+                else if(currentItem.getItem() instanceof BlockItem)
                 {
                     if(blockHit)
                     {
-                        ItemBlock block = (ItemBlock) currentItem.getItem();
-                        if(block.getBlock().canPlaceBlockAt(mc.world, mc.objectMouseOver.getBlockPos().offset(mc.objectMouseOver.sideHit)))
+                        //TODO figure out logic to determine if block can be placed.
+                        /*BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult) mc.objectMouseOver;
+                        BlockItem item = (BlockItem) currentItem.getItem();
+                        ItemUseContext itemUseContext = new ItemUseContext(mc.player, Hand.MAIN_HAND, blockRayTraceResult);
+                        BlockItemUseContext blockItemUseContext = new BlockItemUseContext(itemUseContext);
+                        blockItemUseContext = item.getBlockItemUseContext(blockItemUseContext);
+                        if(blockItemUseContext != null)
                         {
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
-                        }
+                            BlockState state = item.getStateForPlacement(blockItemUseContext);
+                            if(state != null)
+                            {
+                                actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
+                            }
+                        }*/
+                        actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
                     }
                 }
                 else if(!currentItem.isEmpty() && !mc.player.isHandActive())
@@ -164,7 +176,7 @@ public class RenderEvents
                     //actions.put(Buttons.X, new Action(I18n.format("controllable.action.swap_hands"), Action.Side.LEFT));  //TODO make a verbose action config option
                 }
 
-                if(mc.player.isRiding())
+                if(mc.player.isPassenger())
                 {
                     actions.put(Buttons.LEFT_THUMB_STICK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
                 }
@@ -192,16 +204,19 @@ public class RenderEvents
         if(ControllerInput.lastUse <= 0)
             return;
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         if(mc.gameSettings.hideGUI)
+            return;
+
+        if(Controllable.getController() == null)
             return;
 
         GlStateManager.pushMatrix();
         {
             if(!MinecraftForge.EVENT_BUS.post(new RenderAvailableActionsEvent()))
             {
-                GuiIngame guiIngame = mc.ingameGUI;
-                boolean isChatVisible = mc.currentScreen == null && guiIngame.getChatGUI().drawnChatLines.stream().anyMatch(chatLine -> guiIngame.getUpdateCounter() - chatLine.getUpdatedCounter() < 200);
+                IngameGui guiIngame = mc.ingameGUI;
+                boolean isChatVisible = mc.currentScreen == null && guiIngame.getChatGUI().drawnChatLines.stream().anyMatch(chatLine -> guiIngame.getTicks() - chatLine.getUpdatedCounter() < 200);
 
                 int leftIndex = 0;
                 int rightIndex = 0;
@@ -210,23 +225,30 @@ public class RenderEvents
                     Action action = actions.get(button);
                     Action.Side side = action.getSide();
 
-                    float texU = (button % 19) * 13F;
-                    float texV = (button / 19) * 13F;
+                    int remappedButton = button;
+                    Controller controller = Controllable.getController();
+                    Mappings.Entry mapping = controller.getMapping();
+                    if(mapping != null)
+                    {
+                        remappedButton = mapping.remap(button);
+                    }
+
+                    int texU = (remappedButton % 19) * 13;
+                    int texV = (remappedButton / 19) * 13;
                     int size = 13;
 
-                    ScaledResolution resolution = new ScaledResolution(mc);
-                    int x = side == Action.Side.LEFT ? 5 : resolution.getScaledWidth() - 5 - size;
-                    int y = resolution.getScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
+                    int x = side == Action.Side.LEFT ? 5 : mc.mainWindow.getScaledWidth() - 5 - size;
+                    int y = mc.mainWindow.getScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
 
                     mc.getTextureManager().bindTexture(CONTROLLER_BUTTONS);
-                    GlStateManager.color(1.0F, 1.0F, 1.0F);
+                    GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
                     GlStateManager.disableLighting();
 
                     if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2)
                         continue;
 
                     /* Draw buttons icon */
-                    Gui.drawScaledCustomSizeModalRect(x, y, texU, texV, size, size, size, size, 256, 256);
+                    Widget.blit(x, y, texU, texV, size, size, 256, 256);
 
                     /* Draw description text */
                     if(side == Action.Side.LEFT)
@@ -247,7 +269,7 @@ public class RenderEvents
             {
                 if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
                 {
-                    GuiInventory.drawEntityOnScreen(20, 45, 20, 0, 0, mc.player);
+                    InventoryScreen.drawEntityOnScreen(20, 45, 20, 0, 0, mc.player);
                 }
             }
         }

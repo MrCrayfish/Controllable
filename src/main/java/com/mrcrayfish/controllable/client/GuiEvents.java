@@ -1,15 +1,12 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.gui.ControllerSelectionScreen;
 import com.mrcrayfish.controllable.client.gui.GuiButtonController;
-import com.mrcrayfish.controllable.client.gui.GuiControllerSelection;
 import com.studiohartman.jamepad.ControllerManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiIngameMenu;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiOptions;
+import net.minecraft.client.gui.screen.OptionsScreen;
 import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /**
  * Author: MrCrayfish
@@ -29,22 +26,11 @@ public class GuiEvents
         /* Resets the controller button states */
         ButtonBinding.resetButtonStates();
 
-        if(event.getGui() instanceof GuiOptions)
+        if(event.getGui() instanceof OptionsScreen)
         {
             int y = event.getGui().height / 6 + 72 - 6;
-            event.getButtonList().add(new GuiButtonController(6969, (event.getGui().width / 2) + 5 + 150 + 4, y));
-        }
-    }
-
-    @SubscribeEvent
-    public void onAction(GuiScreenEvent.ActionPerformedEvent event)
-    {
-        if(event.getGui() instanceof GuiOptions)
-        {
-            if(event.getButton().id == 6969)
-            {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiControllerSelection(manager, true));
-            }
+            event.addWidget(new GuiButtonController((event.getGui().width / 2) + 5 + 150 + 4, y, button ->
+                    Minecraft.getInstance().displayGuiScreen(new ControllerSelectionScreen(manager, event.getGui()))));
         }
     }
 }

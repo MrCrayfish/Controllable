@@ -19,4 +19,5 @@ public class ButtonBindings
     public static final ButtonBinding SCREENSHOT = new ButtonBinding(-1, "key.screenshot");
     public static final ButtonBinding SCROLL_LEFT = new ButtonBinding(Buttons.LEFT_BUMPER, "key.scrollLeft");
     public static final ButtonBinding SCROLL_RIGHT = new ButtonBinding(Buttons.RIGHT_BUMPER, "key.scrollRight");
+    public static final ButtonBinding QUICK_MOVE = new ButtonBinding(Buttons.B, "key.quickMove");
 }

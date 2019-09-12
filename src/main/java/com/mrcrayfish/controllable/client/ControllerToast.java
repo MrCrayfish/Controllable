@@ -1,9 +1,9 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mrcrayfish.controllable.client.gui.GuiControllerLayout;
-import net.minecraft.client.gui.toasts.GuiToast;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import net.minecraft.client.gui.toasts.IToast;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.toasts.ToastGui;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
 
@@ -22,14 +22,14 @@ public class ControllerToast implements IToast
     }
 
     @Override
-    public Visibility draw(GuiToast toastGui, long delta)
+    public Visibility draw(ToastGui toastGui, long delta)
     {
         toastGui.getMinecraft().getTextureManager().bindTexture(TEXTURE_TOASTS);
-        GlStateManager.color(1.0F, 1.0F, 1.0F);
-        toastGui.drawTexturedModalRect(0, 0, 0, 32, 160, 32);
+        GlStateManager.color3f(1.0F, 1.0F, 1.0F);
+        toastGui.blit(0, 0, 0, 32, 160, 32);
 
-        toastGui.getMinecraft().getTextureManager().bindTexture(GuiControllerLayout.TEXTURE);
-        toastGui.drawTexturedModalRect(8, 8, 20, 43, 20, 16);
+        toastGui.getMinecraft().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
+        toastGui.blit(8, 8, 20, 43, 20, 16);
 
         String title = toastGui.getMinecraft().fontRenderer.trimStringToWidth(controllerName, 120);
         toastGui.getMinecraft().fontRenderer.drawString(TextFormatting.DARK_GRAY + title, 35, 7, 0);

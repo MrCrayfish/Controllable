@@ -195,7 +195,7 @@ public class Mappings
         {
             try
             {
-                File mappingsFolder = new File(Minecraft.getMinecraft().gameDir, "config/controllable/mappings");
+                File mappingsFolder = new File(Minecraft.getInstance().gameDir, "config/controllable/mappings");
                 mappingsFolder.mkdirs();
                 String name = id.replaceAll("\\s+", "_").toLowerCase(Locale.ENGLISH) + ".json";
                 GsonBuilder builder = new GsonBuilder();

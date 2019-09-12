@@ -1,14 +1,14 @@
 package com.mrcrayfish.controllable.client.gui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.AbstractGui;
 
 /**
  * Author: MrCrayfish
  */
-public class ControllerButton extends Gui
+public class ControllerButton extends AbstractGui
 {
     protected int button;
     private int x, y;
@@ -32,7 +32,8 @@ public class ControllerButton extends Gui
     public void draw(int x, int y, int mouseX, int mouseY, boolean selected)
     {
         GlStateManager.enableBlend();
-        Minecraft.getMinecraft().getTextureManager().bindTexture(GuiControllerLayout.TEXTURE);
+        Minecraft.getInstance().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
+        int buttonU = u;
         int buttonV = v;
         int buttonX = x + this.x * this.scale;
         int buttonY = y + this.y * this.scale;
@@ -47,7 +48,7 @@ public class ControllerButton extends Gui
         {
             buttonV += this.height;
         }
-        drawScaledCustomSizeModalRect(buttonX, buttonY, u, buttonV, this.width, this.height, this.width * this.scale, this.height * this.scale, 256, 256);
+        blit(buttonX, buttonY, this.width * this.scale, this.height * this.scale, buttonU, buttonV, this.width, this.height, 256, 256);
         GlStateManager.disableBlend();
     }
 

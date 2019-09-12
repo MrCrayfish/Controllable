@@ -1,36 +1,34 @@
 package com.mrcrayfish.controllable;
 
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
-import com.mrcrayfish.controllable.asm.ControllablePlugin;
 import com.mrcrayfish.controllable.client.*;
-import com.mrcrayfish.controllable.client.gui.GuiControllerLayout;
-import com.studiohartman.jamepad.*;
+import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
+import com.studiohartman.jamepad.ControllerIndex;
+import com.studiohartman.jamepad.ControllerManager;
+import com.studiohartman.jamepad.ControllerState;
+import com.studiohartman.jamepad.ControllerUnpluggedException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.client.FMLFileResourcePack;
-import net.minecraftforge.fml.client.FMLFolderResourcePack;
-import net.minecraftforge.fml.common.*;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Author: MrCrayfish
  */
-//@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, acceptedMinecraftVersions = Reference.MOD_COMPATIBILITY, clientSideOnly = true, certificateFingerprint = "4d54165f7f65cf475bf13341569655b980a5b430")
-public class Controllable extends DummyModContainer
-{
+@Mod(Reference.MOD_ID)
+public class Controllable
+{//4d54165f7f65cf475bf13341569655b980a5b430
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
     private static ControllerManager manager;
@@ -43,13 +41,8 @@ public class Controllable extends DummyModContainer
 
     public Controllable()
     {
-        super(new ModMetadata());
-        ModMetadata meta = this.getMetadata();
-        meta.modId = Reference.MOD_ID;
-        meta.name = Reference.MOD_NAME;
-        meta.version = Reference.MOD_VERSION;
-        meta.authorList = Collections.singletonList("MrCrayfish");
-        meta.url = "https://mrcrayfish.com/mod?id=controllable";
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().register(this);
     }
 
     @Nullable
@@ -63,37 +56,8 @@ public class Controllable extends DummyModContainer
         return selectedControllerIndex;
     }
 
-
-    @Override
-    public boolean registerBus(final EventBus bus, final LoadController controller)
+    private void onClientSetup(FMLClientSetupEvent event)
     {
-        bus.register(this);
-        return true;
-    }
-
-    @Override
-    public File getSource()
-    {
-        return ControllablePlugin.LOCATION;
-    }
-
-    @Override
-    public boolean shouldLoadInEnvironment()
-    {
-        return FMLCommonHandler.instance().getSide().isClient();
-    }
-
-    @Override
-    public Class<?> getCustomResourcePackClass()
-    {
-        return this.getSource().isDirectory() ? FMLFolderResourcePack.class : FMLFileResourcePack.class;
-    }
-
-    @Subscribe
-    public void onPreInit(FMLPreInitializationEvent event)
-    {
-        //ControllerProperties.load(event.getModConfigurationDirectory());
-
         /* Loads up the controller manager and setup shutdown cleanup */
         Controllable.manager = new ControllerManager();
         Controllable.manager.initSDLGamepad();
@@ -101,7 +65,10 @@ public class Controllable extends DummyModContainer
         Controllable.connectedControllerNames = getConnectedControllerNames();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> Controllable.manager.quitSDLGamepad()));
 
-        ControllerProperties.load(event.getModConfigurationDirectory());
+        Minecraft mc = event.getMinecraftSupplier().get();
+        File configFolder = new File(mc.gameDir, "config");
+
+        ControllerProperties.load(configFolder);
 
         /* Attempts to load the first controller connected */
         ControllerIndex index = manager.getControllerIndex(0);
@@ -110,7 +77,7 @@ public class Controllable extends DummyModContainer
             setController(new Controller(index));
         }
 
-        Mappings.load(event.getModConfigurationDirectory());
+        Mappings.load(configFolder);
 
         /* Registers events */
         MinecraftForge.EVENT_BUS.register(this);
@@ -157,7 +124,7 @@ public class Controllable extends DummyModContainer
 
         manager.update();
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         int controllersCount = manager.getNumControllers();
         if(controllersCount != currentControllerCount)
         {
@@ -189,7 +156,7 @@ public class Controllable extends DummyModContainer
             if(mc.player != null)
             {
                 String controllerName = newControllers.size() > 0 ? newControllers.get(0) : I18n.format("controllable.toast.controller");
-                Minecraft.getMinecraft().getToastGui().add(new ControllerToast(connected, controllerName));
+                Minecraft.getInstance().getToastGui().add(new ControllerToast(connected, controllerName));
             }
         }
 
@@ -237,9 +204,9 @@ public class Controllable extends DummyModContainer
 
     private static void processButton(int index, boolean state)
     {
-        if(Minecraft.getMinecraft().currentScreen instanceof GuiControllerLayout && state)
+        if(Minecraft.getInstance().currentScreen instanceof ControllerLayoutScreen && state)
         {
-            if(((GuiControllerLayout) Minecraft.getMinecraft().currentScreen).onButtonInput(index))
+            if(((ControllerLayoutScreen) Minecraft.getInstance().currentScreen).onButtonInput(index))
             {
                 return;
             }

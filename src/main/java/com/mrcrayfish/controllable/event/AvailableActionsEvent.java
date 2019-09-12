@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.event;
 
 import com.mrcrayfish.controllable.client.Action;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Event;
 
 import java.util.Map;
 

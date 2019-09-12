@@ -1,30 +1,33 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.gui.GuiControllerLayout;
+import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Slot;
-import net.minecraft.network.play.client.CPacketPlayerDigging;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.client.MouseHelper;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.screen.inventory.CreativeScreen;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.util.InputMappings;
+import net.minecraft.client.util.NativeUtil;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.network.play.client.CPlayerDiggingPacket;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -33,7 +36,7 @@ import java.lang.reflect.Method;
 /**
  * Author: MrCrayfish
  */
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ControllerInput
 {
     public static int lastUse = 0;
@@ -44,12 +47,12 @@ public class ControllerInput
 
     private float prevXAxis;
     private float prevYAxis;
-    private int prevTargetMouseX;
-    private int prevTargetMouseY;
-    private int targetMouseX;
-    private int targetMouseY;
-    private float mouseSpeedX;
-    private float mouseSpeedY;
+    private double prevTargetMouseX;
+    private double prevTargetMouseY;
+    private double targetMouseX;
+    private double targetMouseY;
+    private double mouseSpeedX;
+    private double mouseSpeedY;
 
     private int dropCounter = -1;
 
@@ -70,11 +73,11 @@ public class ControllerInput
             if(controller == null)
                 return;
 
-            Minecraft mc = Minecraft.getMinecraft();
-            if(mc.inGameHasFocus)
+            Minecraft mc = Minecraft.getInstance();
+            if(mc.mouseHelper.isMouseGrabbed())
                 return;
 
-            if(mc.currentScreen == null || mc.currentScreen instanceof GuiControllerLayout)
+            if(mc.currentScreen == null || mc.currentScreen instanceof ControllerLayoutScreen)
                 return;
 
             /* Only need to run code if left thumb stick has input */
@@ -88,8 +91,8 @@ public class ControllerInput
                  * switching back to controller, the cursor would jump to old target mouse position. */
                 if(prevXAxis == 0.0F && prevYAxis == 0.0F)
                 {
-                    prevTargetMouseX = targetMouseX = Mouse.getX();
-                    prevTargetMouseY = targetMouseY = Mouse.getY();
+                    prevTargetMouseX = targetMouseX = mc.mouseHelper.getMouseX();
+                    prevTargetMouseY = targetMouseY = mc.mouseHelper.getMouseY();
                 }
 
                 float xAxis = (controller.getLThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickXValue());
@@ -116,7 +119,7 @@ public class ControllerInput
             if(Math.abs(mouseSpeedX) > 0.05F || Math.abs(mouseSpeedY) > 0.05F)
             {
                 targetMouseX += 30 * mouseSpeedX;
-                targetMouseY += 30 * mouseSpeedY;
+                targetMouseY -= 30 * mouseSpeedY;
             }
 
             prevXAxis = controller.getLThumbStickXValue();
@@ -124,9 +127,9 @@ public class ControllerInput
 
             this.moveMouseToClosestSlot(moving, mc.currentScreen);
 
-            if(mc.currentScreen instanceof GuiContainerCreative)
+            if(mc.currentScreen instanceof CreativeScreen)
             {
-                this.handleCreativeScrolling((GuiContainerCreative) mc.currentScreen, controller);
+                this.handleCreativeScrolling((CreativeScreen) mc.currentScreen, controller);
             }
         }
     }
@@ -137,14 +140,15 @@ public class ControllerInput
         /* Makes the cursor movement appear smooth between ticks. This will only run if the target
          * mouse position is different to the previous tick's position. This allows for the mouse
          * to still be used as input. */
-        if(Minecraft.getMinecraft().currentScreen != null && (targetMouseX != prevTargetMouseX || targetMouseY != prevTargetMouseY))
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.currentScreen != null && (targetMouseX != prevTargetMouseX || targetMouseY != prevTargetMouseY))
         {
-            if(!(Minecraft.getMinecraft().currentScreen instanceof GuiControllerLayout))
+            if(!(mc.currentScreen instanceof ControllerLayoutScreen))
             {
-                float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
-                int mouseX = (int) (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * partialTicks + 0.5F);
-                int mouseY = (int) (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * partialTicks + 0.5F);
-                Mouse.setCursorPosition(mouseX, mouseY);
+                float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
+                double mouseX = (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * partialTicks + 0.5);
+                double mouseY = (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * partialTicks + 0.5);
+                GLFW.glfwSetCursorPos(mc.mainWindow.getHandle(), mouseX, mouseY);
             }
         }
     }
@@ -159,8 +163,8 @@ public class ControllerInput
         if(event.phase == TickEvent.Phase.END)
             return;
 
-        Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayer player = mc.player;
+        Minecraft mc = Minecraft.getInstance();
+        PlayerEntity player = mc.player;
         if(player == null)
             return;
 
@@ -174,8 +178,8 @@ public class ControllerInput
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
                     float rotationYaw = turnEvent.getYawSpeed() * (controller.getRThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickXValue());
-                    float rotationPitch = turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickYValue());
-                    player.turn(rotationYaw, rotationPitch);
+                    float rotationPitch = turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() > 0.0F ? -1 : 1) * Math.abs(controller.getRThumbStickYValue());
+                    player.rotateTowards(rotationYaw, rotationPitch);
                 }
             }
         }
@@ -210,7 +214,7 @@ public class ControllerInput
     @SubscribeEvent
     public void onInputUpdate(InputUpdateEvent event)
     {
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        PlayerEntity player = Minecraft.getInstance().player;
         if(player == null)
             return;
 
@@ -218,7 +222,7 @@ public class ControllerInput
         if(controller == null)
             return;
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         if(keyboardSneaking && !mc.gameSettings.keyBindSneak.isKeyDown())
         {
@@ -232,7 +236,7 @@ public class ControllerInput
             keyboardSneaking = true;
         }
 
-        if(mc.player.capabilities.isFlying || mc.player.isRiding())
+        if(mc.player.abilities.isFlying || mc.player.isPassenger())
         {
             lastUse = 100;
             sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
@@ -294,7 +298,7 @@ public class ControllerInput
 
     public void handleButtonInput(Controller controller, int button, boolean state)
     {
-        if(Minecraft.getMinecraft().currentScreen instanceof GuiControllerLayout)
+        if(Minecraft.getInstance().currentScreen instanceof ControllerLayoutScreen)
         {
             return;
         }
@@ -312,7 +316,7 @@ public class ControllerInput
         if(MinecraftForge.EVENT_BUS.post(event))
             return;
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         if(state)
         {
             if(mc.currentScreen == null)
@@ -326,14 +330,14 @@ public class ControllerInput
                     else
                     {
                         mc.getTutorial().openInventory();
-                        mc.displayGuiScreen(new GuiInventory(mc.player));
+                        mc.displayGuiScreen(new InventoryScreen(mc.player));
                     }
-                    prevTargetMouseX = targetMouseX = Mouse.getX();
-                    prevTargetMouseY = targetMouseY = Mouse.getY();
+                    prevTargetMouseX = targetMouseX = mc.mouseHelper.getMouseX();
+                    prevTargetMouseY = targetMouseY = mc.mouseHelper.getMouseY();
                 }
                 else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
-                    if(mc.player != null && !mc.player.capabilities.isFlying && !mc.player.isRiding())
+                    if(mc.player != null && !mc.player.abilities.isFlying && !mc.player.isPassenger())
                     {
                         sneaking = !sneaking;
                     }
@@ -356,10 +360,11 @@ public class ControllerInput
                 {
                     if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
                     {
-                        mc.getConnection().sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.SWAP_HELD_ITEMS, BlockPos.ORIGIN, EnumFacing.DOWN));
+
+                        mc.getConnection().sendPacket(new CPlayerDiggingPacket(CPlayerDiggingPacket.Action.SWAP_HELD_ITEMS, BlockPos.ZERO, Direction.DOWN));
                     }
                 }
-                else if(ButtonBindings.TOGGLE_PERSPECTIVE.isButtonPressed() && mc.inGameHasFocus)
+                else if(ButtonBindings.TOGGLE_PERSPECTIVE.isButtonPressed() && mc.mouseHelper.isMouseGrabbed())
                 {
                     cycleThirdPersonView();
                 }
@@ -390,16 +395,16 @@ public class ControllerInput
                 }
                 else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
                 {
-                    if(mc.currentScreen instanceof GuiContainerCreative)
+                    if(mc.currentScreen instanceof CreativeScreen)
                     {
-                        scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, 1);
+                        scrollCreativeTabs((CreativeScreen) mc.currentScreen, 1);
                     }
                 }
                 else if(ButtonBindings.SCROLL_LEFT.isButtonPressed())
                 {
-                    if(mc.currentScreen instanceof GuiContainerCreative)
+                    if(mc.currentScreen instanceof CreativeScreen)
                     {
-                        scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, -1);
+                        scrollCreativeTabs((CreativeScreen) mc.currentScreen, -1);
                     }
                 }
                 else if(button == Buttons.A)
@@ -441,7 +446,7 @@ public class ControllerInput
      */
     private void cycleThirdPersonView()
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         mc.gameSettings.thirdPersonView++;
         if(mc.gameSettings.thirdPersonView > 2)
@@ -451,34 +456,34 @@ public class ControllerInput
 
         if(mc.gameSettings.thirdPersonView == 0)
         {
-            mc.entityRenderer.loadEntityShader(mc.getRenderViewEntity());
+            mc.gameRenderer.loadEntityShader(mc.getRenderViewEntity());
         }
         else if(mc.gameSettings.thirdPersonView == 1)
         {
-            mc.entityRenderer.loadEntityShader(null);
+            mc.gameRenderer.loadEntityShader(null);
         }
     }
 
-    private void scrollCreativeTabs(GuiContainerCreative creative, int dir)
+    private void scrollCreativeTabs(CreativeScreen creative, int dir)
     {
         lastUse = 100;
 
         try
         {
-            Method method = ReflectionHelper.findMethod(GuiContainerCreative.class, "setCurrentCreativeTab", "func_147050_b", CreativeTabs.class);
+            Method method = ObfuscationReflectionHelper.findMethod(CreativeScreen.class, "func_147050_b", ItemGroup.class);
             method.setAccessible(true);
             if(dir > 0)
             {
-                if(creative.getSelectedTabIndex() < CreativeTabs.CREATIVE_TAB_ARRAY.length - 1)
+                if(creative.getSelectedTabIndex() < ItemGroup.GROUPS.length - 1)
                 {
-                    method.invoke(creative, CreativeTabs.CREATIVE_TAB_ARRAY[creative.getSelectedTabIndex() + 1]);
+                    method.invoke(creative, ItemGroup.GROUPS[creative.getSelectedTabIndex() + 1]);
                 }
             }
             else if(dir < 0)
             {
                 if(creative.getSelectedTabIndex() > 0)
                 {
-                    method.invoke(creative, CreativeTabs.CREATIVE_TAB_ARRAY[creative.getSelectedTabIndex() - 1]);
+                    method.invoke(creative, ItemGroup.GROUPS[creative.getSelectedTabIndex() - 1]);
                 }
             }
         }
@@ -488,23 +493,23 @@ public class ControllerInput
         }
     }
 
-    private void moveMouseToClosestSlot(boolean moving, GuiScreen screen)
+    private void moveMouseToClosestSlot(boolean moving, Screen screen)
     {
         /* Makes the mouse attracted to slots. This helps with selecting items when using
          * a controller. */
-        if(screen instanceof GuiContainer)
+        if(screen instanceof ContainerScreen)
         {
-            Minecraft mc = Minecraft.getMinecraft();
-            GuiContainer guiContainer = (GuiContainer) screen;
+            Minecraft mc = Minecraft.getInstance();
+            ContainerScreen guiContainer = (ContainerScreen) screen;
             int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
             int guiTop = (guiContainer.height - guiContainer.getYSize()) / 2;
-            int mouseX = targetMouseX * guiContainer.width / mc.displayWidth;
-            int mouseY = guiContainer.height - targetMouseY * guiContainer.height / mc.displayHeight - 1;
+            double mouseX = targetMouseX * guiContainer.width / mc.mainWindow.getWidth(); //TODO needs testing. may need to change
+            double mouseY = guiContainer.height - targetMouseY * guiContainer.height / mc.mainWindow.getHeight() - 1;
 
             /* Finds the closest slot in the GUI within 14 pixels (inclusive) */
             Slot closestSlot = null;
             double closestDistance = -1.0;
-            for(Slot slot : guiContainer.inventorySlots.inventorySlots)
+            for(Slot slot : guiContainer.getContainer().inventorySlots)
             {
                 int posX = guiLeft + slot.xPos + 8;
                 int posY = guiTop + slot.yPos + 8;
@@ -521,12 +526,12 @@ public class ControllerInput
             {
                 int slotCenterX = guiLeft + closestSlot.xPos + 8;
                 int slotCenterY = guiTop + closestSlot.yPos + 8;
-                int realMouseX = (int) (slotCenterX / ((float) guiContainer.width / (float) mc.displayWidth));
-                int realMouseY = (int) (-(slotCenterY + 1 - guiContainer.height) / ((float) guiContainer.width / (float) mc.displayWidth));
-                int deltaX = targetMouseX - realMouseX;
-                int deltaY = targetMouseY - realMouseY;
-                int targetMouseXScaled = targetMouseX * guiContainer.width / mc.displayWidth;
-                int targetMouseYScaled = guiContainer.height - targetMouseY * guiContainer.height / mc.displayHeight - 1;
+                double realMouseX = (slotCenterX / ((float) guiContainer.width / (float) mc.mainWindow.getWidth())); //TODO test this! may need changing
+                double realMouseY = (-(slotCenterY + 1 - guiContainer.height) / ((float) guiContainer.width / (float) mc.mainWindow.getWidth()));
+                double deltaX = targetMouseX - realMouseX;
+                double deltaY = targetMouseY - realMouseY;
+                double targetMouseXScaled = targetMouseX * guiContainer.width / mc.mainWindow.getWidth();
+                double targetMouseYScaled = guiContainer.height - targetMouseY * guiContainer.height / mc.mainWindow.getHeight() - 1;
 
                 if(!moving)
                 {
@@ -558,11 +563,11 @@ public class ControllerInput
         }
     }
 
-    private void handleCreativeScrolling(GuiContainerCreative creative, Controller controller)
+    private void handleCreativeScrolling(CreativeScreen creative, Controller controller)
     {
         try
         {
-            int i = (((GuiContainerCreative.ContainerCreative) creative.inventorySlots).itemList.size() + 9 - 1) / 9 - 5;
+            int i = (creative.getContainer().itemList.size() + 9 - 1) / 9 - 5;
             int dir = 0;
 
             if(controller.getState().dpadUp || controller.getRThumbStickYValue() >= 0.8F)
@@ -574,14 +579,14 @@ public class ControllerInput
                 dir = -1;
             }
 
-            Field field = ReflectionHelper.findField(GuiContainerCreative.class, "currentScroll", "field_147067_x");
+            Field field = ObfuscationReflectionHelper.findField(CreativeScreen.class, "field_147067_x");
             field.setAccessible(true);
 
             float currentScroll = field.getFloat(creative);
             currentScroll = (float) ((double) currentScroll - (double) dir / (double) i);
             currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
             field.setFloat(creative, currentScroll);
-            ((GuiContainerCreative.ContainerCreative) creative.inventorySlots).scrollTo(currentScroll);
+            creative.getContainer().scrollTo(currentScroll);
         }
         catch(IllegalAccessException e)
         {
@@ -593,32 +598,39 @@ public class ControllerInput
      * Invokes a mouse click in a GUI. This is modified version that is designed for controllers.
      * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
      *
-     * @param gui the gui instance
+     * @param screen the screen instance
      * @param button the button to click with
      */
-    private void invokeMouseClick(GuiScreen gui, int button)
+    private void invokeMouseClick(Screen screen, int button)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-        if(gui != null)
+        Minecraft mc = Minecraft.getInstance();
+        if(screen != null)
         {
-            int guiX = Mouse.getX() * gui.width / mc.displayWidth;
-            int guiY = gui.height - Mouse.getY() * gui.height / mc.displayHeight - 1;
+            MouseHelper helper = mc.mouseHelper;
+            double mouseX = helper.getMouseX() * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth();
+            double mouseY = helper.getMouseY() * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight();
 
             try
             {
-                Field eventButton = ReflectionHelper.findField(GuiScreen.class, "eventButton", "field_146287_f");
+                Field eventButton = ObfuscationReflectionHelper.findField(MouseHelper.class, "field_198042_g");
                 eventButton.setAccessible(true);
-                eventButton.set(gui, button);
+                eventButton.set(mc.mouseHelper, button);
 
-                Field lastMouseEvent = ReflectionHelper.findField(GuiScreen.class, "lastMouseEvent", "field_146288_g");
+                Field lastMouseEvent = ObfuscationReflectionHelper.findField(MouseHelper.class, "field_198045_j");
                 lastMouseEvent.setAccessible(true);
-                lastMouseEvent.set(gui, Minecraft.getSystemTime());
+                lastMouseEvent.set(mc.mouseHelper, NativeUtil.func_216394_b());
 
-                Method mouseClicked = ReflectionHelper.findMethod(GuiScreen.class, "mouseClicked", "func_73864_a", int.class, int.class, int.class);
-                mouseClicked.setAccessible(true);
-                mouseClicked.invoke(gui, guiX, guiY, button);
+                Screen.wrapScreenError(() -> {
+                    boolean cancelled = ForgeHooksClient.onGuiMouseClickedPre(screen, mouseX, mouseY, button);
+                    if (!cancelled) {
+                        cancelled = screen.mouseClicked(mouseX, mouseY, button);
+                    }
+                    if (!cancelled) {
+                        ForgeHooksClient.onGuiMouseClickedPost(screen, mouseX, mouseY, button);
+                    }
+                }, "mouseClicked event handler", screen.getClass().getCanonicalName());
             }
-            catch(IllegalAccessException | InvocationTargetException e)
+            catch(IllegalAccessException e)
             {
                 e.printStackTrace();
             }
@@ -629,29 +641,35 @@ public class ControllerInput
      * Invokes a mouse released in a GUI. This is modified version that is designed for controllers.
      * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
      *
-     * @param gui the gui instance
+     * @param screen the screen instance
      * @param button the button to click with
      */
-    private void invokeMouseReleased(GuiScreen gui, int button)
+    private void invokeMouseReleased(Screen screen, int button)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-        if(gui != null)
+        Minecraft mc = Minecraft.getInstance();
+        if(screen != null)
         {
-            int mouseX = Mouse.getX() * gui.width / mc.displayWidth;
-            int mouseY = gui.height - Mouse.getY() * gui.height / mc.displayHeight - 1;
+            MouseHelper helper = mc.mouseHelper;
+            double mouseX = helper.getMouseX() * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth();
+            double mouseY = helper.getMouseY() * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight();
 
             try
             {
-                Field eventButton = ReflectionHelper.findField(GuiScreen.class, "eventButton", "field_146287_f");
+                Field eventButton = ObfuscationReflectionHelper.findField(MouseHelper.class, "field_198042_g");
                 eventButton.setAccessible(true);
-                eventButton.set(gui, -1);
+                eventButton.set(mc.mouseHelper, -1);
 
-                //Resets the mouse straight away
-                Method mouseReleased = ReflectionHelper.findMethod(GuiScreen.class, "mouseReleased", "func_146286_b", int.class, int.class, int.class);
-                mouseReleased.setAccessible(true);
-                mouseReleased.invoke(gui, mouseX, mouseY, button);
+                Screen.wrapScreenError(() -> {
+                    boolean cancelled = ForgeHooksClient.onGuiMouseReleasedPre(screen, mouseX, mouseY, button);
+                    if (!cancelled) {
+                        cancelled = screen.mouseReleased(mouseX, mouseY, button);
+                    }
+                    if (!cancelled) {
+                        ForgeHooksClient.onGuiMouseReleasedPost(screen, mouseX, mouseY, button);
+                    }
+                }, "mouseReleased event handler", screen.getClass().getCanonicalName());
             }
-            catch(IllegalAccessException | InvocationTargetException e)
+            catch(IllegalAccessException e)
             {
                 e.printStackTrace();
             }
@@ -663,7 +681,7 @@ public class ControllerInput
      */
     public static boolean isLeftClicking()
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         boolean isLeftClicking = mc.gameSettings.keyBindAttack.isKeyDown();
         Controller controller = Controllable.getController();
         if(controller != null)
@@ -673,7 +691,7 @@ public class ControllerInput
                 isLeftClicking = true;
             }
         }
-        return mc.currentScreen == null && isLeftClicking && mc.inGameHasFocus;
+        return mc.currentScreen == null && isLeftClicking && mc.mouseHelper.isMouseGrabbed();
     }
 
     /**
@@ -681,7 +699,7 @@ public class ControllerInput
      */
     public static boolean isRightClicking()
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         boolean isRightClicking = mc.gameSettings.keyBindUseItem.isKeyDown();
         Controller controller = Controllable.getController();
         if(controller != null)
@@ -699,16 +717,16 @@ public class ControllerInput
      */
     public static boolean canQuickMove()
     {
-        boolean isSneaking = (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
+        boolean canQuickMove = InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT) || InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            if(controller.getState().b)
+            if(ButtonBindings.QUICK_MOVE.isButtonDown())
             {
-                isSneaking = true;
+                canQuickMove = true;
             }
         }
-        return isSneaking;
+        return canQuickMove;
     }
 }
 

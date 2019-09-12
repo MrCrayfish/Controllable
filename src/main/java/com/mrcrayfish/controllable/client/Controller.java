@@ -6,15 +6,6 @@ import com.studiohartman.jamepad.ControllerUnpluggedException;
 
 import javax.annotation.Nullable;
 
-/**
- * A wrapper class for {@link org.lwjgl.input.Controller} to make method names more modern. Instead
- * of methods like {@link org.lwjgl.input.Controller#getXAxisValue()}, this class turns that into
- * {@link #getLThumbStickXValue()} which is much more accurate name. The class also adds in support
- * for virtual buttons, the direction pad isn't technically buttons but support for it has been
- * added within this mod, {@link #isButtonPressed(int)} adds in special cases for them.
- *
- * Author: MrCrayfish
- */
 public class Controller
 {
     private Mappings.Entry mapping = null;

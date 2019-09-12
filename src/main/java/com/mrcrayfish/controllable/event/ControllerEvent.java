@@ -1,10 +1,8 @@
 package com.mrcrayfish.controllable.event;
 
 import com.mrcrayfish.controllable.client.Controller;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.MovementInput;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.Event;
 
 /**
  * Author: MrCrayfish
