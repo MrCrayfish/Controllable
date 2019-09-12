@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHelper;
+import net.minecraft.client.gui.screen.IngameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
@@ -368,6 +369,13 @@ public class ControllerInput
                 {
                     cycleThirdPersonView();
                 }
+                else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
+                {
+                    if(mc.player != null)
+                    {
+                        mc.displayInGameMenu(false);
+                    }
+                }
                 else if(mc.player != null && !mc.player.isHandActive())
                 {
                     if(ButtonBindings.ATTACK.isButtonPressed())
@@ -405,6 +413,13 @@ public class ControllerInput
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
                         scrollCreativeTabs((CreativeScreen) mc.currentScreen, -1);
+                    }
+                }
+                else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
+                {
+                    if(mc.currentScreen instanceof IngameMenuScreen)
+                    {
+                        mc.displayGuiScreen(null);
                     }
                 }
                 else if(button == Buttons.A)

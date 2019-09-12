@@ -20,4 +20,5 @@ public class ButtonBindings
     public static final ButtonBinding SCROLL_LEFT = new ButtonBinding(Buttons.LEFT_BUMPER, "key.scrollLeft");
     public static final ButtonBinding SCROLL_RIGHT = new ButtonBinding(Buttons.RIGHT_BUMPER, "key.scrollRight");
     public static final ButtonBinding QUICK_MOVE = new ButtonBinding(Buttons.B, "key.quickMove");
+    public static final ButtonBinding PAUSE_GAME = new ButtonBinding(Buttons.START, "key.pauseGame");
 }
