@@ -64,6 +64,8 @@ function initializeCoreMod() {
                     desc: "(II)V",
                     patch: patch_ForgeIngameGui_renderPlayerList
                 }, classNode);
+
+                return classNode;
             }
         }
     };
