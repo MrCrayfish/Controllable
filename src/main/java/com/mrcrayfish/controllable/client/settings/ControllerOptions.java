@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.SharedConstants;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.io.IOUtils;
 
@@ -87,7 +86,7 @@ public class ControllerOptions
                 }
                 catch(Exception var10)
                 {
-                    Controllable.LOGGER.warn("Skipping bad option: {}", (Object) line);
+                    Controllable.LOGGER.warn("Skipping bad option: {}", line);
                 }
             }
 
@@ -127,9 +126,9 @@ public class ControllerOptions
     {
         try(PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8)))
         {
-            writer.println("deadZone:" + this.deadZone);
-            writer.println("rotationSpeed:" + this.rotationSpeed);
-            writer.println("mouseSpeed:" + this.mouseSpeed);
+            writer.println("deadZone:" + FORMAT.format(this.deadZone));
+            writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
+            writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
         }
         catch(FileNotFoundException e)
         {
