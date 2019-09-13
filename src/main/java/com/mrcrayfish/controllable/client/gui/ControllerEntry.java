@@ -1,6 +1,9 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.Controller;
+import com.mrcrayfish.controllable.client.Mappings;
 import com.studiohartman.jamepad.ControllerIndex;
 import com.studiohartman.jamepad.ControllerUnpluggedException;
 import net.minecraft.client.Minecraft;
@@ -57,6 +60,10 @@ public final class ControllerEntry extends ExtendedList.AbstractListEntry<Contro
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
         controllerList.setSelected(this);
+        ControllerIndex index = controllerList.getManager().getControllerIndex(controller.getIndex());
+        Controller controller = new Controller(index);
+        Mappings.updateControllerMappings(controller);
+        Controllable.setController(controller);
         return true;
     }
 }

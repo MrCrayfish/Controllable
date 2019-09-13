@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.client.gui.ControllerSelectionScreen;
-import com.mrcrayfish.controllable.client.gui.GuiButtonController;
+import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
 import com.studiohartman.jamepad.ControllerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.OptionsScreen;
@@ -29,7 +29,7 @@ public class GuiEvents
         if(event.getGui() instanceof OptionsScreen)
         {
             int y = event.getGui().height / 6 + 72 - 6;
-            event.addWidget(new GuiButtonController((event.getGui().width / 2) + 5 + 150 + 4, y, button ->
+            event.addWidget(new ControllerButton((event.getGui().width / 2) + 5 + 150 + 4, y, button ->
                     Minecraft.getInstance().displayGuiScreen(new ControllerSelectionScreen(manager, event.getGui()))));
         }
     }

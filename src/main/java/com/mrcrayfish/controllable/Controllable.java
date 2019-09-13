@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable;
 
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import com.studiohartman.jamepad.ControllerIndex;
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
@@ -31,6 +32,7 @@ public class Controllable
 {//4d54165f7f65cf475bf13341569655b980a5b430
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
+    private static ControllerOptions options;
     private static ControllerManager manager;
     private static Controller controller;
     private static ControllerInput input;
@@ -56,6 +58,11 @@ public class Controllable
         return selectedControllerIndex;
     }
 
+    public static ControllerOptions getOptions()
+    {
+        return options;
+    }
+
     private void onClientSetup(FMLClientSetupEvent event)
     {
         /* Loads up the controller manager and setup shutdown cleanup */
@@ -69,6 +76,7 @@ public class Controllable
         File configFolder = new File(mc.gameDir, "config");
 
         ControllerProperties.load(configFolder);
+        Controllable.options = new ControllerOptions(mc, mc.gameDir);
 
         /* Attempts to load the first controller connected */
         ControllerIndex index = manager.getControllerIndex(0);

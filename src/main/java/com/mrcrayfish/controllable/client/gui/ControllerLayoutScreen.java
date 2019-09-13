@@ -8,6 +8,8 @@ import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
@@ -26,12 +28,12 @@ public class ControllerLayoutScreen extends Screen
     private List<ControllerButton> controllerButtons = new ArrayList<>();
 
     private int configureButton = -1;
-    private Screen previousScreen;
+    private Screen parentScreen;
 
-    protected ControllerLayoutScreen(Screen previousScreen)
+    protected ControllerLayoutScreen(Screen parentScreen)
     {
-        super(new TranslationTextComponent("controllable.controllerLayout.title"));
-        this.previousScreen = previousScreen;
+        super(new TranslationTextComponent("controllable.gui.title.layout"));
+        this.parentScreen = parentScreen;
     }
 
     @Override
@@ -54,12 +56,17 @@ public class ControllerLayoutScreen extends Screen
         controllerButtons.add(new ControllerButton(Buttons.HOME, 17, 8, 46, 0, 4, 4, 5));
         controllerButtons.add(new ControllerAxis(Buttons.LEFT_THUMB_STICK, 9, 12, 0, 0, 7, 7, 5));
         controllerButtons.add(new ControllerAxis(Buttons.RIGHT_THUMB_STICK, 22, 12, 0, 0, 7, 7, 5));
+
+        this.addButton(new Button(this.width / 2 - 100, this.height - 32, 200, 20, I18n.format("gui.done"), (button) -> {
+            this.minecraft.displayGuiScreen(this.parentScreen);
+        }));
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground();
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableBlend();
         Minecraft.getInstance().getTextureManager().bindTexture(TEXTURE);
         int width = 38 * 5;
@@ -69,6 +76,7 @@ public class ControllerLayoutScreen extends Screen
         blit(x, y, width, height, 50, 0, 38, 29, 256, 256);
         GlStateManager.disableBlend();
         controllerButtons.forEach(controllerButton -> controllerButton.draw(x, y, mouseX, mouseY, configureButton == controllerButton.button));
+        this.drawCenteredString(this.font, this.title.getFormattedText(), this.width / 2, 20, 0xFFFFFF);
         super.render(mouseX, mouseY, partialTicks);
     }
 
@@ -84,7 +92,7 @@ public class ControllerLayoutScreen extends Screen
                 return true;
             }
         }
-        return false;
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override

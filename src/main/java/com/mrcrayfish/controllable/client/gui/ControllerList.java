@@ -46,4 +46,9 @@ public class ControllerList extends ExtendedList<ControllerEntry>
             }
         }
     }
+
+    public ControllerManager getManager()
+    {
+        return manager;
+    }
 }

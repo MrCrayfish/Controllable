@@ -81,8 +81,10 @@ public class ControllerInput
             if(mc.currentScreen == null || mc.currentScreen instanceof ControllerLayoutScreen)
                 return;
 
+            float deadZone = (float) Controllable.getOptions().getDeadZone();
+
             /* Only need to run code if left thumb stick has input */
-            boolean moving = Math.abs(controller.getLThumbStickXValue()) >= 0.35F || Math.abs(controller.getLThumbStickYValue()) >= 0.35F;
+            boolean moving = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
             if(moving)
             {
                 lastUse = 100;
@@ -90,14 +92,14 @@ public class ControllerInput
                 /* Updates the target mouse position when the initial thumb stick movement is
                  * detected. This fixes an issue when the user moves the cursor with the mouse then
                  * switching back to controller, the cursor would jump to old target mouse position. */
-                if(Math.abs(prevXAxis) < 0.35F && Math.abs(prevYAxis) < 0.35F)
+                if(Math.abs(prevXAxis) < deadZone && Math.abs(prevYAxis) < deadZone)
                 {
                     prevTargetMouseX = targetMouseX = (int) mc.mouseHelper.getMouseX();
                     prevTargetMouseY = targetMouseY = (int) mc.mouseHelper.getMouseY();
                 }
 
                 float xAxis = (controller.getLThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickXValue());
-                if(Math.abs(xAxis) > 0.35F)
+                if(Math.abs(xAxis) >= deadZone)
                 {
                     mouseSpeedX = xAxis;
                 }
@@ -107,7 +109,7 @@ public class ControllerInput
                 }
 
                 float yAxis = (controller.getLThumbStickYValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickYValue());
-                if(Math.abs(yAxis) > 0.35F)
+                if(Math.abs(yAxis) >= deadZone)
                 {
                     mouseSpeedY = yAxis;
                 }
@@ -119,8 +121,9 @@ public class ControllerInput
 
             if(Math.abs(mouseSpeedX) > 0.05F || Math.abs(mouseSpeedY) > 0.05F)
             {
-                targetMouseX += 30 * mouseSpeedX;
-                targetMouseY -= 30 * mouseSpeedY;
+                double mouseSpeed = Controllable.getOptions().getMouseSpeed();
+                targetMouseX += mouseSpeed * mouseSpeedX;
+                targetMouseY -= mouseSpeed * mouseSpeedY;
             }
 
             prevXAxis = controller.getLThumbStickXValue();
@@ -171,15 +174,22 @@ public class ControllerInput
 
         if(mc.currentScreen == null)
         {
+            float deadZone = (float) Controllable.getOptions().getDeadZone();
+
             /* Handles rotating the yaw of player */
-            if(controller.getRThumbStickXValue() != 0.0F || controller.getRThumbStickYValue() != 0.0F)
+            if(Math.abs(controller.getRThumbStickXValue()) >= deadZone || Math.abs(controller.getRThumbStickYValue()) >= deadZone)
             {
                 lastUse = 100;
-                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, 20.0F, 15.0F);
+                double rotationSpeed = Controllable.getOptions().getRotationSpeed();
+                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
-                    float rotationYaw = turnEvent.getYawSpeed() * (controller.getRThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickXValue());
-                    float rotationPitch = turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() > 0.0F ? -1 : 1) * Math.abs(controller.getRThumbStickYValue());
+                    //TODO remove dead zone from axis normal
+
+                    //float rotationYaw = turnEvent.getYawSpeed() * MathHelper.clamp(controller.getLThumbStickXValue() - deadZone, 0.0F, 1.0F);
+                    //float rotationPitch = turnEvent.getPitchSpeed() * -MathHelper.clamp(controller.getLThumbStickYValue() - deadZone, 0.0F, 1.0F);
+                    float rotationYaw = turnEvent.getYawSpeed() * controller.getRThumbStickXValue();
+                    float rotationPitch = turnEvent.getPitchSpeed() * -controller.getRThumbStickYValue();
                     player.rotateTowards(rotationYaw, rotationPitch);
                 }
             }
@@ -256,13 +266,15 @@ public class ControllerInput
         {
             if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.Move(controller)))
             {
-                if(controller.getLThumbStickYValue() != 0.0F)
+                float deadZone = (float) Controllable.getOptions().getDeadZone();
+
+                if(Math.abs(controller.getLThumbStickYValue()) >= deadZone)
                 {
                     lastUse = 100;
                     int dir = controller.getLThumbStickYValue() > 0.0F ? 1 : -1;
                     event.getMovementInput().forwardKeyDown = dir > 0;
                     event.getMovementInput().backKeyDown = dir < 0;
-                    event.getMovementInput().moveForward = dir * Math.abs(controller.getLThumbStickYValue());
+                    event.getMovementInput().moveForward = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
                     if(event.getMovementInput().sneak)
                     {
@@ -270,13 +282,13 @@ public class ControllerInput
                     }
                 }
 
-                if(controller.getLThumbStickXValue() != 0.0F)
+                if(Math.abs(controller.getLThumbStickXValue()) >= deadZone)
                 {
                     lastUse = 100;
                     int dir = controller.getLThumbStickXValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().rightKeyDown = dir < 0;
                     event.getMovementInput().leftKeyDown = dir > 0;
-                    event.getMovementInput().moveStrafe = dir * Math.abs(controller.getLThumbStickXValue());
+                    event.getMovementInput().moveStrafe = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickXValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
                     if(event.getMovementInput().sneak)
                     {

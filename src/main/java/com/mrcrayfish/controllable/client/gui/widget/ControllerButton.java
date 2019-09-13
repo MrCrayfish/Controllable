@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.widget;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mrcrayfish.controllable.Reference;
@@ -9,11 +9,11 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Author: MrCrayfish
  */
-public class GuiButtonController extends Button
+public class ControllerButton extends Button
 {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/controller.png");
 
-    public GuiButtonController(int x, int y, IPressable pressable)
+    public ControllerButton(int x, int y, IPressable pressable)
     {
         super(x, y, 20, 20, "", pressable);
     }
