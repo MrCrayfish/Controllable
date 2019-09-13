@@ -18,7 +18,7 @@ Adds in the ability to use a controller to play Minecraft
 [[dependencies.controllable]]
    modId="forge"
    mandatory=true
-   versionRange="[28.0.83,)"
+   versionRange="[28.1.0,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.controllable]]
