@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = "1.14.4-0.3.1"
+version = "1.14.4-0.4.0"
 group = "com.mrcrayfish" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "controllable"
 
@@ -72,6 +72,20 @@ dependencies {
     compile 'com.github.WilliamAHartman:Jamepad:1.3.2'
 }
 
+jar {
+    manifest {
+        attributes([
+            "Specification-Title": "Controllable",
+            "Specification-Vendor": "MrCrayfish",
+            "Specification-Version": "1",
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"MrCrayfish",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            "Signing-Fingerprint": project.hasProperty('fingerprint') ? project.property('fingerprint') : 'unsigned'
+        ])
+    }
+}
 
 Properties keyStoreProperties = new Properties()
 File file = new File("C:\\dev\\keystore.properties")

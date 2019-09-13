@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Mod(Reference.MOD_ID)
 public class Controllable
-{//4d54165f7f65cf475bf13341569655b980a5b430
+{
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
     private static ControllerOptions options;
