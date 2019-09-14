@@ -4,12 +4,11 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
-import com.studiohartman.jamepad.ControllerIndex;
-import com.studiohartman.jamepad.ControllerUnpluggedException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.util.ResourceLocation;
+import uk.co.electronstudio.sdl2gdx.SDL2Controller;
 
 import java.awt.*;
 
@@ -19,15 +18,15 @@ import java.awt.*;
 public final class ControllerEntry extends ExtendedList.AbstractListEntry<ControllerEntry>
 {
     private ControllerList controllerList;
-    private ControllerIndex controller;
+    private Controller controller;
 
-    public ControllerEntry(ControllerList controllerList, ControllerIndex controller)
+    public ControllerEntry(ControllerList controllerList, SDL2Controller sdl2Controller)
     {
         this.controllerList = controllerList;
-        this.controller = controller;
+        this.controller = new Controller(sdl2Controller);
     }
 
-    public ControllerIndex getController()
+    public Controller getController()
     {
         return controller;
     }
@@ -35,24 +34,15 @@ public final class ControllerEntry extends ExtendedList.AbstractListEntry<Contro
     @Override
     public void render(int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
     {
-        try
-        {
-            if(!controller.isConnected())
-            {
-                return;
-            }
+        if(!controller.getNativeController().isConnected())
+            return;
 
-            Minecraft.getInstance().fontRenderer.drawString(controller.getName(), left + 20, top + 4, Color.WHITE.getRGB());
-            if(controllerList.getSelected() == this)
-            {
-                GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-                Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation("textures/gui/container/beacon.png"));
-                Screen.blit(left + 2, top + 2, 91, 224, 14, 12, 256, 256);
-            }
-        }
-        catch(ControllerUnpluggedException e)
+        Minecraft.getInstance().fontRenderer.drawString(controller.getName(), left + 20, top + 4, Color.WHITE.getRGB());
+        if(controllerList.getSelected() == this)
         {
-            e.printStackTrace();
+            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation("textures/gui/container/beacon.png"));
+            Screen.blit(left + 2, top + 2, 91, 224, 14, 12, 256, 256);
         }
     }
 
@@ -62,8 +52,6 @@ public final class ControllerEntry extends ExtendedList.AbstractListEntry<Contro
         if(controllerList.getSelected() != this)
         {
             controllerList.setSelected(this);
-            ControllerIndex index = controllerList.getManager().getControllerIndex(controller.getIndex());
-            Controller controller = new Controller(index);
             Mappings.updateControllerMappings(controller);
             Controllable.setController(controller);
         }

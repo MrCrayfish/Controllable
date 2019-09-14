@@ -34,6 +34,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_DOWN;
+import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_UP;
+
 /**
  * Author: MrCrayfish
  */
@@ -123,7 +126,7 @@ public class ControllerInput
             {
                 double mouseSpeed = Controllable.getOptions().getMouseSpeed();
                 targetMouseX += mouseSpeed * mouseSpeedX;
-                targetMouseY -= mouseSpeed * mouseSpeedY;
+                targetMouseY += mouseSpeed * mouseSpeedY;
             }
 
             prevXAxis = controller.getLThumbStickXValue();
@@ -189,7 +192,7 @@ public class ControllerInput
                     //float rotationYaw = turnEvent.getYawSpeed() * MathHelper.clamp(controller.getLThumbStickXValue() - deadZone, 0.0F, 1.0F);
                     //float rotationPitch = turnEvent.getPitchSpeed() * -MathHelper.clamp(controller.getLThumbStickYValue() - deadZone, 0.0F, 1.0F);
                     float rotationYaw = turnEvent.getYawSpeed() * controller.getRThumbStickXValue();
-                    float rotationPitch = turnEvent.getPitchSpeed() * -controller.getRThumbStickYValue();
+                    float rotationPitch = turnEvent.getPitchSpeed() * controller.getRThumbStickYValue();
                     player.rotateTowards(rotationYaw, rotationPitch);
                 }
             }
@@ -271,7 +274,7 @@ public class ControllerInput
                 if(Math.abs(controller.getLThumbStickYValue()) >= deadZone)
                 {
                     lastUse = 100;
-                    int dir = controller.getLThumbStickYValue() > 0.0F ? 1 : -1;
+                    int dir = controller.getLThumbStickYValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().forwardKeyDown = dir > 0;
                     event.getMovementInput().backKeyDown = dir < 0;
                     event.getMovementInput().moveForward = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
@@ -597,11 +600,11 @@ public class ControllerInput
             int i = (creative.getContainer().itemList.size() + 9 - 1) / 9 - 5;
             int dir = 0;
 
-            if(controller.getState().dpadUp || controller.getRThumbStickYValue() >= 0.8F)
+            if(controller.getNativeController().getButton(SDL_CONTROLLER_BUTTON_DPAD_UP) || controller.getRThumbStickYValue() >= 0.8F)
             {
                 dir = 1;
             }
-            else if(controller.getState().dpadDown || controller.getRThumbStickYValue() <= -0.8F)
+            else if(controller.getNativeController().getButton(SDL_CONTROLLER_BUTTON_DPAD_DOWN) || controller.getRThumbStickYValue() <= -0.8F)
             {
                 dir = -1;
             }

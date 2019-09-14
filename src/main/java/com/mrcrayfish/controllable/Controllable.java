@@ -1,14 +1,10 @@
 package com.mrcrayfish.controllable;
 
+import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
-import com.studiohartman.jamepad.ControllerIndex;
-import com.studiohartman.jamepad.ControllerManager;
-import com.studiohartman.jamepad.ControllerState;
-import com.studiohartman.jamepad.ControllerUnpluggedException;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,45 +13,39 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.libsdl.SDL_Error;
+import uk.co.electronstudio.sdl2gdx.SDL2Controller;
+import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+
+import static org.libsdl.SDL.*;
 
 /**
  * Author: MrCrayfish
  */
 @Mod(Reference.MOD_ID)
-public class Controllable
+public class Controllable extends ControllerAdapter
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
     private static ControllerOptions options;
-    private static ControllerManager manager;
+    private static SDL2ControllerManager manager;
     private static Controller controller;
     private static ControllerInput input;
     private static boolean[] buttonStates;
-    private static int selectedControllerIndex = -1;
-    private static List<String> connectedControllerNames;
-    private static int currentControllerCount;
 
     public Controllable()
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().register(this);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @Nullable
     public static Controller getController()
     {
         return controller;
-    }
-
-    public static int getSelectedControllerIndex()
-    {
-        return selectedControllerIndex;
     }
 
     public static ControllerOptions getOptions()
@@ -66,11 +56,8 @@ public class Controllable
     private void onClientSetup(FMLClientSetupEvent event)
     {
         /* Loads up the controller manager and setup shutdown cleanup */
-        Controllable.manager = new ControllerManager();
-        Controllable.manager.initSDLGamepad();
-        Controllable.currentControllerCount = manager.getNumControllers();
-        Controllable.connectedControllerNames = getConnectedControllerNames();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> Controllable.manager.quitSDLGamepad())); //TODO make asm hook into minecraft close method. Shutdown hook causes jvm crash
+        Controllable.manager = new SDL2ControllerManager();
+        Controllable.manager.addListenerAndRunForConnectedControllers(this);
 
         Minecraft mc = event.getMinecraftSupplier().get();
         File configFolder = new File(mc.gameDir, "config");
@@ -79,12 +66,12 @@ public class Controllable
         Controllable.options = new ControllerOptions(mc, mc.gameDir);
 
         /* Attempts to load the first controller connected if auto select is enabled */
-        if(options.isAutoSelect())
+        if(options.isAutoSelect() && manager.getControllers().size > 0)
         {
-            ControllerIndex index = manager.getControllerIndex(0);
-            if(index.isConnected())
+            com.badlogic.gdx.controllers.Controller controller = manager.getControllers().get(0);
+            if(controller instanceof SDL2Controller)
             {
-                setController(new Controller(index));
+                setController(new Controller((SDL2Controller) controller));
             }
         }
 
@@ -97,43 +84,65 @@ public class Controllable
         MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
     }
 
+    @Override
+    public void connected(com.badlogic.gdx.controllers.Controller sdlController)
+    {
+        Minecraft.getInstance().enqueue(() ->
+        {
+            if(sdlController instanceof SDL2Controller)
+            {
+                Controller controller = new Controller((SDL2Controller) sdlController);
+                if(Controllable.controller == null)
+                {
+                    setController(controller);
+                }
+
+                Minecraft mc = Minecraft.getInstance();
+                if(mc.player != null)
+                {
+                    Minecraft.getInstance().getToastGui().add(new ControllerToast(true, controller.getName()));
+                }
+            }
+        });
+    }
+
+    @Override
+    public void disconnected(com.badlogic.gdx.controllers.Controller sdlController)
+    {
+        Minecraft.getInstance().enqueue(() ->
+        {
+            if(Controllable.controller != null)
+            {
+                if(Controllable.controller.getNativeController() == sdlController)
+                {
+                    setController(null);
+
+                    if(options.isAutoSelect() && manager.getControllers().size > 0)
+                    {
+                        setController(new Controller((SDL2Controller) manager.getControllers().get(0)));
+                    }
+                }
+            }
+
+            Minecraft mc = Minecraft.getInstance();
+            if(mc.player != null)
+            {
+                Minecraft.getInstance().getToastGui().add(new ControllerToast(false, sdlController.getName()));
+            }
+        });
+    }
+
     public static void setController(@Nullable Controller controller)
     {
         if(controller != null)
         {
             Controllable.controller = controller;
-            selectedControllerIndex = controller.getNumber();
             buttonStates = new boolean[Buttons.LENGTH];
-            controller.updateState(manager.getState(selectedControllerIndex));
         }
         else
         {
-            selectedControllerIndex = -1;
             Controllable.controller = null;
         }
-    }
-
-    public static List<String> getConnectedControllerNames()
-    {
-        /* Ensures that the number of controllers matches the controller index size */
-        manager.update();
-
-        /* Adds all the connected controller's names to a list. Used to determine which controller was
-         * connected or disconnected */
-        List<String> names = new ArrayList<>();
-        for(int i = 0; i < manager.getNumControllers(); i++)
-        {
-            try
-            {
-                ControllerIndex index = manager.getControllerIndex(i);
-                if(index.isConnected())
-                {
-                    names.add(index.getName());
-                }
-            }
-            catch(ControllerUnpluggedException ignored) {}
-        }
-        return names;
     }
 
     @SubscribeEvent
@@ -142,85 +151,37 @@ public class Controllable
         if(event.phase != TickEvent.Phase.START)
             return;
 
-        manager.update();
-
-        Minecraft mc = Minecraft.getInstance();
-        int controllersCount = manager.getNumControllers();
-        if(controllersCount != currentControllerCount)
+        try
         {
-            boolean connected = controllersCount > currentControllerCount;
-            List<String> connectControllerNames = getConnectedControllerNames();
-            List<String> newControllers = connected ? connectControllerNames : connectedControllerNames;
-            List<String> oldControllers = connected ? connectedControllerNames : connectControllerNames;
-            for(String name : oldControllers)
-            {
-                Iterator<String> it = newControllers.iterator();
-                while(it.hasNext())
-                {
-                    if(it.next().equals(name))
-                    {
-                        it.remove();
-                        break;
-                    }
-                }
-            }
-
-            /* If no controllers were plugged in, make the new controller the active one */
-            if(currentControllerCount == 0 && controllersCount > 0)
-            {
-                setController(new Controller(manager.getControllerIndex(controllersCount - 1)));
-            }
-
-            connectedControllerNames = newControllers;
-            currentControllerCount = controllersCount;
-
-            if(mc.player != null)
-            {
-                String controllerName = newControllers.size() > 0 ? newControllers.get(0) : I18n.format("controllable.toast.controller");
-                Minecraft.getInstance().getToastGui().add(new ControllerToast(connected, controllerName));
-            }
+            manager.pollState();
+        }
+        catch(SDL_Error e)
+        {
+            e.printStackTrace();
         }
 
-        ControllerState state = manager.getState(selectedControllerIndex);
-        if(!state.isConnected)
-        {
-            if(controller != null)
-            {
-                controller = null;
-            }
-            if(options.isAutoSelect())
-            {
-                selectedControllerIndex = controllersCount > 0 ? 0 : -1;
-            }
+        if(controller == null)
             return;
-        }
-        else if(controller == null)
-        {
-            controller = new Controller(manager.getControllerIndex(selectedControllerIndex));
-            buttonStates = new boolean[Buttons.LENGTH];
-        }
-
-        controller.updateState(state);
 
         ButtonBinding.tick();
 
-        processButton(Buttons.A, state.a);
-        processButton(Buttons.B, state.b);
-        processButton(Buttons.X, state.x);
-        processButton(Buttons.Y, state.y);
-        processButton(Buttons.SELECT, state.back);
-        processButton(Buttons.HOME, state.guide);
-        processButton(Buttons.START, state.start);
-        processButton(Buttons.LEFT_THUMB_STICK, state.leftStickClick);
-        processButton(Buttons.RIGHT_THUMB_STICK, state.rightStickClick);
-        processButton(Buttons.LEFT_BUMPER, state.lb);
-        processButton(Buttons.RIGHT_BUMPER, state.rb);
-        processButton(Buttons.LEFT_TRIGGER, Math.abs(state.leftTrigger) >= 0.1);
-        processButton(Buttons.RIGHT_TRIGGER, Math.abs(state.rightTrigger) >= 0.1);
-        processButton(Buttons.DPAD_UP, state.dpadUp);
-        processButton(Buttons.DPAD_DOWN, state.dpadDown);
-        processButton(Buttons.DPAD_LEFT, state.dpadLeft);
-        processButton(Buttons.DPAD_RIGHT, state.dpadRight);
+        processButton(Buttons.A, getButtonState(SDL_CONTROLLER_BUTTON_A));
+        processButton(Buttons.B, getButtonState(SDL_CONTROLLER_BUTTON_B));
+        processButton(Buttons.X, getButtonState(SDL_CONTROLLER_BUTTON_X));
+        processButton(Buttons.Y, getButtonState(SDL_CONTROLLER_BUTTON_Y));
+        processButton(Buttons.SELECT, getButtonState(SDL_CONTROLLER_BUTTON_BACK));
+        processButton(Buttons.HOME, getButtonState(SDL_CONTROLLER_BUTTON_GUIDE));
+        processButton(Buttons.START, getButtonState(SDL_CONTROLLER_BUTTON_START));
+        processButton(Buttons.LEFT_THUMB_STICK, getButtonState(SDL_CONTROLLER_BUTTON_LEFTSTICK));
+        processButton(Buttons.RIGHT_THUMB_STICK, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
+        processButton(Buttons.LEFT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
+        processButton(Buttons.RIGHT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+        processButton(Buttons.LEFT_TRIGGER, Math.abs(controller.getLTriggerValue()) >= 0.1F);
+        processButton(Buttons.RIGHT_TRIGGER, Math.abs(controller.getRTriggerValue()) >= 0.1F);
+        processButton(Buttons.DPAD_UP, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
+        processButton(Buttons.DPAD_DOWN, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
+        processButton(Buttons.DPAD_LEFT, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
+        processButton(Buttons.DPAD_RIGHT, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
     }
 
     private static void processButton(int index, boolean state)
@@ -266,12 +227,17 @@ public class Controllable
      * @param button the button to check if pressed
      * @return
      */
-    public static boolean isButtonPressed(int button)
+    public static boolean isButtonPressed(int button) //move to controller class
     {
         if(button >= 0 && button < buttonStates.length)
         {
             return buttonStates[button];
         }
         return false;
+    }
+
+    private static boolean getButtonState(int buttonCode)
+    {
+        return controller != null && controller.getNativeController().getButton(buttonCode);
     }
 }

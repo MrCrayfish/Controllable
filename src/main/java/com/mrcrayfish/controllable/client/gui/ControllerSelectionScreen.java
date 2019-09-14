@@ -1,10 +1,10 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.studiohartman.jamepad.ControllerManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TranslationTextComponent;
+import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 
 /**
  * Author: MrCrayfish
@@ -12,19 +12,19 @@ import net.minecraft.util.text.TranslationTextComponent;
 public class ControllerSelectionScreen extends Screen
 {
     private int controllerCount;
-    private ControllerManager manager;
+    private SDL2ControllerManager manager;
     private ControllerList listControllers;
     private Screen previousScreen;
     private Button btnSettings;
     private Button btnRemap;
     private Button btnBack;
 
-    public ControllerSelectionScreen(ControllerManager manager, Screen previousScreen)
+    public ControllerSelectionScreen(SDL2ControllerManager manager, Screen previousScreen)
     {
         super(new TranslationTextComponent("controllable.selectController.title"));
         this.manager = manager;
         this.previousScreen = previousScreen;
-        this.controllerCount = manager.getNumControllers();
+        this.controllerCount = manager.getControllers().size;
     }
 
     @Override
@@ -42,9 +42,9 @@ public class ControllerSelectionScreen extends Screen
     @Override
     public void tick()
     {
-        if(this.controllerCount != this.manager.getNumControllers())
+        if(this.controllerCount != this.manager.getControllers().size)
         {
-            this.controllerCount = this.manager.getNumControllers();
+            this.controllerCount = this.manager.getControllers().size;
             this.listControllers.reload();
             //this.btnRemap.active = this.listControllers.getSelected() != null;
         }

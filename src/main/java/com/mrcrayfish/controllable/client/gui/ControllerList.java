@@ -1,11 +1,14 @@
 package com.mrcrayfish.controllable.client.gui;
 
+import com.badlogic.gdx.utils.Array;
 import com.mrcrayfish.controllable.Controllable;
-import com.studiohartman.jamepad.ControllerManager;
+import com.mrcrayfish.controllable.client.Controller;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import uk.co.electronstudio.sdl2gdx.SDL2Controller;
+import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 
 import java.util.List;
 
@@ -15,9 +18,9 @@ import java.util.List;
 @OnlyIn(Dist.CLIENT)
 public class ControllerList extends ExtendedList<ControllerEntry>
 {
-    private ControllerManager manager;
+    private SDL2ControllerManager manager;
 
-    public ControllerList(ControllerManager manager, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
+    public ControllerList(SDL2ControllerManager manager, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
     {
         super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
         this.manager = manager;
@@ -27,28 +30,31 @@ public class ControllerList extends ExtendedList<ControllerEntry>
     public void reload()
     {
         this.clearEntries();
-        for(int i = 0; i < manager.getNumControllers(); i++)
+        Array<com.badlogic.gdx.controllers.Controller> controllers = manager.getControllers();
+        for(int i = 0; i < controllers.size; i++)
         {
-            this.addEntry(new ControllerEntry(this, manager.getControllerIndex(i)));
+            this.addEntry(new ControllerEntry(this, (SDL2Controller) controllers.get(i)));
         }
         this.updateSelected();
     }
 
     private void updateSelected()
     {
+        Controller controller = Controllable.getController();
+        if(controller == null)
+        {
+            this.setSelected(null);
+            return;
+        }
+
         List<ControllerEntry> entries = this.children();
         for(ControllerEntry entry : entries)
         {
-            if(entry.getController().getIndex() == Controllable.getSelectedControllerIndex())
+            if(entry.getController().getNativeController() == controller.getNativeController())
             {
                 this.setSelected(entry);
                 break;
             }
         }
-    }
-
-    public ControllerManager getManager()
-    {
-        return manager;
     }
 }
