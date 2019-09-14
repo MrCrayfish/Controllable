@@ -59,11 +59,19 @@ public final class ControllerEntry extends ExtendedList.AbstractListEntry<Contro
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        controllerList.setSelected(this);
-        ControllerIndex index = controllerList.getManager().getControllerIndex(controller.getIndex());
-        Controller controller = new Controller(index);
-        Mappings.updateControllerMappings(controller);
-        Controllable.setController(controller);
+        if(controllerList.getSelected() != this)
+        {
+            controllerList.setSelected(this);
+            ControllerIndex index = controllerList.getManager().getControllerIndex(controller.getIndex());
+            Controller controller = new Controller(index);
+            Mappings.updateControllerMappings(controller);
+            Controllable.setController(controller);
+        }
+        else
+        {
+            controllerList.setSelected(null);
+            Controllable.setController(null);
+        }
         return true;
     }
 }

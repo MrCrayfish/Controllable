@@ -37,7 +37,7 @@ public class Controllable
     private static Controller controller;
     private static ControllerInput input;
     private static boolean[] buttonStates;
-    private static int selectedControllerIndex;
+    private static int selectedControllerIndex = -1;
     private static List<String> connectedControllerNames;
     private static int currentControllerCount;
 
@@ -94,12 +94,19 @@ public class Controllable
         MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
     }
 
-    public static void setController(Controller controller)
+    public static void setController(@Nullable Controller controller)
     {
-        Controllable.controller = controller;
-        selectedControllerIndex = controller.getNumber();
-        buttonStates = new boolean[Buttons.LENGTH];
-        controller.updateState(manager.getState(selectedControllerIndex));
+        if(controller != null)
+        {
+            Controllable.controller = controller;
+            selectedControllerIndex = controller.getNumber();
+            buttonStates = new boolean[Buttons.LENGTH];
+            controller.updateState(manager.getState(selectedControllerIndex));
+        }
+        else
+        {
+            selectedControllerIndex = -1;
+        }
     }
 
     public static List<String> getConnectedControllerNames()
