@@ -70,7 +70,7 @@ public class Controllable
         Controllable.manager.initSDLGamepad();
         Controllable.currentControllerCount = manager.getNumControllers();
         Controllable.connectedControllerNames = getConnectedControllerNames();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> Controllable.manager.quitSDLGamepad()));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> Controllable.manager.quitSDLGamepad())); //TODO make asm hook into minecraft close method. Shutdown hook causes jvm crash
 
         Minecraft mc = event.getMinecraftSupplier().get();
         File configFolder = new File(mc.gameDir, "config");
@@ -78,11 +78,14 @@ public class Controllable
         ControllerProperties.load(configFolder);
         Controllable.options = new ControllerOptions(mc, mc.gameDir);
 
-        /* Attempts to load the first controller connected */
-        ControllerIndex index = manager.getControllerIndex(0);
-        if(index.isConnected())
+        /* Attempts to load the first controller connected if auto select is enabled */
+        if(options.isAutoSelect())
         {
-            setController(new Controller(index));
+            ControllerIndex index = manager.getControllerIndex(0);
+            if(index.isConnected())
+            {
+                setController(new Controller(index));
+            }
         }
 
         Mappings.load(configFolder);
@@ -106,6 +109,7 @@ public class Controllable
         else
         {
             selectedControllerIndex = -1;
+            Controllable.controller = null;
         }
     }
 
@@ -121,12 +125,13 @@ public class Controllable
         {
             try
             {
-                names.add(manager.getControllerIndex(i).getName());
+                ControllerIndex index = manager.getControllerIndex(i);
+                if(index.isConnected())
+                {
+                    names.add(index.getName());
+                }
             }
-            catch(ControllerUnpluggedException e)
-            {
-                e.printStackTrace();
-            }
+            catch(ControllerUnpluggedException ignored) {}
         }
         return names;
     }
@@ -144,8 +149,9 @@ public class Controllable
         if(controllersCount != currentControllerCount)
         {
             boolean connected = controllersCount > currentControllerCount;
-            List<String> newControllers = connected ? getConnectedControllerNames() : connectedControllerNames;
-            List<String> oldControllers = connected ? connectedControllerNames : getConnectedControllerNames();
+            List<String> connectControllerNames = getConnectedControllerNames();
+            List<String> newControllers = connected ? connectControllerNames : connectedControllerNames;
+            List<String> oldControllers = connected ? connectedControllerNames : connectControllerNames;
             for(String name : oldControllers)
             {
                 Iterator<String> it = newControllers.iterator();
@@ -165,8 +171,8 @@ public class Controllable
                 setController(new Controller(manager.getControllerIndex(controllersCount - 1)));
             }
 
-            connectedControllerNames = getConnectedControllerNames();
-            currentControllerCount = manager.getNumControllers();
+            connectedControllerNames = newControllers;
+            currentControllerCount = controllersCount;
 
             if(mc.player != null)
             {
@@ -182,9 +188,9 @@ public class Controllable
             {
                 controller = null;
             }
-            if(selectedControllerIndex >= 0)
+            if(options.isAutoSelect())
             {
-                selectedControllerIndex--;
+                selectedControllerIndex = controllersCount > 0 ? 0 : -1;
             }
             return;
         }

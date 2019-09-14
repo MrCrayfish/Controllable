@@ -5,6 +5,7 @@ import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.MathHelper;
@@ -22,6 +23,12 @@ import java.util.List;
 public class ControllerOptions
 {
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
+
+    public static final BooleanOption AUTO_SELECT = new ControllableBooleanOption("controllable.options.autoSelect", gameSettings -> {
+        return Controllable.getOptions().autoSelect;
+    }, (gameSettings, value) -> {
+        Controllable.getOptions().autoSelect = value;
+    });
 
     public static final SliderPercentageOption DEAD_ZONE = new ControllableSliderPercentageOption("controllable.options.deadZone", 0.0, 1.0, 0.01F, gameSettings -> {
         return Controllable.getOptions().deadZone;
@@ -54,6 +61,7 @@ public class ControllerOptions
 
     private Minecraft minecraft;
     private File optionsFile;
+    private boolean autoSelect = true;
     private double deadZone = 0.1;
     private double rotationSpeed = 20.0;
     private double mouseSpeed = 30.0;
@@ -96,6 +104,10 @@ public class ControllerOptions
 
                 try
                 {
+                    if("autoSelect".equals(key))
+                    {
+                        this.autoSelect = Boolean.valueOf(value);
+                    }
                     if("deadZone".equals(key))
                     {
                         DEAD_ZONE.set(minecraft.gameSettings, Double.parseDouble(value));
@@ -126,6 +138,7 @@ public class ControllerOptions
     {
         try(PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8)))
         {
+            writer.println("autoSelect:" + this.autoSelect);
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
@@ -136,18 +149,23 @@ public class ControllerOptions
         }
     }
 
+    public boolean isAutoSelect()
+    {
+        return this.autoSelect;
+    }
+
     public double getDeadZone()
     {
-        return deadZone;
+        return this.deadZone;
     }
 
     public double getRotationSpeed()
     {
-        return rotationSpeed;
+        return this.rotationSpeed;
     }
 
     public double getMouseSpeed()
     {
-        return mouseSpeed;
+        return this.mouseSpeed;
     }
 }
