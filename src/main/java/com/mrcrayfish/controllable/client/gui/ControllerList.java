@@ -50,7 +50,7 @@ public class ControllerList extends ExtendedList<ControllerEntry>
         List<ControllerEntry> entries = this.children();
         for(ControllerEntry entry : entries)
         {
-            if(entry.getController().getNativeController() == controller.getNativeController())
+            if(entry.getSdl2Controller() == controller.getSDL2Controller())
             {
                 this.setSelected(entry);
                 break;

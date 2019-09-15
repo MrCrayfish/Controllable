@@ -141,7 +141,6 @@ public class Mappings
         return entry;
     }
 
-    @Nullable
     public static void updateControllerMappings(Controller controller)
     {
         controller.setMapping(MAPPINGS.get(controller.getName()));

@@ -26,15 +26,15 @@ public final class ControllerEntry extends ExtendedList.AbstractListEntry<Contro
         this.controller = new Controller(sdl2Controller);
     }
 
-    public Controller getController()
+    SDL2Controller getSdl2Controller()
     {
-        return controller;
+        return this.controller.getSDL2Controller();
     }
 
     @Override
     public void render(int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
     {
-        if(!controller.getNativeController().isConnected())
+        if(!controller.getSDL2Controller().isConnected())
             return;
 
         Minecraft.getInstance().fontRenderer.drawString(controller.getName(), left + 20, top + 4, Color.WHITE.getRGB());
@@ -52,8 +52,7 @@ public final class ControllerEntry extends ExtendedList.AbstractListEntry<Contro
         if(controllerList.getSelected() != this)
         {
             controllerList.setSelected(this);
-            Mappings.updateControllerMappings(controller);
-            Controllable.setController(controller);
+            Controllable.setController(this.controller.getSDL2Controller());
         }
         else
         {
