@@ -95,12 +95,12 @@ public class Controllable extends ControllerAdapter
                 if(Controllable.controller == null)
                 {
                     setController(controller);
-                }
 
-                Minecraft mc = Minecraft.getInstance();
-                if(mc.player != null)
-                {
-                    Minecraft.getInstance().getToastGui().add(new ControllerToast(true, controller.getName()));
+                    Minecraft mc = Minecraft.getInstance();
+                    if(mc.player != null)
+                    {
+                        Minecraft.getInstance().getToastGui().add(new ControllerToast(true, controller.getName()));
+                    }
                 }
             }
         });
@@ -115,19 +115,21 @@ public class Controllable extends ControllerAdapter
             {
                 if(Controllable.controller.getNativeController() == sdlController)
                 {
+                    Controller oldController = Controllable.controller;
+
                     setController(null);
 
                     if(options.isAutoSelect() && manager.getControllers().size > 0)
                     {
                         setController(new Controller((SDL2Controller) manager.getControllers().get(0)));
                     }
-                }
-            }
 
-            Minecraft mc = Minecraft.getInstance();
-            if(mc.player != null)
-            {
-                Minecraft.getInstance().getToastGui().add(new ControllerToast(false, sdlController.getName()));
+                    Minecraft mc = Minecraft.getInstance();
+                    if(mc.player != null)
+                    {
+                        Minecraft.getInstance().getToastGui().add(new ControllerToast(false, oldController.getName()));
+                    }
+                }
             }
         });
     }
