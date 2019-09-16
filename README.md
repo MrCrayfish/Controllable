@@ -1,5 +1,7 @@
 ![Controllable Banner](https://i.imgur.com/ILkyAfn.png)
 
+![Minecraft](https://img.shields.io/badge/dynamic/json?label=Minecraft&query=%24.files%5B0%5D.version&url=https://api.cfwidget.com/minecraft/mc-mods/controllable&style=for-the-badge&logo=appveyor) ![Issues](https://img.shields.io/github/issues/MrCrayfish/Controllable?style=for-the-badge&logo=appveyor)
+
 # Controllable
 
 I noticed a lack of support for controller for the Java Edition of Minecraft, this is where Controllable comes in. Controllable adds that ability into the game. This mod has been heavily influenced by the controls in the Bedrock Edition of the game, however it is much more configurable (coming soon) and supports more controllers (coming soon)! There is also an API available for mod developers to add controller support to your own mod.
