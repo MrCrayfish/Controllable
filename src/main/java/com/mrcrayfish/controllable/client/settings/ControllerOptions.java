@@ -104,21 +104,20 @@ public class ControllerOptions
 
                 try
                 {
-                    if("autoSelect".equals(key))
+                    switch(key)
                     {
-                        this.autoSelect = Boolean.valueOf(value);
-                    }
-                    if("deadZone".equals(key))
-                    {
-                        DEAD_ZONE.set(minecraft.gameSettings, Double.parseDouble(value));
-                    }
-                    if("rotationSpeed".equals(key))
-                    {
-                        ROTATION_SPEED.set(minecraft.gameSettings, Double.parseDouble(value));
-                    }
-                    if("mouseSpeed".equals(key))
-                    {
-                        MOUSE_SPEED.set(minecraft.gameSettings, Double.parseDouble(value));
+                        case "autoSelect":
+                            this.autoSelect = Boolean.valueOf(value);
+                            break;
+                        case "deadZone":
+                            this.deadZone = Double.parseDouble(value);
+                            break;
+                        case "rotationSpeed":
+                            this.rotationSpeed = Double.parseDouble(value);
+                            break;
+                        case "mouseSpeed":
+                            this.mouseSpeed = Double.parseDouble(value);
+                            break;
                     }
                 }
                 catch(Exception e)
