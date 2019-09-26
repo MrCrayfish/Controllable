@@ -1,7 +1,7 @@
 ![Controllable Banner](https://i.imgur.com/ILkyAfn.png)
 
 ![Minecraft](https://img.shields.io/badge/dynamic/json?label=Minecraft&query=%24.files%5B0%5D.version&url=https://api.cfwidget.com/minecraft/mc-mods/controllable&style=for-the-badge&logo=appveyor) ![Issues](https://img.shields.io/github/issues/MrCrayfish/Controllable?style=for-the-badge&logo=appveyor) 
-![Curseforge](https://cf.way2muchnoise.eu/full_controllable_downloads.svg?badge_style=for_the_badge)
+![Curseforge](https://cf.way2muchnoise.eu/full_controllable_downloads.svg?sanitize=true&badge_style=for_the_badge)
 
 # Controllable
 
