@@ -233,8 +233,9 @@ public class RenderEvents
                         remappedButton = mapping.remap(button);
                     }
 
+                    int offsetY = controller.getName().toLowerCase().contains("xbox") ? 13: 0;
                     int texU = (remappedButton % 19) * 13;
-                    int texV = (remappedButton / 19) * 13;
+                    int texV = ((remappedButton / 19) * 13) + offsetY;
                     int size = 13;
 
                     int x = side == Action.Side.LEFT ? 5 : mc.mainWindow.getScaledWidth() - 5 - size;
