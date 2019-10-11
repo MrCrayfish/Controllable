@@ -57,6 +57,12 @@ public class ControllerOptions
         return I18n.format("controllable.options.mouseSpeed.format", FORMAT.format(mouseSpeed));
     });
 
+    public static final BooleanOption RENDER_MINI_PLAYER = new ControllableBooleanOption("controllable.options.renderMiniPlayer", gameSettings -> {
+        return Controllable.getOptions().renderMiniPlayer;
+    }, (gameSettings, value) -> {
+        Controllable.getOptions().renderMiniPlayer = value;
+    });
+
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
     private Minecraft minecraft;
@@ -65,6 +71,7 @@ public class ControllerOptions
     private double deadZone = 0.1;
     private double rotationSpeed = 20.0;
     private double mouseSpeed = 30.0;
+    private boolean renderMiniPlayer = true;
 
     public ControllerOptions(Minecraft minecraft, File dataDir)
     {
@@ -118,6 +125,9 @@ public class ControllerOptions
                         case "mouseSpeed":
                             this.mouseSpeed = Double.parseDouble(value);
                             break;
+                        case "renderMiniPlayer":
+                            this.renderMiniPlayer = Boolean.valueOf(value);
+                            break;
                     }
                 }
                 catch(Exception e)
@@ -141,6 +151,7 @@ public class ControllerOptions
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
+            writer.println("renderMiniPlayer:" + FORMAT.format(this.renderMiniPlayer));
         }
         catch(FileNotFoundException e)
         {
@@ -166,5 +177,10 @@ public class ControllerOptions
     public double getMouseSpeed()
     {
         return this.mouseSpeed;
+    }
+
+    public boolean isRenderMiniPlayer()
+    {
+        return renderMiniPlayer;
     }
 }

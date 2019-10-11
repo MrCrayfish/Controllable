@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
+import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import com.mrcrayfish.controllable.event.AvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
@@ -265,7 +266,7 @@ public class RenderEvents
                 }
             }
 
-            if(mc.player != null && mc.currentScreen == null)
+            if(mc.player != null && mc.currentScreen == null && Controllable.getOptions().isRenderMiniPlayer())
             {
                 if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
                 {
