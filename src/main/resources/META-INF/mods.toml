@@ -9,7 +9,7 @@ authors="MrCrayfish"
 
 [[mods]]
 modId="controllable"
-version="0.5.1"
+version="0.5.2"
 displayName="Controllable"
 description='''
 Adds in the ability to use a controller to play Minecraft
