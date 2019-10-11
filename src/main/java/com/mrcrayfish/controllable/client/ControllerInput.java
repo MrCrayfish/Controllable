@@ -768,7 +768,7 @@ public class ControllerInput
     public static boolean canShowPlayerList()
     {
         Minecraft mc = Minecraft.getInstance();
-        boolean canShowPlayerList = mc.gameSettings.keyBindUseItem.isKeyDown();
+        boolean canShowPlayerList = mc.gameSettings.keyBindPlayerList.isKeyDown();
         Controller controller = Controllable.getController();
         if(controller != null)
         {
