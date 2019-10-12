@@ -26,7 +26,6 @@ import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Collections;
-import java.util.List;
 
 import static org.libsdl.SDL.*;
 
@@ -43,9 +42,6 @@ public class Controllable extends DummyModContainer
     private static Controller controller;
     private static ControllerInput input;
     private static boolean[] buttonStates;
-    private static int selectedControllerIndex = -1;
-    private static List<String> connectedControllerNames;
-    private static int currentControllerCount;
 
     public Controllable()
     {
@@ -114,7 +110,7 @@ public class Controllable extends DummyModContainer
             com.badlogic.gdx.controllers.Controller controller = manager.getControllers().get(0);
             if(controller instanceof SDL2Controller)
             {
-                setController(new Controller((SDL2Controller) controller));
+                setController((SDL2Controller) controller);
             }
         }
 
@@ -129,12 +125,13 @@ public class Controllable extends DummyModContainer
 
 
 
-    public static void setController(@Nullable Controller controller)
+    public static void setController(@Nullable SDL2Controller sdl2Controller)
     {
-        if(controller != null)
+        if(sdl2Controller != null)
         {
-            Controllable.controller = controller;
+            Controllable.controller = new Controller(sdl2Controller);
             buttonStates = new boolean[Buttons.LENGTH];
+            Mappings.updateControllerMappings(Controllable.controller);
         }
         else
         {
@@ -162,26 +159,26 @@ public class Controllable extends DummyModContainer
 
         ButtonBinding.tick();
 
-        processButton(Buttons.A, getButtonState(SDL_CONTROLLER_BUTTON_A));
-        processButton(Buttons.B, getButtonState(SDL_CONTROLLER_BUTTON_B));
-        processButton(Buttons.X, getButtonState(SDL_CONTROLLER_BUTTON_X));
-        processButton(Buttons.Y, getButtonState(SDL_CONTROLLER_BUTTON_Y));
-        processButton(Buttons.SELECT, getButtonState(SDL_CONTROLLER_BUTTON_BACK));
-        processButton(Buttons.HOME, getButtonState(SDL_CONTROLLER_BUTTON_GUIDE));
-        processButton(Buttons.START, getButtonState(SDL_CONTROLLER_BUTTON_START));
-        processButton(Buttons.LEFT_THUMB_STICK, getButtonState(SDL_CONTROLLER_BUTTON_LEFTSTICK));
-        processButton(Buttons.RIGHT_THUMB_STICK, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
-        processButton(Buttons.LEFT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
-        processButton(Buttons.RIGHT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
-        processButton(Buttons.LEFT_TRIGGER, Math.abs(controller.getLTriggerValue()) >= 0.1F);
-        processButton(Buttons.RIGHT_TRIGGER, Math.abs(controller.getRTriggerValue()) >= 0.1F);
-        processButton(Buttons.DPAD_UP, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
-        processButton(Buttons.DPAD_DOWN, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
-        processButton(Buttons.DPAD_LEFT, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
-        processButton(Buttons.DPAD_RIGHT, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+        this.processButton(Buttons.A, getButtonState(SDL_CONTROLLER_BUTTON_A));
+        this.processButton(Buttons.B, getButtonState(SDL_CONTROLLER_BUTTON_B));
+        this.processButton(Buttons.X, getButtonState(SDL_CONTROLLER_BUTTON_X));
+        this.processButton(Buttons.Y, getButtonState(SDL_CONTROLLER_BUTTON_Y));
+        this.processButton(Buttons.SELECT, getButtonState(SDL_CONTROLLER_BUTTON_BACK));
+        this.processButton(Buttons.HOME, getButtonState(SDL_CONTROLLER_BUTTON_GUIDE));
+        this.processButton(Buttons.START, getButtonState(SDL_CONTROLLER_BUTTON_START));
+        this.processButton(Buttons.LEFT_THUMB_STICK, getButtonState(SDL_CONTROLLER_BUTTON_LEFTSTICK));
+        this.processButton(Buttons.RIGHT_THUMB_STICK, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
+        this.processButton(Buttons.LEFT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+        this.processButton(Buttons.RIGHT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
+        this.processButton(Buttons.LEFT_TRIGGER, Math.abs(controller.getLTriggerValue()) >= 0.1F);
+        this.processButton(Buttons.RIGHT_TRIGGER, Math.abs(controller.getRTriggerValue()) >= 0.1F);
+        this.processButton(Buttons.DPAD_UP, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
+        this.processButton(Buttons.DPAD_DOWN, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
+        this.processButton(Buttons.DPAD_LEFT, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
+        this.processButton(Buttons.DPAD_RIGHT, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
     }
 
-    private static void processButton(int index, boolean state)
+    private void processButton(int index, boolean state)
     {
         if(Minecraft.getMinecraft().currentScreen instanceof GuiControllerLayout && state)
         {
@@ -202,17 +199,19 @@ public class Controllable extends DummyModContainer
             return;
         }
 
+        ButtonStates states = controller.getButtonsStates();
+
         if(state)
         {
-            if(!buttonStates[index])
+            if(!states.getState(index))
             {
-                buttonStates[index] = true;
+                states.setState(index, true);
                 input.handleButtonInput(controller, index, true);
             }
         }
-        else if(buttonStates[index])
+        else if(states.getState(index))
         {
-            buttonStates[index] = false;
+            states.setState(index, false);
             input.handleButtonInput(controller, index, false);
         }
     }
@@ -226,16 +225,12 @@ public class Controllable extends DummyModContainer
      */
     public static boolean isButtonPressed(int button)
     {
-        if(button >= 0 && button < buttonStates.length)
-        {
-            return buttonStates[button];
-        }
-        return false;
+        return controller != null && controller.getButtonsStates().getState(button);
     }
 
     private static boolean getButtonState(int buttonCode)
     {
-        return controller != null && controller.getNativeController().getButton(buttonCode);
+        return controller != null && controller.getSDL2Controller().getButton(buttonCode);
     }
 
     private static class ControllerHandler implements ControllerListener
@@ -247,16 +242,15 @@ public class Controllable extends DummyModContainer
             {
                 if(sdlController instanceof SDL2Controller)
                 {
-                    Controller controller = new Controller((SDL2Controller) sdlController);
                     if(Controllable.controller == null)
                     {
-                        setController(controller);
-                    }
+                        setController((SDL2Controller) sdlController);
 
-                    Minecraft mc = Minecraft.getMinecraft();
-                    if(mc.player != null)
-                    {
-                        Minecraft.getMinecraft().getToastGui().add(new ControllerToast(true, controller.getName()));
+                        Minecraft mc = Minecraft.getMinecraft();
+                        if(mc.player != null)
+                        {
+                            Minecraft.getMinecraft().getToastGui().add(new ControllerToast(true, controller.getName()));
+                        }
                     }
                 }
             });
@@ -269,21 +263,21 @@ public class Controllable extends DummyModContainer
             {
                 if(Controllable.controller != null)
                 {
-                    if(Controllable.controller.getNativeController() == sdlController)
+                    if(Controllable.controller.getSDL2Controller() == sdlController)
                     {
                         setController(null);
 
                         if(options.isAutoSelect() && manager.getControllers().size > 0)
                         {
-                            setController(new Controller((SDL2Controller) manager.getControllers().get(0)));
+                            setController((SDL2Controller) manager.getControllers().get(0));
+                        }
+
+                        Minecraft mc = Minecraft.getMinecraft();
+                        if(mc.player != null)
+                        {
+                            Minecraft.getMinecraft().getToastGui().add(new ControllerToast(false, sdlController.getName()));
                         }
                     }
-                }
-
-                Minecraft mc = Minecraft.getMinecraft();
-                if(mc.player != null)
-                {
-                    Minecraft.getMinecraft().getToastGui().add(new ControllerToast(false, sdlController.getName()));
                 }
             });
         }

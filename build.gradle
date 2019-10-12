@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-    compile "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
+    provided "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
 }
 
 processResources {
@@ -68,7 +68,7 @@ jar {
         attributes 'FMLCorePlugin': 'com.mrcrayfish.controllable.asm.ControllablePlugin'
     }
     from {
-        configurations.compileOnly.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.provided.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 

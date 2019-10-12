@@ -12,7 +12,7 @@ import net.minecraft.client.resources.I18n;
  */
 public class GuiControllerSettings extends GuiScreen
 {
-    private static final Option[] OPTIONS = new Option[]{ControllerOptions.AUTO_SELECT, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED};
+    private static final Option[] OPTIONS = new Option[]{ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED};
 
     private GuiScreen previous;
 

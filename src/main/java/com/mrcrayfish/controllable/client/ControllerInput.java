@@ -580,11 +580,11 @@ public class ControllerInput
             int i = (((GuiContainerCreative.ContainerCreative) creative.inventorySlots).itemList.size() + 9 - 1) / 9 - 5;
             int dir = 0;
 
-            if(controller.getNativeController().getButton(SDL_CONTROLLER_BUTTON_DPAD_UP) || controller.getRThumbStickYValue() >= 0.8F)
+            if(controller.getSDL2Controller().getButton(SDL_CONTROLLER_BUTTON_DPAD_UP) || controller.getRThumbStickYValue() >= 0.8F)
             {
                 dir = 1;
             }
-            else if(controller.getNativeController().getButton(SDL_CONTROLLER_BUTTON_DPAD_DOWN) || controller.getRThumbStickYValue() <= -0.8F)
+            else if(controller.getSDL2Controller().getButton(SDL_CONTROLLER_BUTTON_DPAD_DOWN) || controller.getRThumbStickYValue() <= -0.8F)
             {
                 dir = -1;
             }
@@ -676,6 +676,7 @@ public class ControllerInput
     /**
      * Used in order to fix block breaking progress. This method is linked via ASM.
      */
+    @SuppressWarnings("unused")
     public static boolean isLeftClicking()
     {
         Minecraft mc = Minecraft.getMinecraft();
@@ -694,6 +695,7 @@ public class ControllerInput
     /**
      * Used in order to fix actions like eating or pulling bow back. This method is linked via ASM.
      */
+    @SuppressWarnings("unused")
     public static boolean isRightClicking()
     {
         Minecraft mc = Minecraft.getMinecraft();
@@ -712,6 +714,7 @@ public class ControllerInput
     /**
      * Used in order to fix the quick move check in inventories. This method is linked via ASM.
      */
+    @SuppressWarnings("unused")
     public static boolean canQuickMove()
     {
         boolean isSneaking = (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
@@ -726,6 +729,10 @@ public class ControllerInput
         return isSneaking;
     }
 
+    /**
+     * Allows the player list to be shown. This method is linked via ASM.
+     */
+    @SuppressWarnings("unused")
     public static boolean canShowPlayerList()
     {
         Minecraft mc = Minecraft.getMinecraft();

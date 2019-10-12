@@ -58,7 +58,7 @@ public class GuiListControllers extends GuiListExtended
     @Override
     protected boolean isSelected(int slotIndex)
     {
-        return Controllable.getController() != null && controllers.get(slotIndex).getController().getNativeController() == Controllable.getController().getNativeController();
+        return Controllable.getController() != null && controllers.get(slotIndex).getSDL2Controller() == Controllable.getController().getSDL2Controller();
     }
 
     public int getSelectedIndex()
@@ -75,9 +75,9 @@ public class GuiListControllers extends GuiListExtended
             this.controller = new Controller(sdl2Controller);
         }
 
-        public Controller getController()
+        SDL2Controller getSDL2Controller()
         {
-            return controller;
+            return controller.getSDL2Controller();
         }
 
         @Override
@@ -89,7 +89,7 @@ public class GuiListControllers extends GuiListExtended
         @Override
         public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
         {
-            if(!controller.getNativeController().isConnected())
+            if(!controller.getSDL2Controller().isConnected())
                 return;
 
             Minecraft.getMinecraft().fontRenderer.drawString(controller.getName(), x + 20, y + 4, Color.WHITE.getRGB());
@@ -103,10 +103,10 @@ public class GuiListControllers extends GuiListExtended
         @Override
         public boolean mousePressed(int slotIndex, int mouseX, int mouseY, int mouseEvent, int relativeX, int relativeY)
         {
-            if(Controllable.getController() == null || Controllable.getController().getNativeController() != this.controller.getNativeController())
+            if(Controllable.getController() == null || Controllable.getController().getSDL2Controller() != this.controller.getSDL2Controller())
             {
                 Mappings.updateControllerMappings(controller);
-                Controllable.setController(controller);
+                Controllable.setController(controller.getSDL2Controller());
             }
             else
             {
