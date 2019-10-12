@@ -19,12 +19,20 @@ controllable.action.pickup_item=Pickup Item
 controllable.action.quick_move=Quick Move
 controllable.action.place_stack=Place Stack
 controllable.action.place_item=Place Item
-
 controllable.gui.title.select_controller=Select a Controller
-controllable.gui.select=Select
-controllable.gui.configure=Configure
-controllable.gui.cancel=Cancel
-
+controllable.gui.title.settings=Settings
+controllable.gui.title.layout=Remap Buttons
+controllable.gui.settings=Settings
+controllable.gui.remap=Remap Buttons
+controllable.gui.back=Back
+controllable.options.autoSelect=Auto Select
+controllable.options.deadZone=Dead Zone
+controllable.options.deadZone.format=Dead Zone: %s
+controllable.options.rotationSpeed=Rotation Speed
+controllable.options.rotationSpeed.format=Rotation Speed: %s
+controllable.options.mouseSpeed=Mouse Speed
+controllable.options.mouseSpeed.format=Mouse Speed: %s
+controllable.options.renderMiniPlayer=Render Mini Player
 controllable.toast.controller=Controller
 controllable.toast.connected=Connected
-controllable.toast.disconnected=Connected
+controllable.toast.disconnected=Disconnected

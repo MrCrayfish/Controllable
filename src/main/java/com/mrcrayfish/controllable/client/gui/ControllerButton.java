@@ -15,6 +15,7 @@ public class ControllerButton extends Gui
     private int u, v;
     private int width, height;
     private int scale;
+    private boolean hovered;
 
     public ControllerButton(int button, int x, int y, int u, int v, int width, int height, int scale)
     {
@@ -28,7 +29,7 @@ public class ControllerButton extends Gui
         this.scale = scale;
     }
 
-    public void draw(int x, int y, int mouseX, int mouseY)
+    public void draw(int x, int y, int mouseX, int mouseY, boolean selected)
     {
         GlStateManager.enableBlend();
         Minecraft.getMinecraft().getTextureManager().bindTexture(GuiControllerLayout.TEXTURE);
@@ -37,16 +38,26 @@ public class ControllerButton extends Gui
         int buttonY = y + this.y * this.scale;
         int buttonWidth = this.width * this.scale;
         int buttonHeight = this.height * this.scale;
-        boolean mouseOver = mouseX >= buttonX && mouseY >= buttonY && mouseX < buttonX + buttonWidth && mouseY < buttonY + buttonHeight;
-        if(mouseOver)
+        hovered = mouseX >= buttonX && mouseY >= buttonY && mouseX < buttonX + buttonWidth && mouseY < buttonY + buttonHeight;
+        if(hovered)
         {
             buttonV += this.height * 2;
         }
-        else if(Controllable.getController() != null && Controllable.getController().isButtonPressed(button))
+        else if(Controllable.getController() != null && Controllable.isButtonPressed(button) || selected)
         {
             buttonV += this.height;
         }
         drawScaledCustomSizeModalRect(buttonX, buttonY, u, buttonV, this.width, this.height, this.width * this.scale, this.height * this.scale, 256, 256);
         GlStateManager.disableBlend();
+    }
+
+    public int getButton()
+    {
+        return button;
+    }
+
+    public boolean isHovered()
+    {
+        return hovered;
     }
 }

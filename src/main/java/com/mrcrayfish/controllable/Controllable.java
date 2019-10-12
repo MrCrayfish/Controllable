@@ -4,6 +4,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mrcrayfish.controllable.asm.ControllablePlugin;
 import com.mrcrayfish.controllable.client.*;
+import com.mrcrayfish.controllable.client.gui.GuiControllerLayout;
+import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import com.studiohartman.jamepad.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -32,11 +34,12 @@ public class Controllable extends DummyModContainer
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
+    private static ControllerOptions options;
     private static ControllerManager manager;
     private static Controller controller;
     private static ControllerInput input;
     private static boolean[] buttonStates;
-    private static int selectedControllerIndex;
+    private static int selectedControllerIndex = -1;
     private static List<String> connectedControllerNames;
     private static int currentControllerCount;
 
@@ -88,6 +91,11 @@ public class Controllable extends DummyModContainer
         return this.getSource().isDirectory() ? FMLFolderResourcePack.class : FMLFileResourcePack.class;
     }
 
+    public static ControllerOptions getOptions()
+    {
+        return options;
+    }
+
     @Subscribe
     public void onPreInit(FMLPreInitializationEvent event)
     {
@@ -102,11 +110,17 @@ public class Controllable extends DummyModContainer
 
         ControllerProperties.load(event.getModConfigurationDirectory());
 
+        Minecraft mc = Minecraft.getMinecraft();
+        Controllable.options = new ControllerOptions(mc, mc.gameDir);
+
         /* Attempts to load the first controller connected */
-        ControllerIndex index = manager.getControllerIndex(0);
-        if(index.isConnected())
+        if(options.isAutoSelect())
         {
-            setController(new Controller(index));
+            ControllerIndex index = manager.getControllerIndex(0);
+            if(index.isConnected())
+            {
+                setController(new Controller(index));
+            }
         }
 
         Mappings.load(event.getModConfigurationDirectory());
@@ -118,12 +132,20 @@ public class Controllable extends DummyModContainer
         MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
     }
 
-    public static void setController(Controller controller)
+    public static void setController(@Nullable Controller controller)
     {
-        Controllable.controller = controller;
-        selectedControllerIndex = controller.getNumber();
-        buttonStates = new boolean[Buttons.LENGTH];
-        controller.updateState(manager.getState(selectedControllerIndex));
+        if(controller != null)
+        {
+            Controllable.controller = controller;
+            selectedControllerIndex = controller.getNumber();
+            buttonStates = new boolean[Buttons.LENGTH];
+            controller.updateState(manager.getState(selectedControllerIndex));
+        }
+        else
+        {
+            selectedControllerIndex = -1;
+            Controllable.controller = null;
+        }
     }
 
     public static List<String> getConnectedControllerNames()
@@ -138,7 +160,11 @@ public class Controllable extends DummyModContainer
         {
             try
             {
-                names.add(manager.getControllerIndex(i).getName());
+                ControllerIndex index = manager.getControllerIndex(i);
+                if(index.isConnected())
+                {
+                    names.add(index.getName());
+                }
             }
             catch(ControllerUnpluggedException e)
             {
@@ -161,8 +187,9 @@ public class Controllable extends DummyModContainer
         if(controllersCount != currentControllerCount)
         {
             boolean connected = controllersCount > currentControllerCount;
-            List<String> newControllers = connected ? getConnectedControllerNames() : connectedControllerNames;
-            List<String> oldControllers = connected ? connectedControllerNames : getConnectedControllerNames();
+            List<String> connectControllerNames = getConnectedControllerNames();
+            List<String> newControllers = connected ? connectControllerNames : connectedControllerNames;
+            List<String> oldControllers = connected ? connectedControllerNames : connectControllerNames;
             for(String name : oldControllers)
             {
                 Iterator<String> it = newControllers.iterator();
@@ -182,8 +209,8 @@ public class Controllable extends DummyModContainer
                 setController(new Controller(manager.getControllerIndex(controllersCount - 1)));
             }
 
-            connectedControllerNames = getConnectedControllerNames();
-            currentControllerCount = manager.getNumControllers();
+            connectedControllerNames = newControllers;
+            currentControllerCount = controllersCount;
 
             if(mc.player != null)
             {
@@ -199,9 +226,9 @@ public class Controllable extends DummyModContainer
             {
                 controller = null;
             }
-            if(selectedControllerIndex >= 0)
+            if(options.isAutoSelect())
             {
-                selectedControllerIndex--;
+                selectedControllerIndex = controllersCount > 0 ? 0 : -1;
             }
             return;
         }
@@ -212,6 +239,8 @@ public class Controllable extends DummyModContainer
         }
 
         controller.updateState(state);
+
+        ButtonBinding.tick();
 
         processButton(Buttons.A, state.a);
         processButton(Buttons.B, state.b);
@@ -234,9 +263,23 @@ public class Controllable extends DummyModContainer
 
     private static void processButton(int index, boolean state)
     {
+        if(Minecraft.getMinecraft().currentScreen instanceof GuiControllerLayout && state)
+        {
+            if(((GuiControllerLayout) Minecraft.getMinecraft().currentScreen).onButtonInput(index))
+            {
+                return;
+            }
+        }
+
         if(controller.getMapping() != null)
         {
             index = controller.getMapping().remap(index);
+        }
+
+        //No binding so don't perform any action
+        if(index == -1)
+        {
+            return;
         }
 
         if(state)
@@ -252,5 +295,21 @@ public class Controllable extends DummyModContainer
             buttonStates[index] = false;
             input.handleButtonInput(controller, index, false);
         }
+    }
+
+    /**
+     * Returns whether a button on the controller is pressed or not. This is a raw approach to
+     * getting whether a button is pressed or not. You should use a {@link ButtonBinding} instead.
+     *
+     * @param button the button to check if pressed
+     * @return
+     */
+    public static boolean isButtonPressed(int button)
+    {
+        if(button >= 0 && button < buttonStates.length)
+        {
+            return buttonStates[button];
+        }
+        return false;
     }
 }

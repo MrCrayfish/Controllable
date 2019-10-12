@@ -7,6 +7,10 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * Author: MrCrayfish
  */
@@ -16,86 +20,63 @@ public class ControllableTransformer implements IClassTransformer
     public byte[] transform(String name, String transformedName, byte[] bytes)
     {
         if(bytes == null)
+        {
             return null;
-
-        //boolean isObfuscated = !name.equals(transformedName);
-        if(transformedName.equals("net.minecraft.client.Minecraft"))
-        {
-            return patchMinecraft(bytes);
         }
-        else if(transformedName.equals("net.minecraft.client.gui.inventory.GuiContainer"))
+
+        switch(transformedName)
         {
-            return patchGuiContainer(bytes);
+            case "net.minecraft.client.Minecraft":
+                bytes = this.patch(new MethodEntry("func_147115_a", "sendClickBlockToController", "(Z)V"), this::patch_Minecraft_sendClickBlockToController, bytes);
+                bytes = this.patch(new MethodEntry("func_184117_aA", "processKeyBinds", "()V"), this::patch_Minecraft_processKeyBinds, bytes);
+                break;
+            case "net.minecraft.client.gui.inventory.GuiContainer":
+                bytes = this.patch(new MethodEntry("func_73864_a", "mouseClicked", "(III)V"), this::patch_GuiContainer_mouseClicked, bytes);
+                bytes = this.patch(new MethodEntry("func_146286_b", "mouseReleased", "(III)V"), this::patch_GuiContainer_mouseReleased, bytes);
+                break;
+            case "net.minecraftforge.client.GuiIngameForge":
+                bytes = this.patch(new MethodEntry("", "renderPlayerList", "(II)V"), this::patch_GuiIngameForge_renderPlayerList, bytes);
+                break;
         }
         return bytes;
     }
 
-    private byte[] patchMinecraft(byte[] bytes)
+    @Nullable
+    private MethodNode findMethod(List<MethodNode> methods, MethodEntry entry)
     {
-        Controllable.LOGGER.info("Patching net.minecraft.client.Minecraft");
+        for(MethodNode node : methods)
+        {
+            if((node.name.equals(entry.obfName) || node.name.equals(entry.name)) && node.desc.equals(entry.desc))
+            {
+                return node;
+            }
+        }
+        return null;
+    }
 
+    private byte[] patch(MethodEntry entry, Function<MethodNode, Boolean> f, byte[] bytes)
+    {
         ClassNode classNode = new ClassNode();
         ClassReader classReader = new ClassReader(bytes);
         classReader.accept(classNode, 0);
 
-        ObfName method_sendClickBlockToController = new ObfName("func_147115_a", "sendClickBlockToController");
-        String params_sendClickBlockToController = "(Z)V";
-
-        ObfName method_processKeyBinds = new ObfName("func_184117_aA", "processKeyBinds");
-        String params_processKeyBinds = "()V";
-
-        for(MethodNode method : classNode.methods)
+        MethodNode methodNode = this.findMethod(classNode.methods, entry);
+        String className = classNode.name.replace("/", ".") + "#" + entry.name + entry.desc;
+        if(methodNode != null)
         {
-            if(method_sendClickBlockToController.equals(method.name) && method.desc.equals(params_sendClickBlockToController))
+            Controllable.LOGGER.info("Starting to patch: " + className);
+            if(f.apply(methodNode))
             {
-                Controllable.LOGGER.info("Patching #sendClickBlockToController");
-
-                method.instructions.insert(new VarInsnNode(Opcodes.ISTORE, 1));
-                method.instructions.insert(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "isLeftClicking", "()Z", false));
-
-                Controllable.LOGGER.info("Successfully patched #sendClickBlockToController");
+                Controllable.LOGGER.info("Successfully patched: " + className);
             }
-            else if(method_processKeyBinds.equals(method.name) && method.desc.equals(params_processKeyBinds))
+            else
             {
-                Controllable.LOGGER.info("Patching #processKeyBinds");
-
-                //ObfName method_onStoppedUsingItem = new ObfName("func_78766_c", "onStoppedUsingItem");
-                ObfName method_isKeyDown = new ObfName("func_151470_d", "isKeyDown");
-                String params_isKeyDown = "()Z";
-
-                AbstractInsnNode foundNode = null;
-                for(AbstractInsnNode node : method.instructions.toArray())
-                {
-                    if(node.getOpcode() == Opcodes.INVOKEVIRTUAL && node.getNext().getOpcode() == Opcodes.IFNE)
-                    {
-                        if(node instanceof MethodInsnNode && method_isKeyDown.equals(((MethodInsnNode) node).name) && params_isKeyDown.equals(((MethodInsnNode) node).desc))
-                        {
-                            if(node.getPrevious().getOpcode() == Opcodes.GETFIELD && node.getPrevious().getPrevious().getOpcode() == Opcodes.GETFIELD && node.getPrevious().getPrevious().getPrevious().getOpcode() == Opcodes.ALOAD)
-                            {
-                                //Pretty sure we found it at this point otherwise another code mod has changed something :/
-                                foundNode = node;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if(foundNode != null)
-                {
-                    AbstractInsnNode next = foundNode.getNext();
-                    method.instructions.remove(foundNode.getPrevious().getPrevious().getPrevious());
-                    method.instructions.remove(foundNode.getPrevious().getPrevious());
-                    method.instructions.remove(foundNode.getPrevious());
-                    method.instructions.remove(foundNode);
-                    method.instructions.insertBefore(next, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "isRightClicking", "()Z", false));
-
-                    Controllable.LOGGER.info("Successfully patched #processKeyBinds");
-                }
-                else
-                {
-                    Controllable.LOGGER.info("Failed to patch #processKeyBinds");
-                }
+                Controllable.LOGGER.info("Failed to patch: " + className);
             }
+        }
+        else
+        {
+            Controllable.LOGGER.info("Failed to find method: " + className);
         }
 
         ClassWriter writer = new ClassWriter(0);
@@ -103,58 +84,62 @@ public class ControllableTransformer implements IClassTransformer
         return writer.toByteArray();
     }
 
-    private byte[] patchGuiContainer(byte[] bytes)
+    private boolean patch_Minecraft_sendClickBlockToController(MethodNode methodNode)
     {
-        Controllable.LOGGER.info("Patching net.minecraft.client.gui.inventory.GuiContainer");
+        methodNode.instructions.insert(new VarInsnNode(Opcodes.ISTORE, 1));
+        methodNode.instructions.insert(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "isLeftClicking", "()Z", false));
+        return true;
+    }
 
-        ClassNode classNode = new ClassNode();
-        ClassReader classReader = new ClassReader(bytes);
-        classReader.accept(classNode, 0);
+    private boolean patch_Minecraft_processKeyBinds(MethodNode methodNode)
+    {
+        MethodEntry entry = new MethodEntry("func_151470_d", "isKeyDown", "()Z");
 
-        ObfName method_mouseClicked = new ObfName("func_73864_a", "mouseClicked");
-        String desc_mouseClicked = "(III)V";
-
-        ObfName method_mouseReleased = new ObfName("func_146286_b", "mouseReleased");
-        String desc_mouseReleased = "(III)V";
-
-        for(MethodNode method : classNode.methods)
+        AbstractInsnNode foundNode = null;
+        for(AbstractInsnNode node : methodNode.instructions.toArray())
         {
-            if(method_mouseReleased.equals(method.name) && method.desc.equals(desc_mouseReleased))
+            if(node.getOpcode() == Opcodes.INVOKEVIRTUAL && node.getNext().getOpcode() == Opcodes.IFNE)
             {
-                Controllable.LOGGER.info("Patching #mouseReleased");
-                if(patchQuickMove(method))
+                MethodInsnNode m = (MethodInsnNode) node;
+                if((entry.obfName.equals(m.name) || entry.name.equals(m.name)) && entry.desc.equals(m.desc))
                 {
-                    Controllable.LOGGER.info("Successfully patched #mouseReleased");
+                    if(node.getPrevious().getOpcode() == Opcodes.GETFIELD && node.getPrevious().getPrevious().getOpcode() == Opcodes.GETFIELD && node.getPrevious().getPrevious().getPrevious().getOpcode() == Opcodes.ALOAD)
+                    {
+                        foundNode = node;
+                        break;
+                    }
                 }
-                else
-                {
-                    Controllable.LOGGER.info("Failed to patch #mouseReleased");
-                }
-
-            }
-            else if(method_mouseClicked.equals(method.name) && method.desc.equals(desc_mouseClicked))
-            {
-                Controllable.LOGGER.info("Patching #mouseClicked");
-                if(patchQuickMove(method))
-                {
-                    Controllable.LOGGER.info("Successfully patched #mouseClicked");
-                }
-                else
-                {
-                    Controllable.LOGGER.info("Failed to patch #mouseClicked");
-                }
-
             }
         }
 
-        ClassWriter writer = new ClassWriter(0);
-        classNode.accept(writer);
-        return writer.toByteArray();
+        if(foundNode != null)
+        {
+            AbstractInsnNode nextNode = foundNode.getNext();
+            if(!this.removeNthNodes(methodNode.instructions, foundNode, -3))
+            {
+                return false;
+            }
+            methodNode.instructions.remove(foundNode);
+            methodNode.instructions.insertBefore(nextNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "isRightClicking", "()Z", false));
+            return true;
+        }
+        return false;
+    }
+
+    private boolean patch_GuiContainer_mouseClicked(MethodNode methodNode)
+    {
+        return this.patchQuickMove(methodNode);
+    }
+
+    private boolean patch_GuiContainer_mouseReleased(MethodNode methodNode)
+    {
+        return this.patchQuickMove(methodNode);
     }
 
     private boolean patchQuickMove(MethodNode method)
     {
-        ObfName method_isKeyDown = new ObfName("func_100015_a", "isKeyDown");
+        MethodEntry entry = new MethodEntry("func_151470_d", "isKeyDown", "()Z");
+
         AbstractInsnNode foundNode = null;
         for(AbstractInsnNode node : method.instructions.toArray())
         {
@@ -173,7 +158,8 @@ public class ControllableTransformer implements IClassTransformer
                 continue;
             }
 
-            if(!method_isKeyDown.equals(((MethodInsnNode) node).name))
+            MethodInsnNode methodNode = (MethodInsnNode) node;
+            if(!(entry.obfName.equals(methodNode.name) || entry.name.equals(methodNode.name)))
             {
                 continue;
             }
@@ -190,7 +176,8 @@ public class ControllableTransformer implements IClassTransformer
                 continue;
             }
 
-            if(!method_isKeyDown.equals(((MethodInsnNode) temp).name))
+            methodNode = (MethodInsnNode) temp;
+            if(!(entry.obfName.equals(methodNode.name) || entry.name.equals(methodNode.name)))
             {
                 continue;
             }
@@ -201,14 +188,109 @@ public class ControllableTransformer implements IClassTransformer
         if(foundNode != null)
         {
             AbstractInsnNode previous = foundNode.getPrevious();
-            method.instructions.remove(foundNode.getNext().getNext().getNext().getNext());
-            method.instructions.remove(foundNode.getNext().getNext().getNext());
-            method.instructions.remove(foundNode.getNext().getNext());
-            method.instructions.remove(foundNode.getNext());
+            this.removeNthNodes(method.instructions, foundNode, 4);
             method.instructions.remove(foundNode);
             method.instructions.insert(previous, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "canQuickMove", "()Z", false));
             return true;
         }
         return false;
+    }
+
+    private boolean patch_GuiIngameForge_renderPlayerList(MethodNode method)
+    {
+        MethodEntry entry = new MethodEntry("func_151470_d", "isKeyDown", "()Z");
+        AbstractInsnNode foundNode = null;
+        for(AbstractInsnNode node : method.instructions.toArray())
+        {
+            if(node.getOpcode() != Opcodes.INVOKEVIRTUAL)
+            {
+                continue;
+            }
+            MethodInsnNode methodNode = (MethodInsnNode) node;
+            if(!(entry.obfName.equals(methodNode.name) || entry.name.equals(methodNode.name)))
+            {
+                continue;
+            }
+            if(this.getNthRelativeNode(node, -1) == null || this.getNthRelativeNode(node, -1).getOpcode() != Opcodes.GETFIELD)
+            {
+                continue;
+            }
+            if(this.getNthRelativeNode(node, -2) == null || this.getNthRelativeNode(node, -2).getOpcode() != Opcodes.GETFIELD)
+            {
+                continue;
+            }
+            if(this.getNthRelativeNode(node, -3) == null || this.getNthRelativeNode(node, -3).getOpcode() != Opcodes.GETFIELD)
+            {
+                continue;
+            }
+            if(this.getNthRelativeNode(node, -4) == null || this.getNthRelativeNode(node, -4).getOpcode() != Opcodes.ALOAD)
+            {
+                continue;
+            }
+            foundNode = node;
+            break;
+        }
+
+        if(foundNode != null)
+        {
+            if(!this.removeNthNodes(method.instructions, foundNode, -4))
+                return false;
+            method.instructions.insert(foundNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "canShowPlayerList", "()Z", false));
+            method.instructions.remove(foundNode);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean removeNthNodes(InsnList instructions, AbstractInsnNode node, int n)
+    {
+        while(n > 0)
+        {
+            if(node.getNext() == null)
+            {
+                return false;
+            }
+            instructions.remove(node.getNext());
+            n--;
+        }
+        while(n < 0)
+        {
+            if(node.getPrevious() == null)
+            {
+                return false;
+            }
+            instructions.remove(node.getPrevious());
+            n++;
+        }
+        return true;
+    }
+
+    private AbstractInsnNode getNthRelativeNode(AbstractInsnNode node, int n)
+    {
+        while(n > 0 && node != null)
+        {
+            node = node.getNext();
+            n--;
+        }
+        while(n < 0 && node != null)
+        {
+            node = node.getPrevious();
+            n++;
+        }
+        return node;
+    }
+
+    public static class MethodEntry
+    {
+        private String obfName;
+        private String name;
+        private String desc;
+
+        public MethodEntry(String obfName, String name, String desc)
+        {
+            this.obfName = obfName;
+            this.name = name;
+            this.desc = desc;
+        }
     }
 }

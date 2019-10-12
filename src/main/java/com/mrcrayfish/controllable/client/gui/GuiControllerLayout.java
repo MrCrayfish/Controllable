@@ -1,13 +1,21 @@
 package com.mrcrayfish.controllable.client.gui;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.Maps;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.Buttons;
+import com.mrcrayfish.controllable.client.Controller;
+import com.mrcrayfish.controllable.client.Mappings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.input.Keyboard;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -18,6 +26,8 @@ public class GuiControllerLayout extends GuiScreen
     public static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/controller.png");
 
     private List<ControllerButton> controllerButtons = new ArrayList<>();
+
+    private int configureButton = -1;
 
     @Override
     public void initGui()
@@ -54,6 +64,65 @@ public class GuiControllerLayout extends GuiScreen
         int y = this.height / 2 - 50;
         drawScaledCustomSizeModalRect(x, y, 50, 0, 38, 29, width, height, 256, 256);
         GlStateManager.disableBlend();
-        controllerButtons.forEach(controllerButton -> controllerButton.draw(x, y, mouseX, mouseY));
+        controllerButtons.forEach(controllerButton -> controllerButton.draw(x, y, mouseX, mouseY, configureButton == controllerButton.button));
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
+    {
+        if(mouseButton == 0)
+        {
+            ControllerButton button = controllerButtons.stream().filter(ControllerButton::isHovered).findFirst().orElse(null);
+            if(button != null)
+            {
+                configureButton = button.getButton();
+            }
+        }
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
+        if(keyCode == Keyboard.KEY_ESCAPE && configureButton != -1)
+        {
+            configureButton = -1;
+            return;
+        }
+        super.keyTyped(typedChar, keyCode);
+    }
+
+    public boolean onButtonInput(int button)
+    {
+        if(configureButton != -1)
+        {
+            Controller controller = Controllable.getController();
+            if(controller != null)
+            {
+                Mappings.Entry entry = controller.getMapping();
+                if(entry == null)
+                {
+                    entry = new Mappings.Entry(controller.getName(), controller.getName(), new HashMap<>());
+                    controller.setMapping(entry);
+                }
+                if(button != configureButton)
+                {
+                    entry.getReassignments().putIfAbsent(configureButton, -1);
+                    entry.getReassignments().put(button, configureButton);
+                }
+                else
+                {
+                    Integer originalButton = entry.getReassignments().inverse().get(configureButton);
+                    if(originalButton != null)
+                    {
+                        entry.getReassignments().remove(originalButton);
+                    }
+                    entry.getReassignments().remove(button);
+                }
+                configureButton = -1;
+                entry.save();
+                return true;
+            }
+        }
+        return false;
     }
 }

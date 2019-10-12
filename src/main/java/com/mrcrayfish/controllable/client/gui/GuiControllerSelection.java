@@ -1,9 +1,6 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.Controller;
-import com.mrcrayfish.controllable.client.Mappings;
-import com.studiohartman.jamepad.ControllerIndex;
 import com.studiohartman.jamepad.ControllerManager;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiIngameMenu;
@@ -22,9 +19,9 @@ public class GuiControllerSelection extends GuiScreen
     private ControllerManager manager;
     private GuiListControllers listControllers;
 
-    private GuiButton btnSelect;
-    private GuiButton btnConfigure;
-    private GuiButton btnCancel;
+    private GuiButton btnSettings;
+    private GuiButton btnRemap;
+    private GuiButton btnBack;
 
     public GuiControllerSelection(ControllerManager manager, boolean mainMenu)
     {
@@ -37,11 +34,10 @@ public class GuiControllerSelection extends GuiScreen
     public void initGui()
     {
         listControllers = new GuiListControllers(manager, mc, this.width, this.height, 32, this.height - 44, 20);
-        this.addButton(btnSelect = new GuiButton(0, this.width / 2 - 154, this.height - 32, 100, 20, I18n.format("controllable.gui.select"))); //TODO localize I18n.format("selectWorld.select")
-        this.addButton(btnConfigure = new GuiButton(1, this.width / 2 - 50, this.height - 32, 100, 20, I18n.format("controllable.gui.configure")));
-        this.addButton(btnCancel = new GuiButton(2, this.width / 2 + 54, this.height - 32, 100, 20, I18n.format("controllable.gui.cancel")));
-        //btnConfigure.enabled = Controllable.getSelectedControllerIndex() != -1;
-        btnConfigure.enabled = false;
+        this.addButton(btnSettings = new GuiButton(0, this.width / 2 - 154, this.height - 32, 100, 20, I18n.format("controllable.gui.settings"))); //TODO localize I18n.format("selectWorld.select")
+        this.addButton(btnRemap = new GuiButton(1, this.width / 2 - 50, this.height - 32, 100, 20, I18n.format("controllable.gui.remap")));
+        this.addButton(btnBack = new GuiButton(2, this.width / 2 + 54, this.height - 32, 100, 20, I18n.format("controllable.gui.back")));
+        btnRemap.enabled = false;
     }
 
     @Override
@@ -52,6 +48,8 @@ public class GuiControllerSelection extends GuiScreen
             controllerCount = manager.getNumControllers();
             listControllers.reload();
             listControllers.setSelectedElement(Controllable.getSelectedControllerIndex());
+            btnRemap.enabled = listControllers.getSelectedIndex() > -1;
+            btnSettings.enabled = listControllers.getSelectedIndex() > -1;
         }
     }
 
@@ -61,13 +59,9 @@ public class GuiControllerSelection extends GuiScreen
         if(!button.enabled)
             return;
 
-        if(button.id == 0 && listControllers.getSelectedIndex() > -1)
+        if(button.id == 0)
         {
-            ControllerIndex index = manager.getControllerIndex(listControllers.getSelectedIndex());
-            Controller controller = new Controller(index);
-            Mappings.updateControllerMappings(controller);
-            Controllable.setController(controller);
-            this.mc.displayGuiScreen(null);
+            this.mc.displayGuiScreen(new GuiControllerSettings(this));
         }
         else if(button.id == 1)
         {

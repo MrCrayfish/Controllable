@@ -19,12 +19,10 @@ controllable.action.pickup_item=Prendre l'objet
 controllable.action.quick_move=Déplacement rapide
 controllable.action.place_stack=Poser le stack
 controllable.action.place_item=Poser l'objet
-
 controllable.gui.title.select_controller=Choisir une manette
 controllable.gui.select=Choisir
 controllable.gui.configure=Configurer
 controllable.gui.cancel=Annuler
-
 controllable.toast.controller=Manette
 controllable.toast.connected=Connectée
 controllable.toast.disconnected=Deconnectée

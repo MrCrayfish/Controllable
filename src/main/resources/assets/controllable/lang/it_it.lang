@@ -19,12 +19,10 @@ controllable.action.pickup_item=Prendi Oggetto
 controllable.action.quick_move=Spostamento Veloce
 controllable.action.place_stack=Lascia tutta la Pila
 controllable.action.place_item=Lascia Oggetto
-
 controllable.gui.title.select_controller=Scegli un Controller
 controllable.gui.select=Seleziona
 controllable.gui.configure=Configurea
 controllable.gui.cancel=Annulla
-
 controllable.toast.controller=Controller
 controllable.toast.connected=Connesso
 controllable.toast.disconnected=Disconnesso

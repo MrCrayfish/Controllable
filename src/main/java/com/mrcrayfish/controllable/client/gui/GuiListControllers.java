@@ -1,6 +1,8 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.Controller;
+import com.mrcrayfish.controllable.client.Mappings;
 import com.studiohartman.jamepad.ControllerIndex;
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerUnpluggedException;
@@ -61,7 +63,7 @@ public class GuiListControllers extends GuiListExtended
     @Override
     protected boolean isSelected(int slotIndex)
     {
-        return selectedElement == slotIndex;
+        return Controllable.getController() != null && controllers.get(slotIndex).index == Controllable.getController().getIndex();
     }
 
     public int getSelectedIndex()
@@ -71,11 +73,11 @@ public class GuiListControllers extends GuiListExtended
 
     public class ControllerEntry implements IGuiListEntry
     {
-        private ControllerIndex controller;
+        private ControllerIndex index;
 
-        public ControllerEntry(ControllerIndex controller)
+        public ControllerEntry(ControllerIndex index)
         {
-            this.controller = controller;
+            this.index = index;
         }
 
         @Override
@@ -89,11 +91,11 @@ public class GuiListControllers extends GuiListExtended
         {
             try
             {
-                if(!controller.isConnected())
+                if(!index.isConnected())
                     return;
 
-                Minecraft.getMinecraft().fontRenderer.drawString(controller.getName(), x + 20, y + 4, Color.WHITE.getRGB());
-                if(selectedElement == slotIndex)
+                Minecraft.getMinecraft().fontRenderer.drawString(index.getName(), x + 20, y + 4, Color.WHITE.getRGB());
+                if(isSelected(slotIndex))
                 {
                     Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("textures/gui/container/beacon.png"));
                     GuiScreen.drawModalRectWithCustomSizedTexture(x + 2, y + 2, 91, 224, 14, 12, 256, 256);
@@ -108,7 +110,18 @@ public class GuiListControllers extends GuiListExtended
         @Override
         public boolean mousePressed(int slotIndex, int mouseX, int mouseY, int mouseEvent, int relativeX, int relativeY)
         {
-            return true;
+            if(Controllable.getController() == null || Controllable.getController().getIndex() != this.index)
+            {
+                ControllerIndex index = manager.getControllerIndex(this.index.getIndex());
+                Controller controller = new Controller(index);
+                Mappings.updateControllerMappings(controller);
+                Controllable.setController(controller);
+            }
+            else
+            {
+                Controllable.setController(null);
+            }
+            return false;
         }
 
         @Override

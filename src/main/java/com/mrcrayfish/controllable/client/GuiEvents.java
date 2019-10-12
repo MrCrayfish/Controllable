@@ -27,11 +27,7 @@ public class GuiEvents
     public void onOpenGui(GuiScreenEvent.InitGuiEvent event)
     {
         /* Resets the controller button states */
-        Controller controller = Controllable.getController();
-        if(controller != null)
-        {
-            controller.resetButtonStates();
-        }
+        ButtonBinding.resetButtonStates();
 
         if(event.getGui() instanceof GuiOptions)
         {

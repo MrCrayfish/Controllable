@@ -16,7 +16,7 @@ public class ControllerAxis extends ControllerButton
     }
 
     @Override
-    public void draw(int x, int y, int mouseX, int mouseY)
+    public void draw(int x, int y, int mouseX, int mouseY, boolean selected)
     {
         GlStateManager.pushMatrix();
         Controller controller = Controllable.getController();
@@ -32,12 +32,12 @@ public class ControllerAxis extends ControllerButton
                     break;
             }
 
-            if(!controller.isButtonPressed(button))
+            if(!Controllable.isButtonPressed(button))
             {
                 GlStateManager.translate(0, -2.5, 0);
             }
         }
-        super.draw(x, y, mouseX, mouseY);
+        super.draw(x, y, mouseX, mouseY, selected);
         GlStateManager.popMatrix();
     }
 }

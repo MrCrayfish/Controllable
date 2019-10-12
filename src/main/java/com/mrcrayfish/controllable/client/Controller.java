@@ -153,46 +153,11 @@ public class Controller
     }
 
     /**
-     * Gets whether or not a button is pressed on the controller. Mappings can be found in
-     * {@link Buttons} to get the index of a button.
-     *
-     * @param button the button to test for
-     * @return if the button is pressed
-     */
-    public boolean isButtonPressed(int button)
-    {
-        return states[button];
-    }
-
-    /**
-     * Sets the state of the specified button. This is whether it is pressed or not. This is an
-     * internal method and should not be called.
-     *
-     * @param button the buttons index
-     * @param state the state of the button (pressed or not)
-     */
-    void setButtonState(int button, boolean state)
-    {
-        states[button] = state;
-    }
-
-    /**
-     * Resets all buttons states. Called when a GUI is opened.
-     */
-    void resetButtonStates()
-    {
-        for(int i = 0; i < states.length; i++)
-        {
-            states[i] = false;
-        }
-    }
-
-    /**
      * Sets the mapping for this controller
      *
      * @param mapping the mapping to assign
      */
-    void setMapping(Mappings.Entry mapping)
+    public void setMapping(Mappings.Entry mapping)
     {
         this.mapping = mapping;
     }

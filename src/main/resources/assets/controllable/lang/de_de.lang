@@ -19,12 +19,10 @@ controllable.action.pickup_item=Gegenstand nehmen
 controllable.action.quick_move=Schnell bewegen
 controllable.action.place_stack=Stapel platzieren
 controllable.action.place_item=Gegenstand platzieren
-
 controllable.gui.title.select_controller=Einen Controller auswählen
 controllable.gui.select=Auswählen
 controllable.gui.configure=Konfigurieren
 controllable.gui.cancel=Abbrechen
-
 controllable.toast.controller=Controller
 controllable.toast.connected=Verbunden
 controllable.toast.disconnected=Getrennt

@@ -4,11 +4,11 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.GuiControllerLayout;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
@@ -68,18 +68,17 @@ public class ControllerInput
             }
 
             Controller controller = Controllable.getController();
-            if(controller == null)
-                return;
+            if(controller == null) return;
 
             Minecraft mc = Minecraft.getMinecraft();
-            if(mc.inGameHasFocus)
-                return;
+            if(mc.inGameHasFocus) return;
 
-            if(mc.currentScreen == null || mc.currentScreen instanceof GuiControllerLayout)
-                return;
+            if(mc.currentScreen == null || mc.currentScreen instanceof GuiControllerLayout) return;
+
+            float deadZone = (float) Controllable.getOptions().getDeadZone();
 
             /* Only need to run code if left thumb stick has input */
-            boolean moving = controller.getLThumbStickXValue() != 0.0F || controller.getLThumbStickYValue() != 0.0F;
+            boolean moving = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
             if(moving)
             {
                 lastUse = 100;
@@ -87,14 +86,14 @@ public class ControllerInput
                 /* Updates the target mouse position when the initial thumb stick movement is
                  * detected. This fixes an issue when the user moves the cursor with the mouse then
                  * switching back to controller, the cursor would jump to old target mouse position. */
-                if(prevXAxis == 0.0F && prevYAxis == 0.0F)
+                if(Math.abs(prevXAxis) < deadZone && Math.abs(prevYAxis) < deadZone)
                 {
                     prevTargetMouseX = targetMouseX = Mouse.getX();
                     prevTargetMouseY = targetMouseY = Mouse.getY();
                 }
 
                 float xAxis = (controller.getLThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickXValue());
-                if(Math.abs(xAxis) > 0.35F)
+                if(Math.abs(xAxis) > deadZone)
                 {
                     mouseSpeedX = xAxis;
                 }
@@ -104,7 +103,7 @@ public class ControllerInput
                 }
 
                 float yAxis = (controller.getLThumbStickYValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickYValue());
-                if(Math.abs(yAxis) > 0.35F)
+                if(Math.abs(yAxis) > deadZone)
                 {
                     mouseSpeedY = yAxis;
                 }
@@ -116,8 +115,9 @@ public class ControllerInput
 
             if(Math.abs(mouseSpeedX) > 0.05F || Math.abs(mouseSpeedY) > 0.05F)
             {
-                targetMouseX += 30 * mouseSpeedX;
-                targetMouseY += 30 * mouseSpeedY;
+                double mouseSpeed = Controllable.getOptions().getMouseSpeed();
+                targetMouseX += 30 * mouseSpeed;
+                targetMouseY += 30 * mouseSpeed;
             }
 
             prevXAxis = controller.getLThumbStickXValue();
@@ -154,28 +154,28 @@ public class ControllerInput
     public void onRender(TickEvent.RenderTickEvent event)
     {
         Controller controller = Controllable.getController();
-        if(controller == null)
-            return;
+        if(controller == null) return;
 
-        if(event.phase == TickEvent.Phase.END)
-            return;
+        if(event.phase == TickEvent.Phase.END) return;
 
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.player;
-        if(player == null)
-            return;
+        if(player == null) return;
 
         if(mc.currentScreen == null)
         {
+            float deadZone = (float) Controllable.getOptions().getDeadZone();
+
             /* Handles rotating the yaw of player */
-            if(controller.getRThumbStickXValue() != 0.0F || controller.getRThumbStickYValue() != 0.0F)
+            if(Math.abs(controller.getRThumbStickXValue()) >= deadZone || Math.abs(controller.getRThumbStickYValue()) >= deadZone)
             {
                 lastUse = 100;
-                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, 20.0F, 15.0F);
+                float rotationSpeed = (float) Controllable.getOptions().getRotationSpeed();
+                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, rotationSpeed, rotationSpeed * 0.75F);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
-                    float rotationYaw = turnEvent.getYawSpeed() * (controller.getRThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickXValue());
-                    float rotationPitch = turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() > 0.0F ? 1 : -1) * Math.abs(controller.getRThumbStickYValue());
+                    float rotationYaw = turnEvent.getYawSpeed() * controller.getRThumbStickXValue(); //TODO TEST THIS
+                    float rotationPitch = turnEvent.getPitchSpeed() * controller.getRThumbStickYValue();
                     player.turn(rotationYaw, rotationPitch);
                 }
             }
@@ -183,7 +183,7 @@ public class ControllerInput
 
         if(mc.currentScreen == null)
         {
-            if(controller.isButtonPressed(Buttons.DPAD_DOWN))
+            if(ButtonBindings.DROP_ITEM.isButtonDown())
             {
                 lastUse = 100;
                 dropCounter++;
@@ -192,15 +192,15 @@ public class ControllerInput
 
         if(dropCounter > 40)
         {
-            if (!mc.player.isSpectator())
+            if(!mc.player.isSpectator())
             {
                 mc.player.dropItem(true);
             }
             dropCounter = 0;
         }
-        else if(dropCounter > 0 && !controller.isButtonPressed(Buttons.DPAD_DOWN))
+        else if(dropCounter > 0 && !ButtonBindings.DROP_ITEM.isButtonDown())
         {
-            if (!mc.player.isSpectator())
+            if(!mc.player.isSpectator())
             {
                 mc.player.dropItem(false);
             }
@@ -212,12 +212,10 @@ public class ControllerInput
     public void onInputUpdate(InputUpdateEvent event)
     {
         EntityPlayer player = Minecraft.getMinecraft().player;
-        if(player == null)
-            return;
+        if(player == null) return;
 
         Controller controller = Controllable.getController();
-        if(controller == null)
-            return;
+        if(controller == null) return;
 
         Minecraft mc = Minecraft.getMinecraft();
 
@@ -237,7 +235,7 @@ public class ControllerInput
         {
             lastUse = 100;
             sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
-            sneaking |= controller.isButtonPressed(Buttons.LEFT_THUMB_STICK);
+            sneaking |= ButtonBindings.SNEAK.isButtonDown();
             isFlying = true;
         }
         else if(isFlying)
@@ -252,13 +250,14 @@ public class ControllerInput
         {
             if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.Move(controller)))
             {
-                if(controller.getLThumbStickYValue() != 0.0F)
+                float deadZone = (float) Controllable.getOptions().getDeadZone();
+                if(Math.abs(controller.getLThumbStickYValue()) >= deadZone)
                 {
                     lastUse = 100;
                     int dir = controller.getLThumbStickYValue() > 0.0F ? 1 : -1;
                     event.getMovementInput().forwardKeyDown = dir > 0;
                     event.getMovementInput().backKeyDown = dir < 0;
-                    event.getMovementInput().moveForward = dir * Math.abs(controller.getLThumbStickYValue());
+                    event.getMovementInput().moveForward = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
                     if(event.getMovementInput().sneak)
                     {
@@ -266,13 +265,13 @@ public class ControllerInput
                     }
                 }
 
-                if(controller.getLThumbStickXValue() != 0.0F)
+                if(Math.abs(controller.getLThumbStickXValue()) >= deadZone)
                 {
                     lastUse = 100;
                     int dir = controller.getLThumbStickXValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().rightKeyDown = dir < 0;
                     event.getMovementInput().leftKeyDown = dir > 0;
-                    event.getMovementInput().moveStrafe = dir * Math.abs(controller.getLThumbStickXValue());
+                    event.getMovementInput().moveStrafe = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickXValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
                     if(event.getMovementInput().sneak)
                     {
@@ -281,13 +280,13 @@ public class ControllerInput
                 }
             }
 
-            if(controller.isButtonPressed(Buttons.A))
+            if(ButtonBindings.JUMP.isButtonDown())
             {
                 event.getMovementInput().jump = true;
             }
         }
 
-        if(controller.isButtonPressed(Buttons.LEFT_TRIGGER) && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
+        if(ButtonBindings.USE_ITEM.isButtonDown() && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
         {
             mc.rightClickMouse();
         }
@@ -295,21 +294,28 @@ public class ControllerInput
 
     public void handleButtonInput(Controller controller, int button, boolean state)
     {
+        if(Minecraft.getMinecraft().currentScreen instanceof GuiControllerLayout)
+        {
+            return;
+        }
+
         lastUse = 100;
 
-        ControllerEvent.ButtonInput event = new ControllerEvent.ButtonInput(controller, button, state);
-        if(MinecraftForge.EVENT_BUS.post(event))
-            return;
+        ControllerEvent.ButtonInput eventInput = new ControllerEvent.ButtonInput(controller, button, state);
+        if(MinecraftForge.EVENT_BUS.post(eventInput)) return;
 
-        button = event.getModifiedButton();
-        controller.setButtonState(button, state);
+        button = eventInput.getModifiedButton();
+        ButtonBinding.setButtonState(button, state);
+
+        ControllerEvent.Button event = new ControllerEvent.Button(controller);
+        if(MinecraftForge.EVENT_BUS.post(event)) return;
 
         Minecraft mc = Minecraft.getMinecraft();
         if(state)
         {
-            if(button == Buttons.Y)
+            if(mc.currentScreen == null)
             {
-                if(mc.currentScreen == null)
+                if(ButtonBindings.INVENTORY.isButtonPressed())
                 {
                     if(mc.playerController.isRidingHorse())
                     {
@@ -323,89 +329,122 @@ public class ControllerInput
                     prevTargetMouseX = targetMouseX = Mouse.getX();
                     prevTargetMouseY = targetMouseY = Mouse.getY();
                 }
-                else if(mc.player != null)
+                else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
-                    mc.player.closeScreen();
+                    if(mc.player != null && !mc.player.capabilities.isFlying && !mc.player.isRiding())
+                    {
+                        sneaking = !sneaking;
+                    }
                 }
-            }
-            else if(button == Buttons.LEFT_THUMB_STICK)
-            {
-                if(mc.currentScreen == null && mc.player != null && !mc.player.capabilities.isFlying && !mc.player.isRiding())
+                else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
                 {
-                    sneaking = !sneaking;
+                    if(mc.player != null)
+                    {
+                        mc.player.inventory.changeCurrentItem(-1);
+                    }
                 }
-            }
-            else if(button == Buttons.LEFT_BUMPER)
-            {
-                if(mc.currentScreen == null)
+                else if(ButtonBindings.SCROLL_LEFT.isButtonPressed())
                 {
-                    mc.player.inventory.changeCurrentItem(1);
+                    if(mc.player != null)
+                    {
+                        mc.player.inventory.changeCurrentItem(1);
+                    }
                 }
-                else if(mc.currentScreen instanceof GuiContainerCreative)
+                else if(ButtonBindings.SWAP_HANDS.isButtonPressed())
                 {
-                    scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, -1);
+                    if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
+                    {
+                        mc.getConnection().sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.SWAP_HELD_ITEMS, BlockPos.ORIGIN, EnumFacing.DOWN));
+                    }
                 }
-            }
-            else if(button == Buttons.RIGHT_BUMPER)
-            {
-                if(mc.currentScreen == null)
+                else if(ButtonBindings.TOGGLE_PERSPECTIVE.isButtonPressed() && mc.inGameHasFocus)
                 {
-                    mc.player.inventory.changeCurrentItem(-1);
+                    cycleThirdPersonView();
                 }
-                else if(mc.currentScreen instanceof GuiContainerCreative)
+                else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
                 {
-                    scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, 1);
+                    if(mc.player != null)
+                    {
+                        mc.displayInGameMenu();
+                    }
                 }
-            }
-            else if(button == Buttons.A && mc.currentScreen != null)
-            {
-                invokeMouseClick(mc.currentScreen, 0);
-            }
-            else if(button == Buttons.X)
-            {
-                if(mc.currentScreen != null)
+                else if(mc.player != null && !mc.player.isHandActive())
                 {
-                    invokeMouseClick(mc.currentScreen, 1);
-                }
-                else if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
-                {
-                    mc.getConnection().sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.SWAP_HELD_ITEMS, BlockPos.ORIGIN, EnumFacing.DOWN));
-                }
-            }
-            else if(button == Buttons.B && mc.currentScreen != null && mc.player != null && mc.player.inventory.getItemStack().isEmpty())
-            {
-                invokeMouseClick(mc.currentScreen, 0);
-            }
-            else if(button == Buttons.DPAD_UP && mc.inGameHasFocus && mc.currentScreen == null)
-            {
-                cycleThirdPersonView();
-            }
-            else if(mc.player != null)
-            {
-                if(!mc.player.isHandActive() && mc.currentScreen == null)
-                {
-                    if(button == Buttons.RIGHT_TRIGGER)
+                    if(ButtonBindings.ATTACK.isButtonPressed())
                     {
                         mc.clickMouse();
                     }
-                    else if(button == Buttons.LEFT_TRIGGER)
+                    else if(ButtonBindings.USE_ITEM.isButtonPressed())
                     {
                         mc.rightClickMouse();
                     }
-                    else if(button == Buttons.RIGHT_THUMB_STICK)
+                    else if(ButtonBindings.PICK_BLOCK.isButtonPressed())
                     {
                         mc.middleClickMouse();
                     }
                 }
             }
+            else
+            {
+                if(ButtonBindings.INVENTORY.isButtonPressed())
+                {
+                    if(mc.player != null)
+                    {
+                        mc.player.closeScreen();
+                    }
+                }
+                else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
+                {
+                    if(mc.currentScreen instanceof GuiContainerCreative)
+                    {
+                        scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, 1);
+                    }
+                }
+                else if(ButtonBindings.SCROLL_LEFT.isButtonPressed())
+                {
+                    if(mc.currentScreen instanceof GuiContainerCreative)
+                    {
+                        scrollCreativeTabs((GuiContainerCreative) mc.currentScreen, -1);
+                    }
+                }
+                else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
+                {
+                    if(mc.currentScreen instanceof GuiIngameMenu)
+                    {
+                        mc.displayGuiScreen(null);
+                    }
+                }
+                else if(button == Buttons.A)
+                {
+                    invokeMouseClick(mc.currentScreen, 0);
+                }
+                else if(button == Buttons.X)
+                {
+                    invokeMouseClick(mc.currentScreen, 1);
+                }
+                else if(button == Buttons.B && mc.player != null && mc.player.inventory.getItemStack().isEmpty())
+                {
+                    invokeMouseClick(mc.currentScreen, 0);
+                }
+            }
         }
-        else if(button == Buttons.A && mc.currentScreen != null)
+        else
         {
-            invokeMouseReleased(mc.currentScreen, 0);
-        }
-        else if(button == Buttons.X && mc.currentScreen != null)
-        {
-            invokeMouseReleased(mc.currentScreen, 1);
+            if(mc.currentScreen == null)
+            {
+
+            }
+            else
+            {
+                if(button == Buttons.A)
+                {
+                    invokeMouseReleased(mc.currentScreen, 0);
+                }
+                else if(button == Buttons.X)
+                {
+                    invokeMouseReleased(mc.currentScreen, 1);
+                }
+            }
         }
     }
 
@@ -505,8 +544,8 @@ public class ControllerInput
                 {
                     if(targetMouseXScaled != slotCenterX || targetMouseYScaled != slotCenterY)
                     {
-                        targetMouseX -= deltaX * 0.5;
-                        targetMouseY -= deltaY * 0.5;
+                        targetMouseX -= deltaX * 0.75;
+                        targetMouseY -= deltaY * 0.75;
                     }
                     else
                     {
@@ -538,11 +577,11 @@ public class ControllerInput
             int i = (((GuiContainerCreative.ContainerCreative) creative.inventorySlots).itemList.size() + 9 - 1) / 9 - 5;
             int dir = 0;
 
-            if(controller.isButtonPressed(Buttons.DPAD_UP) || controller.getRThumbStickYValue() >= 0.8F)
+            if(controller.getState().dpadUp || controller.getRThumbStickYValue() >= 0.8F)
             {
                 dir = 1;
             }
-            else if(controller.isButtonPressed(Buttons.DPAD_DOWN) || controller.getRThumbStickYValue() <= -0.8F)
+            else if(controller.getState().dpadDown || controller.getRThumbStickYValue() <= -0.8F)
             {
                 dir = -1;
             }
@@ -566,7 +605,7 @@ public class ControllerInput
      * Invokes a mouse click in a GUI. This is modified version that is designed for controllers.
      * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
      *
-     * @param gui the gui instance
+     * @param gui    the gui instance
      * @param button the button to click with
      */
     private void invokeMouseClick(GuiScreen gui, int button)
@@ -602,7 +641,7 @@ public class ControllerInput
      * Invokes a mouse released in a GUI. This is modified version that is designed for controllers.
      * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
      *
-     * @param gui the gui instance
+     * @param gui    the gui instance
      * @param button the button to click with
      */
     private void invokeMouseReleased(GuiScreen gui, int button)
@@ -641,7 +680,7 @@ public class ControllerInput
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            if(controller.isButtonPressed(Buttons.RIGHT_TRIGGER))
+            if(ButtonBindings.ATTACK.isButtonDown())
             {
                 isLeftClicking = true;
             }
@@ -659,7 +698,7 @@ public class ControllerInput
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            if(controller.isButtonPressed(Buttons.LEFT_TRIGGER))
+            if(ButtonBindings.USE_ITEM.isButtonDown())
             {
                 isRightClicking = true;
             }
@@ -676,43 +715,26 @@ public class ControllerInput
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            if(controller.isButtonPressed(Buttons.B))
+            if(ButtonBindings.QUICK_MOVE.isButtonDown())
             {
                 isSneaking = true;
             }
         }
         return isSneaking;
     }
+
+    public static boolean canShowPlayerList()
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        boolean canShowPlayerList = mc.gameSettings.keyBindPlayerList.isKeyDown();
+        Controller controller = Controllable.getController();
+        if(controller != null)
+        {
+            if(ButtonBindings.PLAYER_LIST.isButtonDown())
+            {
+                canShowPlayerList = true;
+            }
+        }
+        return canShowPlayerList;
+    }
 }
-
-//SCUFFED PS3
-//X = 3
-//A = 2
-//B = 1
-//Y = 0
-
-//Official PS3
-//X = 0
-//A = 1
-//B = 2
-//Y = 3
-//LEFT_BUMPER = 4
-//RIGHT_BUMPER = 5
-//LEFT_TRIGGER = 6
-//RIGHT_TRIGGER = 7
-//SELECT = 8
-//START = 9
-//LEFT_THUMB_STICK = 10
-//RIGHT_THUMB_STICK = 11
-//HOME = 12
-//TOUCH_PAD = 13
-
-//Official PS1
-//X = 3
-//A = 2
-//B = 1
-//Y = 0
-//LEFT_BUMPER = 6
-//RIGHT_BUMPER = 7
-//LEFT_TRIGGER = 4
-//RIGHT_TRIGGER = 5
