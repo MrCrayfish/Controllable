@@ -151,7 +151,7 @@ public class ControllerOptions
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
-            writer.println("renderMiniPlayer:" + FORMAT.format(this.renderMiniPlayer));
+            writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
         }
         catch(FileNotFoundException e)
         {
