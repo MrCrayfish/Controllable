@@ -1,24 +1,21 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.GuiButtonController;
 import com.mrcrayfish.controllable.client.gui.GuiControllerSelection;
-import com.studiohartman.jamepad.ControllerManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiIngameMenu;
-import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiOptions;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 
 /**
  * Author: MrCrayfish
  */
 public class GuiEvents
 {
-    private ControllerManager manager;
+    private SDL2ControllerManager manager;
 
-    public GuiEvents(ControllerManager manager)
+    public GuiEvents(SDL2ControllerManager  manager)
     {
         this.manager = manager;
     }

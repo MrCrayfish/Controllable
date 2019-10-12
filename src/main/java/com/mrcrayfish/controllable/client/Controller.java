@@ -1,74 +1,27 @@
 package com.mrcrayfish.controllable.client;
 
-import com.studiohartman.jamepad.ControllerIndex;
-import com.studiohartman.jamepad.ControllerState;
-import com.studiohartman.jamepad.ControllerUnpluggedException;
+import net.minecraft.client.resources.I18n;
+import uk.co.electronstudio.sdl2gdx.SDL2Controller;
 
 import javax.annotation.Nullable;
 
-/**
- * A wrapper class for {@link org.lwjgl.input.Controller} to make method names more modern. Instead
- * of methods like {@link org.lwjgl.input.Controller#getXAxisValue()}, this class turns that into
- * {@link #getLThumbStickXValue()} which is much more accurate name. The class also adds in support
- * for virtual buttons, the direction pad isn't technically buttons but support for it has been
- * added within this mod, {@link #isButtonPressed(int)} adds in special cases for them.
- *
- * Author: MrCrayfish
- */
+import static org.libsdl.SDL.*;
+
 public class Controller
 {
-    private Mappings.Entry mapping = null;
-    private ControllerIndex index;
-    private ControllerState state;
-    private boolean[] states;
+    private String cachedName;
+    private Mappings.Entry mapping;
+    private SDL2Controller controller;
 
-    public Controller(ControllerIndex index)
+    public Controller(SDL2Controller controller)
     {
-        this.index = index;
-        this.states = new boolean[Buttons.LENGTH];
+        this.controller = controller;
+        this.getName(); //cache the name straight away
     }
 
-    /**
-     * Gets the number of this controller
-     *
-     * @return the number of this controller
-     */
-    public int getNumber()
+    public SDL2Controller getNativeController()
     {
-        return index.getIndex();
-    }
-
-    /**
-     * Gets the {@link ControllerIndex} instance of this controller. This allows for more raw access
-     * to the controller. It is also useful for making controller rumble.
-     *
-     * @return the {@link ControllerIndex} instance of this controller
-     */
-    public ControllerIndex getIndex()
-    {
-        return index;
-    }
-
-    /**
-     * Gets the {@link ControllerState} instance of this controller. This provides the current state
-     * of all the buttons. This is useful for bypassing {@link #states} as a state can be false
-     * (because it was cancelled) but is actually pressed down.
-     *
-     * @return the {@link ControllerState} instance of this controller
-     */
-    public ControllerState getState()
-    {
-        return state;
-    }
-
-    /**
-     * Updates the {@link ControllerState} of this controller
-     *
-     * @param state the new {@link ControllerState} for this controller
-     */
-    public void updateState(ControllerState state)
-    {
-        this.state = state;
+        return controller;
     }
 
     /**
@@ -78,18 +31,15 @@ public class Controller
      */
     public String getName()
     {
-        if(index.isConnected())
+        if(this.controller.isConnected())
         {
-            try
+            if(this.cachedName == null)
             {
-                return index.getName();
+                this.cachedName = this.controller.getName().replace("SDL GameController ", "").replace("SDL Joystick ", "");
             }
-            catch(ControllerUnpluggedException e)
-            {
-                e.printStackTrace();
-            }
+            return this.cachedName;
         }
-        return "";
+        return I18n.format("controllable.toast.controller");
     }
 
     /**
@@ -99,7 +49,7 @@ public class Controller
      */
     public float getLTriggerValue()
     {
-        return state.leftTrigger > 0.05F ? state.leftTrigger : 0F;
+        return controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT);
     }
 
     /**
@@ -109,7 +59,7 @@ public class Controller
      */
     public float getRTriggerValue()
     {
-        return state.rightTrigger > 0.05F ? state.rightTrigger : 0F;
+        return controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
     }
 
     /**
@@ -119,7 +69,7 @@ public class Controller
      */
     public float getLThumbStickXValue()
     {
-        return Math.abs(state.leftStickX) > 0.05F ? state.leftStickX : 0F;
+        return controller.getAxis(SDL_CONTROLLER_AXIS_LEFTX);
     }
 
     /**
@@ -129,7 +79,7 @@ public class Controller
      */
     public float getLThumbStickYValue()
     {
-        return Math.abs(state.leftStickY) > 0.05F ? state.leftStickY : 0F;
+        return controller.getAxis(SDL_CONTROLLER_AXIS_LEFTY);
     }
 
     /**
@@ -139,7 +89,7 @@ public class Controller
      */
     public float getRThumbStickXValue()
     {
-        return Math.abs(state.rightStickX) > 0.05F ? state.rightStickX : 0F;
+        return controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTX);
     }
 
     /**
@@ -149,7 +99,7 @@ public class Controller
      */
     public float getRThumbStickYValue()
     {
-        return Math.abs(state.rightStickY) > 0.05F ? state.rightStickY : 0F;
+        return controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTY);
     }
 
     /**

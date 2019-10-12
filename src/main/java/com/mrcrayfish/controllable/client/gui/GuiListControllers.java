@@ -1,17 +1,17 @@
 package com.mrcrayfish.controllable.client.gui;
 
+import com.badlogic.gdx.utils.Array;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
-import com.studiohartman.jamepad.ControllerIndex;
-import com.studiohartman.jamepad.ControllerManager;
-import com.studiohartman.jamepad.ControllerUnpluggedException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiListExtended;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import uk.co.electronstudio.sdl2gdx.SDL2Controller;
+import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -23,29 +23,24 @@ import java.util.List;
 @SideOnly(Side.CLIENT)
 public class GuiListControllers extends GuiListExtended
 {
-    private ControllerManager manager;
+    private SDL2ControllerManager manager;
     private List<ControllerEntry> controllers = new ArrayList<>();
 
-    public GuiListControllers(ControllerManager manager, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
+    public GuiListControllers(SDL2ControllerManager manager, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
     {
         super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
         this.manager = manager;
-        this.selectedElement = Controllable.getSelectedControllerIndex();
         this.reload();
     }
 
     public void reload()
     {
-        controllers.clear();
-        for(int i = 0; i < manager.getNumControllers(); i++)
+        this.controllers.clear();
+        Array<com.badlogic.gdx.controllers.Controller> controllers = manager.getControllers();
+        for(int i = 0; i < controllers.size; i++)
         {
-            controllers.add(new ControllerEntry(manager.getControllerIndex(i)));
+            this.controllers.add(new ControllerEntry((SDL2Controller) controllers.get(i)));
         }
-    }
-
-    public void setSelectedElement(int index)
-    {
-        this.selectedElement = index;
     }
 
     @Override
@@ -63,7 +58,7 @@ public class GuiListControllers extends GuiListExtended
     @Override
     protected boolean isSelected(int slotIndex)
     {
-        return Controllable.getController() != null && controllers.get(slotIndex).index == Controllable.getController().getIndex();
+        return Controllable.getController() != null && controllers.get(slotIndex).getController().getNativeController() == Controllable.getController().getNativeController();
     }
 
     public int getSelectedIndex()
@@ -73,11 +68,16 @@ public class GuiListControllers extends GuiListExtended
 
     public class ControllerEntry implements IGuiListEntry
     {
-        private ControllerIndex index;
+        private Controller controller;
 
-        public ControllerEntry(ControllerIndex index)
+        public ControllerEntry(SDL2Controller sdl2Controller)
         {
-            this.index = index;
+            this.controller = new Controller(sdl2Controller);
+        }
+
+        public Controller getController()
+        {
+            return controller;
         }
 
         @Override
@@ -89,31 +89,22 @@ public class GuiListControllers extends GuiListExtended
         @Override
         public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
         {
-            try
-            {
-                if(!index.isConnected())
-                    return;
+            if(!controller.getNativeController().isConnected())
+                return;
 
-                Minecraft.getMinecraft().fontRenderer.drawString(index.getName(), x + 20, y + 4, Color.WHITE.getRGB());
-                if(isSelected(slotIndex))
-                {
-                    Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("textures/gui/container/beacon.png"));
-                    GuiScreen.drawModalRectWithCustomSizedTexture(x + 2, y + 2, 91, 224, 14, 12, 256, 256);
-                }
-            }
-            catch(ControllerUnpluggedException e)
+            Minecraft.getMinecraft().fontRenderer.drawString(controller.getName(), x + 20, y + 4, Color.WHITE.getRGB());
+            if(isSelected(slotIndex))
             {
-                e.printStackTrace();
+                Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("textures/gui/container/beacon.png"));
+                GuiScreen.drawModalRectWithCustomSizedTexture(x + 2, y + 2, 91, 224, 14, 12, 256, 256);
             }
         }
 
         @Override
         public boolean mousePressed(int slotIndex, int mouseX, int mouseY, int mouseEvent, int relativeX, int relativeY)
         {
-            if(Controllable.getController() == null || Controllable.getController().getIndex() != this.index)
+            if(Controllable.getController() == null || Controllable.getController().getNativeController() != this.controller.getNativeController())
             {
-                ControllerIndex index = manager.getControllerIndex(this.index.getIndex());
-                Controller controller = new Controller(index);
                 Mappings.updateControllerMappings(controller);
                 Controllable.setController(controller);
             }

@@ -34,11 +34,11 @@ minecraft {
 }
 
 repositories {
-    maven { url "https://www.jitpack.io" }
+    jcenter()
 }
 
 dependencies {
-    provided 'com.github.WilliamAHartman:Jamepad:1.3.2'
+    compile "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
 }
 
 processResources {
@@ -68,7 +68,7 @@ jar {
         attributes 'FMLCorePlugin': 'com.mrcrayfish.controllable.asm.ControllablePlugin'
     }
     from {
-        configurations.provided.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.compileOnly.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 

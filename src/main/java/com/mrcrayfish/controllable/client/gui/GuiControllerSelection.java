@@ -1,11 +1,10 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mrcrayfish.controllable.Controllable;
-import com.studiohartman.jamepad.ControllerManager;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
+import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 
 import java.io.IOException;
 
@@ -16,18 +15,18 @@ public class GuiControllerSelection extends GuiScreen
 {
     private int controllerCount;
     private boolean mainMenu;
-    private ControllerManager manager;
+    private SDL2ControllerManager manager;
     private GuiListControllers listControllers;
 
     private GuiButton btnSettings;
     private GuiButton btnRemap;
     private GuiButton btnBack;
 
-    public GuiControllerSelection(ControllerManager manager, boolean mainMenu)
+    public GuiControllerSelection(SDL2ControllerManager manager, boolean mainMenu)
     {
         this.manager = manager;
         this.mainMenu = mainMenu;
-        this.controllerCount = manager.getNumControllers();
+        this.controllerCount = manager.getControllers().size;
     }
 
     @Override
@@ -43,13 +42,11 @@ public class GuiControllerSelection extends GuiScreen
     @Override
     public void updateScreen()
     {
-        if(controllerCount != manager.getNumControllers())
+        if(controllerCount != this.manager.getControllers().size)
         {
-            controllerCount = manager.getNumControllers();
+            controllerCount = manager.getControllers().size;
             listControllers.reload();
-            listControllers.setSelectedElement(Controllable.getSelectedControllerIndex());
-            btnRemap.enabled = listControllers.getSelectedIndex() > -1;
-            btnSettings.enabled = listControllers.getSelectedIndex() > -1;
+            btnRemap.enabled = false; //Controllable.getController() != null;
         }
     }
 

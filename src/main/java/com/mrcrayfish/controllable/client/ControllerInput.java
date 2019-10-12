@@ -31,6 +31,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_DOWN;
+import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_UP;
+
 /**
  * Author: MrCrayfish
  */
@@ -116,8 +119,8 @@ public class ControllerInput
             if(Math.abs(mouseSpeedX) > 0.05F || Math.abs(mouseSpeedY) > 0.05F)
             {
                 double mouseSpeed = Controllable.getOptions().getMouseSpeed();
-                targetMouseX += 30 * mouseSpeed;
-                targetMouseY += 30 * mouseSpeed;
+                targetMouseX += mouseSpeed * mouseSpeedX;
+                targetMouseY += mouseSpeed * mouseSpeedY;
             }
 
             prevXAxis = controller.getLThumbStickXValue();
@@ -174,8 +177,8 @@ public class ControllerInput
                 ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, rotationSpeed, rotationSpeed * 0.75F);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
-                    float rotationYaw = turnEvent.getYawSpeed() * controller.getRThumbStickXValue(); //TODO TEST THIS
-                    float rotationPitch = turnEvent.getPitchSpeed() * controller.getRThumbStickYValue();
+                    float rotationYaw = turnEvent.getYawSpeed() * controller.getRThumbStickXValue();
+                    float rotationPitch = turnEvent.getPitchSpeed() * -controller.getRThumbStickYValue();
                     player.turn(rotationYaw, rotationPitch);
                 }
             }
@@ -254,7 +257,7 @@ public class ControllerInput
                 if(Math.abs(controller.getLThumbStickYValue()) >= deadZone)
                 {
                     lastUse = 100;
-                    int dir = controller.getLThumbStickYValue() > 0.0F ? 1 : -1;
+                    int dir = controller.getLThumbStickYValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().forwardKeyDown = dir > 0;
                     event.getMovementInput().backKeyDown = dir < 0;
                     event.getMovementInput().moveForward = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
@@ -577,11 +580,11 @@ public class ControllerInput
             int i = (((GuiContainerCreative.ContainerCreative) creative.inventorySlots).itemList.size() + 9 - 1) / 9 - 5;
             int dir = 0;
 
-            if(controller.getState().dpadUp || controller.getRThumbStickYValue() >= 0.8F)
+            if(controller.getNativeController().getButton(SDL_CONTROLLER_BUTTON_DPAD_UP) || controller.getRThumbStickYValue() >= 0.8F)
             {
                 dir = 1;
             }
-            else if(controller.getState().dpadDown || controller.getRThumbStickYValue() <= -0.8F)
+            else if(controller.getNativeController().getButton(SDL_CONTROLLER_BUTTON_DPAD_DOWN) || controller.getRThumbStickYValue() <= -0.8F)
             {
                 dir = -1;
             }
