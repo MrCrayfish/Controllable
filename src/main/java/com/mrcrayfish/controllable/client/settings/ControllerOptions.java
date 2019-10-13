@@ -3,7 +3,6 @@ package com.mrcrayfish.controllable.client.settings;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
@@ -71,7 +70,6 @@ public class ControllerOptions
 
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
-    private Minecraft minecraft;
     private File optionsFile;
     private boolean autoSelect = true;
     private boolean renderMiniPlayer = true;
@@ -80,9 +78,8 @@ public class ControllerOptions
     private double rotationSpeed = 20.0;
     private double mouseSpeed = 30.0;
 
-    public ControllerOptions(Minecraft minecraft, File dataDir)
+    public ControllerOptions(File dataDir)
     {
-        this.minecraft = minecraft;
         this.optionsFile = new File(dataDir, "controllable-options.txt");
         this.loadOptions();
     }

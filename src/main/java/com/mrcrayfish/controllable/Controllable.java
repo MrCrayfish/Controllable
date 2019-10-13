@@ -5,7 +5,6 @@ import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -68,7 +67,7 @@ public class Controllable extends ControllerAdapter
         File configFolder = new File(mc.gameDir, "config");
 
         ControllerProperties.load(configFolder);
-        Controllable.options = new ControllerOptions(mc, mc.gameDir);
+        Controllable.options = new ControllerOptions(mc.gameDir);
 
         /* Attempts to load the first controller connected if auto select is enabled */
         if(options.isAutoSelect() && manager.getControllers().size > 0)

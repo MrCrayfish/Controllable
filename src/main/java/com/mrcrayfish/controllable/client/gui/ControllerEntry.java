@@ -3,7 +3,6 @@ package com.mrcrayfish.controllable.client.gui;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Controller;
-import com.mrcrayfish.controllable.client.Mappings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.ExtendedList;
