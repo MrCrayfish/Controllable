@@ -59,6 +59,11 @@ minecraft {
     }
 }
 
+configurations {
+    libraries
+    compile.extendsFrom libraries
+}
+
 dependencies {
     minecraft 'net.minecraftforge:forge:1.14.4-28.1.0'
 
@@ -69,7 +74,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
+    libraries "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
 }
 
 jar {
@@ -86,7 +91,7 @@ jar {
         ])
     }
     from {
-        configurations.compileOnly.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.libraries.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
