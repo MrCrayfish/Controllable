@@ -9,10 +9,10 @@ authors="MrCrayfish"
 
 [[mods]]
 modId="controllable"
-version="0.5.2"
+version="0.6.0"
 displayName="Controllable"
 description='''
-Adds in the ability to use a controller to play Minecraft
+Adds the ability to use a controller to play Minecraft
 '''
 
 [[dependencies.controllable]]
