@@ -30,6 +30,18 @@ public class ControllerOptions
         Controllable.getOptions().autoSelect = value;
     });
 
+    public static final BooleanOption RENDER_MINI_PLAYER = new ControllableBooleanOption("controllable.options.renderMiniPlayer", gameSettings -> {
+        return Controllable.getOptions().renderMiniPlayer;
+    }, (gameSettings, value) -> {
+        Controllable.getOptions().renderMiniPlayer = value;
+    });
+
+    public static final BooleanOption VIRTUAL_MOUSE = new ControllableBooleanOption("controllable.options.virtualMouse", gameSettings -> {
+        return Controllable.getOptions().virtualMouse;
+    }, (gameSettings, value) -> {
+        Controllable.getOptions().virtualMouse = value;
+    });
+
     public static final SliderPercentageOption DEAD_ZONE = new ControllableSliderPercentageOption("controllable.options.deadZone", 0.0, 1.0, 0.01F, gameSettings -> {
         return Controllable.getOptions().deadZone;
     }, (gameSettings, value) -> {
@@ -57,21 +69,16 @@ public class ControllerOptions
         return I18n.format("controllable.options.mouseSpeed.format", FORMAT.format(mouseSpeed));
     });
 
-    public static final BooleanOption RENDER_MINI_PLAYER = new ControllableBooleanOption("controllable.options.renderMiniPlayer", gameSettings -> {
-        return Controllable.getOptions().renderMiniPlayer;
-    }, (gameSettings, value) -> {
-        Controllable.getOptions().renderMiniPlayer = value;
-    });
-
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
     private Minecraft minecraft;
     private File optionsFile;
     private boolean autoSelect = true;
+    private boolean renderMiniPlayer = true;
+    private boolean virtualMouse = true;
     private double deadZone = 0.1;
     private double rotationSpeed = 20.0;
     private double mouseSpeed = 30.0;
-    private boolean renderMiniPlayer = true;
 
     public ControllerOptions(Minecraft minecraft, File dataDir)
     {
@@ -116,6 +123,12 @@ public class ControllerOptions
                         case "autoSelect":
                             this.autoSelect = Boolean.valueOf(value);
                             break;
+                        case "renderMiniPlayer":
+                            this.renderMiniPlayer = Boolean.valueOf(value);
+                            break;
+                        case "virtualMouse":
+                            this.virtualMouse = Boolean.valueOf(value);
+                            break;
                         case "deadZone":
                             this.deadZone = Double.parseDouble(value);
                             break;
@@ -124,9 +137,6 @@ public class ControllerOptions
                             break;
                         case "mouseSpeed":
                             this.mouseSpeed = Double.parseDouble(value);
-                            break;
-                        case "renderMiniPlayer":
-                            this.renderMiniPlayer = Boolean.valueOf(value);
                             break;
                     }
                 }
@@ -148,10 +158,11 @@ public class ControllerOptions
         try(PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8)))
         {
             writer.println("autoSelect:" + this.autoSelect);
+            writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
+            writer.println("virtualMouse:" + this.virtualMouse);
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
-            writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
         }
         catch(FileNotFoundException e)
         {
@@ -162,6 +173,16 @@ public class ControllerOptions
     public boolean isAutoSelect()
     {
         return this.autoSelect;
+    }
+
+    public boolean isRenderMiniPlayer()
+    {
+        return renderMiniPlayer;
+    }
+
+    public boolean isVirtualMouse()
+    {
+        return virtualMouse;
     }
 
     public double getDeadZone()
@@ -179,8 +200,4 @@ public class ControllerOptions
         return this.mouseSpeed;
     }
 
-    public boolean isRenderMiniPlayer()
-    {
-        return renderMiniPlayer;
-    }
 }

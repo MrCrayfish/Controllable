@@ -67,6 +67,25 @@ function initializeCoreMod() {
 
                 return classNode;
             }
+            //updateCameraAndRender(FJ)V
+        },
+        'screen_render_patch': {
+            'target': {
+                'type': 'CLASS',
+                'name': 'net.minecraft.client.renderer.GameRenderer'
+            },
+            'transformer': function(classNode) {
+                log("Patching GameRenderer...");
+
+                patch({
+                    obfName: "func_195458_a",
+                    name: "updateCameraAndRender",
+                    desc: "(FJZ)V",
+                    patch: patch_GameRenderer_updateCameraAndRender
+                }, classNode);
+
+                return classNode;
+            }
         }
     };
 }
@@ -246,6 +265,37 @@ function patch_ForgeIngameGui_renderPlayerList(method) {
             return false;
         method.instructions.insert(foundNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "canShowPlayerList", "()Z", false));
         method.instructions.remove(foundNode);
+        return true;
+    }
+    return false;
+}
+
+function patch_GameRenderer_updateCameraAndRender(method) {
+    var findInstruction = {
+        name: "drawScreen",
+        desc: "(Lnet/minecraft/client/gui/screen/Screen;IIF)V",
+        matches: function(s) {
+            return s.equals(this.name);
+        }
+    };
+
+    var foundNode = null;
+    var instructions = method.instructions.toArray();
+    var length = instructions.length;
+    for (var i = 0; i < length; i++) {
+        var node = instructions[i];
+        if(node.getOpcode() != Opcodes.INVOKESTATIC)
+            continue;
+        if(findInstruction.name.equals(node.name) && findInstruction.desc.equals(node.desc)) {
+            foundNode = node;
+            break;
+        }
+    }
+
+    if(foundNode !== null) {
+        var previousNode = foundNode.getPrevious();
+        method.instructions.remove(foundNode);
+        method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/screen/Screen;IIF)V", false))
         return true;
     }
     return false;

@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -50,6 +51,11 @@ public class Controllable extends ControllerAdapter
     public static ControllerOptions getOptions()
     {
         return options;
+    }
+
+    public static ControllerInput getInput()
+    {
+        return input;
     }
 
     private void onClientSetup(FMLClientSetupEvent event)
