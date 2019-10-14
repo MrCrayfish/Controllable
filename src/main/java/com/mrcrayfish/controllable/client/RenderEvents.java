@@ -190,7 +190,7 @@ public class RenderEvents
         if(event.phase != TickEvent.Phase.END)
             return;
 
-        if(ControllerInput.lastUse <= 0)
+        if(Controllable.getInput().getLastUse() <= 0)
             return;
 
         Minecraft mc = Minecraft.getMinecraft();

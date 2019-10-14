@@ -20,8 +20,8 @@ public class GuiEvents
         this.manager = manager;
     }
 
-    @SubscribeEvent
-    public void onOpenGui(GuiScreenEvent.InitGuiEvent event)
+    @SubscribeEvent(receiveCanceled = true)
+    public void onOpenGui(GuiScreenEvent.InitGuiEvent.Post event)
     {
         /* Resets the controller button states */
         ButtonBinding.resetButtonStates();

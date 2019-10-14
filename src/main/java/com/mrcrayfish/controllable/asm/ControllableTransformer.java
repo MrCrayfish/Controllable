@@ -37,6 +37,9 @@ public class ControllableTransformer implements IClassTransformer
             case "net.minecraftforge.client.GuiIngameForge":
                 bytes = this.patch(new MethodEntry("", "renderPlayerList", "(II)V"), this::patch_GuiIngameForge_renderPlayerList, bytes);
                 break;
+            case "net.minecraft.client.renderer.EntityRenderer":
+                bytes = this.patch(new MethodEntry("func_181560_a", "updateCameraAndRender", "(FJ)V"), this::patch_EntityRenderer_updateCameraAndRender, bytes);
+                break;
         }
         return bytes;
     }
@@ -237,6 +240,32 @@ public class ControllableTransformer implements IClassTransformer
                 return false;
             method.instructions.insert(foundNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "canShowPlayerList", "()Z", false));
             method.instructions.remove(foundNode);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean patch_EntityRenderer_updateCameraAndRender(MethodNode method)
+    {
+        MethodEntry entry = new MethodEntry("", "drawScreen", "(Lnet/minecraft/client/gui/GuiScreen;IIF)V");
+        AbstractInsnNode foundNode = null;
+        for(AbstractInsnNode node : method.instructions.toArray())
+        {
+            if(node.getOpcode() != Opcodes.INVOKESTATIC)
+                continue;
+            MethodInsnNode methodNode = (MethodInsnNode) node;
+            if(entry.name.equals(methodNode.name) && entry.desc.equals(methodNode.desc))
+            {
+                foundNode = node;
+                break;
+            }
+        }
+
+        if(foundNode != null)
+        {
+            AbstractInsnNode previousNode = foundNode.getPrevious();
+            method.instructions.remove(foundNode);
+            method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/GuiScreen;IIF)V", false));
             return true;
         }
         return false;

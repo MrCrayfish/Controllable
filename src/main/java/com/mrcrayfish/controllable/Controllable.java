@@ -90,6 +90,11 @@ public class Controllable extends DummyModContainer
         return options;
     }
 
+    public static ControllerInput getInput()
+    {
+        return input;
+    }
+
     @Subscribe
     public void onPreInit(FMLPreInitializationEvent event)
     {

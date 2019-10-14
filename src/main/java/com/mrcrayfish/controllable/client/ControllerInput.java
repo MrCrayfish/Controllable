@@ -1,21 +1,26 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.GuiControllerLayout;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.network.play.client.CPacketPlayerDigging;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -40,12 +45,15 @@ import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_UP;
 @SideOnly(Side.CLIENT)
 public class ControllerInput
 {
-    public static int lastUse = 0;
+    private static final ResourceLocation CURSOR_TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/cursor.png");
 
+    private int lastUse = 0;
     private boolean keyboardSneaking = false;
     private boolean sneaking = false;
     private boolean isFlying = false;
-
+    private boolean nearSlot = false;
+    private int virtualMouseX;
+    private int virtualMouseY;
     private float prevXAxis;
     private float prevYAxis;
     private int prevTargetMouseX;
@@ -56,6 +64,21 @@ public class ControllerInput
     private float mouseSpeedY;
 
     private int dropCounter = -1;
+
+    public int getVirtualMouseX()
+    {
+        return virtualMouseX;
+    }
+
+    public int getVirtualMouseY()
+    {
+        return virtualMouseY;
+    }
+
+    public int getLastUse()
+    {
+        return lastUse;
+    }
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event)
@@ -84,15 +107,20 @@ public class ControllerInput
             boolean moving = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
             if(moving)
             {
-                lastUse = 100;
-
                 /* Updates the target mouse position when the initial thumb stick movement is
                  * detected. This fixes an issue when the user moves the cursor with the mouse then
                  * switching back to controller, the cursor would jump to old target mouse position. */
                 if(Math.abs(prevXAxis) < deadZone && Math.abs(prevYAxis) < deadZone)
                 {
-                    prevTargetMouseX = targetMouseX = Mouse.getX();
-                    prevTargetMouseY = targetMouseY = Mouse.getY();
+                    int mouseX = Mouse.getX();
+                    int mouseY = Mouse.getY();
+                    if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse())
+                    {
+                        mouseX = virtualMouseX;
+                        mouseY = mc.displayHeight - virtualMouseY;
+                    }
+                    prevTargetMouseX = targetMouseX = mouseX;
+                    prevTargetMouseY = targetMouseY = mouseY;
                 }
 
                 float xAxis = (controller.getLThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickXValue());
@@ -120,7 +148,8 @@ public class ControllerInput
             {
                 double mouseSpeed = Controllable.getOptions().getMouseSpeed();
                 targetMouseX += mouseSpeed * mouseSpeedX;
-                targetMouseY += mouseSpeed * mouseSpeedY;
+                targetMouseY -= mouseSpeed * mouseSpeedY;
+                lastUse = 100;
             }
 
             prevXAxis = controller.getLThumbStickXValue();
@@ -132,24 +161,91 @@ public class ControllerInput
             {
                 this.handleCreativeScrolling((GuiContainerCreative) mc.currentScreen, controller);
             }
+
+            if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse())
+            {
+                GuiScreen gui = mc.currentScreen;
+                if(gui != null && (targetMouseX != prevTargetMouseX || targetMouseY != prevTargetMouseY))
+                {
+                    if(gui.eventButton != -1 && gui.lastMouseEvent > 0L)
+                    {
+                        try
+                        {
+                            long deltaTime = Minecraft.getSystemTime() - gui.lastMouseEvent;
+                            int mouseX = virtualMouseX * gui.width / mc.displayWidth;
+                            int mouseY = virtualMouseY * gui.height / mc.displayHeight;
+
+                            Method mouseClickMove = ReflectionHelper.findMethod(GuiScreen.class, "mouseClickMove", "func_146273_a", int.class, int.class, int.class, long.class);
+                            mouseClickMove.setAccessible(true);
+                            mouseClickMove.invoke(gui, mouseX, mouseY, gui.eventButton, deltaTime);
+                        }
+                        catch(IllegalAccessException | InvocationTargetException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(receiveCanceled = true)
+    public void onScreenInit(GuiOpenEvent event)
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        if(mc.currentScreen == null)
+        {
+            targetMouseX = prevTargetMouseX = virtualMouseX = mc.displayWidth / 2;
+            targetMouseY = prevTargetMouseY = virtualMouseY = mc.displayHeight / 2;
+        }
+    }
+
+    @SubscribeEvent(receiveCanceled = true)
     public void onRenderScreen(GuiScreenEvent.DrawScreenEvent.Pre event)
     {
         /* Makes the cursor movement appear smooth between ticks. This will only run if the target
          * mouse position is different to the previous tick's position. This allows for the mouse
          * to still be used as input. */
-        if(Minecraft.getMinecraft().currentScreen != null && (targetMouseX != prevTargetMouseX || targetMouseY != prevTargetMouseY))
+        Minecraft mc = Minecraft.getMinecraft();
+        if(mc.currentScreen != null && (targetMouseX != prevTargetMouseX || targetMouseY != prevTargetMouseY))
         {
-            if(!(Minecraft.getMinecraft().currentScreen instanceof GuiControllerLayout))
+            if(!(mc.currentScreen instanceof GuiControllerLayout))
             {
-                float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
+                float partialTicks = mc.getRenderPartialTicks();
                 int mouseX = (int) (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * partialTicks + 0.5F);
                 int mouseY = (int) (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * partialTicks + 0.5F);
-                Mouse.setCursorPosition(mouseX, mouseY);
+                if(Controllable.getOptions().isVirtualMouse())
+                {
+                    virtualMouseX = mouseX;
+                    virtualMouseY = mc.displayHeight - mouseY;
+                }
+                else
+                {
+                    Mouse.setCursorPosition(mouseX, mouseY);
+                }
             }
+        }
+    }
+
+    @SubscribeEvent(receiveCanceled = true)
+    public void onRenderScreen(GuiScreenEvent.DrawScreenEvent.Post event)
+    {
+        if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && lastUse > 0)
+        {
+            GlStateManager.pushMatrix();
+            {
+                Minecraft minecraft = event.getGui().mc;
+                if(minecraft.player == null || minecraft.player.inventory.getItemStack().isEmpty())
+                {
+                    ScaledResolution resolution = new ScaledResolution(minecraft);
+                    GlStateManager.translate(virtualMouseX / (double) resolution.getScaleFactor(), virtualMouseY / (double) resolution.getScaleFactor(), 300);
+                    GlStateManager.color(1.0F, 1.0F, 1.0F);
+                    GlStateManager.disableLighting();
+                    minecraft.getTextureManager().bindTexture(CURSOR_TEXTURE);
+                    GuiScreen.drawScaledCustomSizeModalRect(-8, -8, nearSlot ? 16 : 0, 0, 16, 16, 16, 16, 32, 32);
+                }
+            }
+            GlStateManager.popMatrix();
         }
     }
 
@@ -505,6 +601,8 @@ public class ControllerInput
 
     private void moveMouseToClosestSlot(boolean moving, GuiScreen screen)
     {
+        nearSlot = false;
+
         /* Makes the mouse attracted to slots. This helps with selecting items when using
          * a controller. */
         if(screen instanceof GuiContainer)
@@ -534,6 +632,8 @@ public class ControllerInput
 
             if(closestSlot != null && (closestSlot.getHasStack() || !mc.player.inventory.getItemStack().isEmpty()))
             {
+                nearSlot = true;
+
                 int slotCenterX = guiLeft + closestSlot.xPos + 8;
                 int slotCenterY = guiTop + closestSlot.yPos + 8;
                 int realMouseX = (int) (slotCenterX / ((float) guiContainer.width / (float) mc.displayWidth));
@@ -616,22 +716,23 @@ public class ControllerInput
         Minecraft mc = Minecraft.getMinecraft();
         if(gui != null)
         {
-            int guiX = Mouse.getX() * gui.width / mc.displayWidth;
-            int guiY = gui.height - Mouse.getY() * gui.height / mc.displayHeight - 1;
+            int mouseX = Mouse.getX();
+            int mouseY = gui.height - Mouse.getY() * gui.height / mc.displayHeight - 1;
+            if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && lastUse > 0)
+            {
+                mouseX = virtualMouseX;
+                mouseY = virtualMouseY * gui.height / mc.displayHeight;
+            }
+            mouseX = mouseX * gui.width / mc.displayWidth;
+
+            gui.eventButton = button;
+            gui.lastMouseEvent = Minecraft.getSystemTime();
 
             try
             {
-                Field eventButton = ReflectionHelper.findField(GuiScreen.class, "eventButton", "field_146287_f");
-                eventButton.setAccessible(true);
-                eventButton.set(gui, button);
-
-                Field lastMouseEvent = ReflectionHelper.findField(GuiScreen.class, "lastMouseEvent", "field_146288_g");
-                lastMouseEvent.setAccessible(true);
-                lastMouseEvent.set(gui, Minecraft.getSystemTime());
-
                 Method mouseClicked = ReflectionHelper.findMethod(GuiScreen.class, "mouseClicked", "func_73864_a", int.class, int.class, int.class);
                 mouseClicked.setAccessible(true);
-                mouseClicked.invoke(gui, guiX, guiY, button);
+                mouseClicked.invoke(gui, mouseX, mouseY, button);
             }
             catch(IllegalAccessException | InvocationTargetException e)
             {
@@ -652,15 +753,19 @@ public class ControllerInput
         Minecraft mc = Minecraft.getMinecraft();
         if(gui != null)
         {
-            int mouseX = Mouse.getX() * gui.width / mc.displayWidth;
+            int mouseX = Mouse.getX();
             int mouseY = gui.height - Mouse.getY() * gui.height / mc.displayHeight - 1;
+            if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && lastUse > 0)
+            {
+                mouseX = virtualMouseX;
+                mouseY = virtualMouseY * gui.height / mc.displayHeight;
+            }
+            mouseX = mouseX * gui.width / mc.displayWidth;
+
+            gui.eventButton = -1;
 
             try
             {
-                Field eventButton = ReflectionHelper.findField(GuiScreen.class, "eventButton", "field_146287_f");
-                eventButton.setAccessible(true);
-                eventButton.set(gui, -1);
-
                 //Resets the mouse straight away
                 Method mouseReleased = ReflectionHelper.findMethod(GuiScreen.class, "mouseReleased", "func_146286_b", int.class, int.class, int.class);
                 mouseReleased.setAccessible(true);

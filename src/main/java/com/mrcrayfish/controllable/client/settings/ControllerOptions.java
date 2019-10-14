@@ -40,6 +40,14 @@ public class ControllerOptions
         return I18n.format("controllable.options.renderMiniPlayer") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
     });
 
+    public static final OptionBoolean VIRTUAL_MOUSE  = new OptionBoolean(() -> {
+        return Controllable.getOptions().virtualMouse;
+    }, value -> {
+        Controllable.getOptions().virtualMouse = value;
+    }, value -> {
+        return I18n.format("controllable.options.virtualMouse") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
+    });
+
     public static final OptionSlider DEAD_ZONE = new OptionSlider(0.01F, 0.0F, 1.0F, () -> {
        return Controllable.getOptions().deadZone;
     }, value -> {
@@ -73,6 +81,7 @@ public class ControllerOptions
     private File optionsFile;
     private boolean autoSelect = true;
     private boolean renderMiniPlayer = true;
+    private boolean virtualMouse = true;
     private double deadZone = 0.1;
     private double rotationSpeed = 20.0;
     private double mouseSpeed = 30.0;
@@ -123,6 +132,9 @@ public class ControllerOptions
                         case "deadZone":
                             this.deadZone = Double.parseDouble(value);
                             break;
+                        case "virtualMouse":
+                            this.virtualMouse = Boolean.valueOf(value);
+                            break;
                         case "rotationSpeed":
                             this.rotationSpeed = Double.parseDouble(value);
                             break;
@@ -153,6 +165,7 @@ public class ControllerOptions
         {
             writer.println("autoSelect:" + this.autoSelect);
             writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
+            writer.println("virtualMouse:" + this.virtualMouse);
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
@@ -171,6 +184,11 @@ public class ControllerOptions
     public boolean isRenderMiniPlayer()
     {
         return renderMiniPlayer;
+    }
+
+    public boolean isVirtualMouse()
+    {
+        return virtualMouse;
     }
 
     public double getDeadZone()

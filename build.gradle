@@ -33,12 +33,17 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
+configurations {
+    libraries
+    compile.extendsFrom libraries
+}
+
 repositories {
     jcenter()
 }
 
 dependencies {
-    provided "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
+    libraries "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
 }
 
 processResources {
@@ -68,7 +73,7 @@ jar {
         attributes 'FMLCorePlugin': 'com.mrcrayfish.controllable.asm.ControllablePlugin'
     }
     from {
-        configurations.provided.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.libraries.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 

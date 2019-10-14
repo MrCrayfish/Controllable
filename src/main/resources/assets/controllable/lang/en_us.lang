@@ -33,6 +33,7 @@ controllable.options.rotationSpeed.format=Rotation Speed: %s
 controllable.options.mouseSpeed=Mouse Speed
 controllable.options.mouseSpeed.format=Mouse Speed: %s
 controllable.options.renderMiniPlayer=Render Mini Player
+controllable.options.virtualMouse=Virtual Mouse
 controllable.toast.controller=Controller
 controllable.toast.connected=Connected
 controllable.toast.disconnected=Disconnected
