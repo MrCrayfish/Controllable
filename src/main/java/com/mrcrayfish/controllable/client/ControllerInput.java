@@ -6,7 +6,7 @@ import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.MouseHelper;
+import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -165,6 +165,37 @@ public class ControllerInput
             if(mc.currentScreen instanceof CreativeScreen)
             {
                 this.handleCreativeScrolling((CreativeScreen) mc.currentScreen, controller);
+            }
+
+            if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse())
+            {
+                Screen screen = mc.currentScreen;
+                if(screen != null && (targetMouseX != prevTargetMouseX || targetMouseY != prevTargetMouseY))
+                {
+                    if(mc.loadingGui == null)
+                    {
+                        double mouseX = virtualMouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth();
+                        double mouseY = virtualMouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight();
+                        Screen.wrapScreenError(() -> screen.mouseMoved(mouseX, mouseY), "mouseMoved event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
+                        if(mc.mouseHelper.activeButton != -1 && mc.mouseHelper.eventTime > 0.0D)
+                        {
+                            double dragX = (targetMouseX - prevTargetMouseX) * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth();
+                            double dragY = (targetMouseY - prevTargetMouseY) * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight();
+                            Screen.wrapScreenError(() ->
+                            {
+                                if(net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPre(screen, mouseX, mouseY, mc.mouseHelper.activeButton, dragX, dragY))
+                                {
+                                    return;
+                                }
+                                if(((IGuiEventListener) screen).mouseDragged(mouseX, mouseY, mc.mouseHelper.activeButton, dragX, dragY))
+                                {
+                                    return;
+                                }
+                                net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPost(screen, mouseX, mouseY, mc.mouseHelper.activeButton, dragX, dragY);
+                            }, "mouseDragged event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
+                        }
+                    }
+                }
             }
         }
     }
@@ -717,32 +748,23 @@ public class ControllerInput
             mouseX = mouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth();
             mouseY = mouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight();
 
-            try
-            {
-                Field eventButton = ObfuscationReflectionHelper.findField(MouseHelper.class, "field_198042_g");
-                eventButton.setAccessible(true);
-                eventButton.set(mc.mouseHelper, button);
+            mc.mouseHelper.activeButton = button;
+            mc.mouseHelper.eventTime = NativeUtil.func_216394_b();
 
-                Field lastMouseEvent = ObfuscationReflectionHelper.findField(MouseHelper.class, "field_198045_j");
-                lastMouseEvent.setAccessible(true);
-                lastMouseEvent.set(mc.mouseHelper, NativeUtil.func_216394_b());
-
-                double finalMouseX = mouseX;
-                double finalMouseY = mouseY;
-                Screen.wrapScreenError(() -> {
-                    boolean cancelled = ForgeHooksClient.onGuiMouseClickedPre(screen, finalMouseX, finalMouseY, button);
-                    if (!cancelled) {
-                        cancelled = screen.mouseClicked(finalMouseX, finalMouseY, button);
-                    }
-                    if (!cancelled) {
-                        ForgeHooksClient.onGuiMouseClickedPost(screen, finalMouseX, finalMouseY, button);
-                    }
-                }, "mouseClicked event handler", screen.getClass().getCanonicalName());
-            }
-            catch(IllegalAccessException e)
+            double finalMouseX = mouseX;
+            double finalMouseY = mouseY;
+            Screen.wrapScreenError(() ->
             {
-                e.printStackTrace();
-            }
+                boolean cancelled = ForgeHooksClient.onGuiMouseClickedPre(screen, finalMouseX, finalMouseY, button);
+                if(!cancelled)
+                {
+                    cancelled = screen.mouseClicked(finalMouseX, finalMouseY, button);
+                }
+                if(!cancelled)
+                {
+                    ForgeHooksClient.onGuiMouseClickedPost(screen, finalMouseX, finalMouseY, button);
+                }
+            }, "mouseClicked event handler", screen.getClass().getCanonicalName());
         }
     }
 
@@ -768,28 +790,22 @@ public class ControllerInput
             mouseX = mouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth();
             mouseY = mouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight();
 
-            try
-            {
-                Field eventButton = ObfuscationReflectionHelper.findField(MouseHelper.class, "field_198042_g");
-                eventButton.setAccessible(true);
-                eventButton.set(mc.mouseHelper, -1);
+            mc.mouseHelper.activeButton = -1;
 
-                double finalMouseX = mouseX;
-                double finalMouseY = mouseY;
-                Screen.wrapScreenError(() -> {
-                    boolean cancelled = ForgeHooksClient.onGuiMouseReleasedPre(screen, finalMouseX, finalMouseY, button);
-                    if (!cancelled) {
-                        cancelled = screen.mouseReleased(finalMouseX, finalMouseY, button);
-                    }
-                    if (!cancelled) {
-                        ForgeHooksClient.onGuiMouseReleasedPost(screen, finalMouseX, finalMouseY, button);
-                    }
-                }, "mouseReleased event handler", screen.getClass().getCanonicalName());
-            }
-            catch(IllegalAccessException e)
+            double finalMouseX = mouseX;
+            double finalMouseY = mouseY;
+            Screen.wrapScreenError(() ->
             {
-                e.printStackTrace();
-            }
+                boolean cancelled = ForgeHooksClient.onGuiMouseReleasedPre(screen, finalMouseX, finalMouseY, button);
+                if(!cancelled)
+                {
+                    cancelled = screen.mouseReleased(finalMouseX, finalMouseY, button);
+                }
+                if(!cancelled)
+                {
+                    ForgeHooksClient.onGuiMouseReleasedPost(screen, finalMouseX, finalMouseY, button);
+                }
+            }, "mouseReleased event handler", screen.getClass().getCanonicalName());
         }
     }
 
