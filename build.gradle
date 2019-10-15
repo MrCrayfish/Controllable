@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = "1.14.4-0.6.0"
+version = "1.14.4-0.6.1"
 group = "com.mrcrayfish" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "controllable"
 
