@@ -234,7 +234,7 @@ public class RenderEvents
                     }
 
                     int texU = (remappedButton % 19) * 13;
-                    int texV = (remappedButton / 19) * 13;
+                    int texV = ((remappedButton / 19) + (Controllable.getOptions().useXInputIcons() ? 1 : 0)) * 13;
                     int size = 13;
 
                     int x = side == Action.Side.LEFT ? 5 : mc.mainWindow.getScaledWidth() - 5 - size;

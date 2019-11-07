@@ -39,23 +39,24 @@ public class ControllerLayoutScreen extends Screen
     @Override
     protected void init()
     {
-        controllerButtons.add(new ControllerButton(Buttons.A, 29, 9, 7, 0, 3, 3, 5));
-        controllerButtons.add(new ControllerButton(Buttons.B, 32, 6, 13, 0, 3, 3, 5));
-        controllerButtons.add(new ControllerButton(Buttons.X, 26, 6, 16, 0, 3, 3, 5));
-        controllerButtons.add(new ControllerButton(Buttons.Y, 29, 3, 10, 0, 3, 3, 5));
-        controllerButtons.add(new ControllerButton(Buttons.LEFT_BUMPER, 5, -2, 25, 0, 7, 3, 5));
-        controllerButtons.add(new ControllerButton(Buttons.RIGHT_BUMPER, 26, -2, 32, 0, 7, 3, 5));
-        controllerButtons.add(new ControllerButton(Buttons.LEFT_TRIGGER, 5, -10, 39, 0, 7, 6, 5));
-        controllerButtons.add(new ControllerButton(Buttons.RIGHT_TRIGGER, 26, -10, 39, 0, 7, 6, 5));
-        controllerButtons.add(new ControllerButton(Buttons.DPAD_DOWN, 6, 9, 19, 0, 3, 3, 5));
-        controllerButtons.add(new ControllerButton(Buttons.DPAD_RIGHT, 9, 6, 19, 0, 3, 3, 5));
-        controllerButtons.add(new ControllerButton(Buttons.DPAD_LEFT, 3, 6, 19, 0, 3, 3, 5));
-        controllerButtons.add(new ControllerButton(Buttons.DPAD_UP, 6, 3, 19, 0, 3, 3, 5));
-        controllerButtons.add(new ControllerButton(Buttons.SELECT, 14, 4, 22, 0, 3, 2, 5));
-        controllerButtons.add(new ControllerButton(Buttons.START, 21, 4, 22, 0, 3, 2, 5));
-        controllerButtons.add(new ControllerButton(Buttons.HOME, 17, 8, 46, 0, 4, 4, 5));
-        controllerButtons.add(new ControllerAxis(Buttons.LEFT_THUMB_STICK, 9, 12, 0, 0, 7, 7, 5));
-        controllerButtons.add(new ControllerAxis(Buttons.RIGHT_THUMB_STICK, 22, 12, 0, 0, 7, 7, 5));
+        int v = Controllable.getOptions().useXInputIcons() ? 13 : 0;
+        controllerButtons.add(new ControllerButton(Buttons.A, 29, 9, 7, v, 3, 3, 5));
+        controllerButtons.add(new ControllerButton(Buttons.B, 32, 6, 13, v, 3, 3, 5));
+        controllerButtons.add(new ControllerButton(Buttons.X, 26, 6, 16, v, 3, 3, 5));
+        controllerButtons.add(new ControllerButton(Buttons.Y, 29, 3, 10, v, 3, 3, 5));
+        controllerButtons.add(new ControllerButton(Buttons.LEFT_BUMPER, 5, -2, 25, v, 7, 3, 5));
+        controllerButtons.add(new ControllerButton(Buttons.RIGHT_BUMPER, 26, -2, 32, v, 7, 3, 5));
+        controllerButtons.add(new ControllerButton(Buttons.LEFT_TRIGGER, 5, -10, 39, v, 7, 6, 5));
+        controllerButtons.add(new ControllerButton(Buttons.RIGHT_TRIGGER, 26, -10, 39, v, 7, 6, 5));
+        controllerButtons.add(new ControllerButton(Buttons.DPAD_DOWN, 6, 9, 19, v, 3, 3, 5));
+        controllerButtons.add(new ControllerButton(Buttons.DPAD_RIGHT, 9, 6, 19, v, 3, 3, 5));
+        controllerButtons.add(new ControllerButton(Buttons.DPAD_LEFT, 3, 6, 19, v, 3, 3, 5));
+        controllerButtons.add(new ControllerButton(Buttons.DPAD_UP, 6, 3, 19, v, 3, 3, 5));
+        controllerButtons.add(new ControllerButton(Buttons.SELECT, 14, 4, 22, v, 3, 2, 5));
+        controllerButtons.add(new ControllerButton(Buttons.START, 21, 4, 22, v, 3, 2, 5));
+        controllerButtons.add(new ControllerButton(Buttons.HOME, 17, 8, 46, v, 4, 4, 5));
+        controllerButtons.add(new ControllerAxis(Buttons.LEFT_THUMB_STICK, 9, 12, 0, v, 7, 7, 5));
+        controllerButtons.add(new ControllerAxis(Buttons.RIGHT_THUMB_STICK, 22, 12, 0, v, 7, 7, 5));
 
         this.addButton(new Button(this.width / 2 - 100, this.height - 32, 200, 20, I18n.format("gui.done"), (button) -> {
             this.minecraft.displayGuiScreen(this.parentScreen);
