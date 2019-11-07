@@ -824,7 +824,7 @@ public class ControllerInput
                 isLeftClicking = true;
             }
         }
-        return mc.currentScreen == null && isLeftClicking && mc.mouseHelper.isMouseGrabbed();
+        return mc.currentScreen == null && isLeftClicking && (Controllable.getOptions().isVirtualMouse() || mc.mouseHelper.isMouseGrabbed());
     }
 
     /**
