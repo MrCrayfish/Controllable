@@ -1,6 +1,5 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.badlogic.gdx.utils.Array;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Controller;
