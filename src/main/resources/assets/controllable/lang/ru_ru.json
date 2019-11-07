@@ -26,7 +26,6 @@
   "controllable.gui.settings": "Настройки",
   "controllable.gui.remap": "Переназначить Кнопки",
   "controllable.gui.back": "Назад",
-  "controllable.options.xInputIcons": "Значки XInput",
   "controllable.options.deadZone": "Мёртвая Зона",
   "controllable.options.deadZone.format": "Мёртвая Зона: %s",
   "controllable.options.rotationSpeed": "Скорость Вращения",

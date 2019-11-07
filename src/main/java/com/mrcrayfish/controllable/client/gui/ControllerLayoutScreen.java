@@ -39,7 +39,7 @@ public class ControllerLayoutScreen extends Screen
     @Override
     protected void init()
     {
-        int v = Controllable.getOptions().useXInputIcons() ? 13 : 0;
+        int v = Controllable.getOptions().getIcons().ordinal() * 13;
         controllerButtons.add(new ControllerButton(Buttons.A, 29, 9, 7, v, 3, 3, 5));
         controllerButtons.add(new ControllerButton(Buttons.B, 32, 6, 13, v, 3, 3, 5));
         controllerButtons.add(new ControllerButton(Buttons.X, 26, 6, 16, v, 3, 3, 5));

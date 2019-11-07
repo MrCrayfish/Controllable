@@ -23,10 +23,12 @@ public class ControllerOptions
 {
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
 
-    public static final BooleanOption XINPUT_ICONS = new ControllableBooleanOption("controllable.options.xInputIcons", gameSettings -> {
-        return Controllable.getOptions().xinputIcons;
-    }, (gameSettings, value) ->  {
-        Controllable.getOptions().xinputIcons = value;
+    public static final SliderPercentageOption ICONS = new ControllableSliderPercentageOption("controllable.options.icons", 0, EnumIcons.values().length - 1, 1, gameSettings -> {
+        return (double) Controllable.getOptions().icons.ordinal();
+    }, (gameSettings, value) -> {
+        Controllable.getOptions().icons = EnumIcons.values()[(int) Math.floor(value)];
+    }, (gameSettings, option) -> {
+        return I18n.format("controllable.options.icons.format", Controllable.getOptions().icons.name());
     });
 
     public static final BooleanOption AUTO_SELECT = new ControllableBooleanOption("controllable.options.autoSelect", gameSettings -> {
@@ -77,13 +79,13 @@ public class ControllerOptions
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
     private File optionsFile;
-    private boolean xinputIcons = true;
     private boolean autoSelect = true;
     private boolean renderMiniPlayer = true;
     private boolean virtualMouse = true;
     private double deadZone = 0.1;
     private double rotationSpeed = 20.0;
     private double mouseSpeed = 30.0;
+    private EnumIcons icons = EnumIcons.DualShock;
 
     public ControllerOptions(File dataDir)
     {
@@ -124,8 +126,8 @@ public class ControllerOptions
                 {
                     switch(key)
                     {
-                        case "xInputIcons":
-                            this.xinputIcons = Boolean.valueOf(value);
+                        case "icons":
+                            this.icons = EnumIcons.valueOfOrDefault(value);
                             break;
                         case "autoSelect":
                             this.autoSelect = Boolean.valueOf(value);
@@ -164,7 +166,7 @@ public class ControllerOptions
     {
         try(PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8)))
         {
-            writer.println("xInputIcons:" + this.xinputIcons);
+            writer.println("icons:" + this.icons.name());
             writer.println("autoSelect:" + this.autoSelect);
             writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
             writer.println("virtualMouse:" + this.virtualMouse);
@@ -178,9 +180,9 @@ public class ControllerOptions
         }
     }
 
-    public boolean useXInputIcons()
+    public EnumIcons getIcons()
     {
-        return xinputIcons;
+        return icons;
     }
 
     public boolean isAutoSelect()
