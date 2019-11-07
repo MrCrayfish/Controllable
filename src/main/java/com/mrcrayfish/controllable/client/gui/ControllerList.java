@@ -25,17 +25,6 @@ public class ControllerList extends ExtendedList<ControllerEntry>
     {
         super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
         this.manager = manager;
-        this.manager.addListener(new ControllerAdapter() {
-            @Override
-            public void connected(com.badlogic.gdx.controllers.Controller controller) {
-                reload();
-            }
-
-            @Override
-            public void disconnected(com.badlogic.gdx.controllers.Controller controller) {
-                reload();
-            }
-        });
         this.reload();
     }
 
