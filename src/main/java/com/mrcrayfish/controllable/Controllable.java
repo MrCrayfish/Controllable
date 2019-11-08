@@ -97,7 +97,10 @@ public class Controllable extends ControllerAdapter
             {
                 if(Controllable.controller == null)
                 {
-                    setController((SDL2Controller) sdlController);
+                    if(options.isAutoSelect())
+                    {
+                        setController((SDL2Controller) sdlController);
+                    }
 
                     Minecraft mc = Minecraft.getInstance();
                     if(mc.player != null)
