@@ -171,6 +171,9 @@ public class Controllable extends ControllerAdapter
 
         ButtonBinding.tick();
 
+        float lTriggerValue = Math.abs(controller.getLTriggerValue());
+        float rTriggerValue = Math.abs(controller.getRTriggerValue());
+
         this.processButton(Buttons.A, getButtonState(SDL_CONTROLLER_BUTTON_A));
         this.processButton(Buttons.B, getButtonState(SDL_CONTROLLER_BUTTON_B));
         this.processButton(Buttons.X, getButtonState(SDL_CONTROLLER_BUTTON_X));
@@ -182,8 +185,8 @@ public class Controllable extends ControllerAdapter
         this.processButton(Buttons.RIGHT_THUMB_STICK, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
         this.processButton(Buttons.LEFT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
         this.processButton(Buttons.RIGHT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
-        this.processButton(Buttons.LEFT_TRIGGER, Math.abs(controller.getLTriggerValue()) >= 0.1F);
-        this.processButton(Buttons.RIGHT_TRIGGER, Math.abs(controller.getRTriggerValue()) >= 0.1F);
+        this.processButton(Buttons.LEFT_TRIGGER, lTriggerValue >= 0.1F);
+        this.processButton(Buttons.RIGHT_TRIGGER, rTriggerValue >= 0.1F);
         this.processButton(Buttons.DPAD_UP, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
         this.processButton(Buttons.DPAD_DOWN, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
         this.processButton(Buttons.DPAD_LEFT, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
