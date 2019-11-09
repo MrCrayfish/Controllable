@@ -52,6 +52,10 @@ public class ControllerOptions
         Minecraft mc = Minecraft.getInstance();
         mc.gameSettings.pauseOnLostFocus = !value;
         mc.gameSettings.saveOptions();
+
+        if (!value) {
+            mc.mouseHelper.ungrabMouse();
+        }
     });
 
     public static final SliderPercentageOption DEAD_ZONE = new ControllableSliderPercentageOption("controllable.options.deadZone", 0.0, 1.0, 0.01F, gameSettings -> {
@@ -142,6 +146,10 @@ public class ControllerOptions
                             break;
                         case "virtualMouse":
                             this.virtualMouse = Boolean.valueOf(value);
+
+                            Minecraft mc = Minecraft.getInstance();
+                            mc.gameSettings.pauseOnLostFocus = !Boolean.valueOf(value);
+                            mc.gameSettings.saveOptions();
                             break;
                         case "deadZone":
                             this.deadZone = Double.parseDouble(value);
