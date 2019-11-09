@@ -153,7 +153,9 @@ public class ControllerInput
             {
                 double mouseSpeed = Controllable.getOptions().getMouseSpeed();
                 targetMouseX += mouseSpeed * mouseSpeedX;
+                targetMouseX = (int) clamp(0, mc.mainWindow.getWidth(), targetMouseX);
                 targetMouseY += mouseSpeed * mouseSpeedY;
+                targetMouseY = (int) clamp(0, mc.mainWindow.getHeight(), targetMouseY);
                 lastUse = 100;
             }
 
@@ -205,10 +207,15 @@ public class ControllerInput
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.currentScreen == null)
+
         {
             targetMouseX = prevTargetMouseX = (int) (virtualMouseX = mc.mainWindow.getWidth() / 2F);
             targetMouseY = prevTargetMouseY = (int) (virtualMouseY = mc.mainWindow.getHeight() / 2F);
         }
+    }
+
+    private double clamp(double min, double max, double value) {
+        return Math.max(min, Math.min(max, value));
     }
 
     @SubscribeEvent(receiveCanceled = true)
@@ -824,7 +831,7 @@ public class ControllerInput
                 isLeftClicking = true;
             }
         }
-        return mc.currentScreen == null && isLeftClicking && mc.mouseHelper.isMouseGrabbed();
+        return mc.currentScreen == null && isLeftClicking && (Controllable.getOptions().isVirtualMouse() || mc.mouseHelper.isMouseGrabbed());
     }
 
     /**
