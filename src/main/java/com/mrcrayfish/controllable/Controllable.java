@@ -4,6 +4,7 @@ import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
+import com.mrcrayfish.controllable.event.MiscEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -86,6 +87,7 @@ public class Controllable extends ControllerAdapter
         MinecraftForge.EVENT_BUS.register(input = new ControllerInput());
         MinecraftForge.EVENT_BUS.register(new RenderEvents());
         MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
+        MinecraftForge.EVENT_BUS.register(new MiscEvents());
     }
 
     @Override
