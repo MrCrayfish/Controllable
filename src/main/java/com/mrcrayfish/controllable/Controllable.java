@@ -86,6 +86,8 @@ public class Controllable extends ControllerAdapter
         MinecraftForge.EVENT_BUS.register(input = new ControllerInput());
         MinecraftForge.EVENT_BUS.register(new RenderEvents());
         MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
+
+        mc.mouseHelper = new ControllableMouseHelper(mc);
     }
 
     @Override
