@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.settings;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
@@ -39,6 +40,10 @@ public class ControllerOptions
         return Controllable.getOptions().virtualMouse;
     }, (gameSettings, value) -> {
         Controllable.getOptions().virtualMouse = value;
+
+        Minecraft mc = Minecraft.getInstance();
+        mc.gameSettings.pauseOnLostFocus = !value;
+        mc.gameSettings.saveOptions();
     });
 
     public static final SliderPercentageOption DEAD_ZONE = new ControllableSliderPercentageOption("controllable.options.deadZone", 0.0, 1.0, 0.01F, gameSettings -> {
