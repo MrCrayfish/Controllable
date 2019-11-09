@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.settings;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
@@ -23,6 +24,14 @@ public class ControllerOptions
 {
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
 
+    public static final SliderPercentageOption ICONS = new ControllableSliderPercentageOption("controllable.options.icons", 0, EnumIcons.values().length - 1, 1, gameSettings -> {
+        return (double) Controllable.getOptions().icons.ordinal();
+    }, (gameSettings, value) -> {
+        Controllable.getOptions().icons = EnumIcons.values()[(int) Math.floor(value)];
+    }, (gameSettings, option) -> {
+        return I18n.format("controllable.options.icons.format", Controllable.getOptions().icons.name());
+    });
+
     public static final BooleanOption AUTO_SELECT = new ControllableBooleanOption("controllable.options.autoSelect", gameSettings -> {
         return Controllable.getOptions().autoSelect;
     }, (gameSettings, value) -> {
@@ -39,6 +48,14 @@ public class ControllerOptions
         return Controllable.getOptions().virtualMouse;
     }, (gameSettings, value) -> {
         Controllable.getOptions().virtualMouse = value;
+
+        Minecraft mc = Minecraft.getInstance();
+        mc.gameSettings.pauseOnLostFocus = !value;
+        mc.gameSettings.saveOptions();
+
+        if (!value) {
+            mc.mouseHelper.ungrabMouse();
+        }
     });
 
     public static final SliderPercentageOption DEAD_ZONE = new ControllableSliderPercentageOption("controllable.options.deadZone", 0.0, 1.0, 0.01F, gameSettings -> {
@@ -71,6 +88,7 @@ public class ControllerOptions
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
     private File optionsFile;
+    private EnumIcons icons = EnumIcons.DualShock;
     private boolean autoSelect = true;
     private boolean renderMiniPlayer = true;
     private boolean virtualMouse = true;
@@ -117,6 +135,9 @@ public class ControllerOptions
                 {
                     switch(key)
                     {
+                        case "icons":
+                            icons = EnumIcons.valueOfOrDefault(value);
+                            break;
                         case "autoSelect":
                             this.autoSelect = Boolean.valueOf(value);
                             break;
@@ -125,6 +146,10 @@ public class ControllerOptions
                             break;
                         case "virtualMouse":
                             this.virtualMouse = Boolean.valueOf(value);
+
+                            Minecraft mc = Minecraft.getInstance();
+                            mc.gameSettings.pauseOnLostFocus = !Boolean.valueOf(value);
+                            mc.gameSettings.saveOptions();
                             break;
                         case "deadZone":
                             this.deadZone = Double.parseDouble(value);
@@ -154,6 +179,7 @@ public class ControllerOptions
     {
         try(PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8)))
         {
+            writer.println("icons:" + this.icons.name());
             writer.println("autoSelect:" + this.autoSelect);
             writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
             writer.println("virtualMouse:" + this.virtualMouse);
@@ -165,6 +191,10 @@ public class ControllerOptions
         {
             e.printStackTrace();
         }
+    }
+
+    public EnumIcons getIcons() {
+        return icons;
     }
 
     public boolean isAutoSelect()
