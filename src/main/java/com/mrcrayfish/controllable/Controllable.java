@@ -206,6 +206,11 @@ public class Controllable extends ControllerAdapter
             }
         }
 
+        if (controller == null)
+        {
+            return;
+        }
+
         if(controller.getMapping() != null)
         {
             index = controller.getMapping().remap(index);
