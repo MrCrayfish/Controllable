@@ -207,6 +207,7 @@ public class ControllerInput
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.currentScreen == null)
+
         {
             targetMouseX = prevTargetMouseX = (int) (virtualMouseX = mc.mainWindow.getWidth() / 2F);
             targetMouseY = prevTargetMouseY = (int) (virtualMouseY = mc.mainWindow.getHeight() / 2F);
