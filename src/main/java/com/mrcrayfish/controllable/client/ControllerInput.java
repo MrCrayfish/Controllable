@@ -153,7 +153,9 @@ public class ControllerInput
             {
                 double mouseSpeed = Controllable.getOptions().getMouseSpeed();
                 targetMouseX += mouseSpeed * mouseSpeedX;
+                targetMouseX = (int) clamp(0, mc.mainWindow.getWidth(), targetMouseX);
                 targetMouseY += mouseSpeed * mouseSpeedY;
+                targetMouseY = (int) clamp(0, mc.mainWindow.getHeight(), targetMouseY);
                 lastUse = 100;
             }
 
@@ -209,6 +211,10 @@ public class ControllerInput
             targetMouseX = prevTargetMouseX = (int) (virtualMouseX = mc.mainWindow.getWidth() / 2F);
             targetMouseY = prevTargetMouseY = (int) (virtualMouseY = mc.mainWindow.getHeight() / 2F);
         }
+    }
+
+    private double clamp(double min, double max, double value) {
+        return Math.max(min, Math.min(max, value));
     }
 
     @SubscribeEvent(receiveCanceled = true)
