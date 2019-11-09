@@ -153,7 +153,9 @@ public class ControllerInput
             {
                 double mouseSpeed = Controllable.getOptions().getMouseSpeed();
                 targetMouseX += mouseSpeed * mouseSpeedX;
+                targetMouseX = MathHelper.clamp(targetMouseX, 0, mc.mainWindow.getWidth());
                 targetMouseY += mouseSpeed * mouseSpeedY;
+                targetMouseY = MathHelper.clamp(targetMouseY, 0, mc.mainWindow.getHeight());
                 lastUse = 100;
             }
 
