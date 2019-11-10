@@ -6,6 +6,7 @@ import net.minecraft.client.gui.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.recipebook.RecipeTabToggleWidget;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.ToggleWidget;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -13,6 +14,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +23,7 @@ public class RecipeBookManager
     private final Field fRecipeBookPage = ObfuscationReflectionHelper.findField(RecipeBookGui.class, "field_193022_s");
     private final Field fCurrentPage = ObfuscationReflectionHelper.findField(RecipeBookPage.class, "field_193738_c");
     private final Field fTotalPages = ObfuscationReflectionHelper.findField(RecipeBookPage.class, "field_193737_b");
+    private final Field fButtons = ObfuscationReflectionHelper.findField(RecipeBookPage.class, "field_193743_h");
     private final Method mUpdateButtonsForPage = ObfuscationReflectionHelper.findMethod(RecipeBookPage.class, "func_194198_d");
 
     private final Field fRecipeTabs = ObfuscationReflectionHelper.findField(RecipeBookGui.class, "field_193018_j");
@@ -41,6 +44,7 @@ public class RecipeBookManager
         fRecipeBookPage.setAccessible(true);
         fCurrentPage.setAccessible(true);
         fTotalPages.setAccessible(true);
+        fButtons.setAccessible(true);
         mUpdateButtonsForPage.setAccessible(true);
 
         fRecipeTabs.setAccessible(true);
@@ -162,5 +166,20 @@ public class RecipeBookManager
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<Widget> getWidgets(RecipeBookGui screen)
+    {
+        List<Widget> widgets = new ArrayList<>();
+        try {
+            widgets.addAll((List<? extends Widget>) fRecipeTabs.get(screen));
+            RecipeBookPage page = (RecipeBookPage) fRecipeBookPage.get(screen);
+            widgets.addAll((List<? extends Widget>) fButtons.get(page));
+        }
+        catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+        return widgets;
     }
 }
