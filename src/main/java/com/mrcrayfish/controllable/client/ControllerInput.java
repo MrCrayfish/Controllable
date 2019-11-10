@@ -208,8 +208,8 @@ public class ControllerInput
         Minecraft mc = Minecraft.getInstance();
         if(mc.currentScreen == null)
         {
-            targetMouseX = prevTargetMouseX = (int) (virtualMouseX = mc.mainWindow.getWidth() / 2F);
-            targetMouseY = prevTargetMouseY = (int) (virtualMouseY = mc.mainWindow.getHeight() / 2F);
+            virtualMouseX = targetMouseX = prevTargetMouseX = (int) (mc.mainWindow.getWidth() / 2F);
+            virtualMouseY = targetMouseY = prevTargetMouseY = (int) (mc.mainWindow.getHeight() / 2F);
         }
     }
 
@@ -449,8 +449,6 @@ public class ControllerInput
                         mc.getTutorial().openInventory();
                         mc.displayGuiScreen(new InventoryScreen(mc.player));
                     }
-                    prevTargetMouseX = targetMouseX = (int) mc.mouseHelper.getMouseX();
-                    prevTargetMouseY = targetMouseY = (int) mc.mouseHelper.getMouseY();
                 }
                 else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
