@@ -256,7 +256,9 @@ public class ControllerInput
                 Minecraft minecraft = event.getGui().getMinecraft();
                 if(minecraft.player == null || minecraft.player.inventory.getItemStack().isEmpty())
                 {
-                    GlStateManager.translated(virtualMouseX / minecraft.mainWindow.getGuiScaleFactor(), virtualMouseY / minecraft.mainWindow.getGuiScaleFactor(), 300);
+                    double mouseX = (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * Minecraft.getInstance().getRenderPartialTicks());
+                    double mouseY = (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * Minecraft.getInstance().getRenderPartialTicks());
+                    GlStateManager.translated(mouseX / minecraft.mainWindow.getGuiScaleFactor(), mouseY / minecraft.mainWindow.getGuiScaleFactor(), 300);
                     GlStateManager.color3f(1.0F, 1.0F, 1.0F);
                     GlStateManager.disableLighting();
                     event.getGui().getMinecraft().getTextureManager().bindTexture(CURSOR_TEXTURE);
