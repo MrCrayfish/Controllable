@@ -826,7 +826,8 @@ public class ControllerInput
                 isLeftClicking = true;
             }
         }
-        return mc.currentScreen == null && isLeftClicking && mc.mouseHelper.isMouseGrabbed();
+        boolean usingVirtualMouse = (Controllable.getOptions().isVirtualMouse() && Controllable.getInput().getLastUse() > 0);
+        return mc.currentScreen == null && isLeftClicking && (mc.mouseHelper.isMouseGrabbed() || usingVirtualMouse);
     }
 
     /**
