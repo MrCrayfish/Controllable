@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.AbstractSlider;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.client.util.NativeUtil;
@@ -33,12 +34,14 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import org.codehaus.plexus.util.ReflectionUtils;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,6 +55,7 @@ import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_UP;
 public class ControllerInput
 {
     private List<Widget> widgets = new ArrayList<>();
+    private Screen prevScreen = null;
 
     private static final ResourceLocation CURSOR_TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/cursor.png");
 
@@ -109,12 +113,10 @@ public class ControllerInput
             if(mc.mouseHelper.isMouseGrabbed())
                 return;
 
-            if (mc.currentScreen == null)
+            if (mc.currentScreen == null || mc.currentScreen != prevScreen)
             {
-                if (widgets.size() != 0)
-                {
-                    widgets.clear();
-                }
+                widgets.clear();
+                prevScreen = mc.currentScreen;
             }
 
             if(mc.currentScreen == null || mc.currentScreen instanceof ControllerLayoutScreen)
@@ -213,16 +215,6 @@ public class ControllerInput
                 }
             }
         }
-    }
-
-    @SubscribeEvent(receiveCanceled = true)
-    public void onGuiInit(GuiScreenEvent.InitGuiEvent event)
-    {
-        widgets.clear();
-        widgets.addAll(event.getWidgetList());
-        // TODO: Un-Comment after 'Feature: Recipe book controls' PR has been merged
-//        if(event.getGui() instanceof IRecipeShownListener)
-//            widgets.addAll(Controllable.getRecipeBookManager().getWidgets());
     }
 
     @SubscribeEvent(receiveCanceled = true)
@@ -647,22 +639,100 @@ public class ControllerInput
         }
     }
 
+    private List<Widget> getWidgets(Object parent)
+    {
+        return getWidgets(parent, 0);
+    }
+
+    private List<Widget> getWidgets(Object parent, int level) {
+        List<Widget> widgets = new ArrayList<>();
+        if (parent == null || (level != 0 && parent instanceof Screen)) return widgets;
+        Class clazz = parent.getClass();
+        if (clazz.isPrimitive()) return widgets;
+
+        if (parent instanceof Widget) {
+            widgets.add((Widget) parent);
+            return widgets;
+        }
+        List<Field> fields = ReflectionUtils.getFieldsIncludingSuperclasses(parent.getClass()).stream()
+                .filter(f -> !f.getType().isPrimitive()).collect(Collectors.toList());
+        List<Field> wFeilds = fields.stream()
+                .filter(f -> Widget.class.isAssignableFrom(f.getType()) || List.class.isAssignableFrom(f.getType()))
+                .collect(Collectors.toList());
+        try {
+            for (Field f : fields) {
+                boolean accessible = f.isAccessible();
+                f.setAccessible(true);
+                Object o = f.get(parent);
+                {
+                    if (o instanceof List) {
+                        List l = (List) f.get(parent);
+                        if (l != null && !l.isEmpty()) {
+                            widgets.addAll(
+                                    (Collection<? extends Widget>) l.stream()
+                                            .filter(i -> i instanceof Widget).collect(Collectors.toList())
+                            );
+                        }
+                    } else if (o instanceof Widget) {
+                        widgets.add((Widget) f.get(parent));
+                    }
+                }
+                f.setAccessible(accessible);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        if (level + 1 < 4) {
+            fields.removeAll(wFeilds);
+            fields.forEach(f -> {
+                boolean accessible = f.isAccessible();
+                f.setAccessible(true);
+                try {
+                    Object o = f.get(parent);
+                    if (o != null)
+                    {
+                        widgets.addAll(getWidgets(o, level + 1));
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                f.setAccessible(accessible);
+            });
+
+        }
+        return widgets;
+    }
+
     private void moveMouseToClosestButton(boolean moving, Screen screen)
     {
         /* Makes the mouse attracted to widgets. This helps with selecting widgets when using
          * a controller. */
         Minecraft mc = Minecraft.getInstance();
+
+        if (widgets.isEmpty()) {
+            widgets.addAll(getWidgets(mc.currentScreen));
+        }
+
         int mouseX = (int) (targetMouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth());
         int mouseY = (int) (targetMouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight());
 
-        if (widgets.isEmpty())
-            return;
+        if (widgets.isEmpty()) return;
 
-        Widget closestWidget = widgets.stream().filter(e -> e.isHovered()).collect(Collectors.toList()).get(0);
+        Widget closestWidget = null;
+
+        for (Widget widget : widgets) {
+            if (widget.isHovered())
+            {
+                closestWidget = widget;
+            }
+        }
 
         if(closestWidget != null && closestWidget.visible)
         {
+
             int posX = closestWidget.x + (closestWidget.getWidth() / 2);
+            if (closestWidget instanceof AbstractSlider)
+                posX = mouseX;
             int posY = closestWidget.y + (closestWidget.getHeight() / 2);
             moveCursor(moving, mc, mouseX, mouseY, posX, posY);
         }
