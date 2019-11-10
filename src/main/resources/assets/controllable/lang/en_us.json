@@ -26,6 +26,7 @@
   "controllable.gui.settings": "Settings",
   "controllable.gui.remap": "Remap Buttons",
   "controllable.gui.back": "Back",
+  "controllable.options.forceFeedback": "Vibration",
   "controllable.options.autoSelect": "Auto Select",
   "controllable.options.deadZone": "Dead Zone",
   "controllable.options.deadZone.format": "Dead Zone: %s",
