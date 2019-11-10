@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -521,12 +522,20 @@ public class ControllerInput
                     {
                         scrollCreativeTabs((CreativeScreen) mc.currentScreen, 1);
                     }
+                    else if(mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        Controllable.getRecipeBookManager().toggleRecipeBook((ContainerScreen) mc.currentScreen);
+                    }
                 }
                 else if(ButtonBindings.SCROLL_LEFT.isButtonPressed())
                 {
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
                         scrollCreativeTabs((CreativeScreen) mc.currentScreen, -1);
+                    }
+                    else if(mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        Controllable.getRecipeBookManager().toggleCraftableFilter(((IRecipeShownListener) mc.currentScreen).func_194310_f());
                     }
                 }
                 else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
@@ -547,6 +556,34 @@ public class ControllerInput
                 else if(button == Buttons.B && mc.player != null && mc.player.inventory.getItemStack().isEmpty())
                 {
                     invokeMouseClick(mc.currentScreen, 0);
+                }
+                else if(button == Buttons.DPAD_LEFT)
+                {
+                    if (mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        Controllable.getRecipeBookManager().prevPage(((IRecipeShownListener) mc.currentScreen).func_194310_f());
+                    }
+                }
+                else if(button == Buttons.DPAD_RIGHT)
+                {
+                    if (mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        Controllable.getRecipeBookManager().nextPage(((IRecipeShownListener) mc.currentScreen).func_194310_f());
+                    }
+                }
+                else if(button == Buttons.DPAD_UP)
+                {
+                    if (mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        Controllable.getRecipeBookManager().prevTab(((IRecipeShownListener) mc.currentScreen).func_194310_f());
+                    }
+                }
+                else if(button == Buttons.DPAD_DOWN)
+                {
+                    if (mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        Controllable.getRecipeBookManager().nextTab(((IRecipeShownListener) mc.currentScreen).func_194310_f());
+                    }
                 }
             }
         }
@@ -636,6 +673,11 @@ public class ControllerInput
             int guiTop = (guiContainer.height - guiContainer.getYSize()) / 2;
             int mouseX = (int) (targetMouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth());
             int mouseY = (int) (targetMouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight());
+
+            if (screen instanceof IRecipeShownListener && Controllable.getRecipeBookManager().isOffsetNextToMainGUI(((IRecipeShownListener) screen).func_194310_f()))
+            {
+                guiLeft += 78;
+            }
 
             //Slot closestSlot = guiContainer.getSlotUnderMouse();
 

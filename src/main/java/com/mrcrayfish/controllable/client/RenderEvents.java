@@ -9,6 +9,7 @@ import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IngameGui;
+import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.Widget;
@@ -65,6 +66,25 @@ public class RenderEvents
                 {
                     actions.put(Buttons.A, new Action(I18n.format("controllable.action.place_stack"), Action.Side.LEFT));
                     actions.put(Buttons.X, new Action(I18n.format("controllable.action.place_item"), Action.Side.LEFT));
+                }
+
+                if (mc.currentScreen instanceof IRecipeShownListener)
+                {
+                    actions.put(Buttons.RIGHT_BUMPER, new Action(I18n.format("controllable.action.recipe_book.toggle"), Action.Side.LEFT));
+                    if (((IRecipeShownListener) mc.currentScreen).func_194310_f().isVisible())
+                    {
+                        actions.put(Buttons.LEFT_BUMPER, new Action(I18n.format("controllable.action.recipe_book.filter_toggle"), Action.Side.LEFT));
+                        if (Controllable.getRecipeBookManager().getTotalPages(((IRecipeShownListener) mc.currentScreen).func_194310_f()) > 1)
+                        {
+                            actions.put(Buttons.DPAD_LEFT, new Action(I18n.format("controllable.action.recipe_book.prev_page"), Action.Side.LEFT));
+                            actions.put(Buttons.DPAD_RIGHT, new Action(I18n.format("controllable.action.recipe_book.next_page"), Action.Side.LEFT));
+                        }
+                        if (Controllable.getRecipeBookManager().getTabCount(((IRecipeShownListener) mc.currentScreen).func_194310_f()) > 1)
+                        {
+                            actions.put(Buttons.DPAD_UP, new Action(I18n.format("controllable.action.recipe_book.prev_tab"), Action.Side.LEFT));
+                            actions.put(Buttons.DPAD_DOWN, new Action(I18n.format("controllable.action.recipe_book.next_tab"), Action.Side.LEFT));
+                        }
+                    }
                 }
 
                 actions.put(Buttons.Y, new Action(I18n.format("controllable.action.close_inventory"), Action.Side.RIGHT));

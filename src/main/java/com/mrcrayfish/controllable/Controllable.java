@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable;
 import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.gui.RecipeBookManager;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
@@ -34,6 +35,7 @@ public class Controllable extends ControllerAdapter
     private static SDL2ControllerManager manager;
     private static Controller controller;
     private static ControllerInput input;
+    private static RecipeBookManager recipeBookManager;
 
     public Controllable()
     {
@@ -57,11 +59,17 @@ public class Controllable extends ControllerAdapter
         return input;
     }
 
+    public static RecipeBookManager getRecipeBookManager() {
+        return recipeBookManager;
+    }
+
     private void onClientSetup(FMLClientSetupEvent event)
     {
         /* Loads up the controller manager and setup shutdown cleanup */
         Controllable.manager = new SDL2ControllerManager();
         Controllable.manager.addListenerAndRunForConnectedControllers(this);
+
+        recipeBookManager = new RecipeBookManager();
 
         Minecraft mc = event.getMinecraftSupplier().get();
         File configFolder = new File(mc.gameDir, "config");
