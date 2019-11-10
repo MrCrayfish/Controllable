@@ -212,6 +212,8 @@ public class ControllerInput
         {
             nearSlot = false;
             moved = false;
+            mouseSpeedX = 0.0;
+            mouseSpeedY = 0.0;
             virtualMouseX = targetMouseX = prevTargetMouseX = (int) (mc.mainWindow.getWidth() / 2F);
             virtualMouseY = targetMouseY = prevTargetMouseY = (int) (mc.mainWindow.getHeight() / 2F);
         }
