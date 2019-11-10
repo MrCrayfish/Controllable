@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.client.util.NativeUtil;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,6 +38,9 @@ import org.lwjgl.glfw.GLFW;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_DOWN;
 import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_UP;
@@ -47,6 +51,8 @@ import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_UP;
 @OnlyIn(Dist.CLIENT)
 public class ControllerInput
 {
+    private List<Widget> widgets = new ArrayList<>();
+
     private static final ResourceLocation CURSOR_TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/cursor.png");
 
     private int lastUse = 0;
@@ -102,6 +108,14 @@ public class ControllerInput
             Minecraft mc = Minecraft.getInstance();
             if(mc.mouseHelper.isMouseGrabbed())
                 return;
+
+            if (mc.currentScreen == null)
+            {
+                if (widgets.size() != 0)
+                {
+                    widgets.clear();
+                }
+            }
 
             if(mc.currentScreen == null || mc.currentScreen instanceof ControllerLayoutScreen)
                 return;
@@ -160,6 +174,7 @@ public class ControllerInput
             prevXAxis = controller.getLThumbStickXValue();
             prevYAxis = controller.getLThumbStickYValue();
 
+            this.moveMouseToClosestButton(moving, mc.currentScreen);
             this.moveMouseToClosestSlot(moving, mc.currentScreen);
 
             if(mc.currentScreen instanceof CreativeScreen)
@@ -198,6 +213,16 @@ public class ControllerInput
                 }
             }
         }
+    }
+
+    @SubscribeEvent(receiveCanceled = true)
+    public void onGuiInit(GuiScreenEvent.InitGuiEvent event)
+    {
+        widgets.clear();
+        widgets.addAll(event.getWidgetList());
+        // TODO: Un-Comment after 'Feature: Recipe book controls' PR has been merged
+//        if(event.getGui() instanceof IRecipeShownListener)
+//            widgets.addAll(Controllable.getRecipeBookManager().getWidgets());
     }
 
     @SubscribeEvent(receiveCanceled = true)
@@ -622,6 +647,32 @@ public class ControllerInput
         }
     }
 
+    private void moveMouseToClosestButton(boolean moving, Screen screen)
+    {
+        /* Makes the mouse attracted to widgets. This helps with selecting widgets when using
+         * a controller. */
+        Minecraft mc = Minecraft.getInstance();
+        int mouseX = (int) (targetMouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth());
+        int mouseY = (int) (targetMouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight());
+
+        if (widgets.isEmpty())
+            return;
+
+        Widget closestWidget = widgets.stream().filter(e -> e.isHovered()).collect(Collectors.toList()).get(0);
+
+        if(closestWidget != null && closestWidget.visible)
+        {
+            int posX = closestWidget.x + (closestWidget.getWidth() / 2);
+            int posY = closestWidget.y + (closestWidget.getHeight() / 2);
+            moveCursor(moving, mc, mouseX, mouseY, posX, posY);
+        }
+        else
+        {
+            mouseSpeedX *= 0.1F;
+            mouseSpeedY *= 0.1F;
+        }
+    }
+
     private void moveMouseToClosestSlot(boolean moving, Screen screen)
     {
         nearSlot = false;
@@ -660,27 +711,7 @@ public class ControllerInput
                 nearSlot = true;
                 int slotCenterXScaled = guiLeft + closestSlot.xPos + 8;
                 int slotCenterYScaled = guiTop + closestSlot.yPos + 8;
-                int slotCenterX = (int) (slotCenterXScaled / ((double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth()));
-                int slotCenterY = (int) (slotCenterYScaled / ((double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight()));
-                double deltaX = slotCenterX - targetMouseX;
-                double deltaY = slotCenterY - targetMouseY;
-
-                if(!moving)
-                {
-                    if(mouseX != slotCenterXScaled || mouseY != slotCenterYScaled)
-                    {
-                        targetMouseX += deltaX * 0.75;
-                        targetMouseY += deltaY * 0.75;
-                    }
-                    else
-                    {
-                        mouseSpeedX = 0.0F;
-                        mouseSpeedY = 0.0F;
-                    }
-                }
-
-                mouseSpeedX *= 0.75F;
-                mouseSpeedY *= 0.75F;
+                moveCursor(moving, mc, mouseX, mouseY, slotCenterXScaled, slotCenterYScaled);
             }
             else
             {
@@ -693,6 +724,31 @@ public class ControllerInput
             mouseSpeedX = 0.0F;
             mouseSpeedY = 0.0F;
         }
+    }
+
+    private void moveCursor(boolean moving, Minecraft mc, int mouseX, int mouseY, int posX, int posY)
+    {
+        int centerX = (int) (posX / ((double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth()));
+        int centerY = (int) (posY / ((double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight()));
+        double deltaX = centerX - targetMouseX;
+        double deltaY = centerY - targetMouseY;
+
+        if(!moving)
+        {
+            if(mouseX != posX || mouseY != posY)
+            {
+                targetMouseX += deltaX * 0.75;
+                targetMouseY += deltaY * 0.75;
+            }
+            else
+            {
+                mouseSpeedX = 0.0F;
+                mouseSpeedY = 0.0F;
+            }
+        }
+
+        mouseSpeedX *= 0.75F;
+        mouseSpeedY *= 0.75F;
     }
 
     private void handleCreativeScrolling(CreativeScreen creative, Controller controller)
