@@ -64,6 +64,7 @@ public class ControllerInput
     private int targetMouseY;
     private double mouseSpeedX;
     private double mouseSpeedY;
+    private boolean moved;
 
     private int dropCounter = -1;
 
@@ -157,6 +158,7 @@ public class ControllerInput
                 targetMouseY += mouseSpeed * mouseSpeedY;
                 targetMouseY = MathHelper.clamp(targetMouseY, 0, mc.mainWindow.getHeight());
                 lastUse = 100;
+                moved = true;
             }
 
             prevXAxis = controller.getLThumbStickXValue();
@@ -208,6 +210,8 @@ public class ControllerInput
         Minecraft mc = Minecraft.getInstance();
         if(mc.currentScreen == null)
         {
+            nearSlot = false;
+            moved = false;
             virtualMouseX = targetMouseX = prevTargetMouseX = (int) (mc.mainWindow.getWidth() / 2F);
             virtualMouseY = targetMouseY = prevTargetMouseY = (int) (mc.mainWindow.getHeight() / 2F);
         }
@@ -630,6 +634,9 @@ public class ControllerInput
          * a controller. */
         if(screen instanceof ContainerScreen)
         {
+            /* Prevents cursor from moving until at least some input is detected */
+            if(!moved) return;
+
             Minecraft mc = Minecraft.getInstance();
             ContainerScreen guiContainer = (ContainerScreen) screen;
             int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
