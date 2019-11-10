@@ -54,6 +54,7 @@ public class RecipeBookManager
         mSendUpdateSettings.setAccessible(true);
 
         fGuiLeft.setAccessible(true);
+        fXSize.setAccessible(true);
     }
 
     public int getTotalPages(RecipeBookGui screen) {
