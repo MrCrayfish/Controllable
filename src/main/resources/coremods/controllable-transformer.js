@@ -128,7 +128,7 @@ var FrameNode = Java.type('org.objectweb.asm.tree.FrameNode');
 
 function patch_Minecraft_sendClickBlockToController(method) {
     method.instructions.insert(new VarInsnNode(Opcodes.ISTORE, 1));
-    method.instructions.insert(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "isLeftClicking", "()Z", false));
+    method.instructions.insert(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "isLeftClicking", "()Z", false));
     return true;
 }
 
@@ -162,7 +162,7 @@ function patch_Minecraft_processKeyBinds(method) {
         if(!removeNthNodes(method.instructions, foundNode, -3))
             return false;
         method.instructions.remove(foundNode);
-        method.instructions.insertBefore(nextNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "isRightClicking", "()Z", false));
+        method.instructions.insertBefore(nextNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "isRightClicking", "()Z", false));
         return true;
     }
     return false;
@@ -222,7 +222,7 @@ function patchQuickMove(method) {
         if(!removeNthNodes(method.instructions, foundNode, -3))
             return false;
         method.instructions.remove(foundNode);
-        method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "canQuickMove", "()Z", false));
+        method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "canQuickMove", "()Z", false));
         return true;
     }
     return false;
@@ -263,7 +263,7 @@ function patch_ForgeIngameGui_renderPlayerList(method) {
     {
         if(!removeNthNodes(method.instructions, foundNode, -3))
             return false;
-        method.instructions.insert(foundNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "canShowPlayerList", "()Z", false));
+        method.instructions.insert(foundNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "canShowPlayerList", "()Z", false));
         method.instructions.remove(foundNode);
         return true;
     }
@@ -295,7 +295,7 @@ function patch_GameRenderer_updateCameraAndRender(method) {
     if(foundNode !== null) {
         var previousNode = foundNode.getPrevious();
         method.instructions.remove(foundNode);
-        method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/screen/Screen;IIF)V", false))
+        method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/screen/Screen;IIF)V", false))
         return true;
     }
     return false;
