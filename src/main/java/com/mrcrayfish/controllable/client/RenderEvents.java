@@ -35,8 +35,6 @@ public class RenderEvents
 {
     private static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Reference.MOD_ID, "textures/gui/buttons.png");
 
-    private float prevHealth = -1;
-
     private Map<Integer, Action> actions = new HashMap<>();
 
     @SubscribeEvent
@@ -45,27 +43,6 @@ public class RenderEvents
         Minecraft mc = Minecraft.getInstance();
         if(event.phase == TickEvent.Phase.START && mc.player != null && !mc.gameSettings.hideGUI)
         {
-            if (Controllable.getOptions().useForceFeedback())
-            {
-                if (prevHealth == -1)
-                    prevHealth = mc.player.getHealth();
-
-                if (prevHealth > mc.player.getHealth())
-                {
-                    Controller controller = Controllable.getController();
-                    if (controller != null)
-                    {
-                        float difference = prevHealth - mc.player.getHealth();
-                        float magnitude = difference / mc.player.getMaxHealth();
-                        controller.getSDL2Controller().rumble(1f, 1f, (int) (1000 * magnitude));
-                    }
-                    prevHealth = mc.player.getHealth();
-                }
-
-                if (prevHealth < mc.player.getHealth())
-                    prevHealth = mc.player.getHealth();
-            }
-
             actions = new HashMap<>();
 
             if(mc.currentScreen instanceof ContainerScreen)

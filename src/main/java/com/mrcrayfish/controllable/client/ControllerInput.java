@@ -65,6 +65,8 @@ public class ControllerInput
     private double mouseSpeedX;
     private double mouseSpeedY;
 
+    private float prevHealth = -1;
+
     private int dropCounter = -1;
 
     public double getVirtualMouseX()
@@ -87,6 +89,8 @@ public class ControllerInput
     {
         if(event.phase == TickEvent.Phase.START)
         {
+
+
             prevTargetMouseX = targetMouseX;
             prevTargetMouseY = targetMouseY;
 
@@ -102,6 +106,26 @@ public class ControllerInput
             Minecraft mc = Minecraft.getInstance();
             if(mc.mouseHelper.isMouseGrabbed())
                 return;
+
+            if (Controllable.getOptions().useForceFeedback())
+            {
+                if (mc.world == null && prevHealth != -1)
+                    prevHealth = -1;
+
+                if (prevHealth == -1)
+                    prevHealth = mc.player.getHealth();
+
+                if (prevHealth > mc.player.getHealth())
+                {
+                    float difference = prevHealth - mc.player.getHealth();
+                    float magnitude = difference / mc.player.getMaxHealth();
+                    controller.getSDL2Controller().rumble(1f, 1f, (int) (1000 * magnitude));
+                    prevHealth = mc.player.getHealth();
+                }
+
+                if (prevHealth < mc.player.getHealth())
+                    prevHealth = mc.player.getHealth();
+            }
 
             if(mc.currentScreen == null || mc.currentScreen instanceof ControllerLayoutScreen)
                 return;
