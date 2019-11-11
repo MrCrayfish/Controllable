@@ -100,6 +100,11 @@ public class ControllerInput
             if(controller == null)
                 return;
 
+            if(Math.abs(controller.getLTriggerValue()) >= 0.1F || Math.abs(controller.getRTriggerValue()) >= 0.1F)
+            {
+                lastUse = 100;
+            }
+
             Minecraft mc = Minecraft.getInstance();
             if(mc.mouseHelper.isMouseGrabbed())
                 return;
