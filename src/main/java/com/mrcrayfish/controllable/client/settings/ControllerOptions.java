@@ -23,6 +23,12 @@ public class ControllerOptions
 {
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
 
+    public static final BooleanOption FORCE_FEEDBACK = new ControllableBooleanOption("controllable.options.forceFeedback", gameSettings -> {
+        return Controllable.getOptions().useForceFeedback();
+    }, (gameSettings, value) -> {
+        Controllable.getOptions().forceFeedback = value;
+    });
+
     public static final BooleanOption AUTO_SELECT = new ControllableBooleanOption("controllable.options.autoSelect", gameSettings -> {
         return Controllable.getOptions().autoSelect;
     }, (gameSettings, value) -> {
@@ -71,6 +77,7 @@ public class ControllerOptions
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
     private File optionsFile;
+    private boolean forceFeedback = true;
     private boolean autoSelect = true;
     private boolean renderMiniPlayer = true;
     private boolean virtualMouse = true;
@@ -117,6 +124,9 @@ public class ControllerOptions
                 {
                     switch(key)
                     {
+                        case "forceFeedback":
+                            this.forceFeedback = Boolean.valueOf(value);
+                            break;
                         case "autoSelect":
                             this.autoSelect = Boolean.valueOf(value);
                             break;
@@ -154,6 +164,7 @@ public class ControllerOptions
     {
         try(PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8)))
         {
+            writer.println("forceFeedback:" + this.forceFeedback);
             writer.println("autoSelect:" + this.autoSelect);
             writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
             writer.println("virtualMouse:" + this.virtualMouse);
@@ -165,6 +176,11 @@ public class ControllerOptions
         {
             e.printStackTrace();
         }
+    }
+
+    public boolean useForceFeedback()
+    {
+        return this.forceFeedback;
     }
 
     public boolean isAutoSelect()
