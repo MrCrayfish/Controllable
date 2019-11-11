@@ -64,6 +64,7 @@ public class ControllerInput
     private int targetMouseY;
     private double mouseSpeedX;
     private double mouseSpeedY;
+    private boolean moved;
 
     private int dropCounter = -1;
 
@@ -98,6 +99,11 @@ public class ControllerInput
             Controller controller = Controllable.getController();
             if(controller == null)
                 return;
+
+            if(Math.abs(controller.getLTriggerValue()) >= 0.1F || Math.abs(controller.getRTriggerValue()) >= 0.1F)
+            {
+                lastUse = 100;
+            }
 
             Minecraft mc = Minecraft.getInstance();
             if(mc.mouseHelper.isMouseGrabbed())
@@ -153,8 +159,11 @@ public class ControllerInput
             {
                 double mouseSpeed = Controllable.getOptions().getMouseSpeed();
                 targetMouseX += mouseSpeed * mouseSpeedX;
+                targetMouseX = MathHelper.clamp(targetMouseX, 0, mc.mainWindow.getWidth());
                 targetMouseY += mouseSpeed * mouseSpeedY;
+                targetMouseY = MathHelper.clamp(targetMouseY, 0, mc.mainWindow.getHeight());
                 lastUse = 100;
+                moved = true;
             }
 
             prevXAxis = controller.getLThumbStickXValue();
@@ -206,8 +215,12 @@ public class ControllerInput
         Minecraft mc = Minecraft.getInstance();
         if(mc.currentScreen == null)
         {
-            targetMouseX = prevTargetMouseX = (int) (virtualMouseX = mc.mainWindow.getWidth() / 2F);
-            targetMouseY = prevTargetMouseY = (int) (virtualMouseY = mc.mainWindow.getHeight() / 2F);
+            nearSlot = false;
+            moved = false;
+            mouseSpeedX = 0.0;
+            mouseSpeedY = 0.0;
+            virtualMouseX = targetMouseX = prevTargetMouseX = (int) (mc.mainWindow.getWidth() / 2F);
+            virtualMouseY = targetMouseY = prevTargetMouseY = (int) (mc.mainWindow.getHeight() / 2F);
         }
     }
 
@@ -245,14 +258,21 @@ public class ControllerInput
         {
             GlStateManager.pushMatrix();
             {
+                CursorType type = Controllable.getOptions().getCursorType();
                 Minecraft minecraft = event.getGui().getMinecraft();
-                if(minecraft.player == null || minecraft.player.inventory.getItemStack().isEmpty())
+                if(minecraft.player == null || (minecraft.player.inventory.getItemStack().isEmpty() || type == CursorType.CONSOLE))
                 {
-                    GlStateManager.translated(virtualMouseX / minecraft.mainWindow.getGuiScaleFactor(), virtualMouseY / minecraft.mainWindow.getGuiScaleFactor(), 300);
+                    double mouseX = (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * Minecraft.getInstance().getRenderPartialTicks());
+                    double mouseY = (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * Minecraft.getInstance().getRenderPartialTicks());
+                    GlStateManager.translated(mouseX / minecraft.mainWindow.getGuiScaleFactor(), mouseY / minecraft.mainWindow.getGuiScaleFactor(), 500);
                     GlStateManager.color3f(1.0F, 1.0F, 1.0F);
                     GlStateManager.disableLighting();
                     event.getGui().getMinecraft().getTextureManager().bindTexture(CURSOR_TEXTURE);
-                    Screen.blit(-8, -8, 16, 16, nearSlot ? 16 : 0, 0, 16, 16, 32, 32);
+                    if(type == CursorType.CONSOLE)
+                    {
+                        GlStateManager.scaled(0.5, 0.5, 0.5);
+                    }
+                    Screen.blit(-8, -8, 16, 16, nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
                 }
             }
             GlStateManager.popMatrix();
@@ -447,8 +467,6 @@ public class ControllerInput
                         mc.getTutorial().openInventory();
                         mc.displayGuiScreen(new InventoryScreen(mc.player));
                     }
-                    prevTargetMouseX = targetMouseX = (int) mc.mouseHelper.getMouseX();
-                    prevTargetMouseY = targetMouseY = (int) mc.mouseHelper.getMouseY();
                 }
                 else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
@@ -630,6 +648,9 @@ public class ControllerInput
          * a controller. */
         if(screen instanceof ContainerScreen)
         {
+            /* Prevents cursor from moving until at least some input is detected */
+            if(!moved) return;
+
             Minecraft mc = Minecraft.getInstance();
             ContainerScreen guiContainer = (ContainerScreen) screen;
             int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
@@ -807,79 +828,5 @@ public class ControllerInput
                 }
             }, "mouseReleased event handler", screen.getClass().getCanonicalName());
         }
-    }
-
-    /**
-     * Used in order to fix block breaking progress. This method is linked via ASM.
-     */
-    public static boolean isLeftClicking()
-    {
-        Minecraft mc = Minecraft.getInstance();
-        boolean isLeftClicking = mc.gameSettings.keyBindAttack.isKeyDown();
-        Controller controller = Controllable.getController();
-        if(controller != null)
-        {
-            if(ButtonBindings.ATTACK.isButtonDown())
-            {
-                isLeftClicking = true;
-            }
-        }
-        return mc.currentScreen == null && isLeftClicking && mc.mouseHelper.isMouseGrabbed();
-    }
-
-    /**
-     * Used in order to fix actions like eating or pulling bow back. This method is linked via ASM.
-     */
-    @SuppressWarnings("unused")
-    public static boolean isRightClicking()
-    {
-        Minecraft mc = Minecraft.getInstance();
-        boolean isRightClicking = mc.gameSettings.keyBindUseItem.isKeyDown();
-        Controller controller = Controllable.getController();
-        if(controller != null)
-        {
-            if(ButtonBindings.USE_ITEM.isButtonDown())
-            {
-                isRightClicking = true;
-            }
-        }
-        return isRightClicking;
-    }
-
-    /**
-     * Used in order to fix the quick move check in inventories. This method is linked via ASM.
-     */
-    @SuppressWarnings("unused")
-    public static boolean canQuickMove()
-    {
-        boolean canQuickMove = InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT) || InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
-        Controller controller = Controllable.getController();
-        if(controller != null)
-        {
-            if(ButtonBindings.QUICK_MOVE.isButtonDown())
-            {
-                canQuickMove = true;
-            }
-        }
-        return canQuickMove;
-    }
-
-    /**
-     * Allows the player list to be shown. This method is linked via ASM.
-     */
-    @SuppressWarnings("unused")
-    public static boolean canShowPlayerList()
-    {
-        Minecraft mc = Minecraft.getInstance();
-        boolean canShowPlayerList = mc.gameSettings.keyBindPlayerList.isKeyDown();
-        Controller controller = Controllable.getController();
-        if(controller != null)
-        {
-            if(ButtonBindings.PLAYER_LIST.isButtonDown())
-            {
-                canShowPlayerList = true;
-            }
-        }
-        return canShowPlayerList;
     }
 }

@@ -13,7 +13,7 @@ import net.minecraft.util.text.TranslationTextComponent;
  */
 public class SettingsScreen extends Screen
 {
-    private static final AbstractOption[] OPTIONS = new AbstractOption[]{ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED};
+    private static final AbstractOption[] OPTIONS = new AbstractOption[]{ControllerOptions.FORCE_FEEDBACK, ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.CONSOLE_HOTBAR, ControllerOptions.CURSOR_TYPE, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED};
     private final Screen parentScreen;
 
     protected SettingsScreen(Screen parentScreen)

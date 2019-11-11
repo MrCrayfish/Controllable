@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.settings;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.CursorType;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
@@ -23,6 +24,12 @@ public class ControllerOptions
 {
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
 
+    public static final BooleanOption FORCE_FEEDBACK = new ControllableBooleanOption("controllable.options.forceFeedback", gameSettings -> {
+        return Controllable.getOptions().forceFeedback;
+    }, (gameSettings, value) -> {
+        Controllable.getOptions().forceFeedback = value;
+    });
+
     public static final BooleanOption AUTO_SELECT = new ControllableBooleanOption("controllable.options.autoSelect", gameSettings -> {
         return Controllable.getOptions().autoSelect;
     }, (gameSettings, value) -> {
@@ -39,6 +46,21 @@ public class ControllerOptions
         return Controllable.getOptions().virtualMouse;
     }, (gameSettings, value) -> {
         Controllable.getOptions().virtualMouse = value;
+    });
+
+    public static final BooleanOption CONSOLE_HOTBAR = new ControllableBooleanOption("controllable.options.consoleHotbar", gameSettings -> {
+        return Controllable.getOptions().consoleHotbar;
+    }, (gameSettings, value) -> {
+        Controllable.getOptions().consoleHotbar = value;
+    });
+
+    public static final ControllableEnumOption<CursorType> CURSOR_TYPE = new ControllableEnumOption<>("controllable.options.cursorType", CursorType.class, gameSettings -> {
+        return Controllable.getOptions().cursorType;
+    }, (gameSettings, cursorType) -> {
+        Controllable.getOptions().cursorType = cursorType;
+    }, (gameSettings, controllableEnumOption) -> {
+        CursorType cursorType = controllableEnumOption.get(gameSettings);
+        return I18n.format("controllable.cursor." + cursorType.getName());
     });
 
     public static final SliderPercentageOption DEAD_ZONE = new ControllableSliderPercentageOption("controllable.options.deadZone", 0.0, 1.0, 0.01F, gameSettings -> {
@@ -71,9 +93,12 @@ public class ControllerOptions
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
     private File optionsFile;
+    private boolean forceFeedback = true;
     private boolean autoSelect = true;
     private boolean renderMiniPlayer = true;
     private boolean virtualMouse = true;
+    private boolean consoleHotbar = false;
+    private CursorType cursorType = CursorType.LIGHT;
     private double deadZone = 0.1;
     private double rotationSpeed = 20.0;
     private double mouseSpeed = 30.0;
@@ -117,6 +142,9 @@ public class ControllerOptions
                 {
                     switch(key)
                     {
+                        case "forceFeedback":
+                            this.forceFeedback = Boolean.valueOf(value);
+                            break;
                         case "autoSelect":
                             this.autoSelect = Boolean.valueOf(value);
                             break;
@@ -125,6 +153,12 @@ public class ControllerOptions
                             break;
                         case "virtualMouse":
                             this.virtualMouse = Boolean.valueOf(value);
+                            break;
+                        case "consoleHotbar":
+                            this.consoleHotbar = Boolean.valueOf(value);
+                            break;
+                        case "cursorType":
+                            this.cursorType = CursorType.byId(value);
                             break;
                         case "deadZone":
                             this.deadZone = Double.parseDouble(value);
@@ -154,9 +188,12 @@ public class ControllerOptions
     {
         try(PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8)))
         {
+            writer.println("forceFeedback:" + this.forceFeedback);
             writer.println("autoSelect:" + this.autoSelect);
             writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
             writer.println("virtualMouse:" + this.virtualMouse);
+            writer.println("consoleHotbar:" + this.consoleHotbar);
+            writer.println("cursorType:" + this.cursorType.getName());
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
@@ -165,6 +202,11 @@ public class ControllerOptions
         {
             e.printStackTrace();
         }
+    }
+
+    public boolean useForceFeedback()
+    {
+        return this.forceFeedback;
     }
 
     public boolean isAutoSelect()
@@ -180,6 +222,16 @@ public class ControllerOptions
     public boolean isVirtualMouse()
     {
         return virtualMouse;
+    }
+
+    public boolean useConsoleHotbar()
+    {
+        return consoleHotbar;
+    }
+
+    public CursorType getCursorType()
+    {
+        return cursorType;
     }
 
     public double getDeadZone()

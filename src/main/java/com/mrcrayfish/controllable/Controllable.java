@@ -86,6 +86,7 @@ public class Controllable extends ControllerAdapter
         MinecraftForge.EVENT_BUS.register(input = new ControllerInput());
         MinecraftForge.EVENT_BUS.register(new RenderEvents());
         MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
+        MinecraftForge.EVENT_BUS.register(new ControllerEvents());
     }
 
     @Override
@@ -174,23 +175,24 @@ public class Controllable extends ControllerAdapter
 
         ButtonBinding.tick();
 
-        this.processButton(Buttons.A, getButtonState(SDL_CONTROLLER_BUTTON_A));
-        this.processButton(Buttons.B, getButtonState(SDL_CONTROLLER_BUTTON_B));
-        this.processButton(Buttons.X, getButtonState(SDL_CONTROLLER_BUTTON_X));
-        this.processButton(Buttons.Y, getButtonState(SDL_CONTROLLER_BUTTON_Y));
-        this.processButton(Buttons.SELECT, getButtonState(SDL_CONTROLLER_BUTTON_BACK));
-        this.processButton(Buttons.HOME, getButtonState(SDL_CONTROLLER_BUTTON_GUIDE));
-        this.processButton(Buttons.START, getButtonState(SDL_CONTROLLER_BUTTON_START));
-        this.processButton(Buttons.LEFT_THUMB_STICK, getButtonState(SDL_CONTROLLER_BUTTON_LEFTSTICK));
-        this.processButton(Buttons.RIGHT_THUMB_STICK, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
-        this.processButton(Buttons.LEFT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
-        this.processButton(Buttons.RIGHT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
-        this.processButton(Buttons.LEFT_TRIGGER, Math.abs(controller.getLTriggerValue()) >= 0.1F);
-        this.processButton(Buttons.RIGHT_TRIGGER, Math.abs(controller.getRTriggerValue()) >= 0.1F);
-        this.processButton(Buttons.DPAD_UP, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
-        this.processButton(Buttons.DPAD_DOWN, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
-        this.processButton(Buttons.DPAD_LEFT, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
-        this.processButton(Buttons.DPAD_RIGHT, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+        Controller currentController = controller;
+        this.processButton(Buttons.A, this.getButtonState(SDL_CONTROLLER_BUTTON_A));
+        this.processButton(Buttons.B, this.getButtonState(SDL_CONTROLLER_BUTTON_B));
+        this.processButton(Buttons.X, this.getButtonState(SDL_CONTROLLER_BUTTON_X));
+        this.processButton(Buttons.Y, this.getButtonState(SDL_CONTROLLER_BUTTON_Y));
+        this.processButton(Buttons.SELECT, this.getButtonState(SDL_CONTROLLER_BUTTON_BACK));
+        this.processButton(Buttons.HOME, this.getButtonState(SDL_CONTROLLER_BUTTON_GUIDE));
+        this.processButton(Buttons.START, this.getButtonState(SDL_CONTROLLER_BUTTON_START));
+        this.processButton(Buttons.LEFT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSTICK));
+        this.processButton(Buttons.RIGHT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
+        this.processButton(Buttons.LEFT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+        this.processButton(Buttons.RIGHT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
+        this.processButton(Buttons.LEFT_TRIGGER, Math.abs(currentController.getLTriggerValue()) >= 0.1F);
+        this.processButton(Buttons.RIGHT_TRIGGER, Math.abs(currentController.getRTriggerValue()) >= 0.1F);
+        this.processButton(Buttons.DPAD_UP, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
+        this.processButton(Buttons.DPAD_DOWN, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
+        this.processButton(Buttons.DPAD_LEFT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
+        this.processButton(Buttons.DPAD_RIGHT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
     }
 
     private void processButton(int index, boolean state)
@@ -201,6 +203,11 @@ public class Controllable extends ControllerAdapter
             {
                 return;
             }
+        }
+
+        if (controller == null)
+        {
+            return;
         }
 
         if(controller.getMapping() != null)
