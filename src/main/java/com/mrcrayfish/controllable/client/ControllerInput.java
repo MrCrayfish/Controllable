@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.gui.WidgetAttraction;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -12,7 +13,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
-import net.minecraft.client.util.InputMappings;
 import net.minecraft.client.util.NativeUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Slot;
@@ -60,13 +60,15 @@ public class ControllerInput
     private float prevYAxis;
     private int prevTargetMouseX;
     private int prevTargetMouseY;
-    private int targetMouseX;
-    private int targetMouseY;
-    private double mouseSpeedX;
-    private double mouseSpeedY;
-    private boolean moved;
+    public int targetMouseX;
+    public int targetMouseY;
+    public double mouseSpeedX;
+    public double mouseSpeedY;
+    public boolean moved;
 
     private int dropCounter = -1;
+
+    private WidgetAttraction widgetAttraction = new WidgetAttraction(this);
 
     public double getVirtualMouseX()
     {
@@ -110,7 +112,9 @@ public class ControllerInput
                 return;
 
             if(mc.currentScreen == null || mc.currentScreen instanceof ControllerLayoutScreen)
+            {
                 return;
+            }
 
             float deadZone = (float) Controllable.getOptions().getDeadZone();
 
@@ -169,6 +173,7 @@ public class ControllerInput
             prevXAxis = controller.getLThumbStickXValue();
             prevYAxis = controller.getLThumbStickYValue();
 
+            widgetAttraction.moveMouseToClosestWidget(moving, mc.currentScreen);
             this.moveMouseToClosestSlot(moving, mc.currentScreen);
 
             if(mc.currentScreen instanceof CreativeScreen)
@@ -681,27 +686,7 @@ public class ControllerInput
                 nearSlot = true;
                 int slotCenterXScaled = guiLeft + closestSlot.xPos + 8;
                 int slotCenterYScaled = guiTop + closestSlot.yPos + 8;
-                int slotCenterX = (int) (slotCenterXScaled / ((double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth()));
-                int slotCenterY = (int) (slotCenterYScaled / ((double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight()));
-                double deltaX = slotCenterX - targetMouseX;
-                double deltaY = slotCenterY - targetMouseY;
-
-                if(!moving)
-                {
-                    if(mouseX != slotCenterXScaled || mouseY != slotCenterYScaled)
-                    {
-                        targetMouseX += deltaX * 0.75;
-                        targetMouseY += deltaY * 0.75;
-                    }
-                    else
-                    {
-                        mouseSpeedX = 0.0F;
-                        mouseSpeedY = 0.0F;
-                    }
-                }
-
-                mouseSpeedX *= 0.75F;
-                mouseSpeedY *= 0.75F;
+                moveMouse(mc, moving, slotCenterXScaled, slotCenterYScaled, mouseX, mouseY);
             }
             else
             {
@@ -714,6 +699,31 @@ public class ControllerInput
             mouseSpeedX = 0.0F;
             mouseSpeedY = 0.0F;
         }
+    }
+
+    public void moveMouse(Minecraft mc, boolean moving, int targetX, int targetY, int mouseX, int mouseY)
+    {
+        int slotCenterX = (int) (targetX / ((double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth()));
+        int slotCenterY = (int) (targetY / ((double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight()));
+        double deltaX = slotCenterX - targetMouseX;
+        double deltaY = slotCenterY - targetMouseY;
+
+        if(!moving)
+        {
+            if(mouseX != slotCenterX || mouseY != slotCenterY)
+            {
+                targetMouseX += deltaX * 0.75;
+                targetMouseY += deltaY * 0.75;
+            }
+            else
+            {
+                mouseSpeedX = 0.0F;
+                mouseSpeedY = 0.0F;
+            }
+        }
+
+        mouseSpeedX *= 0.75F;
+        mouseSpeedY *= 0.75F;
     }
 
     private void handleCreativeScrolling(CreativeScreen creative, Controller controller)
