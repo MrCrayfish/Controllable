@@ -24,7 +24,7 @@ public class ControllerOptions
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
 
     public static final BooleanOption FORCE_FEEDBACK = new ControllableBooleanOption("controllable.options.forceFeedback", gameSettings -> {
-        return Controllable.getOptions().useForceFeedback();
+        return Controllable.getOptions().forceFeedback;
     }, (gameSettings, value) -> {
         Controllable.getOptions().forceFeedback = value;
     });
@@ -45,6 +45,12 @@ public class ControllerOptions
         return Controllable.getOptions().virtualMouse;
     }, (gameSettings, value) -> {
         Controllable.getOptions().virtualMouse = value;
+    });
+
+    public static final BooleanOption CONSOLE_HOTBAR = new ControllableBooleanOption("controllable.options.consoleHotbar", gameSettings -> {
+        return Controllable.getOptions().consoleHotbar;
+    }, (gameSettings, value) -> {
+        Controllable.getOptions().consoleHotbar = value;
     });
 
     public static final SliderPercentageOption DEAD_ZONE = new ControllableSliderPercentageOption("controllable.options.deadZone", 0.0, 1.0, 0.01F, gameSettings -> {
@@ -81,6 +87,7 @@ public class ControllerOptions
     private boolean autoSelect = true;
     private boolean renderMiniPlayer = true;
     private boolean virtualMouse = true;
+    private boolean consoleHotbar = false;
     private double deadZone = 0.1;
     private double rotationSpeed = 20.0;
     private double mouseSpeed = 30.0;
@@ -136,6 +143,9 @@ public class ControllerOptions
                         case "virtualMouse":
                             this.virtualMouse = Boolean.valueOf(value);
                             break;
+                        case "consoleHotbar":
+                            this.consoleHotbar = Boolean.valueOf(value);
+                            break;
                         case "deadZone":
                             this.deadZone = Double.parseDouble(value);
                             break;
@@ -168,6 +178,7 @@ public class ControllerOptions
             writer.println("autoSelect:" + this.autoSelect);
             writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
             writer.println("virtualMouse:" + this.virtualMouse);
+            writer.println("consoleHotbar:" + this.consoleHotbar);
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
@@ -196,6 +207,11 @@ public class ControllerOptions
     public boolean isVirtualMouse()
     {
         return virtualMouse;
+    }
+
+    public boolean useConsoleHotbar()
+    {
+        return consoleHotbar;
     }
 
     public double getDeadZone()
