@@ -23,6 +23,12 @@ public class ControllerEvents
             return;
         }
 
+        /* Stops vibration from running because controller is not in use */
+        if(Controllable.getInput().getLastUse() <= 0)
+        {
+            return;
+        }
+
         Controller controller = Controllable.getController();
         if(controller != null)
         {
@@ -30,10 +36,6 @@ public class ControllerEvents
             UseAction action = event.getItem().getUseAction();
             switch(action)
             {
-                case EAT:
-                case DRINK:
-                    magnitudeFactor = 0.5F;
-                    break;
                 case BLOCK:
                     magnitudeFactor = 0.25F;
                     break;
@@ -47,7 +49,7 @@ public class ControllerEvents
                     magnitudeFactor = MathHelper.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 1.5F) / 1.5F;
                     break;
             }
-            controller.getSDL2Controller().rumble(0.5F * magnitudeFactor, 0.5F * magnitudeFactor, 50);
+            controller.getSDL2Controller().rumble(0.5F * magnitudeFactor, 0.5F * magnitudeFactor, 50); //50ms is one tick
         }
     }
 
