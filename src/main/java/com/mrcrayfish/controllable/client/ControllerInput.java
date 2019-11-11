@@ -74,6 +74,9 @@ public class ControllerInput
     private int targetMouseY;
     private double mouseSpeedX;
     private double mouseSpeedY;
+    private boolean moved;
+
+    private float prevHealth = -1;
 
     private int dropCounter = -1;
 
@@ -97,6 +100,8 @@ public class ControllerInput
     {
         if(event.phase == TickEvent.Phase.START)
         {
+
+
             prevTargetMouseX = targetMouseX;
             prevTargetMouseY = targetMouseY;
 
@@ -112,11 +117,31 @@ public class ControllerInput
             Minecraft mc = Minecraft.getInstance();
             if(mc.mouseHelper.isMouseGrabbed())
                 return;
-
+          
             if (mc.currentScreen == null || mc.currentScreen != prevScreen)
             {
                 widgets.clear();
                 prevScreen = mc.currentScreen;
+            }
+          
+            if (Controllable.getOptions().useForceFeedback())
+            {
+                if (mc.world == null && prevHealth != -1)
+                    prevHealth = -1;
+
+                if (prevHealth == -1)
+                    prevHealth = mc.player.getHealth();
+
+                if (prevHealth > mc.player.getHealth())
+                {
+                    float difference = prevHealth - mc.player.getHealth();
+                    float magnitude = difference / mc.player.getMaxHealth();
+                    controller.getSDL2Controller().rumble(1f, 1f, (int) (1000 * magnitude));
+                    prevHealth = mc.player.getHealth();
+                }
+
+                if (prevHealth < mc.player.getHealth())
+                    prevHealth = mc.player.getHealth();
             }
 
             if(mc.currentScreen == null || mc.currentScreen instanceof ControllerLayoutScreen)
@@ -169,8 +194,11 @@ public class ControllerInput
             {
                 double mouseSpeed = Controllable.getOptions().getMouseSpeed();
                 targetMouseX += mouseSpeed * mouseSpeedX;
+                targetMouseX = MathHelper.clamp(targetMouseX, 0, mc.mainWindow.getWidth());
                 targetMouseY += mouseSpeed * mouseSpeedY;
+                targetMouseY = MathHelper.clamp(targetMouseY, 0, mc.mainWindow.getHeight());
                 lastUse = 100;
+                moved = true;
             }
 
             prevXAxis = controller.getLThumbStickXValue();
@@ -223,8 +251,12 @@ public class ControllerInput
         Minecraft mc = Minecraft.getInstance();
         if(mc.currentScreen == null)
         {
-            targetMouseX = prevTargetMouseX = (int) (virtualMouseX = mc.mainWindow.getWidth() / 2F);
-            targetMouseY = prevTargetMouseY = (int) (virtualMouseY = mc.mainWindow.getHeight() / 2F);
+            nearSlot = false;
+            moved = false;
+            mouseSpeedX = 0.0;
+            mouseSpeedY = 0.0;
+            virtualMouseX = targetMouseX = prevTargetMouseX = (int) (mc.mainWindow.getWidth() / 2F);
+            virtualMouseY = targetMouseY = prevTargetMouseY = (int) (mc.mainWindow.getHeight() / 2F);
         }
     }
 
@@ -265,7 +297,9 @@ public class ControllerInput
                 Minecraft minecraft = event.getGui().getMinecraft();
                 if(minecraft.player == null || minecraft.player.inventory.getItemStack().isEmpty())
                 {
-                    GlStateManager.translated(virtualMouseX / minecraft.mainWindow.getGuiScaleFactor(), virtualMouseY / minecraft.mainWindow.getGuiScaleFactor(), 300);
+                    double mouseX = (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * Minecraft.getInstance().getRenderPartialTicks());
+                    double mouseY = (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * Minecraft.getInstance().getRenderPartialTicks());
+                    GlStateManager.translated(mouseX / minecraft.mainWindow.getGuiScaleFactor(), mouseY / minecraft.mainWindow.getGuiScaleFactor(), 300);
                     GlStateManager.color3f(1.0F, 1.0F, 1.0F);
                     GlStateManager.disableLighting();
                     event.getGui().getMinecraft().getTextureManager().bindTexture(CURSOR_TEXTURE);
@@ -464,8 +498,6 @@ public class ControllerInput
                         mc.getTutorial().openInventory();
                         mc.displayGuiScreen(new InventoryScreen(mc.player));
                     }
-                    prevTargetMouseX = targetMouseX = (int) mc.mouseHelper.getMouseX();
-                    prevTargetMouseY = targetMouseY = (int) mc.mouseHelper.getMouseY();
                 }
                 else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
@@ -751,6 +783,9 @@ public class ControllerInput
          * a controller. */
         if(screen instanceof ContainerScreen)
         {
+            /* Prevents cursor from moving until at least some input is detected */
+            if(!moved) return;
+
             Minecraft mc = Minecraft.getInstance();
             ContainerScreen guiContainer = (ContainerScreen) screen;
             int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
@@ -950,7 +985,8 @@ public class ControllerInput
                 isLeftClicking = true;
             }
         }
-        return mc.currentScreen == null && isLeftClicking && mc.mouseHelper.isMouseGrabbed();
+        boolean usingVirtualMouse = (Controllable.getOptions().isVirtualMouse() && Controllable.getInput().getLastUse() > 0);
+        return mc.currentScreen == null && isLeftClicking && (mc.mouseHelper.isMouseGrabbed() || usingVirtualMouse);
     }
 
     /**
