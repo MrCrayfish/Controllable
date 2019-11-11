@@ -78,7 +78,7 @@ public class ControllerEvents
             {
                 float difference = prevHealth - mc.player.getHealth();
                 float magnitude = difference / mc.player.getMaxHealth();
-                controller.getSDL2Controller().rumble(0.75F, 0.75F, 500 * (int) magnitude);
+                controller.getSDL2Controller().rumble(1.0F, 1.0F, (int) (800 * magnitude));
                 prevHealth = mc.player.getHealth();
             }
             else
