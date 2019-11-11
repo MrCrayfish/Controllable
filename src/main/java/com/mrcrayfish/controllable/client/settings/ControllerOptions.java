@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.settings;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.CursorType;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
@@ -53,6 +54,15 @@ public class ControllerOptions
         Controllable.getOptions().consoleHotbar = value;
     });
 
+    public static final ControllableEnumOption<CursorType> CURSOR_TYPE = new ControllableEnumOption<>("controllable.options.cursorType", CursorType.class, gameSettings -> {
+        return Controllable.getOptions().cursorType;
+    }, (gameSettings, cursorType) -> {
+        Controllable.getOptions().cursorType = cursorType;
+    }, (gameSettings, controllableEnumOption) -> {
+        CursorType cursorType = controllableEnumOption.get(gameSettings);
+        return I18n.format("controllable.cursor." + cursorType.getName());
+    });
+
     public static final SliderPercentageOption DEAD_ZONE = new ControllableSliderPercentageOption("controllable.options.deadZone", 0.0, 1.0, 0.01F, gameSettings -> {
         return Controllable.getOptions().deadZone;
     }, (gameSettings, value) -> {
@@ -88,6 +98,7 @@ public class ControllerOptions
     private boolean renderMiniPlayer = true;
     private boolean virtualMouse = true;
     private boolean consoleHotbar = false;
+    private CursorType cursorType = CursorType.LIGHT;
     private double deadZone = 0.1;
     private double rotationSpeed = 20.0;
     private double mouseSpeed = 30.0;
@@ -146,6 +157,9 @@ public class ControllerOptions
                         case "consoleHotbar":
                             this.consoleHotbar = Boolean.valueOf(value);
                             break;
+                        case "cursorType":
+                            this.cursorType = CursorType.byId(value);
+                            break;
                         case "deadZone":
                             this.deadZone = Double.parseDouble(value);
                             break;
@@ -179,6 +193,7 @@ public class ControllerOptions
             writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
             writer.println("virtualMouse:" + this.virtualMouse);
             writer.println("consoleHotbar:" + this.consoleHotbar);
+            writer.println("cursorType:" + this.cursorType.getName());
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
@@ -212,6 +227,11 @@ public class ControllerOptions
     public boolean useConsoleHotbar()
     {
         return consoleHotbar;
+    }
+
+    public CursorType getCursorType()
+    {
+        return cursorType;
     }
 
     public double getDeadZone()

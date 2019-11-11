@@ -258,16 +258,21 @@ public class ControllerInput
         {
             GlStateManager.pushMatrix();
             {
+                CursorType type = Controllable.getOptions().getCursorType();
                 Minecraft minecraft = event.getGui().getMinecraft();
-                if(minecraft.player == null || minecraft.player.inventory.getItemStack().isEmpty())
+                if(minecraft.player == null || (minecraft.player.inventory.getItemStack().isEmpty() || type == CursorType.CONSOLE))
                 {
                     double mouseX = (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * Minecraft.getInstance().getRenderPartialTicks());
                     double mouseY = (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * Minecraft.getInstance().getRenderPartialTicks());
-                    GlStateManager.translated(mouseX / minecraft.mainWindow.getGuiScaleFactor(), mouseY / minecraft.mainWindow.getGuiScaleFactor(), 300);
+                    GlStateManager.translated(mouseX / minecraft.mainWindow.getGuiScaleFactor(), mouseY / minecraft.mainWindow.getGuiScaleFactor(), 500);
                     GlStateManager.color3f(1.0F, 1.0F, 1.0F);
                     GlStateManager.disableLighting();
                     event.getGui().getMinecraft().getTextureManager().bindTexture(CURSOR_TEXTURE);
-                    Screen.blit(-8, -8, 16, 16, nearSlot ? 16 : 0, 0, 16, 16, 32, 32);
+                    if(type == CursorType.CONSOLE)
+                    {
+                        GlStateManager.scaled(0.5, 0.5, 0.5);
+                    }
+                    Screen.blit(-8, -8, 16, 16, nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
                 }
             }
             GlStateManager.popMatrix();
