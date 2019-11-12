@@ -12,7 +12,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
-import net.minecraft.client.util.InputMappings;
 import net.minecraft.client.util.NativeUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Slot;
@@ -65,6 +64,10 @@ public class ControllerInput
     private double mouseSpeedX;
     private double mouseSpeedY;
     private boolean moved;
+    private float prevTargetPitch;
+    private float prevTargetYaw;
+    private float targetPitch;
+    private float targetYaw;
 
     private int dropCounter = -1;
 
@@ -294,25 +297,65 @@ public class ControllerInput
         if(player == null)
             return;
 
+        if(mc.currentScreen == null && (prevTargetYaw != targetYaw || prevTargetPitch != targetPitch))
+        {
+            float rotationYaw = player.prevRotationYaw + (targetYaw - player.prevRotationYaw) * Minecraft.getInstance().getRenderPartialTicks();
+            float rotationPitch = player.prevRotationPitch + (targetPitch - player.prevRotationPitch) * Minecraft.getInstance().getRenderPartialTicks();
+            player.rotationYaw = rotationYaw;
+            player.rotationPitch = rotationPitch;
+            if(player.getRidingEntity() != null)
+            {
+                player.getRidingEntity().applyOrientationToEntity(player);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRender(TickEvent.ClientTickEvent event)
+    {
+        if(event.phase == TickEvent.Phase.END)
+            return;
+
+        prevTargetYaw = targetYaw;
+        prevTargetPitch = targetPitch;
+
+        Minecraft mc = Minecraft.getInstance();
+        PlayerEntity player = mc.player;
+        if(player == null)
+            return;
+
+        Controller controller = Controllable.getController();
+        if(controller == null)
+            return;
+
         if(mc.currentScreen == null)
         {
             float deadZone = (float) Controllable.getOptions().getDeadZone();
 
             /* Handles rotating the yaw of player */
-            if(Math.abs(controller.getRThumbStickXValue()) >= deadZone || Math.abs(controller.getRThumbStickYValue()) >= deadZone)
+            if(Math.abs(controller.getRThumbStickXValue()) >= deadZone)
             {
                 lastUse = 100;
                 double rotationSpeed = Controllable.getOptions().getRotationSpeed();
                 ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
-                    //TODO remove dead zone from axis normal
-
-                    //float rotationYaw = turnEvent.getYawSpeed() * MathHelper.clamp(controller.getLThumbStickXValue() - deadZone, 0.0F, 1.0F);
-                    //float rotationPitch = turnEvent.getPitchSpeed() * -MathHelper.clamp(controller.getLThumbStickYValue() - deadZone, 0.0F, 1.0F);
-                    float rotationYaw = turnEvent.getYawSpeed() * controller.getRThumbStickXValue();
-                    float rotationPitch = turnEvent.getPitchSpeed() * controller.getRThumbStickYValue();
-                    player.rotateTowards(rotationYaw, rotationPitch);
+                    float deadZoneTrim = (controller.getRThumbStickXValue() > 0 ? 1 : -1) * deadZone;
+                    float rotationYaw = (turnEvent.getYawSpeed() * (controller.getRThumbStickXValue() - deadZoneTrim) / (1.0F - deadZone)) * 0.33F;
+                    targetYaw = (float)((double)player.rotationYaw + rotationYaw);
+                }
+            }
+            if(Math.abs(controller.getRThumbStickYValue()) >= deadZone)
+            {
+                lastUse = 100;
+                double rotationSpeed = Controllable.getOptions().getRotationSpeed();
+                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
+                if(!MinecraftForge.EVENT_BUS.post(turnEvent))
+                {
+                    float deadZoneTrim = (controller.getRThumbStickYValue() > 0 ? 1 : -1) * deadZone;
+                    float rotationPitch = (turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() - deadZoneTrim) / (1.0F - deadZone)) * 0.33F;
+                    targetPitch = (float)((double)player.rotationPitch + rotationPitch);
+                    targetPitch = MathHelper.clamp(targetPitch, -90.0F, 90.0F);
                 }
             }
         }
