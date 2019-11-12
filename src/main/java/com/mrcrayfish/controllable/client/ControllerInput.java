@@ -651,7 +651,7 @@ public class ControllerInput
     }
 
 
-    public void moveMouseToClosestWidget(boolean moving, Screen screen)
+    private void moveMouseToClosestWidget(boolean moving, Screen screen)
     {
         Minecraft mc = Minecraft.getInstance();
 
