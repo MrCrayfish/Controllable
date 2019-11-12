@@ -221,6 +221,7 @@ public class ControllerInput
     @SubscribeEvent(receiveCanceled = true)
     public void onScreenInit(GuiOpenEvent event)
     {
+        widgetList.clear();
         Minecraft mc = Minecraft.getInstance();
         if(mc.currentScreen == null)
         {
@@ -654,10 +655,6 @@ public class ControllerInput
     {
         Minecraft mc = Minecraft.getInstance();
 
-        if (screen != prevScreen)
-        {
-            widgetList.clear();
-        }
         if(widgetList.isEmpty() && screen != prevScreen)
         {
             widgetList = WidgetAttraction.getWidgets(screen);
