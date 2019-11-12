@@ -23,7 +23,6 @@
     <option name="SPACE_BEFORE_CATCH_PARENTHESES" value="false" />
     <option name="SPACE_BEFORE_SWITCH_PARENTHESES" value="false" />
     <option name="SPACE_BEFORE_SYNCHRONIZED_PARENTHESES" value="false" />
-    <option name="KEEP_SIMPLE_CLASSES_IN_ONE_LINE" value="true" />
     <option name="IF_BRACE_FORCE" value="1" />
     <option name="ENUM_CONSTANTS_WRAP" value="2" />
   </codeStyleSettings>
