@@ -233,8 +233,8 @@ public class RenderEvents
                         remappedButton = mapping.remap(button);
                     }
 
-                    int texU = (remappedButton % 19) * 13;
-                    int texV = (remappedButton / 19) * 13;
+                    int texU = remappedButton * 13;
+                    int texV = Controllable.getOptions().getControllerType().ordinal() * 13;
                     int size = 13;
 
                     int x = side == Action.Side.LEFT ? 5 : mc.mainWindow.getScaledWidth() - 5 - size;
