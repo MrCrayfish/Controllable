@@ -1,11 +1,8 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mrcrayfish.controllable.client.ControllerInput;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
 import net.minecraft.client.gui.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AbstractSlider;
 import net.minecraft.client.gui.widget.Widget;
 import org.codehaus.plexus.util.ReflectionUtils;
 
@@ -16,43 +13,34 @@ import java.util.stream.Collectors;
 
 public class WidgetAttraction
 {
-    private List<Widget> widgetList = new ArrayList<>();
-    private final ControllerInput input;
-    private Screen prevScreen;
-
-    private List<Class> classWhitelist = new ArrayList<Class>() {{
+    private static List<Class> classWhitelist = new ArrayList<Class>() {{
         add(RecipeBookGui.class);
         add(RecipeBookPage.class);
     }};
 
-    public WidgetAttraction(ControllerInput input)
+    public static List<Widget> getWidgets(Screen screen)
     {
-        this.input = input;
+        List<Widget> widgets = new ArrayList<>(getWidgets(screen, 0));
+        widgets.removeIf(Objects::isNull); // Remove nulls
+        widgets = widgets.stream().distinct().collect(Collectors.toList()); // Remove possible duplicates
+        return widgets;
     }
 
-    private void getWidgets(Screen screen)
-    {
-        widgetList.addAll(getWidgets(screen, 0));
-        widgetList.removeIf(Objects::isNull);
-        widgetList = widgetList.stream().distinct().collect(Collectors.toList());
-    }
-
-    private List<Widget> getWidgets(Object parent, int level)
+    private static List<Widget> getWidgets(Object parent, int level)
     {
         List<Widget> widgets = new ArrayList<>();
 
         ReflectionUtils.getFieldsIncludingSuperclasses(parent.getClass()).forEach(f -> {
             try
             {
-                boolean isAccessible = f.isAccessible();
-                f.setAccessible(true);
                 if(Widget.class.isAssignableFrom(f.getType()))
                 {
-
+                    f.setAccessible(true);
                     widgets.add((Widget) f.get(parent));
                 }
                 else if(List.class.isAssignableFrom(f.getType()))
                 {
+                    f.setAccessible(true);
                     List l = (List) f.get(parent);
                     if (l != null && !l.isEmpty())
                     {
@@ -72,9 +60,9 @@ public class WidgetAttraction
                 }
                 else if(classWhitelist.contains(f.getType()))
                 {
+                    f.setAccessible(true);
                     widgets.addAll(getWidgets(f.get(parent), level + 1));
                 }
-                f.setAccessible(isAccessible);
             }
             catch(IllegalAccessException e)
             {
@@ -83,59 +71,5 @@ public class WidgetAttraction
         });
 
         return widgets;
-    }
-
-    public void moveMouseToClosestWidget(boolean moving, Screen screen)
-    {
-        Minecraft mc = Minecraft.getInstance();
-
-        if (screen != prevScreen)
-        {
-            widgetList.clear();
-        }
-        if(widgetList.isEmpty() && screen != prevScreen)
-        {
-            getWidgets(screen);
-            prevScreen = screen;
-            if(widgetList.isEmpty())
-            {
-                return;
-            }
-        }
-
-        if(!input.moved) return;
-
-        int mouseX = (int) (input.targetMouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth());
-        int mouseY = (int) (input.targetMouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight());
-
-        Widget closestWidget = null;
-        for(Widget widget : widgetList)
-        {
-            if (widget == null)
-            {
-                continue;
-            }
-
-            if(widget.isHovered() && widget.visible)
-            {
-                closestWidget = widget;
-            }
-        }
-
-        if(closestWidget != null)
-        {
-            int targetX = closestWidget.x + closestWidget.getWidth() / 2;
-            if (closestWidget instanceof AbstractSlider)
-            {
-                targetX = mouseX;
-            }
-            int targetY = closestWidget.y + closestWidget.getHeight() / 2;
-            input.moveMouse(mc, moving, targetX, targetY, mouseX, mouseY);
-        }
-        else
-        {
-            input.mouseSpeedX *= 0.1F;
-            input.mouseSpeedY *= 0.1F;
-        }
     }
 }
