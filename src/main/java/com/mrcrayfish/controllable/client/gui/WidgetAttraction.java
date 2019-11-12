@@ -32,7 +32,6 @@ public class WidgetAttraction
 
     private void getWidgets(Screen screen)
     {
-        widgetList.clear();
         widgetList.addAll(getWidgets(screen, 0));
         widgetList.removeIf(Objects::isNull);
         widgetList = widgetList.stream().distinct().collect(Collectors.toList());
@@ -87,11 +86,15 @@ public class WidgetAttraction
     {
         Minecraft mc = Minecraft.getInstance();
 
-        if (widgetList.isEmpty() || screen != prevScreen)
+        if (screen != prevScreen)
+        {
+            widgetList.clear();
+        }
+        if(widgetList.isEmpty() && screen != prevScreen)
         {
             getWidgets(screen);
             prevScreen = screen;
-            if (widgetList.isEmpty())
+            if(widgetList.isEmpty())
             {
                 return;
             }
