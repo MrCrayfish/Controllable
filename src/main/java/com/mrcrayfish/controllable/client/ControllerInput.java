@@ -173,7 +173,7 @@ public class ControllerInput
             prevXAxis = controller.getLThumbStickXValue();
             prevYAxis = controller.getLThumbStickYValue();
 
-            widgetAttraction.moveMouseToClosestWidget(moving, mc.currentScreen);
+            this.widgetAttraction.moveMouseToClosestWidget(moving, mc.currentScreen);
             this.moveMouseToClosestSlot(moving, mc.currentScreen);
 
             if(mc.currentScreen instanceof CreativeScreen)

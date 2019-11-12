@@ -54,16 +54,19 @@ public class WidgetAttraction
                 else if(List.class.isAssignableFrom(f.getType()))
                 {
                     List l = (List) f.get(parent);
-                    for(Object o : l)
+                    if (l != null && !l.isEmpty())
                     {
-                        if(!(o instanceof Widget))
+                        for(Object o : l)
                         {
-                            break;
-                        }
-                        Widget w = (Widget) o;
-                        if (w.visible)
-                        {
-                            widgets.add(w);
+                            if(!(o instanceof Widget))
+                            {
+                                break;
+                            }
+                            Widget w = (Widget) o;
+                            if(w.visible)
+                            {
+                                widgets.add(w);
+                            }
                         }
                     }
                 }
