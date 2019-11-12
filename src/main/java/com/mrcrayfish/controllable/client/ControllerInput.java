@@ -63,11 +63,11 @@ public class ControllerInput
     private float prevYAxis;
     private int prevTargetMouseX;
     private int prevTargetMouseY;
-    public int targetMouseX;
-    public int targetMouseY;
-    public double mouseSpeedX;
-    public double mouseSpeedY;
-    public boolean moved;
+    private int targetMouseX;
+    private int targetMouseY;
+    private double mouseSpeedX;
+    private double mouseSpeedY;
+    private boolean moved;
 
     private int dropCounter = -1;
 
