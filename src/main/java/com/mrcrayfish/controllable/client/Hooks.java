@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -108,5 +109,17 @@ public class Hooks
             screen.render(mouseX, mouseY, partialTicks);
         }
         MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.DrawScreenEvent.Post(screen, mouseX, mouseY, partialTicks));
+    }
+
+    /**
+     * Fixes selected item name rendering not being offset by console hotbar
+     */
+    @SuppressWarnings("unused")
+    public static void applyHotbarOffset()
+    {
+        if(Controllable.getOptions().useConsoleHotbar())
+        {
+            GlStateManager.translated(0, -20, 0);
+        }
     }
 }

@@ -65,6 +65,13 @@ function initializeCoreMod() {
                     patch: patch_ForgeIngameGui_renderPlayerList
                 }, classNode);
 
+                patch({
+                    obfName: "",
+                    name: "renderRecordOverlay",
+                    desc: "(IIF)V",
+                    patch: patch_IngameGui_renderSelectedItem
+                }, classNode);
+
                 return classNode;
             }
             //updateCameraAndRender(FJ)V
@@ -85,6 +92,21 @@ function initializeCoreMod() {
                 }, classNode);
 
                 return classNode;
+            }
+        },
+        'selected_item_name': {
+            'target': {
+                'type': 'CLASS',
+                'name': 'net.minecraft.client.gui.IngameGui'
+            },
+            'transformer': function(classNode) {
+                log("Patching IngameGui...");
+                patch({
+                    obfName: "func_194801_c ",
+                    name: "renderSelectedItem",
+                    desc: "()V",
+                    patch: patch_IngameGui_renderSelectedItem
+                }, classNode);
             }
         }
     };
@@ -296,6 +318,35 @@ function patch_GameRenderer_updateCameraAndRender(method) {
         var previousNode = foundNode.getPrevious();
         method.instructions.remove(foundNode);
         method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/screen/Screen;IIF)V", false))
+        return true;
+    }
+    return false;
+}
+
+function patch_IngameGui_renderSelectedItem(method) {
+    var findInstruction = {
+        name: "pushMatrix",
+        desc: "()V",
+        matches: function(s) {
+            return s.equals(this.name);
+        }
+    };
+
+    var foundNode = null;
+    var instructions = method.instructions.toArray();
+    var length = instructions.length;
+    for (var i = 0; i < length; i++) {
+        var node = instructions[i];
+        if(node.getOpcode() != Opcodes.INVOKESTATIC)
+             continue;
+        if(findInstruction.name.equals(node.name) && findInstruction.desc.equals(node.desc)) {
+            foundNode = node;
+            break;
+        }
+    }
+
+    if(foundNode !== null) {
+        method.instructions.insert(foundNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "applyHotbarOffset", "()V", false));
         return true;
     }
     return false;

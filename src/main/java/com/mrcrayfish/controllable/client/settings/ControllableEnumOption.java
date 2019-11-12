@@ -4,7 +4,6 @@ import net.minecraft.client.GameSettings;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.OptionButton;
 import net.minecraft.client.settings.AbstractOption;
-import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.util.IStringSerializable;
 
 import java.util.function.BiConsumer;
