@@ -30,7 +30,7 @@ public class ControllableEnumOption<T extends Enum<T> & IStringSerializable> ext
         this.setter = setter;
         this.displayNameGetter = displayNameGetter;
     }
-    
+
     private void nextEnum(GameSettings options)
     {
         this.set(options, this.getEnum(++ordinal));
