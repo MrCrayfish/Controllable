@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client.settings;
 
+import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.OptionButton;
@@ -29,6 +30,12 @@ public class ControllableEnumOption<T extends Enum<T> & IStringSerializable> ext
         this.setter = setter;
         this.displayNameGetter = displayNameGetter;
     }
+    
+    private void nextEnum(GameSettings options)
+    {
+        this.set(options, this.getEnum(++ordinal));
+        Controllable.getOptions().saveOptions();
+    }
 
     public void set(GameSettings options, T t)
     {
@@ -47,7 +54,7 @@ public class ControllableEnumOption<T extends Enum<T> & IStringSerializable> ext
     public Widget createWidget(GameSettings options, int x, int y, int width)
     {
         return new OptionButton(x, y, width, 20, this, this.getTitle(options), (button) -> {
-            this.set(options, this.getEnum(++ordinal));
+            this.nextEnum(options);
             button.setMessage(this.getTitle(options));
         });
     }
