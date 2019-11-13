@@ -369,7 +369,7 @@ public class ControllerInput
             }
         }
 
-        if(dropCounter > 40)
+        if(dropCounter > 20)
         {
             if (!mc.player.isSpectator())
             {
