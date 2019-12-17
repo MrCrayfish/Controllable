@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
@@ -162,9 +163,9 @@ public class ControllerInput
             {
                 double mouseSpeed = Controllable.getOptions().getMouseSpeed();
                 targetMouseX += mouseSpeed * mouseSpeedX;
-                targetMouseX = MathHelper.clamp(targetMouseX, 0, mc.mainWindow.getWidth());
+                targetMouseX = MathHelper.clamp(targetMouseX, 0, mc.func_228018_at_().getWidth());
                 targetMouseY += mouseSpeed * mouseSpeedY;
-                targetMouseY = MathHelper.clamp(targetMouseY, 0, mc.mainWindow.getHeight());
+                targetMouseY = MathHelper.clamp(targetMouseY, 0, mc.func_228018_at_().getHeight());
                 lastUse = 100;
                 moved = true;
             }
@@ -186,13 +187,13 @@ public class ControllerInput
                 {
                     if(mc.loadingGui == null)
                     {
-                        double mouseX = virtualMouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth();
-                        double mouseY = virtualMouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight();
+                        double mouseX = virtualMouseX * (double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth();
+                        double mouseY = virtualMouseY * (double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight();
                         Screen.wrapScreenError(() -> screen.mouseMoved(mouseX, mouseY), "mouseMoved event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
                         if(mc.mouseHelper.activeButton != -1 && mc.mouseHelper.eventTime > 0.0D)
                         {
-                            double dragX = (targetMouseX - prevTargetMouseX) * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth();
-                            double dragY = (targetMouseY - prevTargetMouseY) * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight();
+                            double dragX = (targetMouseX - prevTargetMouseX) * (double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth();
+                            double dragY = (targetMouseY - prevTargetMouseY) * (double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight();
                             Screen.wrapScreenError(() ->
                             {
                                 if(net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPre(screen, mouseX, mouseY, mc.mouseHelper.activeButton, dragX, dragY))
@@ -222,8 +223,8 @@ public class ControllerInput
             moved = false;
             mouseSpeedX = 0.0;
             mouseSpeedY = 0.0;
-            virtualMouseX = targetMouseX = prevTargetMouseX = (int) (mc.mainWindow.getWidth() / 2F);
-            virtualMouseY = targetMouseY = prevTargetMouseY = (int) (mc.mainWindow.getHeight() / 2F);
+            virtualMouseX = targetMouseX = prevTargetMouseX = (int) (mc.func_228018_at_().getWidth() / 2F);
+            virtualMouseY = targetMouseY = prevTargetMouseY = (int) (mc.func_228018_at_().getHeight() / 2F);
         }
     }
 
@@ -248,7 +249,7 @@ public class ControllerInput
                 }
                 else
                 {
-                    GLFW.glfwSetCursorPos(mc.mainWindow.getHandle(), mouseX, mouseY);
+                    GLFW.glfwSetCursorPos(mc.func_228018_at_().getHandle(), mouseX, mouseY);
                 }
             }
         }
@@ -259,7 +260,7 @@ public class ControllerInput
     {
         if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && lastUse > 0)
         {
-            GlStateManager.pushMatrix();
+            RenderSystem.pushMatrix();
             {
                 CursorType type = Controllable.getOptions().getCursorType();
                 Minecraft minecraft = event.getGui().getMinecraft();
@@ -267,18 +268,18 @@ public class ControllerInput
                 {
                     double mouseX = (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * Minecraft.getInstance().getRenderPartialTicks());
                     double mouseY = (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * Minecraft.getInstance().getRenderPartialTicks());
-                    GlStateManager.translated(mouseX / minecraft.mainWindow.getGuiScaleFactor(), mouseY / minecraft.mainWindow.getGuiScaleFactor(), 500);
-                    GlStateManager.color3f(1.0F, 1.0F, 1.0F);
-                    GlStateManager.disableLighting();
+                    RenderSystem.translated(mouseX / minecraft.func_228018_at_().getGuiScaleFactor(), mouseY / minecraft.func_228018_at_().getGuiScaleFactor(), 500);
+                    RenderSystem.color3f(1.0F, 1.0F, 1.0F);
+                    RenderSystem.disableLighting();
                     event.getGui().getMinecraft().getTextureManager().bindTexture(CURSOR_TEXTURE);
                     if(type == CursorType.CONSOLE)
                     {
-                        GlStateManager.scaled(0.5, 0.5, 0.5);
+                        RenderSystem.scaled(0.5, 0.5, 0.5);
                     }
                     Screen.blit(-8, -8, 16, 16, nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
                 }
             }
-            GlStateManager.popMatrix();
+            RenderSystem.popMatrix();
         }
     }
 
@@ -373,7 +374,7 @@ public class ControllerInput
         {
             if (!mc.player.isSpectator())
             {
-                mc.player.dropItem(true);
+                mc.player.func_225609_n_(true);
             }
             dropCounter = 0;
         }
@@ -381,7 +382,7 @@ public class ControllerInput
         {
             if (!mc.player.isSpectator())
             {
-                mc.player.dropItem(false);
+                mc.player.func_225609_n_(false);
             }
             dropCounter = 0;
         }
@@ -400,13 +401,13 @@ public class ControllerInput
 
         Minecraft mc = Minecraft.getInstance();
 
-        if(keyboardSneaking && !mc.gameSettings.keyBindSneak.isKeyDown())
+        if(keyboardSneaking && !mc.gameSettings.field_228046_af_.isKeyDown())
         {
             sneaking = false;
             keyboardSneaking = false;
         }
 
-        if(mc.gameSettings.keyBindSneak.isKeyDown())
+        if(mc.gameSettings.field_228046_af_.isKeyDown())
         {
             sneaking = true;
             keyboardSneaking = true;
@@ -415,7 +416,7 @@ public class ControllerInput
         if(mc.player.abilities.isFlying || mc.player.isPassenger())
         {
             lastUse = 100;
-            sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
+            sneaking = mc.gameSettings.field_228046_af_.isKeyDown();
             sneaking |= ButtonBindings.SNEAK.isButtonDown();
             isFlying = true;
         }
@@ -425,7 +426,7 @@ public class ControllerInput
             isFlying = false;
         }
 
-        event.getMovementInput().sneak = sneaking;
+        event.getMovementInput().field_228350_h_ = sneaking;
 
         if(mc.currentScreen == null)
         {
@@ -441,7 +442,7 @@ public class ControllerInput
                     event.getMovementInput().backKeyDown = dir < 0;
                     event.getMovementInput().moveForward = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
-                    if(event.getMovementInput().sneak)
+                    if(event.getMovementInput().field_228350_h_)
                     {
                         event.getMovementInput().moveForward *= 0.3D;
                     }
@@ -455,7 +456,7 @@ public class ControllerInput
                     event.getMovementInput().leftKeyDown = dir > 0;
                     event.getMovementInput().moveStrafe = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickXValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
-                    if(event.getMovementInput().sneak)
+                    if(event.getMovementInput().field_228350_h_)
                     {
                         event.getMovementInput().moveStrafe *= 0.3D;
                     }
@@ -698,8 +699,8 @@ public class ControllerInput
             ContainerScreen guiContainer = (ContainerScreen) screen;
             int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
             int guiTop = (guiContainer.height - guiContainer.getYSize()) / 2;
-            int mouseX = (int) (targetMouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth());
-            int mouseY = (int) (targetMouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight());
+            int mouseX = (int) (targetMouseX * (double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth());
+            int mouseY = (int) (targetMouseY * (double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight());
 
             //Slot closestSlot = guiContainer.getSlotUnderMouse();
 
@@ -724,8 +725,8 @@ public class ControllerInput
                 nearSlot = true;
                 int slotCenterXScaled = guiLeft + closestSlot.xPos + 8;
                 int slotCenterYScaled = guiTop + closestSlot.yPos + 8;
-                int slotCenterX = (int) (slotCenterXScaled / ((double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth()));
-                int slotCenterY = (int) (slotCenterYScaled / ((double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight()));
+                int slotCenterX = (int) (slotCenterXScaled / ((double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth()));
+                int slotCenterY = (int) (slotCenterYScaled / ((double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight()));
                 double deltaX = slotCenterX - targetMouseX;
                 double deltaY = slotCenterY - targetMouseY;
 
@@ -809,8 +810,8 @@ public class ControllerInput
                 mouseX = virtualMouseX;
                 mouseY = virtualMouseY;
             }
-            mouseX = mouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth();
-            mouseY = mouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight();
+            mouseX = mouseX * (double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth();
+            mouseY = mouseY * (double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight();
 
             mc.mouseHelper.activeButton = button;
             mc.mouseHelper.eventTime = NativeUtil.func_216394_b();
@@ -851,8 +852,8 @@ public class ControllerInput
                 mouseX = virtualMouseX;
                 mouseY = virtualMouseY;
             }
-            mouseX = mouseX * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth();
-            mouseY = mouseY * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight();
+            mouseX = mouseX * (double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth();
+            mouseY = mouseY * (double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight();
 
             mc.mouseHelper.activeButton = -1;
 

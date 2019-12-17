@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.event.AvailableActionsEvent;
@@ -162,7 +163,7 @@ public class RenderEvents
                     actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.use_item"), Action.Side.RIGHT));
                 }
 
-                if(!mc.player.isSneaking() && blockHit && canOpenBlock && !mc.player.isHandActive())
+                if(!mc.player.func_225608_bj_() && blockHit && canOpenBlock && !mc.player.isHandActive())
                 {
                     actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.interact"), Action.Side.RIGHT));
                 }
@@ -211,7 +212,7 @@ public class RenderEvents
         if(Controllable.getController() == null)
             return;
 
-        GlStateManager.pushMatrix();
+        RenderSystem.pushMatrix();
         {
             if(!MinecraftForge.EVENT_BUS.post(new RenderAvailableActionsEvent()))
             {
@@ -237,12 +238,12 @@ public class RenderEvents
                     int texV = Controllable.getOptions().getControllerType().ordinal() * 13;
                     int size = 13;
 
-                    int x = side == Action.Side.LEFT ? 5 : mc.mainWindow.getScaledWidth() - 5 - size;
-                    int y = mc.mainWindow.getScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
+                    int x = side == Action.Side.LEFT ? 5 : mc.func_228018_at_().getScaledWidth() - 5 - size;
+                    int y = mc.func_228018_at_().getScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
 
                     mc.getTextureManager().bindTexture(CONTROLLER_BUTTONS);
-                    GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-                    GlStateManager.disableLighting();
+                    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+                    RenderSystem.disableLighting();
 
                     if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2)
                         continue;
@@ -269,10 +270,10 @@ public class RenderEvents
             {
                 if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
                 {
-                    InventoryScreen.drawEntityOnScreen(20, 45, 20, 0, 0, mc.player);
+                    InventoryScreen.func_228187_a_(20, 45, 20, 0, 0, mc.player);
                 }
             }
         }
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 }

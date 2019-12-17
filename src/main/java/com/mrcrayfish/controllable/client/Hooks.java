@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -60,7 +61,7 @@ public class Hooks
     @SuppressWarnings("unused")
     public static boolean canQuickMove()
     {
-        boolean canQuickMove = InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT) || InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
+        boolean canQuickMove = InputMappings.isKeyDown(Minecraft.getInstance().func_228018_at_().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT) || InputMappings.isKeyDown(Minecraft.getInstance().func_228018_at_().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
         Controller controller = Controllable.getController();
         if(controller != null)
         {
@@ -101,8 +102,8 @@ public class Hooks
         if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && input.getLastUse() > 0)
         {
             Minecraft minecraft = Minecraft.getInstance();
-            mouseX = (int) (input.getVirtualMouseX() * (double) minecraft.mainWindow.getScaledWidth() / (double) minecraft.mainWindow.getWidth());
-            mouseY = (int) (input.getVirtualMouseY() * (double) minecraft.mainWindow.getScaledHeight() / (double) minecraft.mainWindow.getHeight());
+            mouseX = (int) (input.getVirtualMouseX() * (double) minecraft.func_228018_at_().getScaledWidth() / (double) minecraft.func_228018_at_().getWidth());
+            mouseY = (int) (input.getVirtualMouseY() * (double) minecraft.func_228018_at_().getScaledHeight() / (double) minecraft.func_228018_at_().getHeight());
         }
         if(!MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.DrawScreenEvent.Pre(screen, mouseX, mouseY, partialTicks)))
         {
@@ -119,7 +120,7 @@ public class Hooks
     {
         if(Controllable.getOptions().useConsoleHotbar())
         {
-            GlStateManager.translated(0, -20, 0);
+            RenderSystem.translated(0, -20, 0);
         }
     }
 }

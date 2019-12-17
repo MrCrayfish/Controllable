@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import net.minecraft.client.gui.toasts.IToast;
 import net.minecraft.client.gui.toasts.ToastGui;
@@ -25,7 +26,7 @@ public class ControllerToast implements IToast
     public Visibility draw(ToastGui toastGui, long delta)
     {
         toastGui.getMinecraft().getTextureManager().bindTexture(TEXTURE_TOASTS);
-        GlStateManager.color3f(1.0F, 1.0F, 1.0F);
+        RenderSystem.color3f(1.0F, 1.0F, 1.0F);
         toastGui.blit(0, 0, 0, 32, 160, 32);
 
         toastGui.getMinecraft().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);

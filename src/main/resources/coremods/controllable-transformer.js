@@ -107,6 +107,7 @@ function initializeCoreMod() {
                     desc: "()V",
                     patch: patch_IngameGui_renderSelectedItem
                 }, classNode);
+                return classNode;
             }
         }
     };
@@ -138,6 +139,7 @@ function patch(entry, classNode) {
     }
 }
 
+var ASMAPI = Java.type('net.minecraftforge.coremod.api.ASMAPI');
 var Opcodes = Java.type('org.objectweb.asm.Opcodes');
 var MethodInsnNode = Java.type('org.objectweb.asm.tree.MethodInsnNode');
 var InsnNode = Java.type('org.objectweb.asm.tree.InsnNode');
@@ -169,11 +171,16 @@ function patch_Minecraft_processKeyBinds(method) {
     var length = instructions.length;
     for (var i = 0; i < length; i++) {
         var node = instructions[i];
-        if(node.getOpcode() == Opcodes.INVOKEVIRTUAL && node.getNext().getOpcode() == Opcodes.IFNE) {
+        if(node.getOpcode() == Opcodes.INVOKEVIRTUAL && node.getNext().getOpcode() == Opcodes.IFEQ) {
             if(node instanceof MethodInsnNode && findInstruction.matches(node.name) && findInstruction.desc.equals(node.desc)) {
                 if(node.getPrevious().getOpcode() == Opcodes.GETFIELD && node.getPrevious().getPrevious().getOpcode() == Opcodes.GETFIELD && node.getPrevious().getPrevious().getPrevious().getOpcode() == Opcodes.ALOAD) {
-                    foundNode = node;
-                    break;
+                    var relativeNode = getNthRelativeNode(node, 4)
+                    if(relativeNode !== null && relativeNode.getOpcode() == Opcodes.INVOKEVIRTUAL) {
+                        if(relativeNode.name.equals(ASMAPI.mapMethod("func_198035_h"))) {
+                            foundNode = node;
+                            break;
+                        }
+                    }
                 }
             }
         }

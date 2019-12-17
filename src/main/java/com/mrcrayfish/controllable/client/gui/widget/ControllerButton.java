@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client.gui.widget;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
@@ -23,7 +23,7 @@ public class ControllerButton extends Button
     {
         if (this.visible)
         {
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             Minecraft.getInstance().getTextureManager().bindTexture(TEXTURE);
             boolean mouseOver = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
             int textureV = 43;
