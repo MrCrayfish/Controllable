@@ -171,16 +171,11 @@ function patch_Minecraft_processKeyBinds(method) {
     var length = instructions.length;
     for (var i = 0; i < length; i++) {
         var node = instructions[i];
-        if(node.getOpcode() == Opcodes.INVOKEVIRTUAL && node.getNext().getOpcode() == Opcodes.IFEQ) {
+        if(node.getOpcode() == Opcodes.INVOKEVIRTUAL && node.getNext().getOpcode() == Opcodes.IFNE) {
             if(node instanceof MethodInsnNode && findInstruction.matches(node.name) && findInstruction.desc.equals(node.desc)) {
                 if(node.getPrevious().getOpcode() == Opcodes.GETFIELD && node.getPrevious().getPrevious().getOpcode() == Opcodes.GETFIELD && node.getPrevious().getPrevious().getPrevious().getOpcode() == Opcodes.ALOAD) {
-                    var relativeNode = getNthRelativeNode(node, 4)
-                    if(relativeNode !== null && relativeNode.getOpcode() == Opcodes.INVOKEVIRTUAL) {
-                        if(relativeNode.name.equals(ASMAPI.mapMethod("func_198035_h"))) {
-                            foundNode = node;
-                            break;
-                        }
-                    }
+                    foundNode = node;
+                    break;
                 }
             }
         }
@@ -324,7 +319,7 @@ function patch_GameRenderer_updateCameraAndRender(method) {
     if(foundNode !== null) {
         var previousNode = foundNode.getPrevious();
         method.instructions.remove(foundNode);
-        method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/screen/Screen;IIF)V", false))
+        method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/screen/Screen;IIF)V", false));
         return true;
     }
     return false;
