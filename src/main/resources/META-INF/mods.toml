@@ -20,10 +20,10 @@ Adds the ability to use a controller to play Minecraft
    mandatory=true
    versionRange="[29.0.0,)"
    ordering="NONE"
-   side="BOTH"
+   side="CLIENT"
 [[dependencies.controllable]]
    modId="minecraft"
    mandatory=true
    versionRange="[1.15,1.16)"
    ordering="NONE"
-   side="BOTH"
+   side="CLIENT"
