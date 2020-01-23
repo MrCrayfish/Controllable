@@ -160,7 +160,7 @@ public class ControllerInput
 
             if(Math.abs(mouseSpeedX) > 0.05F || Math.abs(mouseSpeedY) > 0.05F)
             {
-                double mouseSpeed = Controllable.getOptions().getMouseSpeed();
+                double mouseSpeed = Controllable.getOptions().getMouseSpeed() * mc.getMainWindow().getGuiScaleFactor();
                 targetMouseX += mouseSpeed * mouseSpeedX;
                 targetMouseX = MathHelper.clamp(targetMouseX, 0, mc.getMainWindow().getWidth());
                 targetMouseY += mouseSpeed * mouseSpeedY;
