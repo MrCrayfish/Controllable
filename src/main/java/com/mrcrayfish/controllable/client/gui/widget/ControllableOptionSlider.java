@@ -21,7 +21,7 @@ public class ControllableOptionSlider extends OptionSlider
     @Override
     protected void applyValue()
     {
-        this.option.set(this.options, this.option.func_216725_b(this.value));
+        this.option.set(this.options, this.option.denormalizeValue(this.value));
         Controllable.getOptions().saveOptions();
     }
 }

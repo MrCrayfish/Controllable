@@ -1,6 +1,5 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
@@ -163,9 +162,9 @@ public class ControllerInput
             {
                 double mouseSpeed = Controllable.getOptions().getMouseSpeed();
                 targetMouseX += mouseSpeed * mouseSpeedX;
-                targetMouseX = MathHelper.clamp(targetMouseX, 0, mc.func_228018_at_().getWidth());
+                targetMouseX = MathHelper.clamp(targetMouseX, 0, mc.getMainWindow().getWidth());
                 targetMouseY += mouseSpeed * mouseSpeedY;
-                targetMouseY = MathHelper.clamp(targetMouseY, 0, mc.func_228018_at_().getHeight());
+                targetMouseY = MathHelper.clamp(targetMouseY, 0, mc.getMainWindow().getHeight());
                 lastUse = 100;
                 moved = true;
             }
@@ -187,13 +186,13 @@ public class ControllerInput
                 {
                     if(mc.loadingGui == null)
                     {
-                        double mouseX = virtualMouseX * (double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth();
-                        double mouseY = virtualMouseY * (double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight();
+                        double mouseX = virtualMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+                        double mouseY = virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
                         Screen.wrapScreenError(() -> screen.mouseMoved(mouseX, mouseY), "mouseMoved event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
                         if(mc.mouseHelper.activeButton != -1 && mc.mouseHelper.eventTime > 0.0D)
                         {
-                            double dragX = (targetMouseX - prevTargetMouseX) * (double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth();
-                            double dragY = (targetMouseY - prevTargetMouseY) * (double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight();
+                            double dragX = (targetMouseX - prevTargetMouseX) * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+                            double dragY = (targetMouseY - prevTargetMouseY) * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
                             Screen.wrapScreenError(() ->
                             {
                                 if(net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPre(screen, mouseX, mouseY, mc.mouseHelper.activeButton, dragX, dragY))
@@ -223,8 +222,8 @@ public class ControllerInput
             moved = false;
             mouseSpeedX = 0.0;
             mouseSpeedY = 0.0;
-            virtualMouseX = targetMouseX = prevTargetMouseX = (int) (mc.func_228018_at_().getWidth() / 2F);
-            virtualMouseY = targetMouseY = prevTargetMouseY = (int) (mc.func_228018_at_().getHeight() / 2F);
+            virtualMouseX = targetMouseX = prevTargetMouseX = (int) (mc.getMainWindow().getWidth() / 2F);
+            virtualMouseY = targetMouseY = prevTargetMouseY = (int) (mc.getMainWindow().getHeight() / 2F);
         }
     }
 
@@ -249,7 +248,7 @@ public class ControllerInput
                 }
                 else
                 {
-                    GLFW.glfwSetCursorPos(mc.func_228018_at_().getHandle(), mouseX, mouseY);
+                    GLFW.glfwSetCursorPos(mc.getMainWindow().getHandle(), mouseX, mouseY);
                 }
             }
         }
@@ -268,7 +267,7 @@ public class ControllerInput
                 {
                     double mouseX = (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * Minecraft.getInstance().getRenderPartialTicks());
                     double mouseY = (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * Minecraft.getInstance().getRenderPartialTicks());
-                    RenderSystem.translated(mouseX / minecraft.func_228018_at_().getGuiScaleFactor(), mouseY / minecraft.func_228018_at_().getGuiScaleFactor(), 500);
+                    RenderSystem.translated(mouseX / minecraft.getMainWindow().getGuiScaleFactor(), mouseY / minecraft.getMainWindow().getGuiScaleFactor(), 500);
                     RenderSystem.color3f(1.0F, 1.0F, 1.0F);
                     RenderSystem.disableLighting();
                     event.getGui().getMinecraft().getTextureManager().bindTexture(CURSOR_TEXTURE);
@@ -401,13 +400,13 @@ public class ControllerInput
 
         Minecraft mc = Minecraft.getInstance();
 
-        if(keyboardSneaking && !mc.gameSettings.field_228046_af_.isKeyDown())
+        if(keyboardSneaking && !mc.gameSettings.keyBindSneak.isKeyDown())
         {
             sneaking = false;
             keyboardSneaking = false;
         }
 
-        if(mc.gameSettings.field_228046_af_.isKeyDown())
+        if(mc.gameSettings.keyBindSneak.isKeyDown())
         {
             sneaking = true;
             keyboardSneaking = true;
@@ -416,7 +415,7 @@ public class ControllerInput
         if(mc.player.abilities.isFlying || mc.player.isPassenger())
         {
             lastUse = 100;
-            sneaking = mc.gameSettings.field_228046_af_.isKeyDown();
+            sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
             sneaking |= ButtonBindings.SNEAK.isButtonDown();
             isFlying = true;
         }
@@ -699,8 +698,8 @@ public class ControllerInput
             ContainerScreen guiContainer = (ContainerScreen) screen;
             int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
             int guiTop = (guiContainer.height - guiContainer.getYSize()) / 2;
-            int mouseX = (int) (targetMouseX * (double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth());
-            int mouseY = (int) (targetMouseY * (double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight());
+            int mouseX = (int) (targetMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth());
+            int mouseY = (int) (targetMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight());
 
             //Slot closestSlot = guiContainer.getSlotUnderMouse();
 
@@ -725,8 +724,8 @@ public class ControllerInput
                 nearSlot = true;
                 int slotCenterXScaled = guiLeft + closestSlot.xPos + 8;
                 int slotCenterYScaled = guiTop + closestSlot.yPos + 8;
-                int slotCenterX = (int) (slotCenterXScaled / ((double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth()));
-                int slotCenterY = (int) (slotCenterYScaled / ((double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight()));
+                int slotCenterX = (int) (slotCenterXScaled / ((double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth()));
+                int slotCenterY = (int) (slotCenterYScaled / ((double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight()));
                 double deltaX = slotCenterX - targetMouseX;
                 double deltaY = slotCenterY - targetMouseY;
 
@@ -810,11 +809,11 @@ public class ControllerInput
                 mouseX = virtualMouseX;
                 mouseY = virtualMouseY;
             }
-            mouseX = mouseX * (double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth();
-            mouseY = mouseY * (double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight();
+            mouseX = mouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+            mouseY = mouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
 
             mc.mouseHelper.activeButton = button;
-            mc.mouseHelper.eventTime = NativeUtil.func_216394_b();
+            mc.mouseHelper.eventTime = NativeUtil.getTime();
 
             double finalMouseX = mouseX;
             double finalMouseY = mouseY;
@@ -852,8 +851,8 @@ public class ControllerInput
                 mouseX = virtualMouseX;
                 mouseY = virtualMouseY;
             }
-            mouseX = mouseX * (double) mc.func_228018_at_().getScaledWidth() / (double) mc.func_228018_at_().getWidth();
-            mouseY = mouseY * (double) mc.func_228018_at_().getScaledHeight() / (double) mc.func_228018_at_().getHeight();
+            mouseX = mouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+            mouseY = mouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
 
             mc.mouseHelper.activeButton = -1;
 

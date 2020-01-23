@@ -238,8 +238,8 @@ public class RenderEvents
                     int texV = Controllable.getOptions().getControllerType().ordinal() * 13;
                     int size = 13;
 
-                    int x = side == Action.Side.LEFT ? 5 : mc.func_228018_at_().getScaledWidth() - 5 - size;
-                    int y = mc.func_228018_at_().getScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
+                    int x = side == Action.Side.LEFT ? 5 : mc.getMainWindow().getScaledWidth() - 5 - size;
+                    int y = mc.getMainWindow().getScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
 
                     mc.getTextureManager().bindTexture(CONTROLLER_BUTTONS);
                     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);

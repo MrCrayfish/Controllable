@@ -18,7 +18,7 @@ public class ControllableBooleanOption extends BooleanOption
     }
 
     @Override
-    public void func_216740_a(GameSettings settings)
+    public void nextValue(GameSettings settings)
     {
         this.set(settings, String.valueOf(!this.get(settings)));
         Controllable.getOptions().saveOptions();
