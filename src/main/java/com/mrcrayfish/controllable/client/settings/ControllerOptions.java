@@ -73,6 +73,12 @@ public class ControllerOptions
         return I18n.format("controllable.controller." + controllerType.getName());
     });
 
+    public static final BooleanOption INVERT_LOOK = new ControllableBooleanOption("controllable.options.invertLook", gameSettings -> {
+        return Controllable.getOptions().invertLook;
+    }, (gameSettings, value) -> {
+        Controllable.getOptions().invertLook = value;
+    });
+
     public static final SliderPercentageOption DEAD_ZONE = new ControllableSliderPercentageOption("controllable.options.deadZone", 0.0, 1.0, 0.01F, gameSettings -> {
         return Controllable.getOptions().deadZone;
     }, (gameSettings, value) -> {
@@ -110,6 +116,7 @@ public class ControllerOptions
     private boolean consoleHotbar = false;
     private CursorType cursorType = CursorType.LIGHT;
     private ControllerType controllerType = ControllerType.DEFAULT;
+    private boolean invertLook = false;
     private double deadZone = 0.15;
     private double rotationSpeed = 25.0;
     private double mouseSpeed = 30.0;
@@ -174,6 +181,9 @@ public class ControllerOptions
                         case "controllerType":
                             this.controllerType = ControllerType.byName(value);
                             break;
+                        case "invertLook":
+                            this.invertLook = Boolean.valueOf(value);
+                            break;
                         case "deadZone":
                             this.deadZone = Double.parseDouble(value);
                             break;
@@ -209,6 +219,7 @@ public class ControllerOptions
             writer.println("consoleHotbar:" + this.consoleHotbar);
             writer.println("cursorType:" + this.cursorType.getName());
             writer.println("controllerType:" + this.controllerType.getName());
+            writer.println("invertLook:" + this.invertLook);
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
@@ -252,6 +263,11 @@ public class ControllerOptions
     public ControllerType getControllerType()
     {
         return controllerType;
+    }
+
+    public boolean isInvertLook()
+    {
+        return invertLook;
     }
 
     public double getDeadZone()

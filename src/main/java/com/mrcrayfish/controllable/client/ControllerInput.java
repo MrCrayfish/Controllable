@@ -297,7 +297,7 @@ public class ControllerInput
 
         if(mc.currentScreen == null && (targetYaw != 0F || targetPitch != 0F))
         {
-            player.rotateTowards(targetYaw, targetPitch);
+            player.rotateTowards(targetYaw, targetPitch * (Controllable.getOptions().isInvertLook() ? -1 : 1));
             if(player.getRidingEntity() != null)
             {
                 player.getRidingEntity().applyOrientationToEntity(player);
