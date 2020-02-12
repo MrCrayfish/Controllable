@@ -211,8 +211,16 @@ public class RenderEvents
                     Action action = actions.get(button);
                     Action.Side side = action.getSide();
 
-                    float texU = (button % 19) * 13F;
-                    float texV = (button / 19) * 13F;
+                    int remappedButton = button;
+                    Controller controller = Controllable.getController();
+                    Mappings.Entry mapping = controller.getMapping();
+                    if(mapping != null)
+                    {
+                        remappedButton = mapping.remap(button);
+                    }
+
+                    float texU = (remappedButton % 19) * 13F;
+                    float texV = Controllable.getOptions().getControllerType().ordinal() * 13;
                     int size = 13;
 
                     ScaledResolution resolution = new ScaledResolution(mc);

@@ -36,6 +36,8 @@ public class ControllableTransformer implements IClassTransformer
                 break;
             case "net.minecraftforge.client.GuiIngameForge":
                 bytes = this.patch(new MethodEntry("", "renderPlayerList", "(II)V"), this::patch_GuiIngameForge_renderPlayerList, bytes);
+                bytes = this.patch(new MethodEntry("", "renderRecordOverlay", "(IIF)V"), this::patch_IngameGui_renderSelectedItem, bytes);
+                bytes = this.patch(new MethodEntry("", "renderToolHighlight", "(Lnet/minecraft/client/gui/ScaledResolution;)V"), this::patch_IngameGui_renderSelectedItem, bytes);
                 break;
             case "net.minecraft.client.renderer.EntityRenderer":
                 bytes = this.patch(new MethodEntry("func_181560_a", "updateCameraAndRender", "(FJ)V"), this::patch_EntityRenderer_updateCameraAndRender, bytes);
@@ -90,7 +92,7 @@ public class ControllableTransformer implements IClassTransformer
     private boolean patch_Minecraft_sendClickBlockToController(MethodNode methodNode)
     {
         methodNode.instructions.insert(new VarInsnNode(Opcodes.ISTORE, 1));
-        methodNode.instructions.insert(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "isLeftClicking", "()Z", false));
+        methodNode.instructions.insert(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "isLeftClicking", "()Z", false));
         return true;
     }
 
@@ -123,7 +125,7 @@ public class ControllableTransformer implements IClassTransformer
                 return false;
             }
             methodNode.instructions.remove(foundNode);
-            methodNode.instructions.insertBefore(nextNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "isRightClicking", "()Z", false));
+            methodNode.instructions.insertBefore(nextNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "isRightClicking", "()Z", false));
             return true;
         }
         return false;
@@ -193,7 +195,7 @@ public class ControllableTransformer implements IClassTransformer
             AbstractInsnNode previous = foundNode.getPrevious();
             this.removeNthNodes(method.instructions, foundNode, 4);
             method.instructions.remove(foundNode);
-            method.instructions.insert(previous, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "canQuickMove", "()Z", false));
+            method.instructions.insert(previous, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "canQuickMove", "()Z", false));
             return true;
         }
         return false;
@@ -238,7 +240,7 @@ public class ControllableTransformer implements IClassTransformer
         {
             if(!this.removeNthNodes(method.instructions, foundNode, -4))
                 return false;
-            method.instructions.insert(foundNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/ControllerInput", "canShowPlayerList", "()Z", false));
+            method.instructions.insert(foundNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "canShowPlayerList", "()Z", false));
             method.instructions.remove(foundNode);
             return true;
         }
@@ -265,7 +267,30 @@ public class ControllableTransformer implements IClassTransformer
         {
             AbstractInsnNode previousNode = foundNode.getPrevious();
             method.instructions.remove(foundNode);
-            method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/GuiScreen;IIF)V", false));
+            method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/GuiScreen;IIF)V", false));
+            return true;
+        }
+        return false;
+    }
+
+    private boolean patch_IngameGui_renderSelectedItem(MethodNode method)
+    {
+        MethodEntry entry = new MethodEntry("func_179094_E", "pushMatrix", "()V");
+        AbstractInsnNode foundNode = null;
+        for(AbstractInsnNode node : method.instructions.toArray())
+        {
+            if(node.getOpcode() != Opcodes.INVOKESTATIC)
+                continue;
+            MethodInsnNode methodNode = (MethodInsnNode) node;
+            if((entry.obfName.equals(methodNode.name) || entry.name.equals(methodNode.name)) && entry.desc.equals(methodNode.desc))
+            {
+                foundNode = node;
+                break;
+            }
+        }
+        if(foundNode != null)
+        {
+            method.instructions.insert(foundNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "applyHotbarOffset", "()V", false));
             return true;
         }
         return false;

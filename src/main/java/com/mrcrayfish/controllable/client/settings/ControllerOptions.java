@@ -3,7 +3,10 @@ package com.mrcrayfish.controllable.client.settings;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.ControllerType;
+import com.mrcrayfish.controllable.client.CursorType;
 import com.mrcrayfish.controllable.client.gui.option.OptionBoolean;
+import com.mrcrayfish.controllable.client.gui.option.OptionEnum;
 import com.mrcrayfish.controllable.client.gui.option.OptionSlider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -23,6 +26,14 @@ import java.util.List;
 public class ControllerOptions
 {
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
+
+    public static final OptionBoolean FORCE_FEEDBACK = new OptionBoolean(() -> {
+        return Controllable.getOptions().forceFeedback;
+    }, value -> {
+        Controllable.getOptions().forceFeedback = value;
+    }, value -> {
+        return I18n.format("controllable.options.forceFeedback") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
+    });
 
     public static final OptionBoolean AUTO_SELECT = new OptionBoolean(() -> {
         return Controllable.getOptions().autoSelect;
@@ -46,6 +57,38 @@ public class ControllerOptions
         Controllable.getOptions().virtualMouse = value;
     }, value -> {
         return I18n.format("controllable.options.virtualMouse") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
+    });
+
+    public static final OptionBoolean CONSOLE_HOTBAR = new OptionBoolean(() -> {
+        return Controllable.getOptions().consoleHotbar;
+    }, value -> {
+        Controllable.getOptions().consoleHotbar = value;
+    }, value -> {
+        return I18n.format("controllable.options.consoleHotbar") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
+    });
+
+    public static final OptionEnum<CursorType> CURSOR_TYPE = new OptionEnum<>(() -> {
+        return Controllable.getOptions().cursorType;
+    }, value -> {
+        Controllable.getOptions().cursorType = value;
+    }, value -> {
+        return I18n.format("controllable.options.cursorType") + ": " + I18n.format("controllable.cursor." + value.getName());
+    });
+
+    public static final OptionEnum<ControllerType> CONTROLLER_TYPE = new OptionEnum<>(() -> {
+        return Controllable.getOptions().controllerType;
+    }, value -> {
+        Controllable.getOptions().controllerType = value;
+    }, value -> {
+        return I18n.format("controllable.options.controllerType") + ": " + I18n.format("controllable.controller." + value.getName());
+    });
+
+    public static final OptionBoolean INVERT_LOOK = new OptionBoolean(() -> {
+        return Controllable.getOptions().invertLook;
+    }, value -> {
+        Controllable.getOptions().invertLook = value;
+    }, value -> {
+        return I18n.format("controllable.options.invertLook") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
     });
 
     public static final OptionSlider DEAD_ZONE = new OptionSlider(0.01F, 0.0F, 1.0F, () -> {
@@ -79,11 +122,16 @@ public class ControllerOptions
 
     private Minecraft minecraft;
     private File optionsFile;
+    private boolean forceFeedback = true;
     private boolean autoSelect = true;
     private boolean renderMiniPlayer = true;
     private boolean virtualMouse = true;
-    private double deadZone = 0.1;
-    private double rotationSpeed = 20.0;
+    private boolean consoleHotbar = false;
+    private CursorType cursorType = CursorType.LIGHT;
+    private ControllerType controllerType = ControllerType.DEFAULT;
+    private boolean invertLook = false;
+    private double deadZone = 0.15;
+    private double rotationSpeed = 25.0;
     private double mouseSpeed = 30.0;
 
     public ControllerOptions(Minecraft minecraft, File dataDir)
@@ -126,14 +174,29 @@ public class ControllerOptions
                 {
                     switch(key)
                     {
+                        case "forceFeedback":
+                            this.forceFeedback = Boolean.valueOf(value);
+                            break;
                         case "autoSelect":
                             this.autoSelect = Boolean.valueOf(value);
+                            break;
+                        case "cursorType":
+                            this.cursorType = CursorType.byId(value);
+                            break;
+                        case "controllerType":
+                            this.controllerType = ControllerType.byName(value);
+                            break;
+                        case "invertLook":
+                            this.invertLook = Boolean.valueOf(value);
                             break;
                         case "deadZone":
                             this.deadZone = Double.parseDouble(value);
                             break;
                         case "virtualMouse":
                             this.virtualMouse = Boolean.valueOf(value);
+                            break;
+                        case "consoleHotbar":
+                            this.consoleHotbar = Boolean.valueOf(value);
                             break;
                         case "rotationSpeed":
                             this.rotationSpeed = Double.parseDouble(value);
@@ -163,9 +226,14 @@ public class ControllerOptions
     {
         try(PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8)))
         {
+            writer.println("forceFeedback:" + this.forceFeedback);
             writer.println("autoSelect:" + this.autoSelect);
             writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
             writer.println("virtualMouse:" + this.virtualMouse);
+            writer.println("consoleHotbar:" + this.consoleHotbar);
+            writer.println("cursorType:" + this.cursorType.getName());
+            writer.println("controllerType:" + this.controllerType.getName());
+            writer.println("invertLook:" + this.invertLook);
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
@@ -174,6 +242,11 @@ public class ControllerOptions
         {
             e.printStackTrace();
         }
+    }
+
+    public boolean useForceFeedback()
+    {
+        return this.forceFeedback;
     }
 
     public boolean isAutoSelect()
@@ -189,6 +262,26 @@ public class ControllerOptions
     public boolean isVirtualMouse()
     {
         return virtualMouse;
+    }
+
+    public boolean useConsoleHotbar()
+    {
+        return consoleHotbar;
+    }
+
+    public CursorType getCursorType()
+    {
+        return cursorType;
+    }
+
+    public ControllerType getControllerType()
+    {
+        return controllerType;
+    }
+
+    public boolean isInvertLook()
+    {
+        return invertLook;
     }
 
     public double getDeadZone()

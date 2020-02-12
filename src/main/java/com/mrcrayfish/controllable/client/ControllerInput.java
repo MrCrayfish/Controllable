@@ -62,6 +62,9 @@ public class ControllerInput
     private int targetMouseY;
     private float mouseSpeedX;
     private float mouseSpeedY;
+    private boolean moved;
+    private float targetPitch;
+    private float targetYaw;
 
     private int dropCounter = -1;
 
@@ -95,6 +98,11 @@ public class ControllerInput
 
             Controller controller = Controllable.getController();
             if(controller == null) return;
+
+            if(Math.abs(controller.getLTriggerValue()) >= 0.1F || Math.abs(controller.getRTriggerValue()) >= 0.1F)
+            {
+                lastUse = 100;
+            }
 
             Minecraft mc = Minecraft.getMinecraft();
             if(mc.inGameHasFocus) return;
@@ -146,10 +154,14 @@ public class ControllerInput
 
             if(Math.abs(mouseSpeedX) > 0.05F || Math.abs(mouseSpeedY) > 0.05F)
             {
-                double mouseSpeed = Controllable.getOptions().getMouseSpeed();
+                ScaledResolution resolution = new ScaledResolution(mc);
+                double mouseSpeed = Controllable.getOptions().getMouseSpeed() * resolution.getScaleFactor();
                 targetMouseX += mouseSpeed * mouseSpeedX;
+                targetMouseX = MathHelper.clamp(targetMouseX, 0, mc.displayWidth);
                 targetMouseY -= mouseSpeed * mouseSpeedY;
+                targetMouseY = MathHelper.clamp(targetMouseY, 0, mc.displayHeight);
                 lastUse = 100;
+                moved = true;
             }
 
             prevXAxis = controller.getLThumbStickXValue();
@@ -195,8 +207,12 @@ public class ControllerInput
         Minecraft mc = Minecraft.getMinecraft();
         if(mc.currentScreen == null)
         {
-            targetMouseX = prevTargetMouseX = virtualMouseX = mc.displayWidth / 2;
-            targetMouseY = prevTargetMouseY = virtualMouseY = mc.displayHeight / 2;
+            nearSlot = false;
+            moved = false;
+            mouseSpeedX = 0.0F;
+            mouseSpeedY = 0.0F;
+            virtualMouseX = targetMouseX = prevTargetMouseX = mc.displayWidth / 2;
+            virtualMouseY = targetMouseY = prevTargetMouseY = mc.displayHeight / 2;
         }
     }
 
@@ -234,15 +250,22 @@ public class ControllerInput
         {
             GlStateManager.pushMatrix();
             {
+                CursorType type = Controllable.getOptions().getCursorType();
                 Minecraft minecraft = event.getGui().mc;
-                if(minecraft.player == null || minecraft.player.inventory.getItemStack().isEmpty())
+                if(minecraft.player == null || (minecraft.player.inventory.getItemStack().isEmpty() || type == CursorType.CONSOLE))
                 {
                     ScaledResolution resolution = new ScaledResolution(minecraft);
-                    GlStateManager.translate(virtualMouseX / (double) resolution.getScaleFactor(), virtualMouseY / (double) resolution.getScaleFactor(), 300);
+                    double mouseX = (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * Minecraft.getMinecraft().getRenderPartialTicks());
+                    double mouseY = (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * Minecraft.getMinecraft().getRenderPartialTicks());
+                    GlStateManager.translate(mouseX / resolution.getScaleFactor(), resolution.getScaledHeight() - (mouseY / resolution.getScaleFactor()), 500);
                     GlStateManager.color(1.0F, 1.0F, 1.0F);
                     GlStateManager.disableLighting();
                     minecraft.getTextureManager().bindTexture(CURSOR_TEXTURE);
-                    GuiScreen.drawScaledCustomSizeModalRect(-8, -8, nearSlot ? 16 : 0, 0, 16, 16, 16, 16, 32, 32);
+                    if(type == CursorType.CONSOLE)
+                    {
+                        GlStateManager.scale(0.5, 0.5, 0.5);
+                    }
+                    GuiScreen.drawScaledCustomSizeModalRect(-8, -8, nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 16, 16, 32, CursorType.values().length * 16);
                 }
             }
             GlStateManager.popMatrix();
@@ -261,21 +284,62 @@ public class ControllerInput
         EntityPlayer player = mc.player;
         if(player == null) return;
 
+        if(mc.currentScreen == null && (targetYaw != 0F || targetPitch != 0F))
+        {
+            float elapsedTicks = mc.getTickLength();
+            player.turn((targetYaw / 0.15F) * elapsedTicks, (targetPitch / 0.15F) * (Controllable.getOptions().isInvertLook() ? 1 : -1) * elapsedTicks);
+            if(player.getRidingEntity() != null)
+            {
+                player.getRidingEntity().applyOrientationToEntity(player);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRender(TickEvent.ClientTickEvent event)
+    {
+        if(event.phase == TickEvent.Phase.END)
+            return;
+
+        targetYaw = 0F;
+        targetPitch = 0F;
+
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer player = mc.player;
+        if(player == null)
+            return;
+
+        Controller controller = Controllable.getController();
+        if(controller == null)
+            return;
+
         if(mc.currentScreen == null)
         {
             float deadZone = (float) Controllable.getOptions().getDeadZone();
 
             /* Handles rotating the yaw of player */
-            if(Math.abs(controller.getRThumbStickXValue()) >= deadZone || Math.abs(controller.getRThumbStickYValue()) >= deadZone)
+            if(Math.abs(controller.getRThumbStickXValue()) >= deadZone)
             {
                 lastUse = 100;
-                float rotationSpeed = (float) Controllable.getOptions().getRotationSpeed();
-                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, rotationSpeed, rotationSpeed * 0.75F);
+                double rotationSpeed = Controllable.getOptions().getRotationSpeed();
+                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
-                    float rotationYaw = turnEvent.getYawSpeed() * controller.getRThumbStickXValue();
-                    float rotationPitch = turnEvent.getPitchSpeed() * -controller.getRThumbStickYValue();
-                    player.turn(rotationYaw, rotationPitch);
+                    float deadZoneTrim = (controller.getRThumbStickXValue() > 0 ? 1 : -1) * deadZone;
+                    float rotationYaw = (turnEvent.getYawSpeed() * (controller.getRThumbStickXValue() - deadZoneTrim) / (1.0F - deadZone)) * 0.33F;
+                    targetYaw = rotationYaw;
+                }
+            }
+            if(Math.abs(controller.getRThumbStickYValue()) >= deadZone)
+            {
+                lastUse = 100;
+                double rotationSpeed = Controllable.getOptions().getRotationSpeed();
+                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
+                if(!MinecraftForge.EVENT_BUS.post(turnEvent))
+                {
+                    float deadZoneTrim = (controller.getRThumbStickYValue() > 0 ? 1 : -1) * deadZone;
+                    float rotationPitch = (turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() - deadZoneTrim) / (1.0F - deadZone)) * 0.33F;
+                    targetPitch = rotationPitch;
                 }
             }
         }
@@ -289,7 +353,7 @@ public class ControllerInput
             }
         }
 
-        if(dropCounter > 40)
+        if(dropCounter > 20)
         {
             if(!mc.player.isSpectator())
             {
@@ -425,8 +489,6 @@ public class ControllerInput
                         mc.getTutorial().openInventory();
                         mc.displayGuiScreen(new GuiInventory(mc.player));
                     }
-                    prevTargetMouseX = targetMouseX = Mouse.getX();
-                    prevTargetMouseY = targetMouseY = Mouse.getY();
                 }
                 else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
@@ -607,6 +669,7 @@ public class ControllerInput
          * a controller. */
         if(screen instanceof GuiContainer)
         {
+            if(!moved) return;
             Minecraft mc = Minecraft.getMinecraft();
             GuiContainer guiContainer = (GuiContainer) screen;
             int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
@@ -776,80 +839,5 @@ public class ControllerInput
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Used in order to fix block breaking progress. This method is linked via ASM.
-     */
-    @SuppressWarnings("unused")
-    public static boolean isLeftClicking()
-    {
-        Minecraft mc = Minecraft.getMinecraft();
-        boolean isLeftClicking = mc.gameSettings.keyBindAttack.isKeyDown();
-        Controller controller = Controllable.getController();
-        if(controller != null)
-        {
-            if(ButtonBindings.ATTACK.isButtonDown())
-            {
-                isLeftClicking = true;
-            }
-        }
-        return mc.currentScreen == null && isLeftClicking && mc.inGameHasFocus;
-    }
-
-    /**
-     * Used in order to fix actions like eating or pulling bow back. This method is linked via ASM.
-     */
-    @SuppressWarnings("unused")
-    public static boolean isRightClicking()
-    {
-        Minecraft mc = Minecraft.getMinecraft();
-        boolean isRightClicking = mc.gameSettings.keyBindUseItem.isKeyDown();
-        Controller controller = Controllable.getController();
-        if(controller != null)
-        {
-            if(ButtonBindings.USE_ITEM.isButtonDown())
-            {
-                isRightClicking = true;
-            }
-        }
-        return isRightClicking;
-    }
-
-    /**
-     * Used in order to fix the quick move check in inventories. This method is linked via ASM.
-     */
-    @SuppressWarnings("unused")
-    public static boolean canQuickMove()
-    {
-        boolean isSneaking = (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
-        Controller controller = Controllable.getController();
-        if(controller != null)
-        {
-            if(ButtonBindings.QUICK_MOVE.isButtonDown())
-            {
-                isSneaking = true;
-            }
-        }
-        return isSneaking;
-    }
-
-    /**
-     * Allows the player list to be shown. This method is linked via ASM.
-     */
-    @SuppressWarnings("unused")
-    public static boolean canShowPlayerList()
-    {
-        Minecraft mc = Minecraft.getMinecraft();
-        boolean canShowPlayerList = mc.gameSettings.keyBindPlayerList.isKeyDown();
-        Controller controller = Controllable.getController();
-        if(controller != null)
-        {
-            if(ButtonBindings.PLAYER_LIST.isButtonDown())
-            {
-                canShowPlayerList = true;
-            }
-        }
-        return canShowPlayerList;
     }
 }

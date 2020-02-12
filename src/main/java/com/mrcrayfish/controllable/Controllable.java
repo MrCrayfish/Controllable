@@ -126,6 +126,7 @@ public class Controllable extends DummyModContainer
         MinecraftForge.EVENT_BUS.register(input = new ControllerInput());
         MinecraftForge.EVENT_BUS.register(new RenderEvents());
         MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
+        MinecraftForge.EVENT_BUS.register(new ControllerEvents());
     }
 
 
@@ -164,6 +165,7 @@ public class Controllable extends DummyModContainer
 
         ButtonBinding.tick();
 
+        Controller currentController = controller;
         this.processButton(Buttons.A, getButtonState(SDL_CONTROLLER_BUTTON_A));
         this.processButton(Buttons.B, getButtonState(SDL_CONTROLLER_BUTTON_B));
         this.processButton(Buttons.X, getButtonState(SDL_CONTROLLER_BUTTON_X));
@@ -175,8 +177,8 @@ public class Controllable extends DummyModContainer
         this.processButton(Buttons.RIGHT_THUMB_STICK, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
         this.processButton(Buttons.LEFT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
         this.processButton(Buttons.RIGHT_BUMPER, getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
-        this.processButton(Buttons.LEFT_TRIGGER, Math.abs(controller.getLTriggerValue()) >= 0.1F);
-        this.processButton(Buttons.RIGHT_TRIGGER, Math.abs(controller.getRTriggerValue()) >= 0.1F);
+        this.processButton(Buttons.LEFT_TRIGGER, Math.abs(currentController.getLTriggerValue()) >= 0.1F);
+        this.processButton(Buttons.RIGHT_TRIGGER, Math.abs(currentController.getRTriggerValue()) >= 0.1F);
         this.processButton(Buttons.DPAD_UP, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
         this.processButton(Buttons.DPAD_DOWN, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
         this.processButton(Buttons.DPAD_LEFT, getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
@@ -191,6 +193,11 @@ public class Controllable extends DummyModContainer
             {
                 return;
             }
+        }
+
+        if(controller == null)
+        {
+            return;
         }
 
         if(controller.getMapping() != null)
@@ -249,7 +256,10 @@ public class Controllable extends DummyModContainer
                 {
                     if(Controllable.controller == null)
                     {
-                        setController((SDL2Controller) sdlController);
+                        if(options.isAutoSelect())
+                        {
+                            setController((SDL2Controller) sdlController);
+                        }
 
                         Minecraft mc = Minecraft.getMinecraft();
                         if(mc.player != null)
