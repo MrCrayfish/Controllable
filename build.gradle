@@ -28,7 +28,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
             mods {
-                cfm {
+                controllable {
                     source sourceSets.main
                 }
             }
@@ -39,7 +39,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
             mods {
-                cfm {
+                controllable {
                     source sourceSets.main
                 }
             }
@@ -51,7 +51,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
             mods {
-                cfm {
+                controllable {
                     source sourceSets.main
                 }
             }
@@ -65,7 +65,7 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.0.0'
+    minecraft 'net.minecraftforge:forge:1.15.2-31.0.14'
 }
 
 repositories {
