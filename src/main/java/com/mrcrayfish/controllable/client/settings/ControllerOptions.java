@@ -110,8 +110,8 @@ public class ControllerOptions
     private boolean consoleHotbar = false;
     private CursorType cursorType = CursorType.LIGHT;
     private ControllerType controllerType = ControllerType.DEFAULT;
-    private double deadZone = 0.1;
-    private double rotationSpeed = 20.0;
+    private double deadZone = 0.15;
+    private double rotationSpeed = 25.0;
     private double mouseSpeed = 30.0;
 
     public ControllerOptions(File dataDir)
