@@ -39,6 +39,7 @@
   "controllable.options.consoleHotbar": "Konsolen Schnellzugriffsl.",
   "controllable.options.cursorType": "Mauszeigertyp",
   "controllable.options.controllerType": "Symbole",
+  "controllable.options.invertLook": "Sicht umkehren",
   "controllable.controller.default": "Standard",
   "controllable.controller.playstation": "Playstation",
   "controllable.controller.xbox": "Xbox",
