@@ -194,6 +194,9 @@ public class ControllerOptions {
                         case "mouseSpeed":
                             this.mouseSpeed = Double.parseDouble(value);
                             break;
+                        case "attackSpeed":
+                            this.attackSpeed = Integer.parseInt(value);
+                            break;
                     }
                 } catch (Exception e) {
                     Controllable.LOGGER.warn("Skipping bad option: {}:{}", key, value);
@@ -218,6 +221,7 @@ public class ControllerOptions {
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
+            writer.println("attackSpeed:" + FORMAT.format(this.attackSpeed));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
