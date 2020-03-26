@@ -74,6 +74,8 @@ repositories {
 
 dependencies {
     libraries "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
 }
 
 jar {
