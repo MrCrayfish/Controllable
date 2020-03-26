@@ -32,6 +32,7 @@
   "controllable.options.deadZone.format": "Dead Zone: %s",
   "controllable.options.rotationSpeed": "Rotation Speed",
   "controllable.options.rotationSpeed.format": "Rotation Speed: %s",
+  "controllable.options.attackSpeed.format": "Attack Speed: %s",
   "controllable.options.mouseSpeed": "Mouse Speed",
   "controllable.options.mouseSpeed.format": "Mouse Speed: %s",
   "controllable.options.renderMiniPlayer": "Render Mini Player",

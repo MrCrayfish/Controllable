@@ -13,7 +13,7 @@ import net.minecraft.util.text.TranslationTextComponent;
  */
 public class SettingsScreen extends Screen
 {
-    private static final AbstractOption[] OPTIONS = new AbstractOption[]{ControllerOptions.FORCE_FEEDBACK, ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.CONSOLE_HOTBAR, ControllerOptions.CONTROLLER_TYPE, ControllerOptions.CURSOR_TYPE, ControllerOptions.INVERT_LOOK, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED};
+    private static final AbstractOption[] OPTIONS = new AbstractOption[]{ControllerOptions.FORCE_FEEDBACK, ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.CONSOLE_HOTBAR, ControllerOptions.CONTROLLER_TYPE, ControllerOptions.CURSOR_TYPE, ControllerOptions.INVERT_LOOK, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED, ControllerOptions.ATTACK_SPEED};
     private final Screen parentScreen;
 
     protected SettingsScreen(Screen parentScreen)
@@ -33,9 +33,8 @@ public class SettingsScreen extends Screen
             this.addButton(option.createWidget(this.minecraft.gameSettings, x, y, 150));
         }
 
-        this.addButton(new Button(this.width / 2 - 100, this.height / 6 + 24 * (OPTIONS.length + 1) / 2, 200, 20, I18n.format("gui.done"), (button) -> {
-            this.minecraft.displayGuiScreen(this.parentScreen);
-        }));
+        this.addButton(new Button(this.width / 2 - 100, this.height / 6 + 24 * (OPTIONS.length + 1) / 2, 200, 20, I18n.format("gui.done"),
+                (button) -> this.minecraft.displayGuiScreen(this.parentScreen)));
     }
 
     @Override

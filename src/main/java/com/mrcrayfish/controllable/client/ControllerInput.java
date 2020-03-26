@@ -21,6 +21,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -66,6 +67,8 @@ public class ControllerInput
     private boolean moved;
     private float targetPitch;
     private float targetYaw;
+
+    private int currentAttackTimer;
 
     private int dropCounter = -1;
 
@@ -461,12 +464,34 @@ public class ControllerInput
             {
                 event.getMovementInput().jump = true;
             }
+
+            // Reset timer if it reaches target
+            if (currentAttackTimer > Controllable.getOptions().getAttackSpeed()) currentAttackTimer = 0;
+
+            if(ButtonBindings.USE_ITEM.isButtonDown() && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
+            {
+                mc.rightClickMouse();
+            }
+
+            else if (ButtonBindings.ATTACK.isButtonDown() && mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY && currentAttackTimer == 0) {
+                // This is to keep attacking while the button is held and staring at a mob
+                mc.clickMouse();
+                currentAttackTimer = 1;
+            }
+
+            // Keep the timer going if the first attack was registered
+            // This is to avoid only increasing timer while staring at a mob.
+            if (ButtonBindings.ATTACK.isButtonDown() && currentAttackTimer > 0) {
+                currentAttackTimer++;
+            }
+
+            // Reset timer when button is no longer held
+            if (!ButtonBindings.ATTACK.isButtonDown()) {
+                currentAttackTimer = 0;
+            }
         }
 
-        if(ButtonBindings.USE_ITEM.isButtonDown() && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
-        {
-            mc.rightClickMouse();
-        }
+
     }
 
     public void handleButtonInput(Controller controller, int button, boolean state)
@@ -551,6 +576,7 @@ public class ControllerInput
                     if(ButtonBindings.ATTACK.isButtonPressed())
                     {
                         mc.clickMouse();
+                        currentAttackTimer = 1;
                     }
                     else if(ButtonBindings.USE_ITEM.isButtonPressed())
                     {

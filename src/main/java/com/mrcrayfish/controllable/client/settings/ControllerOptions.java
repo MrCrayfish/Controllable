@@ -5,8 +5,10 @@ import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerType;
 import com.mrcrayfish.controllable.client.CursorType;
+import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.BooleanOption;
+import net.minecraft.client.settings.SliderMultiplierOption;
 import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.MathHelper;
@@ -21,8 +23,7 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-public class ControllerOptions
-{
+public class ControllerOptions {
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
 
     public static final BooleanOption FORCE_FEEDBACK = new ControllableBooleanOption("controllable.options.forceFeedback", gameSettings -> {
@@ -106,6 +107,14 @@ public class ControllerOptions
         return I18n.format("controllable.options.mouseSpeed.format", FORMAT.format(mouseSpeed));
     });
 
+    public static final SliderPercentageOption ATTACK_SPEED = new ControllableSliderPercentageOption("controllable.options.attackSpeed", 5, 40, 1,
+            gameSettings -> (double) Controllable.getOptions().attackSpeed,
+            (gameSettings, value) -> Controllable.getOptions().attackSpeed = (int) MathHelper.clamp(value, 5, 40),
+            (gameSettings, sliderPercentageOption) -> {
+                int attackSpeed = Controllable.getOptions().attackSpeed;
+                return I18n.format("controllable.options.attackSpeed.format", FORMAT.format(attackSpeed));
+            });
+
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
     private File optionsFile;
@@ -121,59 +130,51 @@ public class ControllerOptions
     private double rotationSpeed = 25.0;
     private double mouseSpeed = 30.0;
 
-    public ControllerOptions(File dataDir)
-    {
+    @Getter
+    private int attackSpeed = 5;
+
+    public ControllerOptions(File dataDir) {
         this.optionsFile = new File(dataDir, "controllable-options.txt");
         this.loadOptions();
     }
 
-    private void loadOptions()
-    {
-        try
-        {
-            if(!this.optionsFile.exists())
-            {
+    private void loadOptions() {
+        try {
+            if (!this.optionsFile.exists()) {
                 return;
             }
 
             List<String> lines = IOUtils.readLines(new FileInputStream(this.optionsFile), Charsets.UTF_8);
             CompoundNBT compound = new CompoundNBT();
 
-            for(String line : lines)
-            {
-                try
-                {
+            for (String line : lines) {
+                try {
                     Iterator<String> iterator = COLON_SPLITTER.omitEmptyStrings().limit(2).split(line).iterator();
                     compound.putString(iterator.next(), iterator.next());
-                }
-                catch(Exception var10)
-                {
+                } catch (Exception var10) {
                     Controllable.LOGGER.warn("Skipping bad option: {}", line);
                 }
             }
 
-            for(String key : compound.keySet())
-            {
+            for (String key : compound.keySet()) {
                 String value = compound.getString(key);
 
-                try
-                {
-                    switch(key)
-                    {
+                try {
+                    switch (key) {
                         case "forceFeedback":
-                            this.forceFeedback = Boolean.valueOf(value);
+                            this.forceFeedback = Boolean.parseBoolean(value);
                             break;
                         case "autoSelect":
-                            this.autoSelect = Boolean.valueOf(value);
+                            this.autoSelect = Boolean.parseBoolean(value);
                             break;
                         case "renderMiniPlayer":
-                            this.renderMiniPlayer = Boolean.valueOf(value);
+                            this.renderMiniPlayer = Boolean.parseBoolean(value);
                             break;
                         case "virtualMouse":
-                            this.virtualMouse = Boolean.valueOf(value);
+                            this.virtualMouse = Boolean.parseBoolean(value);
                             break;
                         case "consoleHotbar":
-                            this.consoleHotbar = Boolean.valueOf(value);
+                            this.consoleHotbar = Boolean.parseBoolean(value);
                             break;
                         case "cursorType":
                             this.cursorType = CursorType.byId(value);
@@ -182,7 +183,7 @@ public class ControllerOptions
                             this.controllerType = ControllerType.byName(value);
                             break;
                         case "invertLook":
-                            this.invertLook = Boolean.valueOf(value);
+                            this.invertLook = Boolean.parseBoolean(value);
                             break;
                         case "deadZone":
                             this.deadZone = Double.parseDouble(value);
@@ -194,24 +195,18 @@ public class ControllerOptions
                             this.mouseSpeed = Double.parseDouble(value);
                             break;
                     }
-                }
-                catch(Exception e)
-                {
+                } catch (Exception e) {
                     Controllable.LOGGER.warn("Skipping bad option: {}:{}", key, value);
                 }
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             Controllable.LOGGER.error("Failed to load options", e);
         }
 
     }
 
-    public void saveOptions()
-    {
-        try(PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8)))
-        {
+    public void saveOptions() {
+        try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8))) {
             writer.println("forceFeedback:" + this.forceFeedback);
             writer.println("autoSelect:" + this.autoSelect);
             writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
@@ -223,65 +218,52 @@ public class ControllerOptions
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
-        }
-        catch(FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean useForceFeedback()
-    {
+    public boolean useForceFeedback() {
         return this.forceFeedback;
     }
 
-    public boolean isAutoSelect()
-    {
+    public boolean isAutoSelect() {
         return this.autoSelect;
     }
 
-    public boolean isRenderMiniPlayer()
-    {
+    public boolean isRenderMiniPlayer() {
         return renderMiniPlayer;
     }
 
-    public boolean isVirtualMouse()
-    {
+    public boolean isVirtualMouse() {
         return virtualMouse;
     }
 
-    public boolean useConsoleHotbar()
-    {
+    public boolean useConsoleHotbar() {
         return consoleHotbar;
     }
 
-    public CursorType getCursorType()
-    {
+    public CursorType getCursorType() {
         return cursorType;
     }
 
-    public ControllerType getControllerType()
-    {
+    public ControllerType getControllerType() {
         return controllerType;
     }
 
-    public boolean isInvertLook()
-    {
+    public boolean isInvertLook() {
         return invertLook;
     }
 
-    public double getDeadZone()
-    {
+    public double getDeadZone() {
         return this.deadZone;
     }
 
-    public double getRotationSpeed()
-    {
+    public double getRotationSpeed() {
         return this.rotationSpeed;
     }
 
-    public double getMouseSpeed()
-    {
+    public double getMouseSpeed() {
         return this.mouseSpeed;
     }
 

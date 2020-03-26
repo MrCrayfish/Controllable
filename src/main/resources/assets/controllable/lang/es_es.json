@@ -35,6 +35,7 @@
     "controllable.options.mouseSpeed.format": "Velocidad del rat\u00F3n: %s",
     "controllable.options.renderMiniPlayer": "Renderizar Mini-Jugador",
     "controllable.options.virtualMouse": "Rat\u00F3n virtual",
+    "controllable.options.attackSpeed.format": "Velocidad de atacar: %s",
     "controllable.toast.controller": "Mando",
     "controllable.toast.connected": "Conectado",
     "controllable.toast.disconnected": "Desconectado"
