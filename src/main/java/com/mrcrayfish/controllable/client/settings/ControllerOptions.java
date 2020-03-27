@@ -233,7 +233,7 @@ public class ControllerOptions {
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
             writer.println("attackSpeed:" + FORMAT.format(this.attackSpeed));
-            writer.println("toggleSprint:" + FORMAT.format(this.toggleSprint));
+            writer.println("toggleSprint:" + this.toggleSprint);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
