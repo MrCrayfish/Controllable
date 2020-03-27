@@ -465,6 +465,22 @@ public class ControllerInput
                 event.getMovementInput().jump = true;
             }
 
+            if (ButtonBindings.SPRINT.isButtonDown() && !Controllable.getOptions().isToggleSprint()) {
+                player.setSprinting(true);
+            }
+
+            if (ButtonBindings.SPRINT.isButtonPressed() && Controllable.getOptions().isToggleSprint()) {
+                player.setSprinting(!player.isSprinting());
+            }
+
+            if (ButtonBindings.SNEAK.isButtonDown() && !Controllable.getOptions().isToggleSneak()) {
+                player.setSprinting(true);
+            }
+
+            if (ButtonBindings.SNEAK.isButtonPressed() && Controllable.getOptions().isToggleSneak()) {
+                event.getMovementInput().field_228350_h_ = (!event.getMovementInput().field_228350_h_);
+            }
+
             // Reset timer if it reaches target
             if (currentAttackTimer > Controllable.getOptions().getAttackSpeed()) currentAttackTimer = 0;
 

@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.client.ControllerType;
 import com.mrcrayfish.controllable.client.CursorType;
 import lombok.Getter;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.settings.AbstractOption;
 import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.nbt.CompoundNBT;
@@ -23,6 +24,7 @@ import java.util.List;
  * Author: MrCrayfish
  */
 public class ControllerOptions {
+
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
 
     public static final BooleanOption FORCE_FEEDBACK = new ControllableBooleanOption("controllable.options.forceFeedback", gameSettings -> {
@@ -114,6 +116,14 @@ public class ControllerOptions {
                 return I18n.format("controllable.options.attackSpeed.format", FORMAT.format(attackSpeed));
             });
 
+    public static final AbstractOption TOGGLE_SPRINT = new ControllableBooleanOption("controllable.options.toggleSprint",
+            gameSettings -> Controllable.getOptions().toggleSprint,
+            (gameSettings, aBoolean) -> Controllable.getOptions().toggleSprint = aBoolean);
+
+    public static final AbstractOption TOGGLE_SNEAK = new ControllableBooleanOption("controllable.options.toggleSneak",
+            gameSettings -> Controllable.getOptions().toggleSneak,
+            (gameSettings, aBoolean) -> Controllable.getOptions().toggleSneak = aBoolean);
+
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
     private File optionsFile;
@@ -131,6 +141,12 @@ public class ControllerOptions {
 
     @Getter
     private int attackSpeed = 5;
+
+    @Getter
+    private boolean toggleSprint = false;
+
+    @Getter
+    private boolean toggleSneak = false;
 
     public ControllerOptions(File dataDir) {
         this.optionsFile = new File(dataDir, "controllable-options.txt");
