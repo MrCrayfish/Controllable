@@ -440,13 +440,11 @@ public class ControllerInput
         {
             sprinting = false;
             keyboardSprinting = false;
-        }
-
-        if(mc.gameSettings.keyBindSprint.isKeyDown())
+        }else if(mc.gameSettings.keyBindSprint.isKeyDown())
         {
             sprinting = true;
             keyboardSprinting = true;
-        }
+        }else sprinting = ButtonBindings.SNEAK.isButtonDown() || mc.gameSettings.keyBindSprint.isKeyDown();
 
         mc.player.setSprinting(sprinting);
 
