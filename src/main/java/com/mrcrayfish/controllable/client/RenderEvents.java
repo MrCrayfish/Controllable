@@ -181,7 +181,7 @@ public class RenderEvents
                     actions.put(ButtonBindings.SPRINT.getButton(), new Action(I18n.format("controllable.action.sprint"), Action.Side.RIGHT));
                 } else {
                     if (Controllable.getOptions().isToggleSprint()) {
-                        actions.put(ButtonBindings.SPRINT.getButton(), new Action(I18n.format("controllable.action.toggleSprint", LocaleUtil.booleanLocale(mc.player.isSprinting())), Action.Side.RIGHT));
+                        actions.put(ButtonBindings.SPRINT.getButton(), new Action(I18n.format("controllable.action.toggleSprint", LocaleUtil.booleanLocale(Controllable.getInput().isSprinting())), Action.Side.RIGHT));
                     }
                 }
 

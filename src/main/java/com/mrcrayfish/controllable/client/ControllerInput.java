@@ -52,9 +52,13 @@ public class ControllerInput
 
     private int lastUse = 0;
     private boolean keyboardSneaking = false;
+    private boolean keyboardSprinting = false;
 
     @Getter
     private boolean sneaking = false;
+
+    @Getter
+    private boolean sprinting = false;
 
     private boolean isFlying = false;
     private boolean nearSlot = false;
@@ -75,6 +79,7 @@ public class ControllerInput
     private int currentAttackTimer;
 
     private int dropCounter = -1;
+
 
     public double getVirtualMouseX()
     {
@@ -429,6 +434,22 @@ public class ControllerInput
 
         event.getMovementInput().field_228350_h_ = sneaking;
 
+
+
+        if(keyboardSprinting && !mc.gameSettings.keyBindSprint.isKeyDown())
+        {
+            sprinting = false;
+            keyboardSprinting = false;
+        }
+
+        if(mc.gameSettings.keyBindSprint.isKeyDown())
+        {
+            sprinting = true;
+            keyboardSprinting = true;
+        }
+
+        mc.player.setSprinting(sprinting);
+
         if(mc.currentScreen == null)
         {
             if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.Move(controller)))
@@ -530,8 +551,10 @@ public class ControllerInput
         {
             if(mc.currentScreen == null)
             {
-                if (Controllable.getOptions().isToggleSprint() && ButtonBindings.SPRINT.isButtonPressed() && mc.player != null) {
-                    mc.player.setSprinting(!mc.player.isSprinting());
+                if (ButtonBindings.SPRINT.isButtonPressed()) {
+                    if (Controllable.getOptions().isToggleSprint() &&  mc.player != null) {
+                        sprinting = !sprinting;
+                    }
                 }else if(ButtonBindings.INVENTORY.isButtonPressed())
                 {
                     if(mc.playerController.isRidingHorse())
