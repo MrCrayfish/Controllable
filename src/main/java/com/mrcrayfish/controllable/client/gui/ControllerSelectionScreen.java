@@ -36,7 +36,7 @@ public class ControllerSelectionScreen extends Screen
         this.btnRemap = this.addButton(new Button(this.width / 2 - 50, this.height - 32, 100, 20, I18n.format("controllable.gui.remap"), this::handleConfigure));
         this.btnBack = this.addButton(new Button(this.width / 2 + 54, this.height - 32, 100, 20, I18n.format("controllable.gui.back"), this::handleCancel));
         //this.btnRemap.active = this.listControllers.getSelected() != null;
-        this.btnRemap.active = false;
+        this.btnRemap.active = false; // TODO: Explain why is disabled
     }
 
     @Override
