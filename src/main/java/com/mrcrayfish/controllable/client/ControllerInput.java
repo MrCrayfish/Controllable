@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
@@ -51,7 +52,10 @@ public class ControllerInput
 
     private int lastUse = 0;
     private boolean keyboardSneaking = false;
+
+    @Getter
     private boolean sneaking = false;
+
     private boolean isFlying = false;
     private boolean nearSlot = false;
     private double virtualMouseX;
@@ -465,21 +469,12 @@ public class ControllerInput
                 event.getMovementInput().jump = true;
             }
 
+            // Held down sprint
             if (ButtonBindings.SPRINT.isButtonDown() && !Controllable.getOptions().isToggleSprint()) {
                 player.setSprinting(true);
             }
 
-            if (ButtonBindings.SPRINT.isButtonPressed() && Controllable.getOptions().isToggleSprint()) {
-                player.setSprinting(!player.isSprinting());
-            }
 
-            if (ButtonBindings.SNEAK.isButtonDown() && !Controllable.getOptions().isToggleSneak()) {
-                player.setSprinting(true);
-            }
-
-            if (ButtonBindings.SNEAK.isButtonPressed() && Controllable.getOptions().isToggleSneak()) {
-                event.getMovementInput().field_228350_h_ = (!event.getMovementInput().field_228350_h_);
-            }
 
             // Reset timer if it reaches target
             if (currentAttackTimer > Controllable.getOptions().getAttackSpeed()) currentAttackTimer = 0;
@@ -535,7 +530,9 @@ public class ControllerInput
         {
             if(mc.currentScreen == null)
             {
-                if(ButtonBindings.INVENTORY.isButtonPressed())
+                if (Controllable.getOptions().isToggleSprint() && ButtonBindings.SPRINT.isButtonPressed() && mc.player != null) {
+                    mc.player.setSprinting(!mc.player.isSprinting());
+                }else if(ButtonBindings.INVENTORY.isButtonPressed())
                 {
                     if(mc.playerController.isRidingHorse())
                     {
