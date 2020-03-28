@@ -1,8 +1,8 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.LocaleUtil;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.event.AvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
@@ -177,13 +177,20 @@ public class RenderEvents
                     //actions.put(Buttons.X, new Action(I18n.format("controllable.action.swap_hands"), Action.Side.LEFT));  //TODO make a verbose action config option
                 }
 
+                if ((!mc.player.getFoodStats().needFood() || mc.player.isCreative() || mc.player.abilities.isFlying ) && !mc.player.isSprinting() && !Controllable.getOptions().isToggleSprint()) {
+                    actions.put(ButtonBindings.SPRINT.getButton(), new Action(I18n.format("controllable.action.sprint"), Action.Side.RIGHT));
+                } else {
+                    if (Controllable.getOptions().isToggleSprint()) {
+                        actions.put(ButtonBindings.SPRINT.getButton(), new Action(I18n.format("controllable.action.toggleSprint", LocaleUtil.booleanLocale(Controllable.getInput().isSprinting())), Action.Side.RIGHT));
+                    }
+                }
+
                 if(mc.player.isPassenger())
                 {
                     actions.put(Buttons.LEFT_THUMB_STICK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
                 }
-                else
-                {
-                    //actions.put(Buttons.LEFT_THUMB_STICK, new Action(I18n.format("controllable.action.sneak"), Action.Side.RIGHT));  //TODO make a verbose action config option
+                else {
+                    actions.put(ButtonBindings.SNEAK.getButton(), new Action(I18n.format("controllable.action.sneak", LocaleUtil.booleanLocale(Controllable.getInput().isSneaking())), Action.Side.RIGHT));
                 }
 
                 if(!mc.player.inventory.getCurrentItem().isEmpty())

@@ -13,7 +13,9 @@
   "controllable.action.swap_hands": "Swap Hands",
   "controllable.action.dismount": "Dismount",
   "controllable.action.jump": "Jump",
-  "controllable.action.sneak": "Sneak",
+  "controllable.action.sneak": "Sneak: %s",
+  "controllable.action.sprint": "Sprint",
+  "controllable.action.toggleSprint": "Toggle Sprint: %s",
   "controllable.action.drop_item": "Drop Item",
   "controllable.action.pickup_stack": "Pickup Stack",
   "controllable.action.pickup_item": "Pickup Item",
@@ -41,6 +43,8 @@
   "controllable.options.cursorType": "Cursor Type",
   "controllable.options.controllerType": "Icons",
   "controllable.options.invertLook": "Invert Look",
+  "controllable.options.toggleSneak": "Toggle Sneak",
+  "controllable.options.toggleSprint": "Toggle Sprint",
   "controllable.controller.default": "Default",
   "controllable.controller.playstation": "Playstation",
   "controllable.controller.xbox": "Xbox",
@@ -50,4 +54,5 @@
   "controllable.toast.controller": "Controller",
   "controllable.toast.connected": "Connected",
   "controllable.toast.disconnected": "Disconnected"
+
 }

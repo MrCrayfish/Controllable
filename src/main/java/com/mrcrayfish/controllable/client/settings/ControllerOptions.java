@@ -7,8 +7,8 @@ import com.mrcrayfish.controllable.client.ControllerType;
 import com.mrcrayfish.controllable.client.CursorType;
 import lombok.Getter;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.settings.AbstractOption;
 import net.minecraft.client.settings.BooleanOption;
-import net.minecraft.client.settings.SliderMultiplierOption;
 import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.MathHelper;
@@ -24,6 +24,7 @@ import java.util.List;
  * Author: MrCrayfish
  */
 public class ControllerOptions {
+
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
 
     public static final BooleanOption FORCE_FEEDBACK = new ControllableBooleanOption("controllable.options.forceFeedback", gameSettings -> {
@@ -89,10 +90,10 @@ public class ControllerOptions {
         return I18n.format("controllable.options.deadZone.format", FORMAT.format(deadZone));
     });
 
-    public static final SliderPercentageOption ROTATION_SPEED = new ControllableSliderPercentageOption("controllable.options.rotationSpeed", 1.0, 50.0, 1.0F, gameSettings -> {
+    public static final SliderPercentageOption ROTATION_SPEED = new ControllableSliderPercentageOption("controllable.options.rotationSpeed", 1.0, 200.0, 1.0F, gameSettings -> {
         return Controllable.getOptions().rotationSpeed;
     }, (gameSettings, value) -> {
-        Controllable.getOptions().rotationSpeed = MathHelper.clamp(value, 1.0, 50.0);
+        Controllable.getOptions().rotationSpeed = MathHelper.clamp(value, 1.0, 200.0);
     }, (gameSettings, option) -> {
         double rotationSpeed = Controllable.getOptions().rotationSpeed;
         return I18n.format("controllable.options.rotationSpeed.format", FORMAT.format(rotationSpeed));
@@ -115,6 +116,10 @@ public class ControllerOptions {
                 return I18n.format("controllable.options.attackSpeed.format", FORMAT.format(attackSpeed));
             });
 
+    public static final AbstractOption TOGGLE_SPRINT = new ControllableBooleanOption("controllable.options.toggleSprint",
+            gameSettings -> Controllable.getOptions().toggleSprint,
+            (gameSettings, aBoolean) -> Controllable.getOptions().toggleSprint = aBoolean);
+
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
     private File optionsFile;
@@ -132,6 +137,9 @@ public class ControllerOptions {
 
     @Getter
     private int attackSpeed = 5;
+
+    @Getter
+    private boolean toggleSprint = false;
 
     public ControllerOptions(File dataDir) {
         this.optionsFile = new File(dataDir, "controllable-options.txt");
@@ -194,6 +202,12 @@ public class ControllerOptions {
                         case "mouseSpeed":
                             this.mouseSpeed = Double.parseDouble(value);
                             break;
+                        case "attackSpeed":
+                            this.attackSpeed = Integer.parseInt(value);
+                            break;
+                        case "toggleSprint":
+                            this.toggleSprint = Boolean.parseBoolean(value);
+                            break;
                     }
                 } catch (Exception e) {
                     Controllable.LOGGER.warn("Skipping bad option: {}:{}", key, value);
@@ -218,6 +232,8 @@ public class ControllerOptions {
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
+            writer.println("attackSpeed:" + FORMAT.format(this.attackSpeed));
+            writer.println("toggleSprint:" + this.toggleSprint);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
