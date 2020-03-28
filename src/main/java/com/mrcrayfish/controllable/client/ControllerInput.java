@@ -435,18 +435,21 @@ public class ControllerInput
         event.getMovementInput().field_228350_h_ = sneaking;
 
 
+        if (Controllable.getOptions().isToggleSprint()) {
+            if (keyboardSprinting && !mc.gameSettings.keyBindSprint.isKeyDown()) {
+                sprinting = false;
+                keyboardSprinting = false;
+            }
 
-        if(keyboardSprinting && !mc.gameSettings.keyBindSprint.isKeyDown())
-        {
-            sprinting = false;
-            keyboardSprinting = false;
-        }else if(mc.gameSettings.keyBindSprint.isKeyDown())
-        {
-            sprinting = true;
-            keyboardSprinting = true;
-        }else sprinting = ButtonBindings.SNEAK.isButtonDown() || mc.gameSettings.keyBindSprint.isKeyDown();
+            if (mc.gameSettings.keyBindSprint.isKeyDown()) {
+                sprinting = true;
+                keyboardSprinting = true;
+            }
 
-        mc.player.setSprinting(sprinting);
+            sprinting |= mc.gameSettings.keyBindSprint.isKeyDown();
+
+            mc.player.setSprinting(sprinting);
+        }
 
         if(mc.currentScreen == null)
         {
