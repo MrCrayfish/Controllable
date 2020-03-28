@@ -4,6 +4,8 @@ import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
+import com.mrcrayfish.controllable.registry.ButtonRegistry;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -35,6 +37,9 @@ public class Controllable extends ControllerAdapter
     private static Controller controller;
     private static ControllerInput input;
 
+    @Getter
+    private static ButtonRegistry buttonRegistry;
+
     public Controllable()
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
@@ -61,6 +66,8 @@ public class Controllable extends ControllerAdapter
     {
         Minecraft mc = event.getMinecraftSupplier().get();
         File configFolder = new File(mc.gameDir, "config");
+
+        buttonRegistry = new ButtonRegistry();
 
         ControllerProperties.load(configFolder);
         Controllable.options = new ControllerOptions(mc.gameDir);
