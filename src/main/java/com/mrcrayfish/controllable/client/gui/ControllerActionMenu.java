@@ -41,7 +41,7 @@ public class ControllerActionMenu extends ControlsScreen {
             });
 
             try {
-                ControllerProperties.saveMappings();
+                ControllerProperties.saveActionRegistry();
             } catch (ConfigLoadException e) {
                 e.printStackTrace();
             }
@@ -83,7 +83,7 @@ public class ControllerActionMenu extends ControlsScreen {
                     Controllable.getButtonRegistry().getButton(action).setButton(e.getModifiedButton());
 
                     try {
-                        ControllerProperties.saveMappings();
+                        ControllerProperties.saveActionRegistry();
                     } catch (ConfigLoadException ex) {
                         ex.printStackTrace();
                     }

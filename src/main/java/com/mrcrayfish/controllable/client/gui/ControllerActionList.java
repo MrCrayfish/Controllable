@@ -118,7 +118,7 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
             this.btnSetNone = new Button(0, 0, 40 /*Forge: add space*/, 20, I18n.format("gui.none"), (p_214386_2_) -> {
                 buttonBinding.setButton(-1);
                 try {
-                    ControllerProperties.saveMappings();
+                    ControllerProperties.saveActionRegistry();
                 } catch (ConfigLoadException e) {
                     throw new IllegalStateException("Unable to save config", e);
                 }
@@ -131,7 +131,7 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
             this.btnReset = new Button(0, 0, 50, 20, I18n.format("controls.reset"), (p_214387_2_) -> {
                 this.buttonBinding.resetButton();
                 try {
-                    ControllerProperties.saveMappings();
+                    ControllerProperties.saveActionRegistry();
                 } catch (ConfigLoadException e) {
                     throw new IllegalStateException("Unable to save config", e);
                 }

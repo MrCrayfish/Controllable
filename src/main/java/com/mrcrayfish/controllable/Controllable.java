@@ -102,7 +102,7 @@ public class Controllable extends ControllerAdapter
 
 
     private void onLoadComplete(FMLLoadCompleteEvent e) {
-        ControllerProperties.loadMappings();
+        ControllerProperties.loadActionRegistry();
     }
 
     @Override

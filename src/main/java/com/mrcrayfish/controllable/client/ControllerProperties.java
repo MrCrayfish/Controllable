@@ -60,12 +60,12 @@ public class ControllerProperties
         }
     }
 
-    public static void loadMappings() {
+    public static void loadActionRegistry() {
         try {
-            if (buttonConfig == null) saveMappings();
+            if (buttonConfig == null) saveActionRegistry();
 
             Controllable.getButtonRegistry().loadFromConfig(buttonConfig);
-            saveMappings();
+            saveActionRegistry();
         } catch (ConfigLoadException e) {
             throw new IllegalStateException("Unable to load button bindings", e);
         }
@@ -78,7 +78,7 @@ public class ControllerProperties
      * saved with the default value provided in the constructor
      * @throws ConfigLoadException
      */
-    public static void saveMappings() throws ConfigLoadException {
+    public static void saveActionRegistry() throws ConfigLoadException {
         buttonConfig = Controllable.getButtonRegistry().saveMappings(ControllerProperties::instantiateConfig, buttonConfig != null);
     }
 
@@ -92,6 +92,7 @@ public class ControllerProperties
             throw new IllegalStateException("Unable to save button bindings", e);
         }
     }
+
     static void save()
     {
         if(!loaded)
