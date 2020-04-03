@@ -41,8 +41,8 @@ public class ButtonRegistry {
 
         configData.buttonMap.forEach((action, buttonId) -> {
             if (buttonBindings.containsKey(action)) {
-                Controllable.LOGGER.debug("Setting {} to {} before was {}", action, buttonId.buttonId, buttonBindings.get(action).getButtonId());
-                buttonBindings.get(action).setButton(buttonId.buttonId);
+                Controllable.LOGGER.debug("Setting {} to {} before was {}", action, buttonId, buttonBindings.get(action).getButtonId());
+                buttonBindings.get(action).setButton(buttonId);
             }
         });
 
@@ -57,15 +57,15 @@ public class ButtonRegistry {
      * @throws ConfigLoadException Thrown when the config is malformed.
      */
     public Config<ButtonConfigData> saveMappings(Function<@NonNull ButtonConfigData, Config<ButtonConfigData>> function, boolean override) throws ConfigLoadException {
-        @NonNull Map<String, ButtonIdPair> saveConfigMap = new HashMap<>();
+        @NonNull Map<String, Integer> saveConfigMap = new HashMap<>();
 
-        buttonBindings.forEach((action, buttonBinding) -> saveConfigMap.put(action, new ButtonIdPair(buttonBinding.getButtonId(), buttonBinding.getDefaultId())));
+        buttonBindings.forEach((action, buttonBinding) -> saveConfigMap.put(action, buttonBinding.getButtonId()));
 
         ButtonConfigData buttonConfigData = new ButtonConfigData(saveConfigMap);
 
         Config<ButtonConfigData> config = function.apply(buttonConfigData); // Instantiate config instance with the default value as buttonConfigData
 
-        @NonNull Map<String, ButtonIdPair> configButtonMap = config.syncLoad().buttonMap; // Loaded from config
+        @NonNull Map<String, Integer> configButtonMap = config.syncLoad().buttonMap; // Loaded from config
 
         if (!override) {
             Controllable.LOGGER.warn("Saving without overriding using current settings");
@@ -142,14 +142,7 @@ public class ButtonRegistry {
     @Getter
     public static class ButtonConfigData {
         // Action:ButtonID
-        private @NonNull Map<String, ButtonIdPair> buttonMap;
-    }
-
-    @AllArgsConstructor
-    @Getter
-    public static class ButtonIdPair {
-        private int buttonId;
-        private int defaultButtonId;
+        private @NonNull Map<String, Integer> buttonMap;
     }
 
     
