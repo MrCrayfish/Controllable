@@ -79,8 +79,16 @@ dependencies {
     libraries "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
     compileOnly 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
-    libraries 'com.github.Fernthedev:fern-configmanager:1.2.3' // Check github releases tag for the version.
-}
+    libraries ('com.github.Fernthedev:fern-configmanager:1.2.3') {
+        // These exclusions minimize the size of the jar and stops adding unnecessary META-INF files that cause Minecraft to crash at least in 1.14.X
+        // The crash issue seems to be avoided in 1.15.X
+        // Might be smarter to explicity add the dependencies rather than use transitive dependencies.
+        exclude group: 'com.google.code.gson' // Exclude GSON because Forge and Minecraft already provide it
+        exclude group: 'com.alibaba'
+        exclude group: 'org.yaml'
+//        exclude name: 'fastjson'
+//        exclude name: 'snakeyaml'
+    }}
 
 jar {
     manifest {
