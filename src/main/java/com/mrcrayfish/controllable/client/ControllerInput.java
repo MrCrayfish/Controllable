@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
+import com.mrcrayfish.controllable.registry.ButtonRegistry;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -95,6 +96,7 @@ public class ControllerInput
     {
         return lastUse;
     }
+    
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event)
@@ -369,7 +371,7 @@ public class ControllerInput
 
         if(mc.currentScreen == null)
         {
-            if(ButtonBindings.DROP_ITEM.isButtonDown())
+            if(ButtonRegistry.ButtonActions.DROP_ITEM.getButton().isButtonDown())
             {
                 lastUse = 100;
                 dropCounter++;
@@ -384,7 +386,7 @@ public class ControllerInput
             }
             dropCounter = 0;
         }
-        else if(dropCounter > 0 && !ButtonBindings.DROP_ITEM.isButtonDown())
+        else if(dropCounter > 0 && !ButtonRegistry.ButtonActions.DROP_ITEM.getButton().isButtonDown())
         {
             if (!mc.player.isSpectator())
             {
@@ -423,7 +425,7 @@ public class ControllerInput
         {
             lastUse = 100;
             sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
-            sneaking |= ButtonBindings.SNEAK.isButtonDown();
+            sneaking |= ButtonRegistry.ButtonActions.SNEAK.getButton().isButtonDown();
             isFlying = true;
         }
         else if(isFlying)
@@ -486,13 +488,13 @@ public class ControllerInput
                 }
             }
 
-            if(ButtonBindings.JUMP.isButtonDown())
+            if(ButtonRegistry.ButtonActions.JUMP.getButton().isButtonDown())
             {
                 event.getMovementInput().jump = true;
             }
 
             // Held down sprint
-            if (ButtonBindings.SPRINT.isButtonDown() && !Controllable.getOptions().isToggleSprint()) {
+            if (ButtonRegistry.ButtonActions.SPRINT.getButton().isButtonDown() && !Controllable.getOptions().isToggleSprint()) {
                 player.setSprinting(true);
             }
 
@@ -501,12 +503,12 @@ public class ControllerInput
             // Reset timer if it reaches target
             if (currentAttackTimer > Controllable.getOptions().getAttackSpeed()) currentAttackTimer = 0;
 
-            if(ButtonBindings.USE_ITEM.isButtonDown() && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
+            if(ButtonRegistry.ButtonActions.USE_ITEM.getButton().isButtonDown() && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
             {
                 mc.rightClickMouse();
             }
 
-            else if (ButtonBindings.ATTACK.isButtonDown() && mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY && currentAttackTimer == 0) {
+            else if (ButtonRegistry.ButtonActions.ATTACK.getButton().isButtonDown() && mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY && currentAttackTimer == 0) {
                 // This is to keep attacking while the button is held and staring at a mob
                 mc.clickMouse();
                 currentAttackTimer = 1;
@@ -514,12 +516,12 @@ public class ControllerInput
 
             // Keep the timer going if the first attack was registered
             // This is to avoid only increasing timer while staring at a mob.
-            if (ButtonBindings.ATTACK.isButtonDown() && currentAttackTimer > 0) {
+            if (ButtonRegistry.ButtonActions.ATTACK.getButton().isButtonDown() && currentAttackTimer > 0) {
                 currentAttackTimer++;
             }
 
             // Reset timer when button is no longer held
-            if (!ButtonBindings.ATTACK.isButtonDown()) {
+            if (!ButtonRegistry.ButtonActions.ATTACK.getButton().isButtonDown()) {
                 currentAttackTimer = 0;
             }
         }
@@ -552,11 +554,11 @@ public class ControllerInput
         {
             if(mc.currentScreen == null)
             {
-                if (ButtonBindings.SPRINT.isButtonPressed()) {
+                if (ButtonRegistry.ButtonActions.SPRINT.getButton().isButtonPressed()) {
                     if (Controllable.getOptions().isToggleSprint() &&  mc.player != null) {
                         sprinting = !sprinting;
                     }
-                }else if(ButtonBindings.INVENTORY.isButtonPressed())
+                }else if(ButtonRegistry.ButtonActions.INVENTORY.getButton().isButtonPressed())
                 {
                     if(mc.playerController.isRidingHorse())
                     {
@@ -568,28 +570,28 @@ public class ControllerInput
                         mc.displayGuiScreen(new InventoryScreen(mc.player));
                     }
                 }
-                else if(ButtonBindings.SNEAK.isButtonPressed())
+                else if(ButtonRegistry.ButtonActions.SNEAK.getButton().isButtonPressed())
                 {
                     if(mc.player != null && !mc.player.abilities.isFlying && !mc.player.isPassenger())
                     {
                         sneaking = !sneaking;
                     }
                 }
-                else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
+                else if(ButtonRegistry.ButtonActions.SCROLL_RIGHT.getButton().isButtonPressed())
                 {
                     if(mc.player != null)
                     {
                         mc.player.inventory.changeCurrentItem(-1);
                     }
                 }
-                else if(ButtonBindings.SCROLL_LEFT.isButtonPressed())
+                else if(ButtonRegistry.ButtonActions.SCROLL_LEFT.getButton().isButtonPressed())
                 {
                     if(mc.player != null)
                     {
                         mc.player.inventory.changeCurrentItem(1);
                     }
                 }
-                else if(ButtonBindings.SWAP_HANDS.isButtonPressed())
+                else if(ButtonRegistry.ButtonActions.SWAP_HANDS.getButton().isButtonPressed())
                 {
                     if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
                     {
@@ -597,11 +599,11 @@ public class ControllerInput
                         mc.getConnection().sendPacket(new CPlayerDiggingPacket(CPlayerDiggingPacket.Action.SWAP_HELD_ITEMS, BlockPos.ZERO, Direction.DOWN));
                     }
                 }
-                else if(ButtonBindings.TOGGLE_PERSPECTIVE.isButtonPressed() && mc.mouseHelper.isMouseGrabbed())
+                else if(ButtonRegistry.ButtonActions.TOGGLE_PERSPECTIVE.getButton().isButtonPressed() && mc.mouseHelper.isMouseGrabbed())
                 {
                     cycleThirdPersonView();
                 }
-                else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
+                else if(ButtonRegistry.ButtonActions.PAUSE_GAME.getButton().isButtonPressed())
                 {
                     if(mc.player != null)
                     {
@@ -610,16 +612,16 @@ public class ControllerInput
                 }
                 else if(mc.player != null && !mc.player.isHandActive())
                 {
-                    if(ButtonBindings.ATTACK.isButtonPressed())
+                    if(ButtonRegistry.ButtonActions.ATTACK.getButton().isButtonPressed())
                     {
                         mc.clickMouse();
                         currentAttackTimer = 1;
                     }
-                    else if(ButtonBindings.USE_ITEM.isButtonPressed())
+                    else if(ButtonRegistry.ButtonActions.USE_ITEM.getButton().isButtonPressed())
                     {
                         mc.rightClickMouse();
                     }
-                    else if(ButtonBindings.PICK_BLOCK.isButtonPressed())
+                    else if(ButtonRegistry.ButtonActions.PICK_BLOCK.getButton().isButtonPressed())
                     {
                         mc.middleClickMouse();
                     }
@@ -627,28 +629,28 @@ public class ControllerInput
             }
             else
             {
-                if(ButtonBindings.INVENTORY.isButtonPressed())
+                if(ButtonRegistry.ButtonActions.INVENTORY.getButton().isButtonPressed())
                 {
                     if(mc.player != null)
                     {
                         mc.player.closeScreen();
                     }
                 }
-                else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
+                else if(ButtonRegistry.ButtonActions.SCROLL_RIGHT.getButton().isButtonPressed())
                 {
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
                         scrollCreativeTabs((CreativeScreen) mc.currentScreen, 1);
                     }
                 }
-                else if(ButtonBindings.SCROLL_LEFT.isButtonPressed())
+                else if(ButtonRegistry.ButtonActions.SCROLL_LEFT.getButton().isButtonPressed())
                 {
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
                         scrollCreativeTabs((CreativeScreen) mc.currentScreen, -1);
                     }
                 }
-                else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
+                else if(ButtonRegistry.ButtonActions.PAUSE_GAME.getButton().isButtonPressed())
                 {
                     if(mc.currentScreen instanceof IngameMenuScreen)
                     {

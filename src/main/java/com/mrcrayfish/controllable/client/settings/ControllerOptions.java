@@ -232,7 +232,7 @@ public class ControllerOptions {
             writer.println("deadZone:" + FORMAT.format(this.deadZone));
             writer.println("rotationSpeed:" + FORMAT.format(this.rotationSpeed));
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
-            writer.println("attackSpeed:" + FORMAT.format(this.attackSpeed));
+            writer.println("attackSpeed:" + this.attackSpeed);
             writer.println("toggleSprint:" + this.toggleSprint);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

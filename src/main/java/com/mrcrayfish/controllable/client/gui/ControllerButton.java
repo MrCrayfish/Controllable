@@ -8,8 +8,7 @@ import net.minecraft.client.gui.AbstractGui;
 /**
  * Author: MrCrayfish
  */
-public class ControllerButton extends AbstractGui
-{
+public class ControllerButton extends AbstractGui {
     protected int button;
     private int x, y;
     private int u, v;

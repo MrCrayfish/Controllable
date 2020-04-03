@@ -1,8 +1,8 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.registry.ButtonRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputMappings;
@@ -27,7 +27,7 @@ public class Hooks
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            if(ButtonBindings.ATTACK.isButtonDown())
+            if(ButtonRegistry.ButtonActions.ATTACK.getButton().isButtonDown())
             {
                 isLeftClicking = true;
             }
@@ -47,7 +47,7 @@ public class Hooks
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            if(ButtonBindings.USE_ITEM.isButtonDown())
+            if(ButtonRegistry.ButtonActions.USE_ITEM.getButton().isButtonDown())
             {
                 isRightClicking = true;
             }
@@ -65,7 +65,7 @@ public class Hooks
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            if(ButtonBindings.QUICK_MOVE.isButtonDown())
+            if(ButtonRegistry.ButtonActions.QUICK_MOVE.getButton().isButtonDown())
             {
                 canQuickMove = true;
             }
@@ -84,7 +84,7 @@ public class Hooks
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            if(ButtonBindings.PLAYER_LIST.isButtonDown())
+            if(ButtonRegistry.ButtonActions.PLAYER_LIST.getButton().isButtonDown())
             {
                 canShowPlayerList = true;
             }

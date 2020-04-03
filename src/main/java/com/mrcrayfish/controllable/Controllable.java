@@ -4,12 +4,15 @@ import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
+import com.mrcrayfish.controllable.registry.ButtonRegistry;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,9 +38,13 @@ public class Controllable extends ControllerAdapter
     private static Controller controller;
     private static ControllerInput input;
 
+    @Getter
+    private static ButtonRegistry buttonRegistry;
+
     public Controllable()
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onLoadComplete);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
@@ -61,6 +68,10 @@ public class Controllable extends ControllerAdapter
     {
         Minecraft mc = event.getMinecraftSupplier().get();
         File configFolder = new File(mc.gameDir, "config");
+
+        buttonRegistry = new ButtonRegistry();
+        buttonRegistry.registerDefaults();
+
 
         ControllerProperties.load(configFolder);
         Controllable.options = new ControllerOptions(mc.gameDir);
@@ -87,6 +98,11 @@ public class Controllable extends ControllerAdapter
         MinecraftForge.EVENT_BUS.register(new RenderEvents());
         MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
         MinecraftForge.EVENT_BUS.register(new ControllerEvents());
+    }
+
+
+    private void onLoadComplete(FMLLoadCompleteEvent e) {
+        ControllerProperties.loadActionRegistry();
     }
 
     @Override
