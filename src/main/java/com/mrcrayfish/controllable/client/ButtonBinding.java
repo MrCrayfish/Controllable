@@ -1,5 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,26 +13,25 @@ public class ButtonBinding
     private static final List<ButtonBinding> BINDINGS = new ArrayList<>();
 
     private int button;
-    private String descriptionKey;
-    private String category;
-    private boolean ignoreConflict;
+
+    @Getter
+    private final int defaultId;
+
     private boolean pressed;
     private int pressedTime;
 
-    public ButtonBinding(int button, String descriptionKey)
-    {
-        this(button, descriptionKey, false);
-    }
-
-    public ButtonBinding(int button, String descriptionKey, boolean ignoreConflict)
+    public ButtonBinding(int button, int defaultId)
     {
         this.button = button;
-        this.descriptionKey = descriptionKey;
-        this.ignoreConflict = ignoreConflict;
+        this.defaultId = defaultId;
         BINDINGS.add(this);
     }
 
-    public int getButton()
+    public void resetButton() {
+        button = defaultId;
+    }
+
+    public int getButtonId()
     {
         return button;
     }
@@ -38,11 +39,6 @@ public class ButtonBinding
     public void setButton(int button)
     {
         this.button = button;
-    }
-
-    public String getDescription()
-    {
-        return descriptionKey;
     }
 
     public boolean isButtonPressed()
@@ -70,7 +66,7 @@ public class ButtonBinding
     {
         for(ButtonBinding binding : BINDINGS)
         {
-            if(binding.getButton() == button)
+            if(binding.getButtonId() == button)
             {
                 binding.pressed = state;
                 binding.pressedTime = 0;
@@ -87,5 +83,17 @@ public class ButtonBinding
         {
             binding.pressed = false;
         }
+    }
+
+    public boolean isDefault() {
+        return button == defaultId;
+    }
+
+    public boolean isInvalid() {
+        return button < 0 || button > Buttons.LENGTH;
+    }
+
+    public boolean conflicts(ButtonBinding buttonBinding) {
+        return button == buttonBinding.getButtonId();
     }
 }

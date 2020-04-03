@@ -9,7 +9,8 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+//Only edit below this line, the above code adds !pause
+// and enables the necessary things for Forge to be setup.
 
 version = "1.15.2-0.8.1"
 group = "com.mrcrayfish" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -70,12 +71,15 @@ dependencies {
 
 repositories {
     jcenter()
+    mavenLocal()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     libraries "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
     compileOnly 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    libraries 'com.github.Fernthedev:fern-configmanager:1.2.3' // Check github releases tag for the version.
 }
 
 jar {

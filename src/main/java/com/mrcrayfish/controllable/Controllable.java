@@ -12,6 +12,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +44,7 @@ public class Controllable extends ControllerAdapter
     public Controllable()
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onLoadComplete);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
@@ -68,6 +70,8 @@ public class Controllable extends ControllerAdapter
         File configFolder = new File(mc.gameDir, "config");
 
         buttonRegistry = new ButtonRegistry();
+        buttonRegistry.registerDefaults();
+
 
         ControllerProperties.load(configFolder);
         Controllable.options = new ControllerOptions(mc.gameDir);
@@ -94,6 +98,11 @@ public class Controllable extends ControllerAdapter
         MinecraftForge.EVENT_BUS.register(new RenderEvents());
         MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
         MinecraftForge.EVENT_BUS.register(new ControllerEvents());
+    }
+
+
+    private void onLoadComplete(FMLLoadCompleteEvent e) {
+        ControllerProperties.loadMappings();
     }
 
     @Override

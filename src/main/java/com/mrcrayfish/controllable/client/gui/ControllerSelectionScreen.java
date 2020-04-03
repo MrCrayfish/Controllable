@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client.gui;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
@@ -17,7 +18,9 @@ public class ControllerSelectionScreen extends Screen
     private Screen previousScreen;
     private Button btnSettings;
     private Button btnRemap;
+    private Button btnActionList;
     private Button btnBack;
+
 
     public ControllerSelectionScreen(SDL2ControllerManager manager, Screen previousScreen)
     {
@@ -32,12 +35,17 @@ public class ControllerSelectionScreen extends Screen
     {
         this.listControllers = new ControllerList(this.manager, this.minecraft, this.width, this.height, 32, this.height - 44, 20);
         this.children.add(this.listControllers);
-        this.btnSettings = this.addButton(new Button(this.width / 2 - 154, this.height - 32, 100, 20, I18n.format("controllable.gui.settings"), this::handleSettings));
-        this.btnRemap = this.addButton(new Button(this.width / 2 - 50, this.height - 32, 100, 20, I18n.format("controllable.gui.remap"), this::handleConfigure));
-        this.btnBack = this.addButton(new Button(this.width / 2 + 54, this.height - 32, 100, 20, I18n.format("controllable.gui.back"), this::handleCancel));
+        this.btnSettings = this.addButton(new Button(this.width / 2 - 208, this.height - 32, 100, 20, I18n.format("controllable.gui.settings"), this::handleSettings));
+        this.btnRemap = this.addButton(new Button(this.width / 2 - 104, this.height - 32, 100, 20, I18n.format("controllable.gui.remap"), this::handleConfigure));
+        this.btnActionList = this.addButton(new Button(this.width / 2, this.height - 32, 100, 20, I18n.format("controllable.gui.actionList"), this::handleActionList));
+        this.btnBack = this.addButton(new Button(this.width / 2 + 104, this.height - 32, 100, 20, I18n.format("controllable.gui.back"), this::handleCancel));
+
+
+
         //this.btnRemap.active = this.listControllers.getSelected() != null;
         this.btnRemap.active = false; // TODO: Explain why is disabled
     }
+
 
     @Override
     public void tick()
@@ -68,6 +76,11 @@ public class ControllerSelectionScreen extends Screen
     {
         this.minecraft.displayGuiScreen(new ControllerLayoutScreen(this));
     }
+
+    private void handleActionList(Button button) {
+        this.minecraft.displayGuiScreen(new ControllerActionMenu(this, Minecraft.getInstance().gameSettings));
+    }
+
 
     private void handleCancel(Button button)
     {

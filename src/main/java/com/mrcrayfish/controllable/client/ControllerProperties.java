@@ -1,6 +1,11 @@
 package com.mrcrayfish.controllable.client;
 
+import com.github.fernthedev.config.common.Config;
+import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
+import com.github.fernthedev.config.gson.GsonConfig;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.registry.ButtonRegistry;
+import org.apache.commons.lang3.Validate;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,17 +18,27 @@ import java.util.Properties;
  */
 public class ControllerProperties
 {
+
+    private static File controllableConfigFolder;
+
     private static File file;
     private static boolean loaded = false;
     private static String lastController = "";
     private static String selectedMapping = "";
 
+    private static File buttonBindingsFile;
+    private static Config<ButtonRegistry.ButtonConfigData> buttonConfig;
+
     public static void load(File configFolder)
     {
+
         if(!loaded)
         {
+            controllableConfigFolder = new File(configFolder, "controllable");
+            Controllable.LOGGER.info("Controllable config folder: {}", controllableConfigFolder.getAbsolutePath());
             Properties properties = new Properties();
-            file = new File(configFolder, "controllable/controller.properties");
+            file = new File(controllableConfigFolder, "controller.properties");
+            buttonBindingsFile = new File(controllableConfigFolder, "button_bindings.json");
             try
             {
                 if(file.createNewFile())
@@ -45,6 +60,38 @@ public class ControllerProperties
         }
     }
 
+    public static void loadMappings() {
+        try {
+            if (buttonConfig == null) saveMappings();
+
+            Controllable.getButtonRegistry().loadFromConfig(buttonConfig);
+            saveMappings();
+        } catch (ConfigLoadException e) {
+            throw new IllegalStateException("Unable to load button bindings", e);
+        }
+    }
+
+    /**
+     * Constructs and saves the mapping
+     *
+     * If the file does not exist, it gets created and
+     * saved with the default value provided in the constructor
+     * @throws ConfigLoadException
+     */
+    public static void saveMappings() throws ConfigLoadException {
+        buttonConfig = Controllable.getButtonRegistry().saveMappings(ControllerProperties::instantiateConfig, buttonConfig != null);
+    }
+
+
+    private static Config<ButtonRegistry.ButtonConfigData> instantiateConfig(ButtonRegistry.ButtonConfigData buttonConfigData) {
+        try {
+            Controllable.LOGGER.info("Saving button bindings to {}", buttonBindingsFile.getAbsolutePath());
+            Validate.notNull(buttonConfigData);
+            return new GsonConfig<>(buttonConfigData, buttonBindingsFile);
+        } catch (ConfigLoadException e) {
+            throw new IllegalStateException("Unable to save button bindings", e);
+        }
+    }
     static void save()
     {
         if(!loaded)
