@@ -16,6 +16,10 @@ import net.minecraft.util.Util;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+/**
+ * @author Fernthedev
+ * {@link "https://github.com/Fernthedev"}
+ */
 public class ControllerActionMenu extends ControlsScreen {
 
     public ControllerActionList.KeyEntry entry;

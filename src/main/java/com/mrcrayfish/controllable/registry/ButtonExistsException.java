@@ -4,6 +4,10 @@ import lombok.Getter;
 
 import java.security.PrivilegedActionException;
 
+/**
+ * @author Fernthedev
+ * {@link "https://github.com/Fernthedev"}
+ */
 public class ButtonExistsException extends IllegalArgumentException {
     @Getter
     private String action;

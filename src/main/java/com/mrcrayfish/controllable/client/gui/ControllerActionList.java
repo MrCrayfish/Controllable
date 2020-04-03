@@ -21,6 +21,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+
+/**
+ * @author Fernthedev
+ * {@link "https://github.com/Fernthedev"}
+ */
 public class ControllerActionList extends AbstractOptionList<ControllerActionList.Entry> {
 
 

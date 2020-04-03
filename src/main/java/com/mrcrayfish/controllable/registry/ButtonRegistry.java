@@ -16,6 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * @author Fernthedev
+ * {@link "https://github.com/Fernthedev"}
+ */
 public class ButtonRegistry {
 
     // ACTION_NAME:BUTTON_BINDING
