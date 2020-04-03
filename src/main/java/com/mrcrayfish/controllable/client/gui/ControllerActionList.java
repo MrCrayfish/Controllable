@@ -152,7 +152,7 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
         @Override
         public void render(int p_render_1_, int p_render_2_, int p_render_3_, int p_render_4_, int p_render_5_, int p_render_6_, int p_render_7_, boolean p_render_8_, float p_render_9_) {
             boolean flag = controlsScreen.controllerButtonId == this.buttonBinding;
-            minecraft.fontRenderer.drawString(this.keyDesc, (float)(p_render_3_ + 90 - maxListLabelWidth), (float)(p_render_2_ + p_render_5_ / 2 - 9 / 2), 16777215);
+            minecraft.fontRenderer.drawString(this.keyDesc, (float)(p_render_3_ + 40 - maxListLabelWidth), (float)(p_render_2_ + p_render_5_ / 2 - 9 / 2), 16777215);
 
             this.btnSetNone.x = p_render_3_ + 60;
             this.btnSetNone.y = p_render_2_;
