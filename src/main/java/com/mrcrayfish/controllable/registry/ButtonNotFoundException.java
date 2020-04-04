@@ -1,12 +1,15 @@
 package com.mrcrayfish.controllable.registry;
 
-import lombok.Getter;
-
 import java.security.PrivilegedActionException;
 
 public class ButtonNotFoundException extends IllegalArgumentException {
-    @Getter
+
     private String action;
+
+    public String getAction()
+    {
+        return action;
+    }
 
     /**
      * Constructs an <code>IllegalArgumentException</code> with no

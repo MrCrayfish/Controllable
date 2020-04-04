@@ -5,7 +5,6 @@ import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerType;
 import com.mrcrayfish.controllable.client.CursorType;
-import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.AbstractOption;
 import net.minecraft.client.settings.BooleanOption;
@@ -134,12 +133,10 @@ public class ControllerOptions {
     private double deadZone = 0.15;
     private double rotationSpeed = 25.0;
     private double mouseSpeed = 30.0;
-
-    @Getter
     private int attackSpeed = 5;
-
-    @Getter
     private boolean toggleSprint = false;
+
+
 
     public ControllerOptions(File dataDir) {
         this.optionsFile = new File(dataDir, "controllable-options.txt");
@@ -277,6 +274,16 @@ public class ControllerOptions {
 
     public double getRotationSpeed() {
         return this.rotationSpeed;
+    }
+
+    public int getAttackSpeed()
+    {
+        return attackSpeed;
+    }
+
+    public boolean isToggleSprint()
+    {
+        return toggleSprint;
     }
 
     public double getMouseSpeed() {

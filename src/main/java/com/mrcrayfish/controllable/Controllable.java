@@ -5,7 +5,6 @@ import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import com.mrcrayfish.controllable.registry.ButtonRegistry;
-import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -38,7 +37,7 @@ public class Controllable extends ControllerAdapter
     private static Controller controller;
     private static ControllerInput input;
 
-    @Getter
+
     private static ButtonRegistry buttonRegistry;
 
     public Controllable()
@@ -269,5 +268,10 @@ public class Controllable extends ControllerAdapter
     private boolean getButtonState(int buttonCode)
     {
         return controller != null && controller.getSDL2Controller().getButton(buttonCode);
+    }
+
+    public static ButtonRegistry getButtonRegistry()
+    {
+        return buttonRegistry;
     }
 }

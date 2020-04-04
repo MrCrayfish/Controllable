@@ -6,7 +6,6 @@ import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import com.mrcrayfish.controllable.registry.ButtonRegistry;
-import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
@@ -55,11 +54,11 @@ public class ControllerInput
     private boolean keyboardSneaking = false;
     private boolean keyboardSprinting = false;
 
-    @Getter
     private boolean sneaking = false;
 
-    @Getter
     private boolean sprinting = false;
+
+
 
     private boolean isFlying = false;
     private boolean nearSlot = false;
@@ -931,5 +930,15 @@ public class ControllerInput
                 }
             }, "mouseReleased event handler", screen.getClass().getCanonicalName());
         }
+    }
+
+    public boolean isSneaking()
+    {
+        return sneaking;
+    }
+
+    public boolean isSprinting()
+    {
+        return sprinting;
     }
 }
