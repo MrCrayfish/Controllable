@@ -9,16 +9,18 @@ import net.minecraft.client.settings.AbstractOption;
 import net.minecraft.util.text.TranslationTextComponent;
 
 /**
- * Author: MrCrayfish
+ * Based on {@link SettingsScreen} by Author: MrCrayfish
+ *
+ * This was made by Fernthedev
  */
-public class SettingsScreen extends Screen
+public class AimAssistSettingsScreen extends Screen
 {
-    private static final AbstractOption[] OPTIONS = new AbstractOption[]{ControllerOptions.FORCE_FEEDBACK, ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.CONSOLE_HOTBAR, ControllerOptions.CONTROLLER_TYPE, ControllerOptions.CURSOR_TYPE, ControllerOptions.INVERT_LOOK, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED, ControllerOptions.ATTACK_SPEED, ControllerOptions.TOGGLE_SPRINT};
+    private static final AbstractOption[] OPTIONS = new AbstractOption[]{ControllerOptions.TOGGLE_AIM, ControllerOptions.AIM_ASSIST_INTENSITY, ControllerOptions.ANIMAL_AIM_MODE, ControllerOptions.HOSTILE_AIM_MODE, ControllerOptions.PLAYER_AIM_MODE};
     private final Screen parentScreen;
 
-    protected SettingsScreen(Screen parentScreen)
+    protected AimAssistSettingsScreen(Screen parentScreen)
     {
-        super(new TranslationTextComponent("controllable.gui.title.settings"));
+        super(new TranslationTextComponent("controllable.gui.title.settings.aim_assist"));
         this.parentScreen = parentScreen;
     }
 
@@ -30,13 +32,11 @@ public class SettingsScreen extends Screen
             AbstractOption option = OPTIONS[i];
             int x = this.width / 2 - 155 + i % 2 * 160;
             int y = this.height / 6 + 24 * (i >> 1);
+
             this.addButton(option.createWidget(this.minecraft.gameSettings, x, y, 150));
         }
 
-        this.addButton(new Button(this.width / 2 - 155, this.height / 6 + 24 * (OPTIONS.length + 1) / 2, 150, 20, I18n.format("controllable.gui.title.settings.aim_assist"),
-                (button) -> this.minecraft.displayGuiScreen(new AimAssistSettingsScreen(this))));
-
-        this.addButton(new Button(this.width / 2 + 5, this.height / 6 + 24 * (OPTIONS.length + 1) / 2, 150, 20, I18n.format("gui.done"),
+        this.addButton(new Button(this.width / 2 - 100, this.height / 6 + 24 * (OPTIONS.length + 1) / 2, 200, 20, I18n.format("gui.done"),
                 (button) -> this.minecraft.displayGuiScreen(this.parentScreen)));
     }
 
@@ -51,6 +51,7 @@ public class SettingsScreen extends Screen
     {
         this.renderBackground();
         this.drawCenteredString(this.font, this.title.getFormattedText(), this.width / 2, 20, 0xFFFFFF);
+
         super.render(mouseX, mouseY, partialTicks);
     }
 }

@@ -10,6 +10,7 @@ import net.minecraft.client.settings.AbstractOption;
 import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.io.IOUtils;
 
@@ -119,6 +120,36 @@ public class ControllerOptions {
             gameSettings -> Controllable.getOptions().toggleSprint,
             (gameSettings, aBoolean) -> Controllable.getOptions().toggleSprint = aBoolean);
 
+    public static final AbstractOption TOGGLE_AIM = new ControllableBooleanOption("controllable.options.aimAssist",
+            gameSettings -> Controllable.getOptions().aimAssist,
+            (gameSettings, aBoolean) -> Controllable.getOptions().aimAssist = aBoolean);
+
+    public static final SliderPercentageOption AIM_ASSIST_INTENSITY = new ControllableSliderPercentageOption("controllable.options.aimAssistIntensity", 1, 100, 1,
+            gameSettings -> (double) Controllable.getOptions().aimAssistIntensity,
+            (gameSettings, value) -> Controllable.getOptions().aimAssistIntensity = (int) MathHelper.clamp(value, 1, 100),
+            (gameSettings, sliderPercentageOption) -> {
+                int assistIntensity = Controllable.getOptions().aimAssistIntensity;
+                return I18n.format("controllable.options.aimAssistIntensity.format", assistIntensity);
+            });
+
+    public static final AbstractOption HOSTILE_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.hostile",
+            AimAssistMode.class,
+            gameSettings -> Controllable.getOptions().hostileAimMode,
+            (gameSettings, mode) -> Controllable.getOptions().hostileAimMode = mode,
+            (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
+
+    public static final AbstractOption ANIMAL_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.animal",
+            AimAssistMode.class,
+            gameSettings -> Controllable.getOptions().animalAimMode,
+            (gameSettings, mode) -> Controllable.getOptions().animalAimMode = mode,
+            (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
+
+    public static final AbstractOption PLAYER_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.player",
+            AimAssistMode.class,
+            gameSettings -> Controllable.getOptions().playerAimMode,
+            (gameSettings, mode) -> Controllable.getOptions().playerAimMode = mode,
+            (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
+
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
     private File optionsFile;
@@ -136,7 +167,11 @@ public class ControllerOptions {
     private int attackSpeed = 5;
     private boolean toggleSprint = false;
 
-
+    private boolean aimAssist = true;
+    private int aimAssistIntensity = 90; //Percentage
+    private AimAssistMode hostileAimMode = AimAssistMode.BOTH;
+    private AimAssistMode animalAimMode = AimAssistMode.AIM;
+    private AimAssistMode playerAimMode = AimAssistMode.BOTH;
 
     public ControllerOptions(File dataDir) {
         this.optionsFile = new File(dataDir, "controllable-options.txt");
@@ -205,6 +240,18 @@ public class ControllerOptions {
                         case "toggleSprint":
                             this.toggleSprint = Boolean.parseBoolean(value);
                             break;
+                        case "aimAssist":
+                            this.aimAssist = Boolean.parseBoolean(value);
+                            break;
+                        case "hostileAimMode":
+                            this.hostileAimMode = AimAssistMode.byName(value);
+                            break;
+                        case "animalAimMode":
+                            this.animalAimMode = AimAssistMode.byName(value);
+                            break;
+                        case "playerAimMode":
+                            this.playerAimMode = AimAssistMode.byName(value);
+                            break;
                     }
                 } catch (Exception e) {
                     Controllable.LOGGER.warn("Skipping bad option: {}:{}", key, value);
@@ -231,6 +278,10 @@ public class ControllerOptions {
             writer.println("mouseSpeed:" + FORMAT.format(this.mouseSpeed));
             writer.println("attackSpeed:" + this.attackSpeed);
             writer.println("toggleSprint:" + this.toggleSprint);
+            writer.println("aimAssist:" + this.aimAssist);
+            writer.println("hostileAimMode:" + this.hostileAimMode);
+            writer.println("animalAimMode:" + this.animalAimMode);
+            writer.println("playerAimMode:" + this.playerAimMode);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -290,4 +341,65 @@ public class ControllerOptions {
         return this.mouseSpeed;
     }
 
+    public boolean isAimAssist()
+    {
+        return aimAssist;
+    }
+
+    public int getAimAssistIntensity()
+    {
+        return aimAssistIntensity;
+    }
+
+    public AimAssistMode getHostileAimMode()
+    {
+        return hostileAimMode;
+    }
+
+    public AimAssistMode getAnimalAimMode()
+    {
+        return animalAimMode;
+    }
+
+    public AimAssistMode getPlayerAimMode()
+    {
+        return playerAimMode;
+    }
+
+    public enum AimAssistMode implements IStringSerializable
+    {
+        NONE("none"),
+        SENSITIVITY("sensitivity"),
+        AIM("aim"),
+        BOTH("both");
+
+        private String strMode;
+
+        AimAssistMode(String strMode)
+        {
+            this.strMode = strMode;
+        }
+
+        public static AimAssistMode byName(String value)
+        {
+            for(AimAssistMode aimAssistMode : values()) {
+                if (aimAssistMode.strMode.equalsIgnoreCase(value)) return aimAssistMode;
+            }
+            return null;
+        }
+
+        @Override
+        public String getName()
+        {
+            return strMode;
+        }
+
+        public boolean sensitivity() {
+            return this == SENSITIVITY || this == BOTH;
+        }
+
+        public boolean aim() {
+            return this == AIM || this == BOTH;
+        }
+    }
 }

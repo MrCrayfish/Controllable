@@ -27,6 +27,11 @@
   "controllable.gui.title.select_controller": "Select a Controller",
   "controllable.gui.title.settings": "Settings",
   "controllable.gui.title.layout": "Remap Buttons",
+  "controllable.gui.title.settings.aim_assist": "Aim Assist Settings",
+  "controllable.options.aimAssistMode.none": "None",
+  "controllable.options.aimAssistMode.sensitivity": "Sensitivity",
+  "controllable.options.aimAssistMode.aim": "Aim",
+  "controllable.options.aimAssistMode.both": "Both",
   "controllable.gui.settings": "Settings",
   "controllable.gui.actionList": "Action Controls",
   "controllable.gui.remap": "Remap Buttons",
@@ -40,6 +45,11 @@
   "controllable.options.attackSpeed.format": "Attack Speed: %s",
   "controllable.options.mouseSpeed": "Mouse Speed",
   "controllable.options.mouseSpeed.format": "Mouse Speed: %s",
+  "controllable.options.aimAssist": "Aim Assist",
+  "controllable.options.aimAssistIntensity.format": "Assist Intensity: %s",
+  "controllable.options.aimAssist.hostile": "Hostile AimMode",
+  "controllable.options.aimAssist.animal": "Animal AimMode",
+  "controllable.options.aimAssist.player": "Player AimMode",
   "controllable.options.renderMiniPlayer": "Render Mini Player",
   "controllable.options.virtualMouse": "Virtual Mouse",
   "controllable.options.consoleHotbar": "Console Hotbar",
@@ -57,5 +67,4 @@
   "controllable.toast.controller": "Controller",
   "controllable.toast.connected": "Connected",
   "controllable.toast.disconnected": "Disconnected"
-
 }
