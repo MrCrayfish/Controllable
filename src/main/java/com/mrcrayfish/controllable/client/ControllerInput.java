@@ -349,7 +349,7 @@ public class ControllerInput
 
                 if(mode.sensitivity())
                 {
-                    resultYaw *= (float) (0.30 * assistIntensity); // Slows the sensitivity to stop slingshotting the bounding box. It can still be slingshotted though if attempted.
+                    resultYaw *= (float) (0.14 * assistIntensity); // Slows the sensitivity to stop slingshotting the bounding box. It can still be slingshotted though if attempted.
                     resultPitch *= (float) (0.12 * assistIntensity); // Slows the sensitivity to stop slingshotting the bounding box. It can still be slingshotted though if attempted.
                 }
 
