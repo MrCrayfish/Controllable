@@ -36,8 +36,7 @@ public class AimAssistSettingsScreen extends Screen
             this.addButton(option.createWidget(this.minecraft.gameSettings, x, y, 150));
         }
 
-        this.addButton(new Button(this.width / 2 - 100, this.height / 6 + 24 * (OPTIONS.length + 1) / 2, 200, 20, I18n.format("gui.done"),
-                (button) -> this.minecraft.displayGuiScreen(this.parentScreen)));
+        this.addButton(new Button(this.width / 2 - 100, this.height / 6 + 24 * (OPTIONS.length + 1) / 2, 200, 20, I18n.format("gui.done"), (button) -> this.minecraft.displayGuiScreen(this.parentScreen)));
     }
 
     @Override

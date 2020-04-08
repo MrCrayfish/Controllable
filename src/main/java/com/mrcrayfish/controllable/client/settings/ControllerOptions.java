@@ -23,7 +23,8 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-public class ControllerOptions {
+public class ControllerOptions
+{
 
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
 
@@ -108,47 +109,25 @@ public class ControllerOptions {
         return I18n.format("controllable.options.mouseSpeed.format", FORMAT.format(mouseSpeed));
     });
 
-    public static final SliderPercentageOption ATTACK_SPEED = new ControllableSliderPercentageOption("controllable.options.attackSpeed", 5, 40, 1,
-            gameSettings -> (double) Controllable.getOptions().attackSpeed,
-            (gameSettings, value) -> Controllable.getOptions().attackSpeed = (int) MathHelper.clamp(value, 5, 40),
-            (gameSettings, sliderPercentageOption) -> {
-                int attackSpeed = Controllable.getOptions().attackSpeed;
-                return I18n.format("controllable.options.attackSpeed.format", FORMAT.format(attackSpeed));
-            });
+    public static final SliderPercentageOption ATTACK_SPEED = new ControllableSliderPercentageOption("controllable.options.attackSpeed", 5, 40, 1, gameSettings -> (double) Controllable.getOptions().attackSpeed, (gameSettings, value) -> Controllable.getOptions().attackSpeed = (int) MathHelper.clamp(value, 5, 40), (gameSettings, sliderPercentageOption) -> {
+        int attackSpeed = Controllable.getOptions().attackSpeed;
+        return I18n.format("controllable.options.attackSpeed.format", FORMAT.format(attackSpeed));
+    });
 
-    public static final AbstractOption TOGGLE_SPRINT = new ControllableBooleanOption("controllable.options.toggleSprint",
-            gameSettings -> Controllable.getOptions().toggleSprint,
-            (gameSettings, aBoolean) -> Controllable.getOptions().toggleSprint = aBoolean);
+    public static final AbstractOption TOGGLE_SPRINT = new ControllableBooleanOption("controllable.options.toggleSprint", gameSettings -> Controllable.getOptions().toggleSprint, (gameSettings, aBoolean) -> Controllable.getOptions().toggleSprint = aBoolean);
 
-    public static final AbstractOption TOGGLE_AIM = new ControllableBooleanOption("controllable.options.aimAssist",
-            gameSettings -> Controllable.getOptions().aimAssist,
-            (gameSettings, aBoolean) -> Controllable.getOptions().aimAssist = aBoolean);
+    public static final AbstractOption TOGGLE_AIM = new ControllableBooleanOption("controllable.options.aimAssist", gameSettings -> Controllable.getOptions().aimAssist, (gameSettings, aBoolean) -> Controllable.getOptions().aimAssist = aBoolean);
 
-    public static final SliderPercentageOption AIM_ASSIST_INTENSITY = new ControllableSliderPercentageOption("controllable.options.aimAssistIntensity", 1, 100, 1,
-            gameSettings -> (double) Controllable.getOptions().aimAssistIntensity,
-            (gameSettings, value) -> Controllable.getOptions().aimAssistIntensity = (int) MathHelper.clamp(value, 1, 100),
-            (gameSettings, sliderPercentageOption) -> {
-                int assistIntensity = Controllable.getOptions().aimAssistIntensity;
-                return I18n.format("controllable.options.aimAssistIntensity.format", assistIntensity);
-            });
+    public static final SliderPercentageOption AIM_ASSIST_INTENSITY = new ControllableSliderPercentageOption("controllable.options.aimAssistIntensity", 1, 100, 1, gameSettings -> (double) Controllable.getOptions().aimAssistIntensity, (gameSettings, value) -> Controllable.getOptions().aimAssistIntensity = (int) MathHelper.clamp(value, 1, 100), (gameSettings, sliderPercentageOption) -> {
+        int assistIntensity = Controllable.getOptions().aimAssistIntensity;
+        return I18n.format("controllable.options.aimAssistIntensity.format", assistIntensity);
+    });
 
-    public static final AbstractOption HOSTILE_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.hostile",
-            AimAssistMode.class,
-            gameSettings -> Controllable.getOptions().hostileAimMode,
-            (gameSettings, mode) -> Controllable.getOptions().hostileAimMode = mode,
-            (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
+    public static final AbstractOption HOSTILE_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.hostile", AimAssistMode.class, gameSettings -> Controllable.getOptions().hostileAimMode, (gameSettings, mode) -> Controllable.getOptions().hostileAimMode = mode, (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
 
-    public static final AbstractOption ANIMAL_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.animal",
-            AimAssistMode.class,
-            gameSettings -> Controllable.getOptions().animalAimMode,
-            (gameSettings, mode) -> Controllable.getOptions().animalAimMode = mode,
-            (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
+    public static final AbstractOption ANIMAL_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.animal", AimAssistMode.class, gameSettings -> Controllable.getOptions().animalAimMode, (gameSettings, mode) -> Controllable.getOptions().animalAimMode = mode, (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
 
-    public static final AbstractOption PLAYER_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.player",
-            AimAssistMode.class,
-            gameSettings -> Controllable.getOptions().playerAimMode,
-            (gameSettings, mode) -> Controllable.getOptions().playerAimMode = mode,
-            (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
+    public static final AbstractOption PLAYER_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.player", AimAssistMode.class, gameSettings -> Controllable.getOptions().playerAimMode, (gameSettings, mode) -> Controllable.getOptions().playerAimMode = mode, (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
 
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
@@ -173,34 +152,45 @@ public class ControllerOptions {
     private AimAssistMode animalAimMode = AimAssistMode.AIM;
     private AimAssistMode playerAimMode = AimAssistMode.BOTH;
 
-    public ControllerOptions(File dataDir) {
+    public ControllerOptions(File dataDir)
+    {
         this.optionsFile = new File(dataDir, "controllable-options.txt");
         this.loadOptions();
     }
 
-    private void loadOptions() {
-        try {
-            if (!this.optionsFile.exists()) {
+    private void loadOptions()
+    {
+        try
+        {
+            if(!this.optionsFile.exists())
+            {
                 return;
             }
 
             List<String> lines = IOUtils.readLines(new FileInputStream(this.optionsFile), Charsets.UTF_8);
             CompoundNBT compound = new CompoundNBT();
 
-            for (String line : lines) {
-                try {
+            for(String line : lines)
+            {
+                try
+                {
                     Iterator<String> iterator = COLON_SPLITTER.omitEmptyStrings().limit(2).split(line).iterator();
                     compound.putString(iterator.next(), iterator.next());
-                } catch (Exception var10) {
+                }
+                catch(Exception var10)
+                {
                     Controllable.LOGGER.warn("Skipping bad option: {}", line);
                 }
             }
 
-            for (String key : compound.keySet()) {
+            for(String key : compound.keySet())
+            {
                 String value = compound.getString(key);
 
-                try {
-                    switch (key) {
+                try
+                {
+                    switch(key)
+                    {
                         case "forceFeedback":
                             this.forceFeedback = Boolean.parseBoolean(value);
                             break;
@@ -253,18 +243,24 @@ public class ControllerOptions {
                             this.playerAimMode = AimAssistMode.byName(value);
                             break;
                     }
-                } catch (Exception e) {
+                }
+                catch(Exception e)
+                {
                     Controllable.LOGGER.warn("Skipping bad option: {}:{}", key, value);
                 }
             }
-        } catch (Exception e) {
+        }
+        catch(Exception e)
+        {
             Controllable.LOGGER.error("Failed to load options", e);
         }
 
     }
 
-    public void saveOptions() {
-        try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8))) {
+    public void saveOptions()
+    {
+        try(PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8)))
+        {
             writer.println("forceFeedback:" + this.forceFeedback);
             writer.println("autoSelect:" + this.autoSelect);
             writer.println("renderMiniPlayer:" + this.renderMiniPlayer);
@@ -282,48 +278,60 @@ public class ControllerOptions {
             writer.println("hostileAimMode:" + this.hostileAimMode);
             writer.println("animalAimMode:" + this.animalAimMode);
             writer.println("playerAimMode:" + this.playerAimMode);
-        } catch (FileNotFoundException e) {
+        }
+        catch(FileNotFoundException e)
+        {
             e.printStackTrace();
         }
     }
 
-    public boolean useForceFeedback() {
+    public boolean useForceFeedback()
+    {
         return this.forceFeedback;
     }
 
-    public boolean isAutoSelect() {
+    public boolean isAutoSelect()
+    {
         return this.autoSelect;
     }
 
-    public boolean isRenderMiniPlayer() {
+    public boolean isRenderMiniPlayer()
+    {
         return renderMiniPlayer;
     }
 
-    public boolean isVirtualMouse() {
+    public boolean isVirtualMouse()
+    {
         return virtualMouse;
     }
 
-    public boolean useConsoleHotbar() {
+    public boolean useConsoleHotbar()
+    {
         return consoleHotbar;
     }
 
-    public CursorType getCursorType() {
+    public CursorType getCursorType()
+    {
         return cursorType;
     }
 
-    public ControllerType getControllerType() {
+    public ControllerType getControllerType()
+    {
         return controllerType;
     }
 
-    public boolean isInvertLook() {
+    public boolean isInvertLook()
+    {
         return invertLook;
     }
 
-    public double getDeadZone() {
+    public double getDeadZone()
+    {
         return this.deadZone;
     }
 
-    public double getRotationSpeed() {
+    public double getRotationSpeed()
+    {
         return this.rotationSpeed;
     }
 
@@ -337,7 +345,8 @@ public class ControllerOptions {
         return toggleSprint;
     }
 
-    public double getMouseSpeed() {
+    public double getMouseSpeed()
+    {
         return this.mouseSpeed;
     }
 
@@ -382,8 +391,10 @@ public class ControllerOptions {
 
         public static AimAssistMode byName(String value)
         {
-            for(AimAssistMode aimAssistMode : values()) {
-                if (aimAssistMode.strMode.equalsIgnoreCase(value)) return aimAssistMode;
+            for(AimAssistMode aimAssistMode : values())
+            {
+                if(aimAssistMode.strMode.equalsIgnoreCase(value))
+                    return aimAssistMode;
             }
             return null;
         }
@@ -394,11 +405,13 @@ public class ControllerOptions {
             return strMode;
         }
 
-        public boolean sensitivity() {
+        public boolean sensitivity()
+        {
             return this == SENSITIVITY || this == BOTH;
         }
 
-        public boolean aim() {
+        public boolean aim()
+        {
             return this == AIM || this == BOTH;
         }
     }
