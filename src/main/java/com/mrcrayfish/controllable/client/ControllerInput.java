@@ -344,6 +344,7 @@ public class ControllerInput
                 Vec3d rayHit = entityRayTraceResult.getHitVec(); // Look where the raytrace of the player's view hits
 
                 AxisAlignedBB targetBox = entity.getBoundingBox().shrink(entity.getBoundingBox().getAverageEdgeLength() * 0.3);
+
                 Vec3d targetCoords = targetBox.getCenter(); // Get the center of the entity which is a good starting point
 
                 double assistIntensity = (Controllable.getOptions().getAimAssistIntensity() / 100.0);
@@ -365,23 +366,61 @@ public class ControllerInput
 
                 if(mode.aim())
                 {
-                    Vec3d targetXCoords = new Vec3d(targetCoords.x, 0, 0); // To accurately measure distance
-                    Vec3d rayXCoords = new Vec3d(rayHit.x, 0, 0); // Measure accurately distance
+                    Vec3d targetVerCoords; // To accurately measure distance
+                    Vec3d rayVerCoords; // Measure accurately distance
+
+                    double targetBoxVerMin;
+                    double targetBoxVerMax;
+
+                    double rayhitVertical;
+                    double targetVertical;
+
+                    float rotationYaw = player.rotationYaw % 360;
+
+                    int direction;
+
+                    if ((rotationYaw >= 90 && rotationYaw <= 180) || (rotationYaw >= 270 && rotationYaw <= 360)) {
+                        targetVerCoords = new Vec3d(0, 0, targetCoords.z);
+
+                        rayVerCoords = new Vec3d(0, 0, rayHit.z);
+
+                        rayhitVertical = rayHit.z;
+                        targetBoxVerMin = targetBox.minZ;
+                        targetBoxVerMax = targetBox.maxZ;
+                        targetVertical = targetVerCoords.z;
+
+                        direction = 1;
+
+                    } else {
+                        targetVerCoords = new Vec3d(targetCoords.x, 0, 0);
+
+                        rayVerCoords = new Vec3d(rayHit.x, 0, 0);
+
+                        rayhitVertical = rayHit.x;
+                        targetBoxVerMin = targetBox.minX;
+                        targetBoxVerMax = targetBox.maxX;
+                        targetVertical = targetVerCoords.x;
+
+                        direction = -1;
+                    }
+
+
+
 
                     Vec3d targetYCoords = new Vec3d(0, targetCoords.y, 0); // Measure accurately distance
                     Vec3d rayYCoords = new Vec3d(0, rayHit.y, 0); // Measure accurately distance
 
-                    double xDir = changeDirection(rayHit.x, targetBox.minX, targetBox.maxX, 0.25) * -1;
+                    double verticalDir = changeDirection(rayhitVertical, targetBoxVerMin, targetBoxVerMax, Math.abs(targetBoxVerMax - targetBoxVerMin) + 0.2) * direction;
                     // Only modify X if it's leaving box
-                    if(xDir != 0)
+                    if(verticalDir != 0)
                     {
                         resultYaw = (float) (toTarget(
                                 resultYaw,
-                                (float) ((targetXCoords.distanceTo(rayXCoords)) * xDir /* interpolateNegatives(playerLookVec.getX()))*/),
-                                (float) targetXCoords.x < rayXCoords.x,
+                                (float) ((targetVerCoords.distanceTo(rayVerCoords)) * verticalDir /* interpolateNegatives(playerLookVec.getX()))*/),
+                                (float) targetVertical < rayhitVertical,
                                 18.0 * assistIntensity) * 0.5);
 
-                        System.out.println(resultYaw + "yaw " + targetXCoords.distanceTo(rayXCoords) + "dis " + xDir + "dir " + getDistanceFromEdge(rayHit.x, targetBox.minX, targetBox.maxX) + "dist");
+                        System.out.println(resultYaw + "yaw " + targetVerCoords.distanceTo(rayVerCoords) + "dis " + verticalDir + "dir " + getDistanceFromEdge(rayHit.x, targetBox.minX, targetBox.maxX) + "dist");
 
                         // TODO: Apply rotation to assist since it does not follow the boundary correctly to the orientation of the camera.
                     }
