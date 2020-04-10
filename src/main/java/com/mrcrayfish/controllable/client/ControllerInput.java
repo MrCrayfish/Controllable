@@ -343,14 +343,24 @@ public class ControllerInput
 
                 Vec3d rayHit = entityRayTraceResult.getHitVec(); // Look where the raytrace of the player's view hits
 
-                Vec3d targetCoords = entity.getBoundingBox().getCenter(); // Get the center of the entity which is a good starting point
+                AxisAlignedBB targetBox = entity.getBoundingBox().shrink(entity.getBoundingBox().getAverageEdgeLength() * 0.3);
+                Vec3d targetCoords = targetBox.getCenter(); // Get the center of the entity which is a good starting point
 
                 double assistIntensity = (Controllable.getOptions().getAimAssistIntensity() / 100.0);
 
                 if(mode.sensitivity())
                 {
-                    resultYaw *= (float) (0.14 * assistIntensity); // Slows the sensitivity to stop slingshotting the bounding box. It can still be slingshotted though if attempted.
-                    resultPitch *= (float) (0.12 * assistIntensity); // Slows the sensitivity to stop slingshotting the bounding box. It can still be slingshotted though if attempted.
+
+                    double invertedIntensity = 1.0 - assistIntensity; // 1.0 - 1.0 max intensity // 1.0 - 0 = least intensity
+
+                    if (invertedIntensity == 0) invertedIntensity = 0.009;
+
+                    double multiplier = 0.90 * (invertedIntensity);
+
+
+
+                    resultYaw *= (float) (multiplier); // Slows the sensitivity to stop slingshotting the bounding box. It can still be slingshotted though if attempted.
+                    resultPitch *= (float) (multiplier); // Slows the sensitivity to stop slingshotting the bounding box. It can still be slingshotted though if attempted.
                 }
 
                 if(mode.aim())
@@ -361,16 +371,22 @@ public class ControllerInput
                     Vec3d targetYCoords = new Vec3d(0, targetCoords.y, 0); // Measure accurately distance
                     Vec3d rayYCoords = new Vec3d(0, rayHit.y, 0); // Measure accurately distance
 
-                    double xDir = changeYDirection(rayHit.x, entity.getBoundingBox().minX, entity.getBoundingBox().maxX, 0.5);
+                    double xDir = changeDirection(rayHit.x, targetBox.minX, targetBox.maxX, 0.25) * -1;
                     // Only modify X if it's leaving box
                     if(xDir != 0)
                     {
-                        resultYaw = (float) (toTarget(resultYaw, (float) ((targetXCoords.distanceTo(rayXCoords) - entity.getBoundingBox().getXSize() / 4) * xDir /* interpolateNegatives(playerLookVec.getX()))*/), (float) targetXCoords.x < rayXCoords.x, 18.0 * assistIntensity) * 0.5);
+                        resultYaw = (float) (toTarget(
+                                resultYaw,
+                                (float) ((targetXCoords.distanceTo(rayXCoords)) * xDir /* interpolateNegatives(playerLookVec.getX()))*/),
+                                (float) targetXCoords.x < rayXCoords.x,
+                                18.0 * assistIntensity) * 0.5);
+
+                        System.out.println(resultYaw + "yaw " + targetXCoords.distanceTo(rayXCoords) + "dis " + xDir + "dir " + getDistanceFromEdge(rayHit.x, targetBox.minX, targetBox.maxX) + "dist");
 
                         // TODO: Apply rotation to assist since it does not follow the boundary correctly to the orientation of the camera.
                     }
 
-                    double yDir = changeYDirection(rayHit.y, entity.getBoundingBox().minY, entity.getBoundingBox().maxY, 0.25);
+                    double yDir = changeDirection(rayHit.y, entity.getBoundingBox().minY, entity.getBoundingBox().maxY, 0.25);
                     // Only modify Y level if it's about to leave box
                     if(yDir != 0)
                     {
@@ -382,6 +398,10 @@ public class ControllerInput
         }
 
         return new Vec2f(resultPitch, resultYaw);
+    }
+
+    private double getDistanceFromEdge(double current, double min, double max) {
+        return Math.max(max - current, min - current);
     }
 
     private ControllerOptions.AimAssistMode getMode(Entity entity)
@@ -404,19 +424,23 @@ public class ControllerInput
         return null;
     }
 
-    private float toTarget(float current, float distance, boolean direction, double multiplier)
+    private float toTarget(float current, float distance, boolean ignore, double multiplier)
     {
-        if(direction)
-        {
-            return (float) ((current - distance) * multiplier);
-        }
-        else
-        {
-            return (float) ((current + distance) * multiplier);
-        }
+        int direction = 1;
+//        if(current < 0)
+//            direction = -1;
+
+        //        if(direction)
+        //        {
+        return (float) ((current - (distance)) * multiplier);
+        //        }
+        //        else
+        //        {
+        //            return (float) ((current + distance) * multiplier);
+        //        }
     }
 
-    private double changeYDirection(double hit, double min, double max, double offset)
+    private double changeDirection(double hit, double min, double max, double offset)
     {
         if(hit <= min + offset)
         {
