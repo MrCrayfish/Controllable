@@ -398,7 +398,7 @@ public class ControllerInput
                         resultYaw = getTargetYaw(aimAssistTarget, player);
                         resultPitch = getTargetPitch(aimAssistTarget, player);
 
-                        // TODO: Fix this code.
+                        // TODO: Fix this code. Causes spinning and does not move pitch correctly.
                     }
 
                     ///////////////////////////////////////////////////////////////////
