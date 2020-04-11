@@ -364,12 +364,6 @@ public class ControllerInput
             if(aimAssistTargetDistance <= 5.2 && player.canEntityBeSeen(aimAssistTarget) && mode != null && mode != ControllerOptions.AimAssistMode.NONE) // Avoid checking entities such as drops or tnt
             {
 
-                Vec3d rayHit = mc.objectMouseOver.getHitVec(); // Look where the raytrace of the player's view hits
-
-                AxisAlignedBB targetBox = aimAssistTarget.getBoundingBox().shrink(aimAssistTarget.getBoundingBox().getAverageEdgeLength() * 0.3);
-
-                Vec3d targetCoords = targetBox.getCenter(); // Get the center of the entity which is a good starting point
-
                 double assistIntensity = (Controllable.getOptions().getAimAssistIntensity() / 100.0);
 
                 if(mode.sensitivity() && entityInRange)
@@ -405,6 +399,13 @@ public class ControllerInput
 
                     if(!mathMode)
                     {
+                        Vec3d rayHit = mc.objectMouseOver.getHitVec(); // Look where the raytrace of the player's view hits
+
+                        AxisAlignedBB targetBox = aimAssistTarget.getBoundingBox().shrink(aimAssistTarget.getBoundingBox().getAverageEdgeLength() * 0.3);
+
+                        Vec3d targetCoords = targetBox.getCenter(); // Get the center of the entity which is a good starting point
+
+
                         // TODO: Remove this. Does not track in 3D space since it only uses X and Y values and ignores the Z making it leave the boundary constantly.
                         Vec3d targetVerCoords; // To accurately measure distance
                         Vec3d rayVerCoords; // Measure accurately distance
