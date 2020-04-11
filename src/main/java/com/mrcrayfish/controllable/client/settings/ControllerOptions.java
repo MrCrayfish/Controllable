@@ -233,6 +233,9 @@ public class ControllerOptions
                         case "aimAssist":
                             this.aimAssist = Boolean.parseBoolean(value);
                             break;
+                        case "aimAssistIntensity":
+                            this.aimAssistIntensity = Integer.parseInt(value);
+                            break;
                         case "hostileAimMode":
                             this.hostileAimMode = AimAssistMode.byName(value);
                             break;
@@ -275,6 +278,7 @@ public class ControllerOptions
             writer.println("attackSpeed:" + this.attackSpeed);
             writer.println("toggleSprint:" + this.toggleSprint);
             writer.println("aimAssist:" + this.aimAssist);
+            writer.println("aimAssistIntensity:" + this.aimAssistIntensity);
             writer.println("hostileAimMode:" + this.hostileAimMode);
             writer.println("animalAimMode:" + this.animalAimMode);
             writer.println("playerAimMode:" + this.playerAimMode);
