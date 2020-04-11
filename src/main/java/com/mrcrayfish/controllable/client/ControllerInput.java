@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.util.NativeUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.controller.LookController;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.AmbientEntity;
 import net.minecraft.entity.passive.AnimalEntity;
@@ -478,6 +479,12 @@ public class ControllerInput
         return new Vec2f(resultPitch, resultYaw);
     }
 
+    /**
+     * From {@link LookController#getTargetPitch()}
+     * @param target
+     * @param playerEntity
+     * @return
+     */
     protected float getTargetPitch(Entity target, PlayerEntity playerEntity) {
         double xDiff = target.getPosX() - playerEntity.getPosX();
         double yDiff = getEyePosition(target) - playerEntity.func_226280_cw_();
@@ -486,18 +493,36 @@ public class ControllerInput
         return (float) (-(MathHelper.atan2(yDiff, distance) * (double)(180F / (float)Math.PI)));
     }
 
+    /**
+     * From {@link LookController#getTargetYaw()}
+     * @param target
+     * @param playerEntity
+     * @return
+     */
     protected float getTargetYaw(Entity target, PlayerEntity playerEntity) {
         double d0 = target.getPosX() - playerEntity.getPosX();
         double d1 = target.getPosZ() - playerEntity.getPosZ();
         return (float)-(MathHelper.atan2(d1, d0) * (double)(180F / (float)Math.PI)) - 90.0F;
     }
 
+    /**
+     * From {@link LookController#clampedRotate(float, float, float)}
+     * @param from
+     * @param to
+     * @param maxDelta
+     * @return
+     */
     protected float clampedRotate(float from, float to, float maxDelta) {
         float f = MathHelper.wrapSubtractDegrees(from, to);
         float f1 = MathHelper.clamp(f, -maxDelta, maxDelta);
         return from + f1;
     }
 
+    /**
+     * From {@link LookController#getEyePosition(Entity)}
+     * @param entity
+     * @return
+     */
     private static double getEyePosition(Entity entity) {
         return entity instanceof LivingEntity ? entity.func_226280_cw_() : (entity.getBoundingBox().minY + entity.getBoundingBox().maxY) / 2.0D;
     }
