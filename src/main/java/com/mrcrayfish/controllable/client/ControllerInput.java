@@ -338,21 +338,35 @@ public class ControllerInput
         float resultPitch = targetPitch;
         float resultYaw = targetYaw;
 
-        boolean controllerInput = (Math.abs(controller.getRThumbStickXValue()) >= deadZone || Math.abs(controller.getRThumbStickYValue()) >= deadZone);
-        boolean entityInRange = mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY;
+        boolean controllerInput = (Math.abs(controller.getRThumbStickXValue()) >= deadZone || Math.abs(controller.getRThumbStickYValue()) >= deadZone); // True if controller has been moved
+        boolean entityInRange = mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY; // Is true if an entity is in the crosshair range
 
+        boolean targetInRange = false; // Is true if the target is in the crosshair raytrace
 
+        // Change aim assist target if new one in sight
         if (entityInRange) {
             EntityRayTraceResult entityRayTraceResult = (EntityRayTraceResult) mc.objectMouseOver;
+
+
+
             if (entityRayTraceResult.getEntity() instanceof LivingEntity)
-                aimAssistTarget = entityRayTraceResult.getEntity();
+            {
+                ControllerOptions.AimAssistMode mode = getMode(entityRayTraceResult.getEntity());
+                if(mode != null && mode.aim())
+                {
+                    aimAssistTarget = entityRayTraceResult.getEntity();
+                    targetInRange = true;
+                }
+            }
         }
+
+
 
         // TODO: Cleanup code
 
-        if (aimAssistTarget == null ||
+        if (aimAssistTarget == null || // Avoid null pointers
                 !aimAssistTarget.isAlive() ||
-                aimAssistTarget.getDistance(player) >= 6.4 // A little higher than 5 to handle when it gets farther
+                aimAssistTarget.getDistance(player) >= 5.9 // A little higher than 5 to handle when it gets farther
         ) aimAssistTarget = null; // Remove target when it's out of range
 
         if(aimAssistTarget != null && aimAssistTarget.isAlive())
@@ -361,15 +375,15 @@ public class ControllerInput
 
             ControllerOptions.AimAssistMode mode = getMode(aimAssistTarget);
 
-            if(aimAssistTargetDistance <= 5.2 && player.canEntityBeSeen(aimAssistTarget) && mode != null && mode != ControllerOptions.AimAssistMode.NONE) // Avoid checking entities such as drops or tnt
+            if(mode != null && mode != ControllerOptions.AimAssistMode.NONE && aimAssistTargetDistance <= 5.2 && player.canEntityBeSeen(aimAssistTarget)) // Avoid checking entities such as drops or tnt
             {
 
                 double assistIntensity = (Controllable.getOptions().getAimAssistIntensity() / 100.0);
 
-                if(mode.sensitivity() && entityInRange)
+                if(mode.sensitivity() && targetInRange && controllerInput)
                 {
 
-                    double invertedIntensity = 1.0 - assistIntensity; // 1.0 - 1.0 max intensity // 1.0 - 0 = least intensity
+                    double invertedIntensity = 1.0 - assistIntensity; // 1.0 - 1.0 max intensity // 1.0 - 0 = the least intensity
 
                     if (invertedIntensity == 0) invertedIntensity = 0.009;
 
@@ -381,103 +395,49 @@ public class ControllerInput
                     resultPitch *= (float) (multiplier); // Slows the sensitivity to stop slingshotting the bounding box. It can still be slingshotted though if attempted.
                 }
 
+
+
                 if(mode.aim())
                 {
+                    float yaw = MathHelper.wrapDegrees(getTargetYaw(aimAssistTarget, player));
+                    float pitch = MathHelper.wrapDegrees(getTargetPitch(aimAssistTarget, player));
 
-                    boolean mathMode = true; // Boolean used for switching math methods in debugging.
-
-                    if (mathMode)
-                    {
-
-                        resultYaw = getTargetYaw(aimAssistTarget, player);
-                        resultPitch = getTargetPitch(aimAssistTarget, player);
-
-                        // TODO: Fix this code. Causes spinning and does not move pitch correctly.
-                    }
-
-                    ///////////////////////////////////////////////////////////////////
-
-                    if(!mathMode)
-                    {
-                        Vec3d rayHit = mc.objectMouseOver.getHitVec(); // Look where the raytrace of the player's view hits
-
-                        AxisAlignedBB targetBox = aimAssistTarget.getBoundingBox().shrink(aimAssistTarget.getBoundingBox().getAverageEdgeLength() * 0.3);
-
-                        Vec3d targetCoords = targetBox.getCenter(); // Get the center of the entity which is a good starting point
+                    float calcPitch = (float) (MathHelper.wrapSubtractDegrees(player.rotationPitch, pitch) * 0.2 * assistIntensity);
+                    float calcYaw = (float) (MathHelper.wrapSubtractDegrees(player.rotationYaw, yaw) * 0.2 * assistIntensity);
 
 
-                        // TODO: Remove this. Does not track in 3D space since it only uses X and Y values and ignores the Z making it leave the boundary constantly.
-                        Vec3d targetVerCoords; // To accurately measure distance
-                        Vec3d rayVerCoords; // Measure accurately distance
+                    if (Math.abs(calcYaw) <= 4 && Math.abs(calcPitch) <= 3) {
 
-                        double targetBoxVerMin;
-                        double targetBoxVerMax;
-
-                        double rayhitVertical;
-                        double targetVertical;
-
-                        float rotationYaw = resultYaw % 360;
-
-                        int direction;
-
-                        if((rotationYaw >= 90 && rotationYaw <= 180) || (rotationYaw >= 270 && rotationYaw <= 360))
+                        if (Math.abs(calcYaw) <= 4)
                         {
-                            targetVerCoords = new Vec3d(0, 0, targetCoords.z);
-
-                            rayVerCoords = new Vec3d(0, 0, rayHit.z);
-
-                            rayhitVertical = rayHit.z;
-                            targetBoxVerMin = targetBox.minZ;
-                            targetBoxVerMax = targetBox.maxZ;
-                            targetVertical = targetVerCoords.z;
-
-                            direction = 1;
-
-                        }
-                        else
-                        {
-                            targetVerCoords = new Vec3d(targetCoords.x, 0, 0);
-
-                            rayVerCoords = new Vec3d(rayHit.x, 0, 0);
-
-                            rayhitVertical = rayHit.x;
-                            targetBoxVerMin = targetBox.minX;
-                            targetBoxVerMax = targetBox.maxX;
-                            targetVertical = targetVerCoords.x;
-
-                            direction = -1;
+                            resultYaw += calcYaw;
                         }
 
-                        Vec3d targetYCoords = new Vec3d(0, targetCoords.y, 0); // Measure accurately distance
-                        Vec3d rayYCoords = new Vec3d(0, rayHit.y, 0); // Measure accurately distance
-
-                        double verticalDir = changeDirection(rayhitVertical, targetBoxVerMin, targetBoxVerMax, Math.abs(targetBoxVerMax - targetBoxVerMin) + 0.2) * direction;
-                        // Only modify X if it's leaving box
-                        if(verticalDir != 0)
+                        if (Math.abs(calcPitch) <= 3)
                         {
-                            resultYaw = (float) (toTarget(resultYaw, (float) ((targetVerCoords.distanceTo(rayVerCoords)) * verticalDir /* interpolateNegatives(playerLookVec.getX()))*/), (float) targetVertical < rayhitVertical, 18.0 * assistIntensity) * 0.5);
-
-                            System.out.println(resultYaw + "yaw " + targetVerCoords.distanceTo(rayVerCoords) + "dis " + verticalDir + "dir " + getDistanceFromEdge(rayHit.x, targetBox.minX, targetBox.maxX) + "dist");
-
-                            // TODO: Apply rotation to assist since it does not follow the boundary correctly to the orientation of the camera.
-                        }
-
-                        double yDir = changeDirection(rayHit.y, aimAssistTarget.getBoundingBox().minY, aimAssistTarget.getBoundingBox().maxY, 0.25);
-                        // Only modify Y level if it's about to leave box
-                        if(yDir != 0)
-                        {
-                            resultPitch = toTarget(resultPitch, (float) (targetYCoords.distanceTo(rayYCoords) * yDir), true, 5.0 * assistIntensity);
-
+                            resultPitch += calcPitch;
                         }
                     }
 
 
-                    ////////////////////////
+//                    if(MathHelper.normalizeAngle(calcPitch))
+//                    {
+//
+//                    }
                 }
             }
         }
 
         return new Vec2f(resultPitch, resultYaw);
+    }
+
+    private boolean intersectBoundingBox(AxisAlignedBB b1, AxisAlignedBB b2) {
+        return b1.minX < b2.maxX ||
+                b1.maxX > b2.minX ||
+                b1.minY < b2.maxY ||
+                b1.maxY > b2.minY ||
+                b1.minZ < b2.maxZ ||
+                b1.maxZ > b2.minZ;
     }
 
     /**
@@ -501,22 +461,9 @@ public class ControllerInput
      * @return
      */
     protected float getTargetYaw(Entity target, PlayerEntity playerEntity) {
-        double d0 = target.getPosX() - playerEntity.getPosX();
-        double d1 = target.getPosZ() - playerEntity.getPosZ();
-        return (float)-(MathHelper.atan2(d1, d0) * (double)(180F / (float)Math.PI)) - 90.0F;
-    }
-
-    /**
-     * From {@link LookController#clampedRotate(float, float, float)}
-     * @param from
-     * @param to
-     * @param maxDelta
-     * @return
-     */
-    protected float clampedRotate(float from, float to, float maxDelta) {
-        float f = MathHelper.wrapSubtractDegrees(from, to);
-        float f1 = MathHelper.clamp(f, -maxDelta, maxDelta);
-        return from + f1;
+        double diffX = target.getPosX() - playerEntity.getPosX();
+        double diffZ = target.getPosZ() - playerEntity.getPosZ();
+        return (float)(MathHelper.atan2(diffZ, diffX) * (double)(180F / (float)Math.PI)) - 90.0F;
     }
 
     /**
@@ -526,14 +473,6 @@ public class ControllerInput
      */
     private static double getEyePosition(Entity entity) {
         return entity instanceof LivingEntity ? entity.func_226280_cw_() : (entity.getBoundingBox().minY + entity.getBoundingBox().maxY) / 2.0D;
-    }
-
-    public static float clampAngle(float yaw) {
-        return MathHelper.wrapDegrees(yaw);
-    }
-
-    private double getDistanceFromEdge(double current, double min, double max) {
-        return Math.max(max - current, min - current);
     }
 
     private ControllerOptions.AimAssistMode getMode(Entity entity)
@@ -642,6 +581,8 @@ public class ControllerInput
 
                 targetPitch = aimAssist.x;
                 targetYaw = aimAssist.y;
+            } else {
+                aimAssistTarget = null;
             }
             //            }
         }
