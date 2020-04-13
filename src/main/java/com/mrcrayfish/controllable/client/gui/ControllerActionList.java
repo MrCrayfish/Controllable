@@ -179,8 +179,10 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
             boolean flag1 = false;
 //            boolean keyCodeModifierConflict = true; // less severe form of conflict, like SHIFT conflicting with SHIFT+G
             if (!buttonBinding.isInvalid()) {
-                for(ButtonBinding buttonBindingCheck : Controllable.getButtonRegistry().getButtonBindings().values()) {
-                    if (buttonBindingCheck != this.buttonBinding && this.buttonBinding.conflicts(buttonBindingCheck)) {
+                for(String action : Controllable.getButtonRegistry().getButtonBindings().keySet()) {
+                    ButtonBinding buttonBindingCheck = Controllable.getButtonRegistry().getButton(action);
+                    ActionData actionData = Controllable.getButtonRegistry().getAction(action);
+                    if (buttonBindingCheck != this.buttonBinding && this.buttonBinding.conflicts(buttonBindingCheck, actionData)) {
                         flag1 = true;
                         break;
 
