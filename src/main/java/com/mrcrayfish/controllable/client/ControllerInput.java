@@ -80,10 +80,15 @@ public class ControllerInput
     private float targetYaw;
 
     private Entity aimAssistTarget;
+    private boolean aimAssistIgnore = true; //If true, aim assist will not aim at an entity until it becomes false. True when mouse is moved, false when controller is moved. Mouse will always override controller state.
+    private double rawMouseX;
+    private double rawMouseY;
 
     private int currentAttackTimer;
 
     private int dropCounter = -1;
+    private boolean mouseMoved;
+    private boolean controllerInput;
 
     public double getVirtualMouseX()
     {
@@ -99,6 +104,7 @@ public class ControllerInput
     {
         return lastUse;
     }
+
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event)
@@ -328,17 +334,14 @@ public class ControllerInput
 
         Controller controller = Controllable.getController();
 
-        if(player == null || controller == null)
+        if(player == null || controller == null || mouseMoved)
         {
             return new Vec2f(targetPitch, targetYaw);
         }
 
-        float deadZone = (float) Controllable.getOptions().getDeadZone();
-
         float resultPitch = targetPitch;
         float resultYaw = targetYaw;
 
-        boolean controllerInput = (Math.abs(controller.getRThumbStickXValue()) >= deadZone || Math.abs(controller.getRThumbStickYValue()) >= deadZone); // True if controller has been moved
         boolean entityInRange = mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY; // Is true if an entity is in the crosshair range
 
         boolean targetInRange = false; // Is true if the target is in the crosshair raytrace
@@ -359,10 +362,6 @@ public class ControllerInput
                 }
             }
         }
-
-
-
-        // TODO: Cleanup code
 
         if (aimAssistTarget == null || // Avoid null pointers
                 !aimAssistTarget.isAlive() ||
@@ -399,7 +398,13 @@ public class ControllerInput
 
 
 
-                if(mode.aim())
+
+                //Check if mouse moves. This is to avoid tracking an entity with a mouse as it will be considered hacks.
+
+                if (controllerInput && !mouseMoved) aimAssistIgnore = false;
+                if (mouseMoved) aimAssistIgnore = true;
+
+                if(mode.aim() && !aimAssistIgnore)
                 {
                     float yaw = MathHelper.wrapDegrees(getTargetYaw(aimAssistTarget, player));
                     float pitch = MathHelper.wrapDegrees(getTargetPitch(aimAssistTarget, player));
@@ -422,24 +427,15 @@ public class ControllerInput
                     }
 
 
-//                    if(MathHelper.normalizeAngle(calcPitch))
-//                    {
-//
-//                    }
+                    //                    if(MathHelper.normalizeAngle(calcPitch))
+                    //                    {
+                    //
+                    //                    }
                 }
             }
         }
 
         return new Vec2f(resultPitch, resultYaw);
-    }
-
-    private boolean intersectBoundingBox(AxisAlignedBB b1, AxisAlignedBB b2) {
-        return b1.minX < b2.maxX ||
-                b1.maxX > b2.minX ||
-                b1.minY < b2.maxY ||
-                b1.maxY > b2.minY ||
-                b1.minZ < b2.maxZ ||
-                b1.maxZ > b2.minZ;
     }
 
     /**
@@ -497,36 +493,6 @@ public class ControllerInput
         return null;
     }
 
-    private float toTarget(float current, float distance, boolean ignore, double multiplier)
-    {
-        int direction = 1;
-//        if(current < 0)
-//            direction = -1;
-
-        //        if(direction)
-        //        {
-        return (float) ((current - (distance)) * multiplier);
-        //        }
-        //        else
-        //        {
-        //            return (float) ((current + distance) * multiplier);
-        //        }
-    }
-
-    private double changeDirection(double hit, double min, double max, double offset)
-    {
-        if(hit <= min + offset)
-        {
-            return 1;
-        }
-        else if(hit >= max - offset)
-        {
-            return -1;
-        }
-        else
-            return 0;
-    }
-
     @SubscribeEvent
     public void onRender(TickEvent.ClientTickEvent event)
     {
@@ -537,6 +503,12 @@ public class ControllerInput
         targetPitch = 0F;
 
         Minecraft mc = Minecraft.getInstance();
+
+        mouseMoved |= Math.abs(rawMouseX - mc.mouseHelper.getMouseX()) > 0.05 || Math.abs(rawMouseY - mc.mouseHelper.getMouseY()) > 0.05;
+
+        rawMouseX = mc.mouseHelper.getMouseX();
+        rawMouseY = mc.mouseHelper.getMouseY();
+
         PlayerEntity player = mc.player;
         if(player == null)
             return;
@@ -545,9 +517,14 @@ public class ControllerInput
         if(controller == null)
             return;
 
+        float deadZone = (float) Controllable.getOptions().getDeadZone();
+        controllerInput = (Math.abs(controller.getRThumbStickXValue()) >= deadZone || Math.abs(controller.getRThumbStickYValue()) >= deadZone); // True if controller has been moved
+
+        mouseMoved &= !controllerInput; // true if both are true
+        controllerInput &= !mouseMoved; // true if both are true
+
         if(mc.currentScreen == null)
         {
-            float deadZone = (float) Controllable.getOptions().getDeadZone();
 
             /* Handles rotating the yaw of player */
             if(Math.abs(controller.getRThumbStickXValue()) >= deadZone)
@@ -577,15 +554,20 @@ public class ControllerInput
 
             //            if (targetYaw != 0 || targetPitch != 0)
             //            {
+
+
+
             if(Controllable.getOptions().isAimAssist())
             {
                 Vec2f aimAssist = handleAimAssist(targetYaw, targetPitch);
+
 
                 targetPitch = aimAssist.x;
                 targetYaw = aimAssist.y;
             } else {
                 aimAssistTarget = null;
             }
+
             //            }
         }
 
