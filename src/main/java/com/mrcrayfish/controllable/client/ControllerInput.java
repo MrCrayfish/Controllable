@@ -373,13 +373,15 @@ public class ControllerInput
         {
             float aimAssistTargetDistance = aimAssistTarget.getDistance(player);
 
-            ControllerOptions.AimAssistMode mode = getMode(aimAssistTarget);
+            ControllerOptions.AimAssistMode mode = getMode(aimAssistTarget); // Aim assist mode
 
             if(mode != null && mode != ControllerOptions.AimAssistMode.NONE && aimAssistTargetDistance <= 5.2 && player.canEntityBeSeen(aimAssistTarget)) // Avoid checking entities such as drops or tnt
             {
 
+                // intensity as percent decimal
                 double assistIntensity = (Controllable.getOptions().getAimAssistIntensity() / 100.0);
 
+                // Lower sensitivity when in bounding box
                 if(mode.sensitivity() && targetInRange && controllerInput)
                 {
 
@@ -405,7 +407,7 @@ public class ControllerInput
                     float calcPitch = (float) (MathHelper.wrapSubtractDegrees(player.rotationPitch, pitch) * 0.2 * assistIntensity);
                     float calcYaw = (float) (MathHelper.wrapSubtractDegrees(player.rotationYaw, yaw) * 0.2 * assistIntensity);
 
-
+                    // Only track when entity is in view
                     if (Math.abs(calcYaw) <= 4 && Math.abs(calcPitch) <= 3) {
 
                         if (Math.abs(calcYaw) <= 4)
