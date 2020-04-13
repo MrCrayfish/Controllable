@@ -1,6 +1,5 @@
 package com.mrcrayfish.controllable.registry;
 
-import lombok.Getter;
 
 import java.security.PrivilegedActionException;
 
@@ -9,11 +8,19 @@ import java.security.PrivilegedActionException;
  * {@link "https://github.com/Fernthedev"}
  */
 public class ButtonExistsException extends IllegalArgumentException {
-    @Getter
-    private String action;
 
-    @Getter
+    private String action;
     private int button;
+
+    public String getAction()
+    {
+        return action;
+    }
+
+    public int getButton()
+    {
+        return button;
+    }
 
     /**
      * Constructs an <code>IllegalArgumentException</code> with no

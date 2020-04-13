@@ -5,13 +5,10 @@ import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.Buttons;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NonNull;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -35,7 +32,7 @@ public class ButtonRegistry {
      * Load the button mappings from the config file
      * @param buttonRegistryConfig
      */
-    public void loadFromConfig(@NonNull Config<ButtonConfigData> buttonRegistryConfig) throws ConfigLoadException {
+    public void loadFromConfig(@Nonnull Config<ButtonConfigData> buttonRegistryConfig) throws ConfigLoadException {
 
         ButtonConfigData configData = buttonRegistryConfig.syncLoad();
 
@@ -56,8 +53,8 @@ public class ButtonRegistry {
      * @return The config instance for reusing
      * @throws ConfigLoadException Thrown when the config is malformed.
      */
-    public Config<ButtonConfigData> saveMappings(Function<@NonNull ButtonConfigData, Config<ButtonConfigData>> function, boolean override) throws ConfigLoadException {
-        @NonNull Map<String, Integer> saveConfigMap = new HashMap<>();
+    public Config<ButtonConfigData> saveMappings(Function<ButtonConfigData, Config<ButtonConfigData>> function, boolean override) throws ConfigLoadException {
+        @Nonnull Map<String, Integer> saveConfigMap = new HashMap<>();
 
         buttonBindings.forEach((action, buttonBinding) -> saveConfigMap.put(action, buttonBinding.getButtonId()));
 
@@ -65,7 +62,7 @@ public class ButtonRegistry {
 
         Config<ButtonConfigData> config = function.apply(buttonConfigData); // Instantiate config instance with the default value as buttonConfigData
 
-        @NonNull Map<String, Integer> configButtonMap = config.syncLoad().buttonMap; // Loaded from config
+        @Nonnull Map<String, Integer> configButtonMap = config.syncLoad().buttonMap; // Loaded from config
 
         if (!override) {
             Controllable.LOGGER.warn("Saving without overriding using current settings");
@@ -137,16 +134,24 @@ public class ButtonRegistry {
     }
 
 
-    @Data
-    @AllArgsConstructor
-    @Getter
     public static class ButtonConfigData {
         // Action:ButtonID
-        private @NonNull Map<String, Integer> buttonMap;
+        private @Nonnull Map<String, Integer> buttonMap;
+
+        public ButtonConfigData(@Nonnull Map<String, Integer> buttonMap)
+        {
+            this.buttonMap = buttonMap;
+        }
+
+        @Nonnull
+        public Map<String, Integer> getButtonMap()
+        {
+            return buttonMap;
+        }
     }
 
     
-    @AllArgsConstructor
+
     public enum ButtonActions {
         JUMP("JUMP", Buttons.A, new ActionData(getGameSettings().keyBindJump)),
         SNEAK("SNEAK", Buttons.LEFT_THUMB_STICK, new ActionData(getGameSettings().keyBindSneak)),
@@ -167,7 +172,6 @@ public class ButtonRegistry {
 
         private String action;
 
-        @Getter
         private int buttonId;
 
         private ActionData actionData;
@@ -178,6 +182,18 @@ public class ButtonRegistry {
 
         public ButtonBinding getButton() {
             return Controllable.getButtonRegistry().getButton(action);
+        }
+
+        ButtonActions(String action, int buttonId, ActionData actionData)
+        {
+            this.action = action;
+            this.buttonId = buttonId;
+            this.actionData = actionData;
+        }
+
+        public int getButtonId()
+        {
+            return buttonId;
         }
     }
 

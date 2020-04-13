@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
-import lombok.Getter;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class ButtonBinding
 
     private int button;
 
-    @Getter
+
     private final int defaultId;
 
     private boolean pressed;
@@ -95,5 +95,10 @@ public class ButtonBinding
 
     public boolean conflicts(ButtonBinding buttonBinding) {
         return button == buttonBinding.getButtonId();
+    }
+
+    public int getDefaultId()
+    {
+        return defaultId;
     }
 }

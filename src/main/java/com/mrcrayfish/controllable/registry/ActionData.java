@@ -1,13 +1,9 @@
 package com.mrcrayfish.controllable.registry;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
+
 import net.minecraft.client.settings.KeyBinding;
 
-@Data
-@Getter
-@AllArgsConstructor
+
 public class ActionData {
 
     private String actionKey;
@@ -21,4 +17,19 @@ public class ActionData {
         this(keyBinding.getKeyDescription(), keyBinding.getKeyCategory());
     }
 
+    public ActionData(String actionKey, String categoryKey)
+    {
+        this.actionKey = actionKey;
+        this.categoryKey = categoryKey;
+    }
+
+    public String getActionKey()
+    {
+        return actionKey;
+    }
+
+    public String getCategoryKey()
+    {
+        return categoryKey;
+    }
 }
