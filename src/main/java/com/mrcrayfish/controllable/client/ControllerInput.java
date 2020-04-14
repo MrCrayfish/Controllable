@@ -19,8 +19,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.controller.LookController;
 import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.entity.monster.PhantomEntity;
+import net.minecraft.entity.monster.SlimeEntity;
 import net.minecraft.entity.passive.AmbientEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemGroup;
@@ -409,18 +412,21 @@ public class ControllerInput
                     float yaw = MathHelper.wrapDegrees(getTargetYaw(aimAssistTarget, player));
                     float pitch = MathHelper.wrapDegrees(getTargetPitch(aimAssistTarget, player));
 
-                    float calcPitch = (float) (MathHelper.wrapSubtractDegrees(player.rotationPitch, pitch) * 0.2 * assistIntensity);
-                    float calcYaw = (float) (MathHelper.wrapSubtractDegrees(player.rotationYaw, yaw) * 0.2 * assistIntensity);
+                    float calcPitch = (float) (MathHelper.wrapSubtractDegrees(player.rotationPitch, pitch) * 0.28 * assistIntensity);
+                    float calcYaw = (float) (MathHelper.wrapSubtractDegrees(player.rotationYaw, yaw) * 0.4 * assistIntensity);
+
+                    float yawDistance = 7.5f;
+                    float pitchDistance = 6;
 
                     // Only track when entity is in view
-                    if (Math.abs(calcYaw) <= 4 && Math.abs(calcPitch) <= 3) {
+                    if (Math.abs(calcYaw) <= yawDistance && Math.abs(calcPitch) <= pitchDistance) {
 
-                        if (Math.abs(calcYaw) <= 4)
+                        if (Math.abs(calcYaw) <= yawDistance)
                         {
                             resultYaw += calcYaw;
                         }
 
-                        if (Math.abs(calcPitch) <= 3)
+                        if (Math.abs(calcPitch) <= pitchDistance)
                         {
                             resultPitch += calcPitch;
                         }
@@ -480,7 +486,8 @@ public class ControllerInput
             return Controllable.getOptions().getPlayerAimMode();
         }
 
-        if(entity instanceof MonsterEntity)
+        WolfEntity
+        if(entity instanceof MonsterEntity || entity instanceof SlimeEntity || entity instanceof PhantomEntity)
         {
             return Controllable.getOptions().getHostileAimMode();
         }
