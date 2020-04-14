@@ -23,7 +23,6 @@ import net.minecraft.entity.monster.PhantomEntity;
 import net.minecraft.entity.monster.SlimeEntity;
 import net.minecraft.entity.passive.AmbientEntity;
 import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemGroup;
@@ -486,7 +485,6 @@ public class ControllerInput
             return Controllable.getOptions().getPlayerAimMode();
         }
 
-        WolfEntity
         if(entity instanceof MonsterEntity || entity instanceof SlimeEntity || entity instanceof PhantomEntity)
         {
             return Controllable.getOptions().getHostileAimMode();

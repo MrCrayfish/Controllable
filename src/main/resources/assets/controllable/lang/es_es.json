@@ -46,7 +46,7 @@
     "controllable.options.deadZone.format": "Zona muerta: %s",
     "controllable.options.rotationSpeed": "Velocidad de rotación",
     "controllable.options.rotationSpeed.format": "Velocidad de rotación: %s",
-    "controllable.options.attackSpeed.format": "Velocidad de atacar: %s",
+    "controllable.options.attackSpeed.format": "Tiempo de atacar: %s (ticks)",
     "controllable.options.mouseSpeed": "Velocidad del ratón",
     "controllable.options.mouseSpeed.format": "Velocidad del ratón: %s",
     "controllable.options.aimAssist": "Asistencia de punteria",
