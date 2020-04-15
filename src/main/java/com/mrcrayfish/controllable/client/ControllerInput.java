@@ -23,6 +23,7 @@ import net.minecraft.entity.monster.PhantomEntity;
 import net.minecraft.entity.monster.SlimeEntity;
 import net.minecraft.entity.passive.AmbientEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.WaterMobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemGroup;
@@ -490,7 +491,7 @@ public class ControllerInput
             return Controllable.getOptions().getHostileAimMode();
         }
 
-        if(entity instanceof AnimalEntity || entity instanceof AmbientEntity)
+        if(entity instanceof AnimalEntity || entity instanceof AmbientEntity || entity instanceof WaterMobEntity)
         {
             return Controllable.getOptions().getAnimalAimMode();
         }
