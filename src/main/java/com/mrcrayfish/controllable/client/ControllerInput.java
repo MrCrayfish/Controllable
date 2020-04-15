@@ -381,15 +381,15 @@ public class ControllerInput
             {
 
                 // intensity as percent decimal
-                double assistIntensity = (Controllable.getOptions().getAimAssistIntensity() / 100.0);
+                float assistIntensity = Controllable.getOptions().getAimAssistIntensity() / 100.0f;
 
                 // Lower sensitivity when in bounding box
                 if(mode.sensitivity() && targetInRange && controllerInput)
                 {
 
-                    double invertedIntensity = 1.0 - assistIntensity; // 1.0 - 1.0 max intensity // 1.0 - 0 = the least intensity
+                    float invertedIntensity = 1.0f - assistIntensity; // 1.0 - 1.0 max intensity // 1.0 - 0 = the least intensity
 
-                    if (invertedIntensity == 0) invertedIntensity = 0.009;
+                    if (invertedIntensity == 0) invertedIntensity = 0.009f;
 
                     double multiplier = 0.90 * (invertedIntensity);
 
@@ -412,11 +412,15 @@ public class ControllerInput
                     float yaw = MathHelper.wrapDegrees(getTargetYaw(aimAssistTarget, player));
                     float pitch = MathHelper.wrapDegrees(getTargetPitch(aimAssistTarget, player));
 
-                    float calcPitch = (float) (MathHelper.wrapSubtractDegrees(player.rotationPitch, pitch) * 0.28 * assistIntensity);
-                    float calcYaw = (float) (MathHelper.wrapSubtractDegrees(player.rotationYaw, yaw) * 0.4 * assistIntensity);
+                    float calcPitch = (float) (MathHelper.wrapSubtractDegrees(player.rotationPitch, pitch) * 0.38 * assistIntensity);
+                    float calcYaw = (float) (MathHelper.wrapSubtractDegrees(player.rotationYaw, yaw) * 0.46 * assistIntensity);
 
-                    float yawDistance = 7.5f;
-                    float pitchDistance = 6;
+                    float invertedIntensity = (float) (1.0 - assistIntensity); // 1.0 - 1.0 max intensity // 1.0 - 0 = the least intensity
+
+                    float yawDistance = 7.2f;
+                    yawDistance -= yawDistance * invertedIntensity; // Adjust distance accordingly to assist intensity
+                    float pitchDistance = 5.8f;
+                    pitchDistance -= pitchDistance * invertedIntensity;  // Adjust distance accordingly to assist intensity
 
                     // Only track when entity is in view
                     if (Math.abs(calcYaw) <= yawDistance && Math.abs(calcPitch) <= pitchDistance) {
