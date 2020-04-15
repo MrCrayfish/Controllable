@@ -50,7 +50,7 @@
     "controllable.options.mouseSpeed": "Velocidad del ratón",
     "controllable.options.mouseSpeed.format": "Velocidad del ratón: %s",
     "controllable.options.aimAssist": "Asistencia de punteria",
-    "controllable.options.aimAssistIntensity.format": "Assist Intensity: %s",
+    "controllable.options.aimAssistIntensity.format": "Intensidad de asistencia: %s",
     "controllable.options.aimAssist.hostile": "Modo de puntar hostil",
     "controllable.options.aimAssist.animal": "Modo de puntar animal",
     "controllable.options.aimAssist.player": "Modo de puntar jugador",
