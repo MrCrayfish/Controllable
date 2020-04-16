@@ -15,15 +15,17 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Author: MrCrayfish
  */
 public class ControllerOptions
 {
-    private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
+    private static final DecimalFormat FORMAT = new DecimalFormat("0.0#", new DecimalFormatSymbols(Locale.US));
 
     public static final BooleanOption FORCE_FEEDBACK = new ControllableBooleanOption("controllable.options.forceFeedback", gameSettings -> {
         return Controllable.getOptions().forceFeedback;
