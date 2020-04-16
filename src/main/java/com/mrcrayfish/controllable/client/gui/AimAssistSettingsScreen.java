@@ -16,7 +16,7 @@ import net.minecraft.util.text.TranslationTextComponent;
  */
 public class AimAssistSettingsScreen extends Screen
 {
-    private static final AbstractOption[] OPTIONS = new AbstractOption[]{ControllerOptions.TOGGLE_AIM, ControllerOptions.AIM_ASSIST_INTENSITY, ControllerOptions.ANIMAL_AIM_MODE, ControllerOptions.HOSTILE_AIM_MODE, ControllerOptions.PLAYER_AIM_MODE};
+    private static final AbstractOption[] OPTIONS = new AbstractOption[]{ControllerOptions.TOGGLE_AIM, ControllerOptions.AIM_ASSIST_INTENSITY, ControllerOptions.ANIMAL_AIM_MODE, ControllerOptions.HOSTILE_AIM_MODE, ControllerOptions.PLAYER_AIM_MODE, ControllerOptions.TOGGLE_IGNORE_SAME_TEAM, ControllerOptions.TOGGLE_IGNORE_SAME_TEAM_FRIENDLY_FIRE, ControllerOptions.TOGGLE_IGNORE_PETS};
     private final Screen parentScreen;
 
     protected AimAssistSettingsScreen(Screen parentScreen)

@@ -23,6 +23,7 @@ import net.minecraft.entity.monster.PhantomEntity;
 import net.minecraft.entity.monster.SlimeEntity;
 import net.minecraft.entity.passive.AmbientEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.WaterMobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Slot;
@@ -46,6 +47,7 @@ import org.lwjgl.glfw.GLFW;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_DOWN;
 import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_UP;
@@ -485,6 +487,17 @@ public class ControllerInput
 
     private ControllerOptions.AimAssistMode getMode(Entity entity)
     {
+
+
+        if (Controllable.getOptions().isIgnoreSameTeam() && entity.getTeam() != null && entity.isOnSameTeam(entity)) {
+
+            // If both are true (ignore when friendly fire is off || friendly fire is disabled)
+            boolean ignore = !Controllable.getOptions().isIgnoreSameTeamFriendlyFire() || !entity.getTeam().getAllowFriendlyFire();
+
+            if (ignore)
+                return ControllerOptions.AimAssistMode.NONE;
+        }
+
         if(entity instanceof PlayerEntity)
         {
             return Controllable.getOptions().getPlayerAimMode();
@@ -497,8 +510,16 @@ public class ControllerInput
 
         if(entity instanceof AnimalEntity || entity instanceof AmbientEntity || entity instanceof WaterMobEntity)
         {
+            if (Controllable.getOptions().isIgnorePets() && entity instanceof TameableEntity) {
+                TameableEntity tameableEntity = (TameableEntity) entity;
+                if (tameableEntity.isOwner(Objects.requireNonNull(Minecraft.getInstance().player))) {
+                    return ControllerOptions.AimAssistMode.NONE;
+                }
+            }
+
             return Controllable.getOptions().getAnimalAimMode();
         }
+
 
         return null;
     }

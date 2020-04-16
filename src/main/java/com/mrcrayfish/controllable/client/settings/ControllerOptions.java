@@ -124,10 +124,21 @@ public class ControllerOptions
     });
 
     public static final AbstractOption HOSTILE_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.hostile", AimAssistMode.class, gameSettings -> Controllable.getOptions().hostileAimMode, (gameSettings, mode) -> Controllable.getOptions().hostileAimMode = mode, (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
-
     public static final AbstractOption ANIMAL_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.animal", AimAssistMode.class, gameSettings -> Controllable.getOptions().animalAimMode, (gameSettings, mode) -> Controllable.getOptions().animalAimMode = mode, (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
-
     public static final AbstractOption PLAYER_AIM_MODE = new ControllableEnumOption<>("controllable.options.aimAssist.player", AimAssistMode.class, gameSettings -> Controllable.getOptions().playerAimMode, (gameSettings, mode) -> Controllable.getOptions().playerAimMode = mode, (gameSettings, mode) -> I18n.format("controllable.options.aimAssistMode." + mode.get(gameSettings).getName()));
+
+    public static final AbstractOption TOGGLE_IGNORE_SAME_TEAM = new ControllableBooleanOption("controllable.options.aimAssist.ignoreSameTeam",
+            gameSettings -> Controllable.getOptions().ignoreSameTeam,
+            (gameSettings, aBoolean) -> Controllable.getOptions().ignoreSameTeam = aBoolean);
+
+    public static final AbstractOption TOGGLE_IGNORE_SAME_TEAM_FRIENDLY_FIRE = new ControllableBooleanOption("controllable.options.aimAssist.ignoreSameTeamFriendlyFire",
+            gameSettings -> Controllable.getOptions().ignoreSameTeamFriendlyFire,
+            (gameSettings, aBoolean) -> Controllable.getOptions().ignoreSameTeamFriendlyFire = aBoolean);
+
+    public static final AbstractOption TOGGLE_IGNORE_PETS = new ControllableBooleanOption("controllable.options.aimAssist.ignorePets",
+            gameSettings -> Controllable.getOptions().ignorePets,
+            (gameSettings, aBoolean) -> Controllable.getOptions().ignorePets = aBoolean);
+
 
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
 
@@ -151,6 +162,9 @@ public class ControllerOptions
     private AimAssistMode hostileAimMode = AimAssistMode.BOTH;
     private AimAssistMode animalAimMode = AimAssistMode.AIM;
     private AimAssistMode playerAimMode = AimAssistMode.BOTH;
+    private boolean ignoreSameTeam = true;
+    private boolean ignoreSameTeamFriendlyFire = false;
+    private boolean ignorePets = true;
 
     public ControllerOptions(File dataDir)
     {
@@ -245,6 +259,15 @@ public class ControllerOptions
                         case "playerAimMode":
                             this.playerAimMode = AimAssistMode.byName(value);
                             break;
+                        case "ignorePets":
+                            this.ignorePets = Boolean.parseBoolean(value);
+                            break;
+                        case "ignoreSameTeam":
+                            this.ignoreSameTeam = Boolean.parseBoolean(value);
+                            break;
+                        case "ignoreSameTeamFriendlyFire":
+                            this.ignoreSameTeamFriendlyFire = Boolean.parseBoolean(value);
+                            break;
                     }
                 }
                 catch(Exception e)
@@ -282,6 +305,9 @@ public class ControllerOptions
             writer.println("hostileAimMode:" + this.hostileAimMode);
             writer.println("animalAimMode:" + this.animalAimMode);
             writer.println("playerAimMode:" + this.playerAimMode);
+            writer.println("ignoreSameTeam: " + ignoreSameTeam);
+            writer.println("ignoreSameTeamFriendlyFire: " + ignoreSameTeamFriendlyFire);
+            writer.println("ignorePets:" + this.ignorePets);
         }
         catch(FileNotFoundException e)
         {
@@ -377,6 +403,21 @@ public class ControllerOptions
     public AimAssistMode getPlayerAimMode()
     {
         return playerAimMode;
+    }
+
+    public boolean isIgnoreSameTeam()
+    {
+        return ignoreSameTeam;
+    }
+
+    public boolean isIgnorePets()
+    {
+        return ignorePets;
+    }
+
+    public boolean isIgnoreSameTeamFriendlyFire()
+    {
+        return ignoreSameTeamFriendlyFire;
     }
 
     public enum AimAssistMode implements IStringSerializable
