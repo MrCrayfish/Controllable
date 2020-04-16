@@ -163,7 +163,7 @@ public class ControllerOptions
     private AimAssistMode animalAimMode = AimAssistMode.AIM;
     private AimAssistMode playerAimMode = AimAssistMode.BOTH;
     private boolean ignoreSameTeam = true;
-    private boolean ignoreSameTeamFriendlyFire = false;
+    private boolean ignoreSameTeamFriendlyFire = true;
     private boolean ignorePets = true;
 
     public ControllerOptions(File dataDir)
