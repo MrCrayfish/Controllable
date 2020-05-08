@@ -16,11 +16,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
+import java.util.*;
 
 /**
  * @author Fernthedev
@@ -42,25 +38,30 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
         Map<String, ButtonBinding> akeybinding = Controllable.getButtonRegistry().getButtonBindings();
         akeybinding = new TreeMap<>(akeybinding);
 
-        final String[] s = {null};
+
+        Map<String, List<ControllerActionList.KeyEntry>> catList = new HashMap<>();
+
 
         akeybinding.forEach((action, buttonBinding) -> {
             ActionData actionData = Controllable.getButtonRegistry().getAction(action);
 
 
-            String category = actionData.getCategoryKey();
+            String category = actionData.getCategoryTranslateKey();
 
-            if (!category.equals(s[0])) {
-                s[0] = category;
-                this.addEntry(new ControllerActionList.CategoryEntry(category));
-            }
-
-            int i = mcIn.fontRenderer.getStringWidth(I18n.format(actionData.getActionKey()));
+            int i = mcIn.fontRenderer.getStringWidth(I18n.format(actionData.getActionTranslateKey()));
             if (i > this.maxListLabelWidth) {
                 this.maxListLabelWidth = i;
             }
 
-            this.addEntry(new ControllerActionList.KeyEntry(buttonBinding, action, actionData));
+            if (!catList.containsKey(category)) catList.put(category, new ArrayList<>());
+
+            catList.get(category).add(new ControllerActionList.KeyEntry(buttonBinding, action, actionData));
+        });
+
+
+        catList.forEach((category, entry) -> {
+            this.addEntry(new ControllerActionList.CategoryEntry(category));
+            entry.forEach(this::addEntry);
         });
 
     }
@@ -108,7 +109,7 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
 
         private KeyEntry(final ButtonBinding buttonBinding, final String action, final ActionData actionData) {
             this.buttonBinding = buttonBinding;
-            this.keyDesc = I18n.format(actionData.getActionKey());
+            this.keyDesc = I18n.format(actionData.getActionTranslateKey());
 
             this.btnChangeKeyBinding = new Button(0, 0, 75 + 20 /*Forge: add space*/, 20, this.keyDesc, (p_214386_2_) -> {
                 controlsScreen.controllerButtonId = this.buttonBinding;
@@ -116,7 +117,7 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
                 controlsScreen.action = action;
             }) {
                 protected String getNarrationMessage() {
-                    return I18n.format(actionData.getActionKey());
+                    return I18n.format(actionData.getActionTranslateKey());
                 }
             };
 
@@ -129,7 +130,7 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
                 }
             }) {
                 protected String getNarrationMessage() {
-                    return I18n.format(actionData.getActionKey());
+                    return I18n.format(actionData.getActionTranslateKey());
                 }
             };
 

@@ -14,7 +14,7 @@ public class ActionData {
     }
 
     public ActionData(String actionKey, KeyBinding keyBinding) {
-        this(keyBinding.getKeyDescription(), keyBinding.getKeyCategory());
+        this(actionKey, keyBinding.getKeyCategory());
     }
 
     public ActionData(String actionKey, String categoryKey)
@@ -23,12 +23,12 @@ public class ActionData {
         this.categoryKey = categoryKey;
     }
 
-    public String getActionKey()
+    public String getActionTranslateKey()
     {
         return actionKey;
     }
 
-    public String getCategoryKey()
+    public String getCategoryTranslateKey()
     {
         return categoryKey;
     }

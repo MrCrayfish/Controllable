@@ -635,6 +635,18 @@ public class ControllerInput
                         mc.player.closeScreen();
                     }
                 }
+                else if (ButtonRegistry.ButtonActions.SCREENSHOT.getButton().isButtonPressed()) {
+                    mc.gameSettings.keyBindScreenshot.setPressed(true);
+                }
+                else if (ButtonRegistry.ButtonActions.OPEN_CHAT.getButton().isButtonPressed()) {
+                    mc.gameSettings.keyBindChat.setPressed(true);
+                }
+                else if (ButtonRegistry.ButtonActions.OPEN_COMMAND_CHAT.getButton().isButtonPressed()) {
+                    mc.gameSettings.keyBindCommand.setPressed(true);
+                }
+                else if (ButtonRegistry.ButtonActions.SMOOTH_CAMERA_TOGGLE.getButton().isButtonPressed()) {
+                    mc.gameSettings.smoothCamera = !mc.gameSettings.smoothCamera;
+                }
                 else if(ButtonRegistry.ButtonActions.SCROLL_RIGHT.getButton().isButtonPressed())
                 {
                     if(mc.currentScreen instanceof CreativeScreen)

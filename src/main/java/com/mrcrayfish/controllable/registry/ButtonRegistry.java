@@ -168,7 +168,13 @@ public class ButtonRegistry {
         SCROLL_LEFT("SCROLL_LEFT", Buttons.LEFT_BUMPER, new ActionData("controllable.action.scroll_left", "key.categories.gameplay")),
         SCROLL_RIGHT("SCROLL_RIGHT", Buttons.RIGHT_BUMPER, new ActionData("controllable.action.scroll_right", "key.categories.gameplay")),
         QUICK_MOVE("QUICK_MOVE", Buttons.B, new ActionData("controllable.action.quick_move", "key.categories.gameplay")),
-        PAUSE_GAME("PAUSE_GAME", Buttons.START, new ActionData("key.keyboard.pause", "key.categories.gameplay"));
+        PAUSE_GAME("PAUSE_GAME", Buttons.START, new ActionData("key.keyboard.pause", "key.categories.gameplay")),
+        OPEN_CHAT("OPEN_CHAT", -1, new ActionData(getGameSettings().keyBindChat)),
+        OPEN_COMMAND_CHAT("OPEN_COMMAND_CHAT", -1, new ActionData(getGameSettings().keyBindCommand)),
+        SMOOTH_CAMERA_TOGGLE("SMOOTH_CAMERA_TOGGLE", -1, new ActionData(getGameSettings().keyBindSmoothCamera)),
+
+        ;
+
 
         private String action;
 
