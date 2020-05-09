@@ -170,10 +170,19 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
 
 
             String buttonStr;
-            try {
-                buttonStr = Buttons.buttonNameFromId(buttonBinding.getButtonId());
-            } catch (IndexOutOfBoundsException ignored) {
-                buttonStr = TextFormatting.YELLOW + "UNKNOWN_BUTTON";
+            if (buttonBinding.getButtonId() == -1)
+            {
+                buttonStr = TextFormatting.YELLOW + "" + TextFormatting.ITALIC + "None";
+            } else
+            {
+                try
+                {
+                    buttonStr = Buttons.buttonNameFromId(buttonBinding.getButtonId());
+                }
+                catch(IndexOutOfBoundsException ignored)
+                {
+                    buttonStr = TextFormatting.YELLOW + "UNKNOWN_BUTTON";
+                }
             }
 
             this.btnChangeKeyBinding.setMessage(buttonStr);
