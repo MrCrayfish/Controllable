@@ -459,5 +459,9 @@ public class ControllerOptions
         {
             return this == AIM || this == BOTH;
         }
+
+        public boolean on() {
+            return aim() || sensitivity();
+        }
     }
 }

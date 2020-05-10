@@ -34,9 +34,6 @@ import net.minecraft.network.play.client.CPlayerDiggingPacket;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ScreenShotHelper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -342,7 +339,7 @@ public class ControllerInput
         }
     }
 
-    private Vec2f handleAimAssist(float targetYaw, float targetPitch)
+    private Vec2f handleAimAssist(float yaw, float pitch)
     {
         Minecraft mc = Minecraft.getInstance();
         PlayerEntity player = mc.player;
@@ -351,29 +348,27 @@ public class ControllerInput
 
         if(player == null || controller == null || mouseMoved)
         {
-            return new Vec2f(targetPitch, targetYaw);
+            return new Vec2f(pitch, yaw);
         }
 
-        float resultPitch = targetPitch;
-        float resultYaw = targetYaw;
+        float resultPitch = pitch;
+        float resultYaw = yaw;
 
         boolean entityInRange = mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY; // Is true if an entity is in the crosshair range
 
-        boolean targetInRange = false; // Is true if the target is in the crosshair raytrace
+        boolean targetBoxInCrosshair = false; // Is true if the target is in the crosshair raytrace
 
         // Change aim assist target if new one in sight
         if (entityInRange) {
             EntityRayTraceResult entityRayTraceResult = (EntityRayTraceResult) mc.objectMouseOver;
 
-
-
             if (entityRayTraceResult.getEntity() instanceof LivingEntity)
             {
                 ControllerOptions.AimAssistMode mode = getMode(entityRayTraceResult.getEntity());
-                if(mode != null && mode.aim())
+                if(mode != null && mode.on())
                 {
                     aimAssistTarget = entityRayTraceResult.getEntity();
-                    targetInRange = true;
+                    targetBoxInCrosshair = true;
                 }
             }
         }
@@ -389,23 +384,48 @@ public class ControllerInput
 
             ControllerOptions.AimAssistMode mode = getMode(aimAssistTarget); // Aim assist mode
 
-            if(mode != null && mode != ControllerOptions.AimAssistMode.NONE && aimAssistTargetDistance <= 5.2 && player.canEntityBeSeen(aimAssistTarget)) // Avoid checking entities such as drops or tnt
+            if(mode != null && mode != ControllerOptions.AimAssistMode.NONE && aimAssistTargetDistance <= 5.2 &&
+                    player.canEntityBeSeen(aimAssistTarget)) // Avoid checking entities such as drops or tnt
             {
 
                 // intensity as percent decimal
                 float assistIntensity = Controllable.getOptions().getAimAssistIntensity() / 100.0f;
 
+                // Get yaw and pitch which will make player look at target
+                float targetAimYaw = MathHelper.wrapDegrees(getTargetYaw(aimAssistTarget, player));
+                float targetAimPitch = MathHelper.wrapDegrees(getTargetPitch(aimAssistTarget, player));
+
+                // The result pitch and yaw which will make aim assist work as an assist rather force crosshair into player
+                float calcPitch = (float) (MathHelper.wrapSubtractDegrees(player.rotationPitch, targetAimPitch) * 0.38 * assistIntensity);
+                float calcYaw = (float) (MathHelper.wrapSubtractDegrees(player.rotationYaw, targetAimYaw) * 0.46 * assistIntensity);
+
+                // Inverted intensity
+                float invertedIntensity = (float) (1.0 - assistIntensity); // 1.0 - 1.0 max intensity // 1.0 - 0 = the least intensity
+
+                // Maximum distance of pitch and yaw which will trigger range
+                float yawMaximumDistance = 9.2f;
+                float pitchMaximumDistance = 7.8f;
+
+                yawMaximumDistance -= yawMaximumDistance * invertedIntensity; // Adjust distance accordingly to assist intensity
+                pitchMaximumDistance -= pitchMaximumDistance * invertedIntensity;  // Adjust distance accordingly to assist intensity
+
+                boolean targetInRange = Math.abs(calcYaw) <= yawMaximumDistance && Math.abs(calcPitch) <= pitchMaximumDistance;
+                boolean targetInRangeHigher = Math.abs(calcYaw) <= yawMaximumDistance * 1.1f && Math.abs(calcPitch) <= pitchMaximumDistance * 1.2f;
+
+
                 // Lower sensitivity when in bounding box
-                if(mode.sensitivity() && targetInRange && controllerInput)
+                if(mode.sensitivity() && controllerInput && targetInRangeHigher)
                 {
 
-                    float invertedIntensity = 1.0f - assistIntensity; // 1.0 - 1.0 max intensity // 1.0 - 0 = the least intensity
+                    double multiplier = 0.85;
+//
+                    if (!targetBoxInCrosshair)
+                        multiplier *= 0.09 + (0.0065 * (Math.abs(MathHelper.wrapSubtractDegrees((float) (yaw * multiplier), targetAimYaw) + MathHelper.wrapSubtractDegrees((float) (targetAimPitch * multiplier), targetAimPitch))));
 
-                    if (invertedIntensity == 0) invertedIntensity = 0.009f;
 
-                    double multiplier = 0.90 * (invertedIntensity);
+                    if (mode.aim() && !targetInRange && targetInRangeHigher) multiplier *= 1.125;
 
-
+                    if (targetBoxInCrosshair) multiplier *= (invertedIntensity * 2) + 0.08;
 
                     resultYaw *= (float) (multiplier); // Slows the sensitivity to stop slingshotting the bounding box. It can still be slingshotted though if attempted.
                     resultPitch *= (float) (multiplier); // Slows the sensitivity to stop slingshotting the bounding box. It can still be slingshotted though if attempted.
@@ -421,38 +441,27 @@ public class ControllerInput
 
                 if(mode.aim() && !aimAssistIgnore)
                 {
-                    float yaw = MathHelper.wrapDegrees(getTargetYaw(aimAssistTarget, player));
-                    float pitch = MathHelper.wrapDegrees(getTargetPitch(aimAssistTarget, player));
 
-                    float calcPitch = (float) (MathHelper.wrapSubtractDegrees(player.rotationPitch, pitch) * 0.38 * assistIntensity);
-                    float calcYaw = (float) (MathHelper.wrapSubtractDegrees(player.rotationYaw, yaw) * 0.46 * assistIntensity);
-
-                    float invertedIntensity = (float) (1.0 - assistIntensity); // 1.0 - 1.0 max intensity // 1.0 - 0 = the least intensity
-
-                    float yawDistance = 7.2f;
-                    yawDistance -= yawDistance * invertedIntensity; // Adjust distance accordingly to assist intensity
-                    float pitchDistance = 5.8f;
-                    pitchDistance -= pitchDistance * invertedIntensity;  // Adjust distance accordingly to assist intensity
+                    // Lower aim assist if looking at entity
+                    if (targetBoxInCrosshair)
+                    {
+                        calcYaw *= 0.85;
+                        calcPitch *= 0.9;
+                    }
 
                     // Only track when entity is in view
-                    if (Math.abs(calcYaw) <= yawDistance && Math.abs(calcPitch) <= pitchDistance) {
+                    if (targetInRange) {
 
-                        if (Math.abs(calcYaw) <= yawDistance)
+                        if (Math.abs(calcYaw) <= yawMaximumDistance)
                         {
                             resultYaw += calcYaw;
                         }
 
-                        if (Math.abs(calcPitch) <= pitchDistance)
+                        if (Math.abs(calcPitch) <= pitchMaximumDistance)
                         {
                             resultPitch += calcPitch;
                         }
                     }
-
-
-                    //                    if(MathHelper.normalizeAngle(calcPitch))
-                    //                    {
-                    //
-                    //                    }
                 }
             }
         }
