@@ -1,10 +1,10 @@
 package com.mrcrayfish.controllable.client.settings;
 
 import com.mrcrayfish.controllable.Controllable;
+import net.minecraft.client.AbstractOption;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.OptionButton;
-import net.minecraft.client.settings.AbstractOption;
 import net.minecraft.util.IStringSerializable;
 
 import java.util.function.BiConsumer;

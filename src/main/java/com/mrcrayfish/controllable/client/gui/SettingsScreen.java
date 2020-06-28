@@ -2,10 +2,10 @@ package com.mrcrayfish.controllable.client.gui;
 
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
+import net.minecraft.client.AbstractOption;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.AbstractOption;
 import net.minecraft.util.text.TranslationTextComponent;
 
 /**

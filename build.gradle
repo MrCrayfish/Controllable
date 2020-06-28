@@ -11,14 +11,14 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = "1.15.2-0.8.0"
+version = "1.16.1-0.8.0"
 group = "com.mrcrayfish" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "controllable"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200122-1.15.1'
+    mappings channel: 'snapshot', version: '20200514-1.16'
     
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -65,7 +65,7 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.0.14'
+    minecraft 'net.minecraftforge:forge:1.16.1-32.0.24'
 }
 
 repositories {
