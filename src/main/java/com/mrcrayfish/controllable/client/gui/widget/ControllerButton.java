@@ -5,6 +5,8 @@ import com.mrcrayfish.controllable.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
 
 /**
  * Author: MrCrayfish
@@ -15,7 +17,7 @@ public class ControllerButton extends Button
 
     public ControllerButton(int x, int y, IPressable pressable)
     {
-        super(x, y, 20, 20, "", pressable);
+        super(x, y, 20, 20, new StringTextComponent(""), pressable);
     }
 
     @Override

@@ -368,7 +368,7 @@ public class ControllerInput
         {
             if (!mc.player.isSpectator())
             {
-                mc.player.func_225609_n_(true);
+                mc.player.drop(true);
             }
             dropCounter = 0;
         }
@@ -376,7 +376,7 @@ public class ControllerInput
         {
             if (!mc.player.isSpectator())
             {
-                mc.player.func_225609_n_(false);
+                mc.player.drop(false);
             }
             dropCounter = 0;
         }
@@ -420,7 +420,7 @@ public class ControllerInput
             isFlying = false;
         }
 
-        event.getMovementInput().field_228350_h_ = sneaking;
+        event.getMovementInput().sneaking = sneaking;
 
         if(mc.currentScreen == null)
         {
@@ -436,7 +436,7 @@ public class ControllerInput
                     event.getMovementInput().backKeyDown = dir < 0;
                     event.getMovementInput().moveForward = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
-                    if(event.getMovementInput().field_228350_h_)
+                    if(event.getMovementInput().sneaking)
                     {
                         event.getMovementInput().moveForward *= 0.3D;
                     }
@@ -450,7 +450,7 @@ public class ControllerInput
                     event.getMovementInput().leftKeyDown = dir > 0;
                     event.getMovementInput().moveStrafe = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickXValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
-                    if(event.getMovementInput().field_228350_h_)
+                    if(event.getMovementInput().sneaking)
                     {
                         event.getMovementInput().moveStrafe *= 0.3D;
                     }
@@ -532,7 +532,7 @@ public class ControllerInput
                     if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
                     {
 
-                        mc.getConnection().sendPacket(new CPlayerDiggingPacket(CPlayerDiggingPacket.Action.SWAP_HELD_ITEMS, BlockPos.ZERO, Direction.DOWN));
+                        mc.getConnection().sendPacket(new CPlayerDiggingPacket(CPlayerDiggingPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
                     }
                 }
                 else if(ButtonBindings.TOGGLE_PERSPECTIVE.isButtonPressed() && mc.mouseHelper.isMouseGrabbed())
