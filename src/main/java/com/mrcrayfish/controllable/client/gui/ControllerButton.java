@@ -30,7 +30,7 @@ public class ControllerButton extends AbstractGui
         this.scale = scale;
     }
 
-    public void draw(int x, int y, int mouseX, int mouseY, boolean selected)
+    public void draw(MatrixStack matrixStack, int x, int y, int mouseX, int mouseY, boolean selected)
     {
         RenderSystem.enableBlend();
         Minecraft.getInstance().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
@@ -49,7 +49,7 @@ public class ControllerButton extends AbstractGui
         {
             buttonV += this.height;
         }
-        blit(new MatrixStack(), buttonX, buttonY, this.width * this.scale, this.height * this.scale, buttonU, buttonV, this.width, this.height, 256, 256);
+        blit(matrixStack, buttonX, buttonY, this.width * this.scale, this.height * this.scale, buttonU, buttonV, this.width, this.height, 256, 256);
         RenderSystem.disableBlend();
     }
 

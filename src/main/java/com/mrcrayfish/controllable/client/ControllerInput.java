@@ -275,7 +275,9 @@ public class ControllerInput
                         RenderSystem.scaled(0.5, 0.5, 0.5);
                     }
 
-                    Screen.blit(new MatrixStack(),-8, -8, 16, 16, nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
+                    event.getMatrixStack().push();
+                    Screen.blit(event.getMatrixStack(),-8, -8, 16, 16, nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
+                    event.getMatrixStack().pop();
                 }
             }
             RenderSystem.popMatrix();

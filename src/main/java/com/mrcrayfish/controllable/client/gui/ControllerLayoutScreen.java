@@ -66,6 +66,7 @@ public class ControllerLayoutScreen extends Screen
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);
+
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         Minecraft.getInstance().getTextureManager().bindTexture(TEXTURE);
@@ -75,7 +76,13 @@ public class ControllerLayoutScreen extends Screen
         int y = this.height / 2 - 50;
         blit(matrixStack, x, y, width, height, 50, 0, 38, 29, 256, 256);
         RenderSystem.disableBlend();
-        controllerButtons.forEach(controllerButton -> controllerButton.draw(x, y, mouseX, mouseY, configureButton == controllerButton.button));
+
+        controllerButtons.forEach(controllerButton -> {
+            matrixStack.push();
+            controllerButton.draw(matrixStack, x, y, mouseX, mouseY, configureButton == controllerButton.button);
+            matrixStack.pop();
+        });
+
         this.drawCenteredString(matrixStack, this.font, this.title.getString(), this.width / 2, 20, 0xFFFFFF);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
