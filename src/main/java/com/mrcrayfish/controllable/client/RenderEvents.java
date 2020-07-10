@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
@@ -163,7 +163,7 @@ public class RenderEvents
                     actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.use_item"), Action.Side.RIGHT));
                 }
 
-                if(!mc.player.func_225608_bj_() && blockHit && canOpenBlock && !mc.player.isHandActive())
+                if(!mc.player.isSneaking() && blockHit && canOpenBlock && !mc.player.isHandActive())
                 {
                     actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.interact"), Action.Side.RIGHT));
                 }
@@ -248,19 +248,21 @@ public class RenderEvents
                     if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2)
                         continue;
 
+                    MatrixStack matrixStack = new MatrixStack();
+
                     /* Draw buttons icon */
-                    Widget.blit(x, y, texU, texV, size, size, 256, 256);
+                    Widget.blit(matrixStack, x, y, texU, texV, size, size, 256, 256);
 
                     /* Draw description text */
                     if(side == Action.Side.LEFT)
                     {
-                        mc.fontRenderer.drawString(action.getDescription(), x + 18, y + 3, Color.WHITE.getRGB());
+                        mc.fontRenderer.drawString(matrixStack, action.getDescription(), x + 18, y + 3, Color.WHITE.getRGB());
                         leftIndex++;
                     }
                     else
                     {
                         int width = mc.fontRenderer.getStringWidth(action.getDescription());
-                        mc.fontRenderer.drawString(action.getDescription(), x - 5 - width, y + 3, Color.WHITE.getRGB());
+                        mc.fontRenderer.drawString(matrixStack, action.getDescription(), x - 5 - width, y + 3, Color.WHITE.getRGB());
                         rightIndex++;
                     }
                 }
@@ -270,7 +272,7 @@ public class RenderEvents
             {
                 if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
                 {
-                    InventoryScreen.func_228187_a_(20, 45, 20, 0, 0, mc.player);
+                    InventoryScreen.drawEntityOnScreen(20, 45, 20, 0, 0, mc.player);
                 }
             }
         }

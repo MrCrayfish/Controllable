@@ -1,12 +1,12 @@
 package com.mrcrayfish.controllable.client.gui.widget;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
 
 /**
  * Author: MrCrayfish
@@ -21,7 +21,7 @@ public class ControllerButton extends Button
     }
 
     @Override
-    public void renderButton(int mouseX, int mouseY, float partialTicks)
+    public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         if (this.visible)
         {
@@ -33,7 +33,7 @@ public class ControllerButton extends Button
             {
                 textureV += this.height;
             }
-            this.blit(this.x, this.y, 0, textureV, this.width, this.height);
+            this.blit(matrixStack, this.x, this.y, 0, textureV, this.width, this.height);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
@@ -273,7 +274,8 @@ public class ControllerInput
                     {
                         RenderSystem.scaled(0.5, 0.5, 0.5);
                     }
-                    Screen.blit(-8, -8, 16, 16, nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
+
+                    Screen.blit(new MatrixStack(),-8, -8, 16, 16, nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
                 }
             }
             RenderSystem.popMatrix();

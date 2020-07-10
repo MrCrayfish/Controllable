@@ -19,7 +19,9 @@ public enum CursorType implements IStringSerializable
     }
 
     @Override
-    public String getName()
+    // TODO: FIX WHEN MAPPINGS DONE
+//    public String getName()
+    public String getString()
     {
         return id;
     }
@@ -35,4 +37,6 @@ public enum CursorType implements IStringSerializable
         }
         return LIGHT;
     }
+
+
 }

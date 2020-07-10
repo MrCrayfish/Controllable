@@ -6,6 +6,7 @@ import net.minecraft.client.GameSettings;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.OptionButton;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -53,15 +54,17 @@ public class ControllableEnumOption<T extends Enum<T> & IStringSerializable> ext
     @Override
     public Widget createWidget(GameSettings options, int x, int y, int width)
     {
-        return new OptionButton(x, y, width, 20, this, this.getTitle(options), (button) -> {
+        return new OptionButton(x, y, width, 20, this, new StringTextComponent(this.getTitle(options)), (button) -> {
             this.nextEnum(options);
-            button.setMessage(this.getTitle(options));
+            button.setMessage(new StringTextComponent(this.getTitle(options)));
         });
     }
 
     public String getTitle(GameSettings options)
     {
-        return this.getDisplayString() + this.displayNameGetter.apply(options, this);
+        // TODO: FIX WHEN MAPPINGS DONE
+//        return this.getDisplayString() + this.displayNameGetter.apply(options, this);
+        return func_238238_a_().getString() + displayNameGetter.apply(options, this);
     }
 
     private T getEnum(int ordinal)

@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
@@ -10,7 +10,6 @@ import com.mrcrayfish.controllable.client.Mappings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
@@ -58,15 +57,15 @@ public class ControllerLayoutScreen extends Screen
         controllerButtons.add(new ControllerAxis(Buttons.LEFT_THUMB_STICK, 9, 12, 0, 0, 7, 7, 5));
         controllerButtons.add(new ControllerAxis(Buttons.RIGHT_THUMB_STICK, 22, 12, 0, 0, 7, 7, 5));
 
-        this.addButton(new Button(this.width / 2 - 100, this.height - 32, 200, 20, I18n.format("gui.done"), (button) -> {
+        this.addButton(new Button(this.width / 2 - 100, this.height - 32, 200, 20, new TranslationTextComponent("gui.done"), (button) -> {
             this.minecraft.displayGuiScreen(this.parentScreen);
         }));
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks)
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground();
+        this.renderBackground(matrixStack);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         Minecraft.getInstance().getTextureManager().bindTexture(TEXTURE);
@@ -74,11 +73,11 @@ public class ControllerLayoutScreen extends Screen
         int height = 29 * 5;
         int x = this.width / 2 - width / 2;
         int y = this.height / 2 - 50;
-        blit(x, y, width, height, 50, 0, 38, 29, 256, 256);
+        blit(matrixStack, x, y, width, height, 50, 0, 38, 29, 256, 256);
         RenderSystem.disableBlend();
         controllerButtons.forEach(controllerButton -> controllerButton.draw(x, y, mouseX, mouseY, configureButton == controllerButton.button));
-        this.drawCenteredString(this.font, this.title.getFormattedText(), this.width / 2, 20, 0xFFFFFF);
-        super.render(mouseX, mouseY, partialTicks);
+        this.drawCenteredString(matrixStack, this.font, this.title.getString(), this.width / 2, 20, 0xFFFFFF);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override

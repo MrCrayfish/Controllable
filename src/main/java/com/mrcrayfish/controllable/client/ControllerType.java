@@ -19,7 +19,9 @@ public enum ControllerType implements IStringSerializable
     }
 
     @Override
-    public String getName()
+    // TODO: FIX WHEN MAPPINGS DONE
+//    public String getName()
+    public String getString()
     {
         return this.name;
     }

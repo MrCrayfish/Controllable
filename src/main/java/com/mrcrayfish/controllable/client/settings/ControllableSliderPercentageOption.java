@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.client.gui.widget.ControllableOptionSlider;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.settings.SliderPercentageOption;
+import net.minecraft.util.text.ITextComponent;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -14,7 +15,7 @@ import java.util.function.Function;
  */
 public class ControllableSliderPercentageOption extends SliderPercentageOption
 {
-    public ControllableSliderPercentageOption(String title, double minValue, double maxValue, float stepSize, Function<GameSettings, Double> getter, BiConsumer<GameSettings, Double> setter, BiFunction<GameSettings, SliderPercentageOption, String> displayNameGetter)
+    public ControllableSliderPercentageOption(String title, double minValue, double maxValue, float stepSize, Function<GameSettings, Double> getter, BiConsumer<GameSettings, Double> setter, BiFunction<GameSettings, SliderPercentageOption, ITextComponent> displayNameGetter)
     {
         super(title, minValue, maxValue, stepSize, getter, setter, displayNameGetter);
     }
