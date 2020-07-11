@@ -96,7 +96,7 @@ public class Hooks
      * Fixes the mouse position when virtual mouse is turned on for controllers. This method is linked via ASM.
      */
     @SuppressWarnings("unused")
-    public static void drawScreen(Screen screen, int mouseX, int mouseY, float partialTicks)
+    public static void drawScreen(MatrixStack matrixStack, Screen screen, int mouseX, int mouseY, float partialTicks)
     {
         ControllerInput input = Controllable.getInput();
         if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && input.getLastUse() > 0)
@@ -105,7 +105,6 @@ public class Hooks
             mouseX = (int) (input.getVirtualMouseX() * (double) minecraft.getMainWindow().getScaledWidth() / (double) minecraft.getMainWindow().getWidth());
             mouseY = (int) (input.getVirtualMouseY() * (double) minecraft.getMainWindow().getScaledHeight() / (double) minecraft.getMainWindow().getHeight());
         }
-        MatrixStack matrixStack = new MatrixStack();
         if(!MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.DrawScreenEvent.Pre(screen, matrixStack, mouseX, mouseY, partialTicks)))
         {
             screen.render(matrixStack, mouseX, mouseY, partialTicks);

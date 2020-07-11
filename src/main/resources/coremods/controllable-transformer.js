@@ -34,14 +34,14 @@ function initializeCoreMod() {
                 log("Patching ContainerScreen...");
 
                 patch({
-                    obfName: "func_73864_a",
+                    obfName: "func_231044_a_",
                     name: "mouseClicked",
                     desc: "(DDI)Z",
                     patch: patch_ContainerScreen_mouseClicked
                 }, classNode);
 
                 patch({
-                     obfName: "func_146286_b",
+                     obfName: "func_231048_c_",
                      name: "mouseReleased",
                      desc: "(DDI)Z",
                      patch: patch_ContainerScreen_mouseReleased
@@ -103,6 +103,7 @@ function initializeCoreMod() {
                 log("Patching IngameGui...");
                 patch({
                     obfName: "func_238453_b_ ",
+                    // name: "func_238453_b_",
                     name: "renderSelectedItem",
                     desc: "(Lcom/mojang/blaze3d/matrix/MatrixStack;)V",
                     patch: patch_IngameGui_renderSelectedItem
@@ -296,8 +297,8 @@ function patch_ForgeIngameGui_renderPlayerList(method) {
 
 function patch_GameRenderer_updateCameraAndRender(method) {
     var findInstruction = {
-        name: "drawScreen",
-        desc: "(Lnet/minecraft/client/gui/screen/Screen;IIF)V",
+        name: "render",
+        desc: "(Lcom/mojang/blaze3d/matrix/MatrixStack;IIF)V",
         matches: function(s) {
             return s.equals(this.name);
         }
@@ -319,7 +320,7 @@ function patch_GameRenderer_updateCameraAndRender(method) {
     if(foundNode !== null) {
         var previousNode = foundNode.getPrevious();
         method.instructions.remove(foundNode);
-        method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/screen/Screen;IIF)V", false));
+        method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/screen/Screen;Lcom/mojang/blaze3d/matrix/MatrixStack;IIF)V", false));
         return true;
     }
     return false;
