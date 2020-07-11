@@ -102,9 +102,9 @@ function initializeCoreMod() {
             'transformer': function(classNode) {
                 log("Patching IngameGui...");
                 patch({
-                    obfName: "func_194801_c ",
+                    obfName: "func_238453_b_ ",
                     name: "renderSelectedItem",
-                    desc: "()V",
+                    desc: "(Lcom/mojang/blaze3d/matrix/MatrixStack;)V",
                     patch: patch_IngameGui_renderSelectedItem
                 }, classNode);
                 return classNode;
