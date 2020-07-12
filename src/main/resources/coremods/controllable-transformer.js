@@ -53,7 +53,7 @@ function initializeCoreMod() {
         'forge_ingame_gui': {
             'target': {
                 'type': 'CLASS',
-                'name': 'net.minecraftforge.client.ForgeIngameGui'
+                'name': 'net.minecraftforge.client.gui.ForgeIngameGui'
             },
             'transformer': function(classNode) {
                 log("Patching ForgeIngameGui...");
@@ -61,16 +61,17 @@ function initializeCoreMod() {
                 patch({
                     obfName: "",
                     name: "renderPlayerList",
-                    desc: "(II)V",
+                    desc: "(IILcom/mojang/blaze3d/matrix/MatrixStack;)V",
                     patch: patch_ForgeIngameGui_renderPlayerList
                 }, classNode);
 
-                patch({
-                    obfName: "",
-                    name: "renderRecordOverlay",
-                    desc: "(IIF)V",
-                    patch: patch_IngameGui_renderSelectedItem
-                }, classNode);
+                // TODO: Fix, causes crash with negative array
+                // patch({
+                //     obfName: "",
+                //     name: "renderRecordOverlay",
+                //     desc: "(IIFLcom/mojang/blaze3d/matrix/MatrixStack;)V",
+                //     patch: patch_IngameGui_renderSelectedItem
+                // }, classNode);
 
                 return classNode;
             }
@@ -266,6 +267,8 @@ function patch_ForgeIngameGui_renderPlayerList(method) {
     var foundNode = null;
     var instructions = method.instructions.toArray();
     var length = instructions.length;
+
+    log("Instructions " + method.instructions.toArray() + " length " + " " + length)
     for (var i = 0; i < length; i++) {
         var node = instructions[i];
         if(node.getOpcode() != Opcodes.INVOKEVIRTUAL)
