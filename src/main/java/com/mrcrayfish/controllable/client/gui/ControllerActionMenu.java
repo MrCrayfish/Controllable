@@ -62,6 +62,9 @@ public class ControllerActionMenu extends ControlsScreen {
             }
 
         }));
+        addButton(buttonShowIcons.createWidget(this.gameSettings, this.width / 2 - (150 / 2), 18, 150));
+
+
         this.addButton(new Button(this.width / 2 - 155 + 160, this.height - 29, 150, 20, I18n.format("gui.done"), (p_213124_1_) -> {
             this.minecraft.displayGuiScreen(this.parentScreen);
             MinecraftForge.EVENT_BUS.unregister(this); // Prevent storing this instance in the event bus.

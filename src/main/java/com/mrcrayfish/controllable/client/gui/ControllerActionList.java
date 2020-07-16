@@ -11,6 +11,7 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.list.AbstractOptionList;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -133,7 +134,7 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
             this.actionData = actionData;
             this.actionDescription = I18n.format(actionData.getActionTranslateKey());
 
-            this.btnChangeKeyBinding = new Button(0, 0, 75 + 20 /*Forge: add space*/, 20, this.keyDesc, (p_214386_2_) -> {
+            this.btnChangeKeyBinding = new Button(0, 0, 75 + 20 /*Forge: add space*/, 20, actionDescription, (p_214386_2_) -> {
                 controlsScreen.controllerButtonId = this.buttonBinding;
                 controlsScreen.entry = this;
                 controlsScreen.action = action;
@@ -166,7 +167,7 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
 
             }) {
                 protected String getNarrationMessage() {
-                    return I18n.format("narrator.controls.unbound", ControllerActionList.KeyEntry.this.keyDesc);
+                    return I18n.format("narrator.controls.unbound", KeyEntry.this.actionDescription);
                 }
             };
         }
@@ -174,8 +175,8 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
 
         @Override
         public void render(int p_render_1_, int p_render_2_, int p_render_3_, int p_render_4_, int p_render_5_, int p_render_6_, int p_render_7_, boolean p_render_8_, float p_render_9_) {
-            boolean flag = controlsScreen.controllerButtonId == this.buttonBinding;
-            minecraft.fontRenderer.drawString(this.keyDesc, (float)(p_render_3_ + 40 - maxListLabelWidth), (float)(p_render_2_ + p_render_5_ / 2 - 9 / 2), 16777215);
+            boolean selected = controlsScreen.controllerButtonId == this.buttonBinding;
+            minecraft.fontRenderer.drawString(this.actionDescription, (float)(p_render_3_ + 40 - maxListLabelWidth), (float)(p_render_2_ + p_render_5_ / 2 - 9 / 2), 16777215);
 
             this.btnSetNone.x = p_render_3_ + 60;
             this.btnSetNone.y = p_render_2_;
