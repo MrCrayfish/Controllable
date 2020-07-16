@@ -3,9 +3,8 @@ package com.mrcrayfish.controllable.client.gui;
 import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.Buttons;
-import com.mrcrayfish.controllable.client.ControllerProperties;
+import com.mrcrayfish.controllable.Reference;
+import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.registry.ActionData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -24,7 +23,7 @@ import java.util.*;
  */
 public class ControllerActionList extends AbstractOptionList<ControllerActionList.Entry> {
 
-
+    private static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Reference.MOD_ID, "textures/gui/buttons.png");
 
     public abstract static class Entry extends AbstractOptionList.Entry<ControllerActionList.Entry> { }
 
@@ -66,6 +65,26 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
 
     }
 
+    @Override
+    protected void renderList(int p_238478_2_, int p_238478_3_, int p_238478_4_, int p_238478_5_, float p_238478_6_)
+    {
+        super.renderList(p_238478_2_, p_238478_3_, p_238478_4_, p_238478_5_, p_238478_6_);
+
+        if(controlsScreen.showIcons())
+        {
+            for(Entry entry : children())
+            {
+                if(entry instanceof KeyEntry)
+                {
+                    KeyEntry keyEntry = (KeyEntry) entry;
+
+                    keyEntry.drawIcon();
+                }
+            }
+        }
+    }
+
+    @Override
     protected int getScrollbarPosition() {
         return super.getScrollbarPosition() + 15 + 20;
     }
@@ -102,14 +121,17 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
 
         private final ButtonBinding buttonBinding;
 
-        private final String keyDesc;
+        private final String actionDescription;
         private final Button btnChangeKeyBinding;
         private final Button btnReset;
         private final Button btnSetNone;
 
+        private final ActionData actionData;
+
         private KeyEntry(final ButtonBinding buttonBinding, final String action, final ActionData actionData) {
             this.buttonBinding = buttonBinding;
-            this.keyDesc = I18n.format(actionData.getActionTranslateKey());
+            this.actionData = actionData;
+            this.actionDescription = I18n.format(actionData.getActionTranslateKey());
 
             this.btnChangeKeyBinding = new Button(0, 0, 75 + 20 /*Forge: add space*/, 20, this.keyDesc, (p_214386_2_) -> {
                 controlsScreen.controllerButtonId = this.buttonBinding;
@@ -169,11 +191,14 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
             this.btnChangeKeyBinding.y = p_render_2_;
 
 
+            // DRAW TEXT
+
             String buttonStr;
-            if (buttonBinding.getButtonId() == -1)
+            if(buttonBinding.getButtonId() == -1)
             {
                 buttonStr = TextFormatting.YELLOW + "" + TextFormatting.ITALIC + "None";
-            } else
+            }
+            else
             {
                 try
                 {
@@ -185,29 +210,85 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
                 }
             }
 
+            if (controlsScreen.showIcons()) buttonStr = "  ";
+
             this.btnChangeKeyBinding.setMessage(buttonStr);
-            boolean flag1 = false;
-//            boolean keyCodeModifierConflict = true; // less severe form of conflict, like SHIFT conflicting with SHIFT+G
-            if (!buttonBinding.isInvalid()) {
-                for(String action : Controllable.getButtonRegistry().getButtonBindings().keySet()) {
+            boolean conflictsWithAnother = false;
+            //            boolean keyCodeModifierConflict = true; // less severe form of conflict, like SHIFT conflicting with SHIFT+G
+            if(!buttonBinding.isInvalid())
+            {
+                for(String action : Controllable.getButtonRegistry().getButtonBindings().keySet())
+                {
                     ButtonBinding buttonBindingCheck = Controllable.getButtonRegistry().getButton(action);
                     ActionData actionData = Controllable.getButtonRegistry().getAction(action);
-                    if (buttonBindingCheck != this.buttonBinding && this.buttonBinding.conflicts(buttonBindingCheck, actionData)) {
-                        flag1 = true;
+                    if(buttonBindingCheck != this.buttonBinding && this.buttonBinding.conflicts(buttonBindingCheck, actionData))
+                    {
+                        conflictsWithAnother = true;
                         break;
 
-//                        keyCodeModifierConflict &= buttonBindingCheck.hasKeyCodeModifierConflict(this.keybinding);
+                        //                        keyCodeModifierConflict &= buttonBindingCheck.hasKeyCodeModifierConflict(this.keybinding);
                     }
                 }
             }
 
-            if (flag) {
+
+
+            if(selected)
+            {
                 this.btnChangeKeyBinding.setMessage(TextFormatting.WHITE + "> " + TextFormatting.YELLOW + this.btnChangeKeyBinding.getMessage() + TextFormatting.WHITE + " <");
-            } else if (flag1) {
-                this.btnChangeKeyBinding.setMessage((TextFormatting.RED) + this.btnChangeKeyBinding.getMessage());
+            }
+            else if(conflictsWithAnother)
+            {
+                if (controlsScreen.showIcons())
+                    this.btnChangeKeyBinding.setMessage(TextFormatting.RED + "> " +this.btnChangeKeyBinding.getMessage() + " <");
+                else
+                    this.btnChangeKeyBinding.setMessage(TextFormatting.RED + this.btnChangeKeyBinding.getMessage());
             }
 
+
             this.btnChangeKeyBinding.render(p_render_6_, p_render_7_, p_render_9_);
+
+
+
+        }
+
+        protected void drawIcon() {
+            // Draw icon
+
+            int remappedButton = buttonBinding.getButtonId();
+            Controller controller = Controllable.getController();
+            Mappings.Entry mapping = controller.getMapping();
+            if(mapping != null)
+            {
+                remappedButton = mapping.remap(buttonBinding.getButtonId());
+            }
+
+            int texU = remappedButton * 13;
+            int texV = Controllable.getOptions().getControllerType().ordinal() * 13;
+            int size = 13;
+
+//            this.x + this.width / 2, this.y + (this.height - 8) / 2
+
+            int x = btnChangeKeyBinding.x + (btnChangeKeyBinding.getWidth() - 13) / 2;
+            int y = btnChangeKeyBinding.y + (btnChangeKeyBinding.getHeight() - 13) / 2;
+
+//            try
+//            {
+//                if (remappedButton == 2)
+//                {
+//
+//                    System.out.println("Draw icon for x " + p_render_6_ +" y " + p_render_7_ + " button " + Buttons.buttonNameFromId(remappedButton));
+//
+//                }
+//            } catch (IndexOutOfBoundsException ignored) {}
+
+//            matrixStack.translate(x, y, 0);
+
+            minecraft.getTextureManager().bindTexture(CONTROLLER_BUTTONS);
+
+
+            /* Draw buttons icon */
+            blit(x, y, texU, texV, size, size, 256, 256);
         }
 
         @Override

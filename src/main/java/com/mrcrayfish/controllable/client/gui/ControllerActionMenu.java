@@ -4,6 +4,7 @@ import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.ControllerProperties;
+import com.mrcrayfish.controllable.client.settings.ControllableBooleanOption;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
@@ -28,6 +29,16 @@ public class ControllerActionMenu extends ControlsScreen {
 
     private ControllerActionList buttonActionList;
     private Button buttonReset;
+
+
+    private boolean showIcons = true;
+
+
+    private ControllableBooleanOption buttonShowIcons = new ControllableBooleanOption("controllable.gui.option.actionMenuShowIcons", gameSettings -> {
+        return showIcons;
+    }, (gameSettings, value) -> {
+        showIcons = value;
+    });
 
     public ControllerActionMenu(Screen screen, GameSettings settings) {
         super(screen, settings);
@@ -100,5 +111,10 @@ public class ControllerActionMenu extends ControlsScreen {
                 this.time = Util.milliTime();
             }
         }
+    }
+
+    public boolean showIcons()
+    {
+        return showIcons;
     }
 }

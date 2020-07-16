@@ -12,7 +12,7 @@ apply plugin: 'net.minecraftforge.gradle'
 //Only edit below this line, the above code adds !pause
 // and enables the necessary things for Forge to be setup.
 
-version = "1.15.2-0.8.1"
+version = "1.15.1-0.8.6"
 group = "com.mrcrayfish" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "controllable"
 
@@ -50,7 +50,7 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
-            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'controllable', '--all', '--output', file('src/generated/resources/')
             mods {
                 controllable {
                     source sourceSets.main
@@ -88,7 +88,8 @@ dependencies {
         exclude group: 'org.yaml'
 //        exclude name: 'fastjson'
 //        exclude name: 'snakeyaml'
-    }}
+    }
+}
 
 jar {
     manifest {
