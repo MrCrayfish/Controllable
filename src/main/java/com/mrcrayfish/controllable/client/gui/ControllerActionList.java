@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.*;
-import com.mrcrayfish.controllable.registry.ActionData;
+import com.mrcrayfish.controllable.registry.ActionDataDescription;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.widget.button.Button;
@@ -43,19 +43,19 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
 
 
         akeybinding.forEach((action, buttonBinding) -> {
-            ActionData actionData = Controllable.getButtonRegistry().getAction(action);
+            ActionDataDescription actionDataDescription = Controllable.getButtonRegistry().getAction(action);
 
 
-            String category = actionData.getCategoryTranslateKey();
+            String category = actionDataDescription.getCategoryTranslateKey();
 
-            int i = mcIn.fontRenderer.getStringWidth(I18n.format(actionData.getActionTranslateKey()));
+            int i = mcIn.fontRenderer.getStringWidth(I18n.format(actionDataDescription.getActionTranslateKey()));
             if (i > this.maxListLabelWidth) {
                 this.maxListLabelWidth = i;
             }
 
             if (!catList.containsKey(category)) catList.put(category, new ArrayList<>());
 
-            catList.get(category).add(new ControllerActionList.KeyEntry(buttonBinding, action, actionData));
+            catList.get(category).add(new ControllerActionList.KeyEntry(buttonBinding, action, actionDataDescription));
         });
 
 
@@ -110,9 +110,12 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
         private final Button btnReset;
         private final Button btnSetNone;
 
-        private KeyEntry(final ButtonBinding buttonBinding, final String action, final ActionData actionData) {
+        private final ActionDataDescription actionDataDescription;
+
+        private KeyEntry(final ButtonBinding buttonBinding, final String action, final ActionDataDescription actionDataDescription) {
             this.buttonBinding = buttonBinding;
-            this.actionDescription = I18n.format(actionData.getActionTranslateKey());
+            this.actionDataDescription = actionDataDescription;
+            this.actionDescription = I18n.format(actionDataDescription.getActionTranslateKey());
 
             this.btnChangeKeyBinding = new Button(0, 0, 75 + 20 /*Forge: add space*/, 20, actionDescription, (p_214386_2_) -> {
                 controlsScreen.controllerButtonId = this.buttonBinding;
@@ -120,7 +123,7 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
                 controlsScreen.action = action;
             }) {
                 protected String getNarrationMessage() {
-                    return I18n.format(actionData.getActionTranslateKey());
+                    return I18n.format(actionDataDescription.getActionTranslateKey());
                 }
             };
 
@@ -133,7 +136,7 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
                 }
             }) {
                 protected String getNarrationMessage() {
-                    return I18n.format(actionData.getActionTranslateKey());
+                    return I18n.format(actionDataDescription.getActionTranslateKey());
                 }
             };
 
@@ -201,8 +204,8 @@ public class ControllerActionList extends AbstractOptionList<ControllerActionLis
                 for(String action : Controllable.getButtonRegistry().getButtonBindings().keySet())
                 {
                     ButtonBinding buttonBindingCheck = Controllable.getButtonRegistry().getButton(action);
-                    ActionData actionData = Controllable.getButtonRegistry().getAction(action);
-                    if(buttonBindingCheck != this.buttonBinding && this.buttonBinding.conflicts(buttonBindingCheck, actionData))
+                    ActionDataDescription actionDataDescription = Controllable.getButtonRegistry().getAction(action);
+                    if(buttonBindingCheck != this.buttonBinding && this.buttonBinding.conflicts(buttonBindingCheck, actionDataDescription))
                     {
                         conflictsWithAnother = true;
                         break;

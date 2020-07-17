@@ -5,7 +5,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
-import com.mrcrayfish.controllable.registry.ButtonRegistry;
+import com.mrcrayfish.controllable.registry.ControllableButtons;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.util.MouseSmoother;
 import net.minecraft.client.util.NativeUtil;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.container.ClickType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.network.play.client.CPlayerDiggingPacket;
@@ -392,7 +393,7 @@ public class ControllerInput
 
         if(mc.currentScreen == null)
         {
-            if(ButtonRegistry.ButtonActions.DROP_ITEM.getButton().isButtonDown())
+            if(ControllableButtons.ButtonActions.DROP_ITEM.getButton().isButtonDown())
             {
                 lastUse = 100;
                 dropCounter++;
@@ -407,7 +408,7 @@ public class ControllerInput
             }
             dropCounter = 0;
         }
-        else if(dropCounter > 0 && !ButtonRegistry.ButtonActions.DROP_ITEM.getButton().isButtonDown())
+        else if(dropCounter > 0 && !ControllableButtons.ButtonActions.DROP_ITEM.getButton().isButtonDown())
         {
             if (!mc.player.isSpectator())
             {
@@ -446,7 +447,7 @@ public class ControllerInput
         {
             lastUse = 100;
             sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
-            sneaking |= ButtonRegistry.ButtonActions.SNEAK.getButton().isButtonDown();
+            sneaking |= ControllableButtons.ButtonActions.SNEAK.getButton().isButtonDown();
             isFlying = true;
         }
         else if(isFlying)
@@ -512,23 +513,23 @@ public class ControllerInput
                 }
             }
 
-            if(ButtonRegistry.ButtonActions.JUMP.getButton().isButtonDown())
+            if(ControllableButtons.ButtonActions.JUMP.getButton().isButtonDown())
             {
                 event.getMovementInput().jump = true;
             }
 
             // Held down sprint
-            if (ButtonRegistry.ButtonActions.SPRINT.getButton().isButtonDown() && !Controllable.getOptions().isToggleSprint()) {
+            if (ControllableButtons.ButtonActions.SPRINT.getButton().isButtonDown() && !Controllable.getOptions().isToggleSprint()) {
                 player.setSprinting(true);
             }
 
 
-            if(ButtonRegistry.ButtonActions.USE_ITEM.getButton().isButtonDown() && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
+            if(ControllableButtons.ButtonActions.USE_ITEM.getButton().isButtonDown() && mc.rightClickDelayTimer == 0 && !mc.player.isHandActive())
             {
                 mc.rightClickMouse();
             }
 
-            else if (ButtonRegistry.ButtonActions.ATTACK.getButton().isButtonDown() && mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY && currentAttackTimer == 0) {
+            else if (ControllableButtons.ButtonActions.ATTACK.getButton().isButtonDown() && mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.ENTITY && currentAttackTimer == 0) {
                 // This is to keep attacking while the button is held and staring at a mob
                 mc.clickMouse();
                 currentAttackTimer = 1;
@@ -536,12 +537,12 @@ public class ControllerInput
 
             // Keep the timer going if the first attack was registered
             // This is to avoid only increasing timer while staring at a mob.
-            if (ButtonRegistry.ButtonActions.ATTACK.getButton().isButtonDown() && currentAttackTimer > 0) {
+            if (ControllableButtons.ButtonActions.ATTACK.getButton().isButtonDown() && currentAttackTimer > 0) {
                 currentAttackTimer++;
             }
 
             // Reset timer when button is no longer held
-            if (!ButtonRegistry.ButtonActions.ATTACK.getButton().isButtonDown()) {
+            if (!ControllableButtons.ButtonActions.ATTACK.getButton().isButtonDown()) {
                 currentAttackTimer = 0;
             }
         }
@@ -572,20 +573,24 @@ public class ControllerInput
         Minecraft mc = Minecraft.getInstance();
         if(state)
         {
-            if (ButtonRegistry.ButtonActions.SCREENSHOT.getButton().isButtonPressed())
+            if(ControllableButtons.ButtonActions.SCREENSHOT.getButton().isButtonPressed())
             {
                 ScreenShotHelper.saveScreenshot(mc.gameDir, mc.getMainWindow().getFramebufferWidth(), mc.getMainWindow().getFramebufferHeight(), mc.getFramebuffer(), (p_212449_1_) -> {
                     mc.execute(() -> {
                         mc.ingameGUI.getChatGUI().printChatMessage(p_212449_1_);
                     });
                 });
-            }else if(mc.currentScreen == null)
+            }
+            else if(mc.currentScreen == null)
             {
-                if (ButtonRegistry.ButtonActions.SPRINT.getButton().isButtonPressed()) {
-                    if (Controllable.getOptions().isToggleSprint() &&  mc.player != null) {
+                if(ControllableButtons.ButtonActions.SPRINT.getButton().isButtonPressed())
+                {
+                    if(Controllable.getOptions().isToggleSprint() && mc.player != null)
+                    {
                         sprinting = !sprinting;
                     }
-                }else if(ButtonRegistry.ButtonActions.INVENTORY.getButton().isButtonPressed())
+                }
+                else if(ControllableButtons.ButtonActions.INVENTORY.getButton().isButtonPressed())
                 {
                     if(mc.playerController.isRidingHorse())
                     {
@@ -597,28 +602,28 @@ public class ControllerInput
                         mc.displayGuiScreen(new InventoryScreen(mc.player));
                     }
                 }
-                else if(ButtonRegistry.ButtonActions.SNEAK.getButton().isButtonPressed())
+                else if(ControllableButtons.ButtonActions.SNEAK.getButton().isButtonPressed())
                 {
                     if(mc.player != null && !mc.player.abilities.isFlying && !mc.player.isPassenger())
                     {
                         sneaking = !sneaking;
                     }
                 }
-                else if(ButtonRegistry.ButtonActions.SCROLL_RIGHT.getButton().isButtonPressed())
+                else if(ControllableButtons.ButtonActions.SCROLL_RIGHT.getButton().isButtonPressed())
                 {
                     if(mc.player != null)
                     {
                         mc.player.inventory.changeCurrentItem(-1);
                     }
                 }
-                else if(ButtonRegistry.ButtonActions.SCROLL_LEFT.getButton().isButtonPressed())
+                else if(ControllableButtons.ButtonActions.SCROLL_LEFT.getButton().isButtonPressed())
                 {
                     if(mc.player != null)
                     {
                         mc.player.inventory.changeCurrentItem(1);
                     }
                 }
-                else if(ButtonRegistry.ButtonActions.SWAP_HANDS.getButton().isButtonPressed())
+                else if(ControllableButtons.ButtonActions.SWAP_HANDS.getButton().isButtonPressed())
                 {
                     if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
                     {
@@ -626,45 +631,72 @@ public class ControllerInput
                         mc.getConnection().sendPacket(new CPlayerDiggingPacket(CPlayerDiggingPacket.Action.SWAP_HELD_ITEMS, BlockPos.ZERO, Direction.DOWN));
                     }
                 }
-                else if(ButtonRegistry.ButtonActions.TOGGLE_PERSPECTIVE.getButton().isButtonPressed() && mc.mouseHelper.isMouseGrabbed())
+                else if(ControllableButtons.ButtonActions.TOGGLE_PERSPECTIVE.getButton().isButtonPressed() && mc.mouseHelper.isMouseGrabbed())
                 {
                     cycleThirdPersonView();
                 }
-                else if(ButtonRegistry.ButtonActions.PAUSE_GAME.getButton().isButtonPressed())
+                else if(ControllableButtons.ButtonActions.PAUSE_GAME.getButton().isButtonPressed())
                 {
                     if(mc.player != null)
                     {
                         mc.displayInGameMenu(false);
                     }
                 }
-                else if(mc.player != null && !mc.player.isHandActive())
+                else if(mc.player != null)
                 {
-                    if(ButtonRegistry.ButtonActions.ATTACK.getButton().isButtonPressed())
+                    boolean slotPressed = false;
+
+                    ButtonBinding[] slotButtonBindings = ControllableButtons.getSlotButtonBindings();
+                    for(int i = 0; i < slotButtonBindings.length; i++)
                     {
-                        mc.clickMouse();
-                        currentAttackTimer = 1;
+                        ButtonBinding buttonBinding = slotButtonBindings[i];
+
+                        if(buttonBinding.isButtonPressed())
+                        {
+                            mc.player.inventory.currentItem = i;
+                            slotPressed = true;
+                            break;
+                        }
                     }
-                    else if(ButtonRegistry.ButtonActions.USE_ITEM.getButton().isButtonPressed())
+
+                    if(!slotPressed)
                     {
-                        mc.rightClickMouse();
-                    }
-                    else if(ButtonRegistry.ButtonActions.PICK_BLOCK.getButton().isButtonPressed())
-                    {
-                        mc.middleClickMouse();
-                    }else if (ButtonRegistry.ButtonActions.OPEN_CHAT.getButton().isButtonPressed()) {
-                        mc.displayGuiScreen(new ChatScreen(""));
-                    }
-                    else if (ButtonRegistry.ButtonActions.OPEN_COMMAND_CHAT.getButton().isButtonPressed()) {
-                        mc.displayGuiScreen(new ChatScreen("/"));
-                    }
-                    else if (ButtonRegistry.ButtonActions.SMOOTH_CAMERA_TOGGLE.getButton().isButtonPressed()) {
-                        mc.gameSettings.smoothCamera = !mc.gameSettings.smoothCamera;
+                        if(ControllableButtons.ButtonActions.OPEN_CHAT.getButton().isButtonPressed())
+                        {
+                            mc.displayGuiScreen(new ChatScreen(""));
+                        }
+                        else if(ControllableButtons.ButtonActions.OPEN_COMMAND_CHAT.getButton().isButtonPressed())
+                        {
+                            mc.displayGuiScreen(new ChatScreen("/"));
+                        }
+                        else if(ControllableButtons.ButtonActions.SMOOTH_CAMERA_TOGGLE.getButton().isButtonPressed())
+                        {
+                            mc.gameSettings.smoothCamera = !mc.gameSettings.smoothCamera;
+                        }
+                        else if(!mc.player.isHandActive())
+                        {
+                            if(ControllableButtons.ButtonActions.ATTACK.getButton().isButtonPressed())
+                            {
+                                mc.clickMouse();
+                                currentAttackTimer = 1;
+                            }
+                            else if(ControllableButtons.ButtonActions.USE_ITEM.getButton().isButtonPressed())
+                            {
+                                mc.rightClickMouse();
+                            }
+                            else if(ControllableButtons.ButtonActions.PICK_BLOCK.getButton().isButtonPressed())
+                            {
+                                mc.middleClickMouse();
+                            }
+                        }
+
+                        // HANDLE SLOTS WHILE NO GUI IS OPEN
                     }
                 }
             }
             else
             {
-                if(ButtonRegistry.ButtonActions.INVENTORY.getButton().isButtonPressed())
+                if(ControllableButtons.ButtonActions.INVENTORY.getButton().isButtonPressed())
                 {
                     if(mc.player != null)
                     {
@@ -672,22 +704,21 @@ public class ControllerInput
                     }
                 }
 
-
-                else if(ButtonRegistry.ButtonActions.SCROLL_RIGHT.getButton().isButtonPressed())
+                else if(ControllableButtons.ButtonActions.SCROLL_RIGHT.getButton().isButtonPressed())
                 {
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
                         scrollCreativeTabs((CreativeScreen) mc.currentScreen, 1);
                     }
                 }
-                else if(ButtonRegistry.ButtonActions.SCROLL_LEFT.getButton().isButtonPressed())
+                else if(ControllableButtons.ButtonActions.SCROLL_LEFT.getButton().isButtonPressed())
                 {
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
                         scrollCreativeTabs((CreativeScreen) mc.currentScreen, -1);
                     }
                 }
-                else if(ButtonRegistry.ButtonActions.PAUSE_GAME.getButton().isButtonPressed())
+                else if(ControllableButtons.ButtonActions.PAUSE_GAME.getButton().isButtonPressed())
                 {
                     if(mc.currentScreen instanceof IngameMenuScreen)
                     {
@@ -702,10 +733,31 @@ public class ControllerInput
                 {
                     invokeMouseClick(mc.currentScreen, 1);
                 }
-                else if(button == Buttons.B && mc.player != null && mc.player.inventory.getItemStack().isEmpty())
+                else if(mc.player != null)
                 {
-                    invokeMouseClick(mc.currentScreen, 0);
+                    if(button == Buttons.B && mc.player.inventory.getItemStack().isEmpty())
+                    {
+                        invokeMouseClick(mc.currentScreen, 0);
+                    }
+                    else if(mc.currentScreen instanceof ContainerScreen)
+                    {
+                        ContainerScreen<?> screen = (ContainerScreen<?>) mc.currentScreen;
+                        ButtonBinding[] slotButtonBindings = ControllableButtons.getSlotButtonBindings();
+                        for(int i = 0; i < slotButtonBindings.length; i++)
+                        {
+                            ButtonBinding buttonBinding = slotButtonBindings[i];
+
+                            if(buttonBinding.isButtonPressed() && screen.getSlotUnderMouse() != null)
+                            {
+
+                                ContainerScreenUtil.handleMouseClick(screen, screen.getSlotUnderMouse(), screen.getSlotUnderMouse().slotNumber, i, ClickType.SWAP);
+                                break;
+
+                            }
+                        }
+                    }
                 }
+
             }
         }
         else
@@ -723,6 +775,11 @@ public class ControllerInput
                 else if(button == Buttons.X)
                 {
                     invokeMouseReleased(mc.currentScreen, 1);
+                }
+                else if(button == Buttons.Y)
+                {
+                    if(mc.player != null)
+                        mc.player.dropItem(mc.player.inventory.getItemStack(), false);
                 }
             }
         }

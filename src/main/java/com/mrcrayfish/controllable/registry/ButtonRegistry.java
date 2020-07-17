@@ -4,9 +4,6 @@ import com.github.fernthedev.config.common.Config;
 import com.github.fernthedev.config.common.exceptions.ConfigLoadException;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.Buttons;
-import net.minecraft.client.GameSettings;
-import net.minecraft.client.Minecraft;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -26,7 +23,7 @@ public class ButtonRegistry {
      * The map where actions get translated to Minecraft translation keys
      * ACTION_NAME:DATA
      */
-    private Map<String, ActionData> actionTranslateMap = new HashMap<>();
+    private Map<String, ActionDataDescription> actionTranslateMap = new HashMap<>();
 
     /**
      * Load the button mappings from the config file
@@ -93,7 +90,17 @@ public class ButtonRegistry {
         return buttonBindings.get(action);
     }
 
-    public ButtonBinding registerButton(String action, ActionData translateKey, ButtonBinding buttonBinding) {
+    /**
+     * Registers the button with it's action and button binding instance.
+     *
+     *
+     *
+     * @param action The name of the action. This is basically the key that will be used for retrieving and storing in the registry
+     * @param translateKey The description of the action. It states in what category and what the action does.
+     * @param buttonBinding The button binding instance. This will handle the state management of the button such as pressed or button id.
+     * @return The button binding instance is returned back
+     */
+    public ButtonBinding registerButton(String action, ActionDataDescription translateKey, ButtonBinding buttonBinding) {
         if (buttonBindings.containsKey(action)) {
             ButtonBinding oldButton = getButton(action);
             throw new ButtonExistsException(action, oldButton.getButtonId(), "Action " + action + " already taken by button " + oldButton.getButtonId());
@@ -107,10 +114,12 @@ public class ButtonRegistry {
 
         actionTranslateMap.put(action, translateKey);
 
-        return buttonBindings.put(action, buttonBinding);
+        buttonBindings.put(action, buttonBinding);
+
+        return buttonBinding;
     }
 
-    public ActionData getAction(String action) {
+    public ActionDataDescription getAction(String action) {
         if (!actionTranslateMap.containsKey(action)) {
             // Theoretically, this should never happen unless an oversight in
             // the api allows it
@@ -121,17 +130,13 @@ public class ButtonRegistry {
 
     /**
      * Returns a copy of the button bindings
-     * @return
+     * @return a copy
      */
     public Map<String, ButtonBinding> getButtonBindings() {
         return new HashMap<>(buttonBindings);
     }
 
-    public void registerDefaults() {
-        for (ButtonActions action : ButtonActions.values()) {
-            registerButton(action.action, action.actionData, new ButtonBinding(action.getButtonId(), action.getButtonId()));
-        }
-    }
+
 
 
     public static class ButtonConfigData {
@@ -147,59 +152,6 @@ public class ButtonRegistry {
         public Map<String, Integer> getButtonMap()
         {
             return buttonMap;
-        }
-    }
-
-    
-
-    public enum ButtonActions {
-        JUMP("JUMP", Buttons.A, new ActionData(getGameSettings().keyBindJump)),
-        SNEAK("SNEAK", Buttons.LEFT_THUMB_STICK, new ActionData(getGameSettings().keyBindSneak)),
-        SPRINT("SPRINT", -1, new ActionData(getGameSettings().keyBindSprint)),
-        INVENTORY("INVENTORY", Buttons.Y, new ActionData(getGameSettings().keyBindInventory)),
-        SWAP_HANDS("SWAP_HANDS", Buttons.X, new ActionData(getGameSettings().keyBindSwapHands)),
-        DROP_ITEM("DROP_ITEM", Buttons.DPAD_DOWN, new ActionData(getGameSettings().keyBindDrop)),
-        USE_ITEM("USE_ITEM", Buttons.LEFT_TRIGGER, new ActionData(getGameSettings().keyBindUseItem)),
-        ATTACK("ATTACK", Buttons.RIGHT_TRIGGER, new ActionData(getGameSettings().keyBindAttack)),
-        PICK_BLOCK("PICK_BLOCK", Buttons.RIGHT_THUMB_STICK, new ActionData(getGameSettings().keyBindPickBlock)),
-        PLAYER_LIST("PLAYER_LIST", Buttons.SELECT, new ActionData(getGameSettings().keyBindPlayerList)),
-        TOGGLE_PERSPECTIVE("TOGGLE_PERSPECTIVE", Buttons.DPAD_UP, new ActionData(getGameSettings().keyBindTogglePerspective)),
-        SCREENSHOT("SCREENSHOT", -1, new ActionData(getGameSettings().keyBindScreenshot)),
-        SCROLL_LEFT("SCROLL_LEFT", Buttons.LEFT_BUMPER, new ActionData("controllable.action.scroll_left", "key.categories.gameplay")),
-        SCROLL_RIGHT("SCROLL_RIGHT", Buttons.RIGHT_BUMPER, new ActionData("controllable.action.scroll_right", "key.categories.gameplay")),
-        QUICK_MOVE("QUICK_MOVE", Buttons.B, new ActionData("controllable.action.quick_move", "key.categories.gameplay")),
-        PAUSE_GAME("PAUSE_GAME", Buttons.START, new ActionData("key.keyboard.pause", "key.categories.gameplay")),
-        OPEN_CHAT("OPEN_CHAT", -1, new ActionData(getGameSettings().keyBindChat)),
-        OPEN_COMMAND_CHAT("OPEN_COMMAND_CHAT", -1, new ActionData(getGameSettings().keyBindCommand)),
-        SMOOTH_CAMERA_TOGGLE("SMOOTH_CAMERA_TOGGLE", -1, new ActionData(getGameSettings().keyBindSmoothCamera)),
-
-        ;
-
-
-        private String action;
-
-        private int buttonId;
-
-        private ActionData actionData;
-
-        private static GameSettings getGameSettings() {
-            return Minecraft.getInstance().gameSettings;
-        }
-
-        public ButtonBinding getButton() {
-            return Controllable.getButtonRegistry().getButton(action);
-        }
-
-        ButtonActions(String action, int buttonId, ActionData actionData)
-        {
-            this.action = action;
-            this.buttonId = buttonId;
-            this.actionData = actionData;
-        }
-
-        public int getButtonId()
-        {
-            return buttonId;
         }
     }
 

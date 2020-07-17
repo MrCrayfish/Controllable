@@ -7,7 +7,7 @@ import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.event.AvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
-import com.mrcrayfish.controllable.registry.ButtonRegistry;
+import com.mrcrayfish.controllable.registry.ControllableButtons;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IngameGui;
@@ -179,10 +179,10 @@ public class RenderEvents
                 }
 
                 if ((!mc.player.getFoodStats().needFood() || mc.player.isCreative() || mc.player.abilities.isFlying ) && !mc.player.isSprinting() && !Controllable.getOptions().isToggleSprint()) {
-                    actions.put(ButtonRegistry.ButtonActions.SPRINT.getButton().getButtonId(), new Action(I18n.format("controllable.action.sprint"), Action.Side.RIGHT));
+                    actions.put(ControllableButtons.ButtonActions.SPRINT.getButton().getButtonId(), new Action(I18n.format("controllable.action.sprint"), Action.Side.RIGHT));
                 } else {
                     if (Controllable.getOptions().isToggleSprint()) {
-                        actions.put(ButtonRegistry.ButtonActions.SPRINT.getButton().getButtonId(), new Action(I18n.format("controllable.action.toggleSprint", LocaleUtil.booleanLocale(Controllable.getInput().isSprinting())), Action.Side.RIGHT));
+                        actions.put(ControllableButtons.ButtonActions.SPRINT.getButton().getButtonId(), new Action(I18n.format("controllable.action.toggleSprint", LocaleUtil.booleanLocale(Controllable.getInput().isSprinting())), Action.Side.RIGHT));
                     }
                 }
 
@@ -191,7 +191,7 @@ public class RenderEvents
                     actions.put(Buttons.LEFT_THUMB_STICK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
                 }
                 else {
-                    actions.put(ButtonRegistry.ButtonActions.SNEAK.getButton().getButtonId(), new Action(I18n.format("controllable.action.sneak", LocaleUtil.booleanLocale(Controllable.getInput().isSneaking())), Action.Side.RIGHT));
+                    actions.put(ControllableButtons.ButtonActions.SNEAK.getButton().getButtonId(), new Action(I18n.format("controllable.action.sneak", LocaleUtil.booleanLocale(Controllable.getInput().isSneaking())), Action.Side.RIGHT));
                 }
 
                 if(!mc.player.inventory.getCurrentItem().isEmpty())

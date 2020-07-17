@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.client;
 
 
 
-import com.mrcrayfish.controllable.registry.ActionData;
+import com.mrcrayfish.controllable.registry.ActionDataDescription;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +22,10 @@ public class ButtonBinding
     private boolean pressed;
     private int pressedTime;
 
-    public ButtonBinding(int button, int defaultId)
+    public ButtonBinding(int button)
     {
         this.button = button;
-        this.defaultId = defaultId;
+        this.defaultId = button;
         BINDINGS.add(this);
     }
 
@@ -98,11 +98,12 @@ public class ButtonBinding
     /**
      *
      * @param buttonBinding The button conflicting with this.
-     * @param actionData The action associated with the button. Used to check if the action is specifically compliant with this button.
+     * @param actionDataDescription The action associated with the button. Used to check if the action is specifically compliant with this button.
      *                   Meant to be used for custom implementations of {@link ButtonBinding}.
-     * @return
+     * @return true if it conflicts with another ButtonBinding.
+     * Only return true if applicable such as if the conflict is in the same circumstance, like riding a vehicle.
      */
-    public boolean conflicts(ButtonBinding buttonBinding, ActionData actionData) {
+    public boolean conflicts(ButtonBinding buttonBinding, ActionDataDescription actionDataDescription) {
         return button == buttonBinding.getButtonId();
     }
 

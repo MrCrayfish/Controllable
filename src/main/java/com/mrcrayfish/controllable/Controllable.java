@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import com.mrcrayfish.controllable.registry.ButtonRegistry;
+import com.mrcrayfish.controllable.registry.ControllableButtons;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -69,7 +70,7 @@ public class Controllable extends ControllerAdapter
         File configFolder = new File(mc.gameDir, "config");
 
         buttonRegistry = new ButtonRegistry();
-        buttonRegistry.registerDefaults();
+        ControllableButtons.registerDefaults();
 
 
         ControllerProperties.load(configFolder);
