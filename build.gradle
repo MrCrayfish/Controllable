@@ -12,7 +12,7 @@ apply plugin: 'net.minecraftforge.gradle'
 //Only edit below this line, the above code adds !pause
 // and enables the necessary things for Forge to be setup.
 
-version = "1.15.1-0.8.6"
+version = "1.15.1-0.8.7"
 group = "com.mrcrayfish" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "controllable"
 
