@@ -1,141 +1,110 @@
 function initializeCoreMod() {
     return {
-        'minecraft': {
+        'send_click': {
             'target': {
-                'type': 'CLASS',
-                'name': 'net.minecraft.client.Minecraft'
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.Minecraft',
+                'methodName': 'func_147115_a',
+                'methodDesc': '(Z)V'
             },
-            'transformer': function(classNode) {
-                log("Patching Minecraft...");
-
-                patch({
-                    obfName: "func_147115_a",
-                    name: "sendClickBlockToController",
-                    desc: "(Z)V",
-                    patch: patch_Minecraft_sendClickBlockToController
-                }, classNode);
-
-                patch({
-                     obfName: "func_184117_aA",
-                     name: "processKeyBinds",
-                     desc: "()V",
-                     patch: patch_Minecraft_processKeyBinds
-                }, classNode);
-
-                return classNode;
+            'transformer': function(method) {
+                wrapInvoke(patch_Minecraft_sendClickBlockToController, method, "Minecraft#func_147115_a");
+                return method;
             }
         },
-        'container_screen': {
+        'process_keys': {
             'target': {
-                'type': 'CLASS',
-                'name': 'net.minecraft.client.gui.screen.inventory.ContainerScreen'
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.Minecraft',
+                'methodName': 'func_184117_aA',
+                'methodDesc': '()V'
             },
-            'transformer': function(classNode) {
-                log("Patching ContainerScreen...");
-
-                patch({
-                    obfName: "func_73864_a",
-                    name: "mouseClicked",
-                    desc: "(DDI)Z",
-                    patch: patch_ContainerScreen_mouseClicked
-                }, classNode);
-
-                patch({
-                     obfName: "func_146286_b",
-                     name: "mouseReleased",
-                     desc: "(DDI)Z",
-                     patch: patch_ContainerScreen_mouseReleased
-                }, classNode);
-
-                return classNode;
+            'transformer': function(method) {
+                wrapInvoke(patch_Minecraft_processKeyBinds, method, "Minecraft#func_184117_aA");
+                return method;
             }
         },
-        'forge_ingame_gui': {
+        'mouse_clicked': {
             'target': {
-                'type': 'CLASS',
-                'name': 'net.minecraftforge.client.ForgeIngameGui'
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.gui.screen.inventory.ContainerScreen',
+                'methodName': 'func_73864_a',
+                'methodDesc': '(DDI)Z'
             },
-            'transformer': function(classNode) {
-                log("Patching ForgeIngameGui...");
-
-                patch({
-                    obfName: "",
-                    name: "renderPlayerList",
-                    desc: "(II)V",
-                    patch: patch_ForgeIngameGui_renderPlayerList
-                }, classNode);
-
-                patch({
-                    obfName: "",
-                    name: "renderRecordOverlay",
-                    desc: "(IIF)V",
-                    patch: patch_IngameGui_renderSelectedItem
-                }, classNode);
-
-                return classNode;
+            'transformer': function(method) {
+                wrapInvoke(patch_ContainerScreen_mouseClicked, method, "ContainerScreen#func_73864_a");
+                return method;
             }
-            //updateCameraAndRender(FJ)V
+        },
+        'mouse_released': {
+            'target': {
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.gui.screen.inventory.ContainerScreen',
+                'methodName': 'func_146286_b',
+                'methodDesc': '(DDI)Z'
+            },
+            'transformer': function(method) {
+                wrapInvoke(patch_ContainerScreen_mouseReleased, method, "ContainerScreen#func_146286_b");
+                return method;
+            }
+        },
+        'render_player_list': {
+            'target': {
+                'type': 'METHOD',
+                'class': 'net.minecraftforge.client.ForgeIngameGui',
+                'methodName': 'renderPlayerList',
+                'methodDesc': '(IILcom/mojang/blaze3d/matrix/MatrixStack;)V'
+            },
+            'transformer': function(method) {
+                wrapInvoke(patch_ForgeIngameGui_renderPlayerList, method, "ForgeIngameGui#renderPlayerList");
+                return method;
+            }
+        },
+        'render_selected_item': {
+            'target': {
+                'type': 'METHOD',
+                'class': 'net.minecraftforge.client.ForgeIngameGui',
+                'methodName': 'renderRecordOverlay',
+                'methodDesc': '(IIFLcom/mojang/blaze3d/matrix/MatrixStack;)V'
+            },
+            'transformer': function(method) {
+                wrapInvoke(patch_IngameGui_renderSelectedItem, method, "ForgeIngameGui#renderRecordOverlay");
+                return method;
+            }
         },
         'screen_render_patch': {
             'target': {
-                'type': 'CLASS',
-                'name': 'net.minecraft.client.renderer.GameRenderer'
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.renderer.GameRenderer',
+                'methodName': 'func_195458_a',
+                'methodDesc': '(FJZ)V'
             },
-            'transformer': function(classNode) {
-                log("Patching GameRenderer...");
-
-                patch({
-                    obfName: "func_195458_a",
-                    name: "updateCameraAndRender",
-                    desc: "(FJZ)V",
-                    patch: patch_GameRenderer_updateCameraAndRender
-                }, classNode);
-
-                return classNode;
+            'transformer': function(method) {
+                wrapInvoke(patch_GameRenderer_updateCameraAndRender, method, "GameRenderer#func_195458_a");
+                return method;
             }
         },
         'selected_item_name': {
             'target': {
-                'type': 'CLASS',
-                'name': 'net.minecraft.client.gui.IngameGui'
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.gui.IngameGui',
+                'methodName': 'func_238453_b_',
+                'methodDesc': '(Lcom/mojang/blaze3d/matrix/MatrixStack;)V'
             },
-            'transformer': function(classNode) {
-                log("Patching IngameGui...");
-                patch({
-                    obfName: "func_194801_c ",
-                    name: "renderSelectedItem",
-                    desc: "()V",
-                    patch: patch_IngameGui_renderSelectedItem
-                }, classNode);
-                return classNode;
+            'transformer': function(method) {
+                wrapInvoke(patch_IngameGui_renderSelectedItem, method, "IngameGui#func_194801_c");
+                return method;
             }
         }
     };
 }
 
-function findMethod(methods, entry) {
-    var length = methods.length;
-    for(var i = 0; i < length; i++) {
-        var method = methods[i];
-        if((method.name.equals(entry.obfName) || method.name.equals(entry.name)) && method.desc.equals(entry.desc)) {
-            return method;
-        }
-    }
-    return null;
-}
-
-function patch(entry, classNode) {
-    var method = findMethod(classNode.methods, entry);
-    var name = classNode.name.replace("/", ".") + "#" + entry.name + entry.desc;
-    if(method !== null) {
-        log("Starting to patch: " + name);
-        if(entry.patch(method)) {
-            log("Successfully patched: " + name);
-        } else {
-            log("Failed to patch: " + name);
-        }
+function wrapInvoke(patcher, method, name) {
+    log("Patching " + name);
+    if(patcher(method)) {
+        log("Successfully patched " + name);
     } else {
-        log("Failed to find method: " + name);
+        log("Failed to patch " + name);
     }
 }
 
@@ -297,7 +266,7 @@ function patch_ForgeIngameGui_renderPlayerList(method) {
 function patch_GameRenderer_updateCameraAndRender(method) {
     var findInstruction = {
         name: "drawScreen",
-        desc: "(Lnet/minecraft/client/gui/screen/Screen;IIF)V",
+        desc: "(Lnet/minecraft/client/gui/screen/Screen;Lcom/mojang/blaze3d/matrix/MatrixStack;IIF)V",
         matches: function(s) {
             return s.equals(this.name);
         }
@@ -319,7 +288,7 @@ function patch_GameRenderer_updateCameraAndRender(method) {
     if(foundNode !== null) {
         var previousNode = foundNode.getPrevious();
         method.instructions.remove(foundNode);
-        method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/screen/Screen;IIF)V", false));
+        method.instructions.insert(previousNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/controllable/client/Hooks", "drawScreen", "(Lnet/minecraft/client/gui/screen/Screen;Lcom/mojang/blaze3d/matrix/MatrixStack;IIF)V", false));
         return true;
     }
     return false;

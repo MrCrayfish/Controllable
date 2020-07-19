@@ -18,7 +18,7 @@ public abstract class ControllerEvent extends Event
 
     public Controller getController()
     {
-        return controller;
+        return this.controller;
     }
 
     @Cancelable
@@ -43,7 +43,7 @@ public abstract class ControllerEvent extends Event
          */
         public int getButton()
         {
-            return originalButton;
+            return this.originalButton;
         }
 
         /**
@@ -54,7 +54,7 @@ public abstract class ControllerEvent extends Event
          */
         public int getModifiedButton()
         {
-            return button;
+            return this.button;
         }
 
         /**
@@ -76,7 +76,7 @@ public abstract class ControllerEvent extends Event
          */
         public boolean getState()
         {
-            return state;
+            return this.state;
         }
     }
 
@@ -119,7 +119,7 @@ public abstract class ControllerEvent extends Event
          */
         public float getYawSpeed()
         {
-            return yawSpeed;
+            return this.yawSpeed;
         }
 
         /**
@@ -140,7 +140,7 @@ public abstract class ControllerEvent extends Event
          */
         public float getPitchSpeed()
         {
-            return pitchSpeed;
+            return this.pitchSpeed;
         }
 
         /**

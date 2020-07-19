@@ -35,7 +35,7 @@ public class Controller
      */
     public SDL2Controller getSDL2Controller()
     {
-        return controller;
+        return this.controller;
     }
 
     /**
@@ -43,7 +43,7 @@ public class Controller
      */
     public ButtonStates getButtonsStates()
     {
-        return states;
+        return this.states;
     }
 
     /**
@@ -57,7 +57,7 @@ public class Controller
         {
             if(this.cachedName == null)
             {
-                this.cachedName = this.controller.getName().replace("SDL GameController ", "").replace("SDL Joystick ", "");
+                this.cachedName = this.controller.getName().replace("SDL GameController ", "").replace("SDL Joystick ", "").replace("HIDAPI:","");
             }
             return this.cachedName;
         }
@@ -74,7 +74,7 @@ public class Controller
      */
     public boolean isButtonPressed(int button)
     {
-        return states.getState(button);
+        return this.states.getState(button);
     }
 
     /**
@@ -84,7 +84,7 @@ public class Controller
      */
     public float getLTriggerValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+        return this.controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT);
     }
 
     /**
@@ -94,7 +94,7 @@ public class Controller
      */
     public float getRTriggerValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+        return this.controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
     }
 
     /**
@@ -104,7 +104,7 @@ public class Controller
      */
     public float getLThumbStickXValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_LEFTX);
+        return this.controller.getAxis(SDL_CONTROLLER_AXIS_LEFTX);
     }
 
     /**
@@ -114,7 +114,7 @@ public class Controller
      */
     public float getLThumbStickYValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_LEFTY);
+        return this.controller.getAxis(SDL_CONTROLLER_AXIS_LEFTY);
     }
 
     /**
@@ -124,7 +124,7 @@ public class Controller
      */
     public float getRThumbStickXValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTX);
+        return this.controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTX);
     }
 
     /**
@@ -134,7 +134,7 @@ public class Controller
      */
     public float getRThumbStickYValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTY);
+        return this.controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTY);
     }
 
     /**
@@ -155,6 +155,6 @@ public class Controller
     @Nullable
     public Mappings.Entry getMapping()
     {
-        return mapping;
+        return this.mapping;
     }
 }

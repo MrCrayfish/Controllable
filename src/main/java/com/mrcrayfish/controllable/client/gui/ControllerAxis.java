@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Buttons;
@@ -16,13 +17,13 @@ public class ControllerAxis extends ControllerButton
     }
 
     @Override
-    public void draw(int x, int y, int mouseX, int mouseY, boolean selected)
+    public void draw(MatrixStack matrixStack, int x, int y, int mouseX, int mouseY, boolean selected)
     {
         RenderSystem.pushMatrix();
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            switch(button)
+            switch(this.button)
             {
                 case Buttons.LEFT_THUMB_STICK:
                     RenderSystem.translatef(controller.getLThumbStickXValue() * 5, -controller.getLThumbStickYValue() * 5, 0);
@@ -32,12 +33,12 @@ public class ControllerAxis extends ControllerButton
                     break;
             }
 
-            if(!Controllable.isButtonPressed(button))
+            if(!Controllable.isButtonPressed(this.button))
             {
                 RenderSystem.translated(0, -2.5, 0);
             }
         }
-        super.draw(x, y, mouseX, mouseY, selected);
+        super.draw(matrixStack, x, y, mouseX, mouseY, selected);
         RenderSystem.popMatrix();
     }
 }

@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
@@ -96,7 +97,7 @@ public class Hooks
      * Fixes the mouse position when virtual mouse is turned on for controllers. This method is linked via ASM.
      */
     @SuppressWarnings("unused")
-    public static void drawScreen(Screen screen, int mouseX, int mouseY, float partialTicks)
+    public static void drawScreen(Screen screen, MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         ControllerInput input = Controllable.getInput();
         if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && input.getLastUse() > 0)
@@ -105,11 +106,11 @@ public class Hooks
             mouseX = (int) (input.getVirtualMouseX() * (double) minecraft.getMainWindow().getScaledWidth() / (double) minecraft.getMainWindow().getWidth());
             mouseY = (int) (input.getVirtualMouseY() * (double) minecraft.getMainWindow().getScaledHeight() / (double) minecraft.getMainWindow().getHeight());
         }
-        if(!MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.DrawScreenEvent.Pre(screen, mouseX, mouseY, partialTicks)))
+        if(!MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.DrawScreenEvent.Pre(screen, matrixStack, mouseX, mouseY, partialTicks)))
         {
-            screen.render(mouseX, mouseY, partialTicks);
+            screen.render(matrixStack, mouseX, mouseY, partialTicks);
         }
-        MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.DrawScreenEvent.Post(screen, mouseX, mouseY, partialTicks));
+        MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.DrawScreenEvent.Post(screen, matrixStack, mouseX, mouseY, partialTicks));
     }
 
     /**

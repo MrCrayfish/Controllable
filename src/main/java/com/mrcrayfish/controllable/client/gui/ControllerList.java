@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.libsdl.SDL_GameController;
 import uk.co.electronstudio.sdl2gdx.SDL2Controller;
 import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 
@@ -30,7 +31,7 @@ public class ControllerList extends ExtendedList<ControllerEntry>
     public void reload()
     {
         this.clearEntries();
-        Array<com.badlogic.gdx.controllers.Controller> controllers = manager.getControllers();
+        Array<com.badlogic.gdx.controllers.Controller> controllers = this.manager.getControllers();
         for(int i = 0; i < controllers.size; i++)
         {
             this.addEntry(new ControllerEntry(this, (SDL2Controller) controllers.get(i)));
