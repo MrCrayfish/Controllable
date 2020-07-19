@@ -5,7 +5,6 @@ import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerType;
 import com.mrcrayfish.controllable.client.CursorType;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.nbt.CompoundNBT;

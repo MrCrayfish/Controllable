@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.libsdl.SDL_GameController;
 import uk.co.electronstudio.sdl2gdx.SDL2Controller;
 import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 

@@ -1,7 +1,6 @@
 package com.mrcrayfish.controllable.client.gui.widget;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
