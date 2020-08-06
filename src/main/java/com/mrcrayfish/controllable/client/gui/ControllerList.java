@@ -30,7 +30,7 @@ public class ControllerList extends ExtendedList<ControllerEntry>
     public void reload()
     {
         this.clearEntries();
-        Array<com.badlogic.gdx.controllers.Controller> controllers = manager.getControllers();
+        Array<com.badlogic.gdx.controllers.Controller> controllers = this.manager.getControllers();
         for(int i = 0; i < controllers.size; i++)
         {
             this.addEntry(new ControllerEntry(this, (SDL2Controller) controllers.get(i)));

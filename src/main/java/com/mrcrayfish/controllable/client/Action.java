@@ -16,7 +16,7 @@ public class Action
 
     public String getDescription()
     {
-        return description;
+        return this.description;
     }
 
     public void setDescription(String description)
@@ -26,7 +26,7 @@ public class Action
 
     public Side getSide()
     {
-        return side;
+        return this.side;
     }
 
     public void setSide(Side side)

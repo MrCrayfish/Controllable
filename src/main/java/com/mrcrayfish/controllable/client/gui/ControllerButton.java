@@ -34,18 +34,18 @@ public class ControllerButton extends AbstractGui
     {
         RenderSystem.enableBlend();
         Minecraft.getInstance().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
-        int buttonU = u;
-        int buttonV = v;
+        int buttonU = this.u;
+        int buttonV = this.v;
         int buttonX = x + this.x * this.scale;
         int buttonY = y + this.y * this.scale;
         int buttonWidth = this.width * this.scale;
         int buttonHeight = this.height * this.scale;
-        hovered = mouseX >= buttonX && mouseY >= buttonY && mouseX < buttonX + buttonWidth && mouseY < buttonY + buttonHeight;
-        if(hovered)
+        this.hovered = mouseX >= buttonX && mouseY >= buttonY && mouseX < buttonX + buttonWidth && mouseY < buttonY + buttonHeight;
+        if(this.hovered)
         {
             buttonV += this.height * 2;
         }
-        else if(Controllable.getController() != null && Controllable.isButtonPressed(button) || selected)
+        else if(Controllable.getController() != null && Controllable.isButtonPressed(this.button) || selected)
         {
             buttonV += this.height;
         }
@@ -55,11 +55,11 @@ public class ControllerButton extends AbstractGui
 
     public int getButton()
     {
-        return button;
+        return this.button;
     }
 
     public boolean isHovered()
     {
-        return hovered;
+        return this.hovered;
     }
 }

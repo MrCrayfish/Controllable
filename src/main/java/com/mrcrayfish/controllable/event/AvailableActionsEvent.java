@@ -19,6 +19,6 @@ public class AvailableActionsEvent extends Event
 
     public Map<Integer, Action> getActions()
     {
-        return actions;
+        return this.actions;
     }
 }

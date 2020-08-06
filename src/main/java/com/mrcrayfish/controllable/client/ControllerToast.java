@@ -39,7 +39,7 @@ public class ControllerToast implements IToast
         String title = toastGui.getMinecraft().fontRenderer.func_238412_a_(controllerName, 120);
         toastGui.getMinecraft().fontRenderer.drawString(matrixStack, TextFormatting.DARK_GRAY + title, 35, 7, 0);
 
-        String message = connected ?
+        String message = this.connected ?
                 TextFormatting.DARK_GREEN.toString() + TextFormatting.BOLD.toString() + I18n.format("controllable.toast.connected") :
                 TextFormatting.RED.toString() + TextFormatting.BOLD.toString() + I18n.format("controllable.toast.disconnected");
         toastGui.getMinecraft().fontRenderer.drawString(matrixStack, TextFormatting.BOLD + message, 35, 18, 0);

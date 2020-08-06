@@ -5,7 +5,6 @@ import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerType;
 import com.mrcrayfish.controllable.client.CursorType;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.nbt.CompoundNBT;
@@ -62,7 +61,7 @@ public class ControllerOptions
         Controllable.getOptions().cursorType = cursorType;
     }, (gameSettings, controllableEnumOption) -> {
         CursorType cursorType = controllableEnumOption.get(gameSettings);
-        return I18n.format("controllable.cursor." + cursorType.getString());
+        return new TranslationTextComponent("controllable.cursor." + cursorType.getString());
     });
 
     public static final ControllableEnumOption<ControllerType> CONTROLLER_TYPE = new ControllableEnumOption<>("controllable.options.controllerType", ControllerType.class, gameSettings -> {
@@ -71,7 +70,7 @@ public class ControllerOptions
         Controllable.getOptions().controllerType = controllerType;
     }, (gameSettings, controllableEnumOption) -> {
         ControllerType controllerType = controllableEnumOption.get(gameSettings);
-        return I18n.format("controllable.controller." + controllerType.getString());
+        return new TranslationTextComponent("controllable.controller." + controllerType.getString());
     });
 
     public static final BooleanOption INVERT_LOOK = new ControllableBooleanOption("controllable.options.invertLook", gameSettings -> {
@@ -243,32 +242,32 @@ public class ControllerOptions
 
     public boolean isRenderMiniPlayer()
     {
-        return renderMiniPlayer;
+        return this.renderMiniPlayer;
     }
 
     public boolean isVirtualMouse()
     {
-        return virtualMouse;
+        return this.virtualMouse;
     }
 
     public boolean useConsoleHotbar()
     {
-        return consoleHotbar;
+        return this.consoleHotbar;
     }
 
     public CursorType getCursorType()
     {
-        return cursorType;
+        return this.cursorType;
     }
 
     public ControllerType getControllerType()
     {
-        return controllerType;
+        return this.controllerType;
     }
 
     public boolean isInvertLook()
     {
-        return invertLook;
+        return this.invertLook;
     }
 
     public double getDeadZone()

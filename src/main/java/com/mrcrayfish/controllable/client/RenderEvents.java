@@ -44,7 +44,7 @@ public class RenderEvents
         Minecraft mc = Minecraft.getInstance();
         if(event.phase == TickEvent.Phase.START && mc.player != null && !mc.gameSettings.hideGUI)
         {
-            actions = new HashMap<>();
+            this.actions = new HashMap<>();
 
             if(mc.currentScreen instanceof ContainerScreen)
             {
@@ -56,19 +56,19 @@ public class RenderEvents
                         Slot slot = container.getSlotUnderMouse();
                         if(slot.getHasStack())
                         {
-                            actions.put(Buttons.A, new Action(I18n.format("controllable.action.pickup_stack"), Action.Side.LEFT));
-                            actions.put(Buttons.X, new Action(I18n.format("controllable.action.pickup_item"), Action.Side.LEFT));
-                            actions.put(Buttons.B, new Action(I18n.format("controllable.action.quick_move"), Action.Side.LEFT));
+                            this.actions.put(Buttons.A, new Action(I18n.format("controllable.action.pickup_stack"), Action.Side.LEFT));
+                            this.actions.put(Buttons.X, new Action(I18n.format("controllable.action.pickup_item"), Action.Side.LEFT));
+                            this.actions.put(Buttons.B, new Action(I18n.format("controllable.action.quick_move"), Action.Side.LEFT));
                         }
                     }
                 }
                 else
                 {
-                    actions.put(Buttons.A, new Action(I18n.format("controllable.action.place_stack"), Action.Side.LEFT));
-                    actions.put(Buttons.X, new Action(I18n.format("controllable.action.place_item"), Action.Side.LEFT));
+                    this.actions.put(Buttons.A, new Action(I18n.format("controllable.action.place_stack"), Action.Side.LEFT));
+                    this.actions.put(Buttons.X, new Action(I18n.format("controllable.action.place_item"), Action.Side.LEFT));
                 }
 
-                actions.put(Buttons.Y, new Action(I18n.format("controllable.action.close_inventory"), Action.Side.RIGHT));
+                this.actions.put(Buttons.Y, new Action(I18n.format("controllable.action.close_inventory"), Action.Side.RIGHT));
             }
             else if(mc.currentScreen == null)
             {
@@ -84,11 +84,11 @@ public class RenderEvents
                 {
                     if(blockHit)
                     {
-                        actions.put(Buttons.RIGHT_TRIGGER, new Action(I18n.format("controllable.action.break"), Action.Side.RIGHT));
+                        this.actions.put(Buttons.RIGHT_TRIGGER, new Action(I18n.format("controllable.action.break"), Action.Side.RIGHT));
                     }
                     else
                     {
-                        actions.put(Buttons.RIGHT_TRIGGER, new Action(I18n.format("controllable.action.attack"), Action.Side.RIGHT));
+                        this.actions.put(Buttons.RIGHT_TRIGGER, new Action(I18n.format("controllable.action.attack"), Action.Side.RIGHT));
                     }
                 }
 
@@ -100,17 +100,17 @@ public class RenderEvents
                         case EAT:
                             if(mc.player.getFoodStats().needFood())
                             {
-                                actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
+                                this.actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
                             }
                             break;
                         case DRINK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
+                            this.actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
                             break;
                         case BLOCK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
+                            this.actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
                             break;
                         case BOW:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
+                            this.actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
                             break;
                     }
                 }
@@ -123,17 +123,17 @@ public class RenderEvents
                         case EAT:
                             if(mc.player.getFoodStats().needFood())
                             {
-                                actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
+                                this.actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
                             }
                             break;
                         case DRINK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
+                            this.actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
                             break;
                         case BLOCK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
+                            this.actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
                             break;
                         case BOW:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
+                            this.actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
                             break;
                     }
                 }
@@ -155,22 +155,22 @@ public class RenderEvents
                                 actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
                             }
                         }*/
-                        actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
+                        this.actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
                     }
                 }
                 else if(!currentItem.isEmpty() && !mc.player.isHandActive())
                 {
-                    actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.use_item"), Action.Side.RIGHT));
+                    this.actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.use_item"), Action.Side.RIGHT));
                 }
 
                 if(!mc.player.isSneaking() && blockHit && canOpenBlock && !mc.player.isHandActive())
                 {
-                    actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.interact"), Action.Side.RIGHT));
+                    this.actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.interact"), Action.Side.RIGHT));
                 }
 
                 //actions.put(Buttons.A, new Action(I18n.format("controllable.action.jump"), Action.Side.LEFT)); //TODO make a verbose action config option
 
-                actions.put(Buttons.Y, new Action(I18n.format("controllable.action.inventory"), Action.Side.LEFT));
+                this.actions.put(Buttons.Y, new Action(I18n.format("controllable.action.inventory"), Action.Side.LEFT));
 
                 if(!mc.player.getHeldItemOffhand().isEmpty() || !mc.player.inventory.getCurrentItem().isEmpty())
                 {
@@ -179,7 +179,7 @@ public class RenderEvents
 
                 if(mc.player.isPassenger())
                 {
-                    actions.put(Buttons.LEFT_THUMB_STICK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
+                    this.actions.put(Buttons.LEFT_THUMB_STICK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
                 }
                 else
                 {
@@ -188,11 +188,11 @@ public class RenderEvents
 
                 if(!mc.player.inventory.getCurrentItem().isEmpty())
                 {
-                    actions.put(Buttons.DPAD_DOWN, new Action(I18n.format("controllable.action.drop_item"), Action.Side.LEFT));
+                    this.actions.put(Buttons.DPAD_DOWN, new Action(I18n.format("controllable.action.drop_item"), Action.Side.LEFT));
                 }
             }
 
-            MinecraftForge.EVENT_BUS.post(new AvailableActionsEvent(actions));
+            MinecraftForge.EVENT_BUS.post(new AvailableActionsEvent(this.actions));
         }
     }
 
@@ -221,9 +221,9 @@ public class RenderEvents
 
                 int leftIndex = 0;
                 int rightIndex = 0;
-                for(Integer button : actions.keySet())
+                for(Integer button : this.actions.keySet())
                 {
-                    Action action = actions.get(button);
+                    Action action = this.actions.get(button);
                     Action.Side side = action.getSide();
 
                     int remappedButton = button;

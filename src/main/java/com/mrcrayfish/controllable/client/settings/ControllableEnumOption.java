@@ -6,6 +6,7 @@ import net.minecraft.client.GameSettings;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.OptionButton;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
 import java.util.function.BiConsumer;
@@ -21,9 +22,9 @@ public class ControllableEnumOption<T extends Enum<T> & IStringSerializable> ext
     private int ordinal = 0;
     private Function<GameSettings, T> getter;
     private BiConsumer<GameSettings, T> setter;
-    private BiFunction<GameSettings, ControllableEnumOption<T>, String> displayNameGetter;
+    private BiFunction<GameSettings, ControllableEnumOption<T>, ITextComponent> displayNameGetter;
 
-    public ControllableEnumOption(String title, Class<T> enumClass, Function<GameSettings, T> getter, BiConsumer<GameSettings, T> setter, BiFunction<GameSettings, ControllableEnumOption<T>, String> displayNameGetter)
+    public ControllableEnumOption(String title, Class<T> enumClass, Function<GameSettings, T> getter, BiConsumer<GameSettings, T> setter, BiFunction<GameSettings, ControllableEnumOption<T>, ITextComponent> displayNameGetter)
     {
         super(title);
         this.enumClass = enumClass;
@@ -60,7 +61,7 @@ public class ControllableEnumOption<T extends Enum<T> & IStringSerializable> ext
         });
     }
 
-    public String getTitle(GameSettings options)
+    public ITextComponent getTitle(GameSettings options)
     {
         // TODO: FIX WHEN MAPPINGS DONE
 //        return this.getDisplayString() + this.displayNameGetter.apply(options, this);
@@ -69,7 +70,7 @@ public class ControllableEnumOption<T extends Enum<T> & IStringSerializable> ext
 
     private T getEnum(int ordinal)
     {
-        T[] e = enumClass.getEnumConstants();
+        T[] e = this.enumClass.getEnumConstants();
         if(ordinal >= e.length) ordinal = 0;
         return e[ordinal];
     }

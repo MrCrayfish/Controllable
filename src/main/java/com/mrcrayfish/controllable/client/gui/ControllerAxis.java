@@ -21,7 +21,7 @@ public class ControllerAxis extends ControllerButton
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            switch(button)
+            switch(this.button)
             {
                 case Buttons.LEFT_THUMB_STICK:
                     matrixStack.translate(controller.getLThumbStickXValue() * 5, controller.getLThumbStickYValue() * 5, 0);
@@ -31,7 +31,7 @@ public class ControllerAxis extends ControllerButton
                     break;
             }
 
-            if(!Controllable.isButtonPressed(button))
+            if(!Controllable.isButtonPressed(this.button))
             {
                 matrixStack.translate(0, -2.5, 0);
             }

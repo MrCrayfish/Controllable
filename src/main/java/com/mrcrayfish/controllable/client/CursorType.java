@@ -19,11 +19,9 @@ public enum CursorType implements IStringSerializable
     }
 
     @Override
-    // TODO: FIX WHEN MAPPINGS DONE
-//    public String getName()
     public String getString()
     {
-        return id;
+        return this.id;
     }
 
     public static CursorType byId(String id)

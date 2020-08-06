@@ -32,7 +32,7 @@ public class ButtonBinding
 
     public int getButton()
     {
-        return button;
+        return this.button;
     }
 
     public void setButton(int button)
@@ -42,17 +42,17 @@ public class ButtonBinding
 
     public String getDescription()
     {
-        return descriptionKey;
+        return this.descriptionKey;
     }
 
     public boolean isButtonPressed()
     {
-        return pressed && pressedTime == 0;
+        return this.pressed && this.pressedTime == 0;
     }
 
     public boolean isButtonDown()
     {
-        return pressed;
+        return this.pressed;
     }
 
     public static void tick()
