@@ -267,7 +267,7 @@ function patch_ForgeIngameGui_renderPlayerList(method) {
 
 function patch_GameRenderer_updateCameraAndRender(method) {
     var findInstruction = {
-        name: "drawScreen",
+        name: "render",
         desc: "(Lnet/minecraft/client/gui/screen/Screen;Lcom/mojang/blaze3d/matrix/MatrixStack;IIF)V",
         matches: function(s) {
             return s.equals(this.name);

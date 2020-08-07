@@ -275,9 +275,8 @@ public class ControllerInput
                         RenderSystem.scaled(0.5, 0.5, 0.5);
                     }
 
-                    event.getMatrixStack().push();
+
                     Screen.blit(event.getMatrixStack(),-8, -8, 16, 16, nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
-                    event.getMatrixStack().pop();
                 }
             }
             RenderSystem.popMatrix();
@@ -333,7 +332,7 @@ public class ControllerInput
             float deadZone = (float) Controllable.getOptions().getDeadZone();
 
             /* Handles rotating the yaw of player */
-            if(Math.abs(controller.getRThumbStickXValue()) >= deadZone || Math.abs(controller.getRThumbStickYValue()) >= deadZone)
+            if(Math.abs(controller.getRThumbStickXValue()) >= deadZone)
             {
                 this.lastUse = 100;
                 double rotationSpeed = Controllable.getOptions().getRotationSpeed();
@@ -342,9 +341,18 @@ public class ControllerInput
                 {
                     float deadZoneTrimX = (controller.getRThumbStickXValue() > 0 ? 1 : -1) * deadZone;
                     this.targetYaw = (turnEvent.getYawSpeed() * (controller.getRThumbStickXValue() - deadZoneTrimX) / (1.0F - deadZone)) * 0.33F;
+                }
+            }
 
-                    float deadZoneTrimY = (controller.getRThumbStickYValue() > 0 ? 1 : -1) * deadZone;
-                    this.targetPitch = (turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() - deadZoneTrimY) / (1.0F - deadZone)) * 0.33F;
+            if(Math.abs(controller.getRThumbStickYValue()) >= deadZone)
+            {
+                lastUse = 100;
+                double rotationSpeed = Controllable.getOptions().getRotationSpeed();
+                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
+                if(!MinecraftForge.EVENT_BUS.post(turnEvent))
+                {
+                    float deadZoneTrim = (controller.getRThumbStickYValue() > 0 ? 1 : -1) * deadZone;
+                    targetPitch = (turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() - deadZoneTrim) / (1.0F - deadZone)) * 0.33F;
                 }
             }
         }

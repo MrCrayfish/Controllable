@@ -55,17 +55,17 @@ public class ControllableEnumOption<T extends Enum<T> & IStringSerializable> ext
     @Override
     public Widget createWidget(GameSettings options, int x, int y, int width)
     {
-        return new OptionButton(x, y, width, 20, this, new StringTextComponent(this.getTitle(options)), (button) -> {
+        return new OptionButton(x, y, width, 20, this, this.getTitle(options), (button) -> {
             this.nextEnum(options);
-            button.setMessage(new StringTextComponent(this.getTitle(options)));
+            button.setMessage(this.getTitle(options));
         });
     }
 
     public ITextComponent getTitle(GameSettings options)
     {
         // TODO: FIX WHEN MAPPINGS DONE
-//        return this.getDisplayString() + this.displayNameGetter.apply(options, this);
-        return func_238238_a_().getString() + displayNameGetter.apply(options, this);
+        //        return this.getDisplayString() + this.displayNameGetter.apply(options, this);
+        return this.func_238238_a_().func_230529_a_(this.displayNameGetter.apply(options, this));
     }
 
     private T getEnum(int ordinal)
