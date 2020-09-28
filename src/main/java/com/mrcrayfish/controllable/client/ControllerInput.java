@@ -329,7 +329,7 @@ public class ControllerInput
             float deadZone = (float) Controllable.getOptions().getDeadZone();
 
             /* Handles rotating the yaw of player */
-            if(Math.abs(controller.getRThumbStickXValue()) >= deadZone || Math.abs(controller.getRThumbStickYValue()) >= deadZone)
+            if(Math.abs(controller.getRThumbStickXValue()) >= deadZone)
             {
                 this.lastUse = 100;
                 double rotationSpeed = Controllable.getOptions().getRotationSpeed();
@@ -338,8 +338,19 @@ public class ControllerInput
                 {
                     float deadZoneTrimX = (controller.getRThumbStickXValue() > 0 ? 1 : -1) * deadZone;
                     this.targetYaw = (turnEvent.getYawSpeed() * (controller.getRThumbStickXValue() - deadZoneTrimX) / (1.0F - deadZone)) * 0.33F;
+                    this.targetPitch = (turnEvent.getPitchSpeed() * controller.getRThumbStickYValue() / (1.0F - deadZone)) * 0.33F;
+                }
+            }
 
+            if(Math.abs(controller.getRThumbStickYValue()) >= deadZone)
+            {
+                this.lastUse = 100;
+                double rotationSpeed = Controllable.getOptions().getRotationSpeed();
+                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
+                if(!MinecraftForge.EVENT_BUS.post(turnEvent))
+                {
                     float deadZoneTrimY = (controller.getRThumbStickYValue() > 0 ? 1 : -1) * deadZone;
+                    this.targetYaw = (turnEvent.getYawSpeed() * controller.getRThumbStickXValue() / (1.0F - deadZone)) * 0.33F;
                     this.targetPitch = (turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() - deadZoneTrimY) / (1.0F - deadZone)) * 0.33F;
                 }
             }
