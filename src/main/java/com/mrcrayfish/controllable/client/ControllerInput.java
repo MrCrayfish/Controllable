@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.settings.PointOfView;
 import net.minecraft.client.util.NativeUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Slot;
@@ -633,20 +634,11 @@ public class ControllerInput
     private void cycleThirdPersonView()
     {
         Minecraft mc = Minecraft.getInstance();
-
-        mc.gameSettings.thirdPersonView++;
-        if(mc.gameSettings.thirdPersonView > 2)
+        PointOfView pointOfView = mc.gameSettings.func_243230_g();
+        mc.gameSettings.func_243229_a(pointOfView.func_243194_c());
+        if(pointOfView.func_243192_a() != mc.gameSettings.func_243230_g().func_243192_a())
         {
-            mc.gameSettings.thirdPersonView = 0;
-        }
-
-        if(mc.gameSettings.thirdPersonView == 0)
-        {
-            mc.gameRenderer.loadEntityShader(mc.getRenderViewEntity());
-        }
-        else if(mc.gameSettings.thirdPersonView == 1)
-        {
-            mc.gameRenderer.loadEntityShader(null);
+            mc.gameRenderer.loadEntityShader(mc.gameSettings.func_243230_g().func_243192_a() ? mc.getRenderViewEntity() : null);
         }
     }
 

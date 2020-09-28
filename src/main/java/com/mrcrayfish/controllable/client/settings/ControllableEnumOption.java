@@ -62,7 +62,7 @@ public class ControllableEnumOption<T extends Enum<T> & IStringSerializable> ext
 
     public ITextComponent getTitle(GameSettings options)
     {
-        return this.func_238238_a_().func_230529_a_(this.displayNameGetter.apply(options, this));
+        return this.displayNameGetter.apply(options, this);
     }
 
     private T getEnum(int ordinal)
