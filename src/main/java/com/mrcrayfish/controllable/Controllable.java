@@ -5,14 +5,16 @@ import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.Util;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.libsdl.SDL;
 import org.libsdl.SDL_Error;
 import uk.co.electronstudio.sdl2gdx.SDL2Controller;
 import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
@@ -38,6 +40,7 @@ public class Controllable extends ControllerAdapter
     public Controllable()
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.clientSpec);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
@@ -87,6 +90,8 @@ public class Controllable extends ControllerAdapter
         MinecraftForge.EVENT_BUS.register(new RenderEvents());
         MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
         MinecraftForge.EVENT_BUS.register(new ControllerEvents());
+
+        this.startControllerThread();
     }
 
     @Override
@@ -155,48 +160,77 @@ public class Controllable extends ControllerAdapter
         }
     }
 
-    @SubscribeEvent
-    public void handleButtonInput(TickEvent.RenderTickEvent event)
+    private void startControllerThread()
     {
-        if(event.phase != TickEvent.Phase.START)
-            return;
-
-        try
+        Runnable r = () ->
         {
-            manager.pollState();
-        }
-        catch(SDL_Error e)
-        {
-            e.printStackTrace();
-        }
-
-        if(controller == null)
-            return;
-
-        ButtonBinding.tick();
-
+            final long pollInterval = Config.CLIENT.controllerPollInterval.get();
+            while(Minecraft.getInstance().isRunning())
+            {
+                try
+                {
+                    manager.pollState();
+                    this.gatherAndQueueControllerInput();
+                    try
+                    {
+                        Thread.sleep(pollInterval);
+                    }
+                    catch(InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                catch(SDL_Error e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            manager.close();
+        };
+        Thread controllerPollThread = new Thread(r, "Controller Input");
+        controllerPollThread.setDaemon(true);
+        controllerPollThread.start();
+    }
+    
+    private void gatherAndQueueControllerInput()
+    {
         Controller currentController = controller;
-        this.processButton(Buttons.A, this.getButtonState(SDL_CONTROLLER_BUTTON_A));
-        this.processButton(Buttons.B, this.getButtonState(SDL_CONTROLLER_BUTTON_B));
-        this.processButton(Buttons.X, this.getButtonState(SDL_CONTROLLER_BUTTON_X));
-        this.processButton(Buttons.Y, this.getButtonState(SDL_CONTROLLER_BUTTON_Y));
-        this.processButton(Buttons.SELECT, this.getButtonState(SDL_CONTROLLER_BUTTON_BACK));
-        this.processButton(Buttons.HOME, this.getButtonState(SDL_CONTROLLER_BUTTON_GUIDE));
-        this.processButton(Buttons.START, this.getButtonState(SDL_CONTROLLER_BUTTON_START));
-        this.processButton(Buttons.LEFT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSTICK));
-        this.processButton(Buttons.RIGHT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
-        this.processButton(Buttons.LEFT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
-        this.processButton(Buttons.RIGHT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
-        this.processButton(Buttons.LEFT_TRIGGER, Math.abs(currentController.getLTriggerValue()) >= 0.1F);
-        this.processButton(Buttons.RIGHT_TRIGGER, Math.abs(currentController.getRTriggerValue()) >= 0.1F);
-        this.processButton(Buttons.DPAD_UP, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
-        this.processButton(Buttons.DPAD_DOWN, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
-        this.processButton(Buttons.DPAD_LEFT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
-        this.processButton(Buttons.DPAD_RIGHT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+        if(currentController == null)
+            return;
+        ButtonStates states = new ButtonStates();
+        states.setState(Buttons.A, this.getButtonState(SDL_CONTROLLER_BUTTON_A));
+        states.setState(Buttons.B, this.getButtonState(SDL_CONTROLLER_BUTTON_B));
+        states.setState(Buttons.X, this.getButtonState(SDL_CONTROLLER_BUTTON_X));
+        states.setState(Buttons.Y, this.getButtonState(SDL_CONTROLLER_BUTTON_Y));
+        states.setState(Buttons.SELECT, this.getButtonState(SDL_CONTROLLER_BUTTON_BACK));
+        states.setState(Buttons.HOME, this.getButtonState(SDL_CONTROLLER_BUTTON_GUIDE));
+        states.setState(Buttons.START, this.getButtonState(SDL_CONTROLLER_BUTTON_START));
+        states.setState(Buttons.LEFT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSTICK));
+        states.setState(Buttons.RIGHT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
+        states.setState(Buttons.LEFT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+        states.setState(Buttons.RIGHT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
+        states.setState(Buttons.LEFT_TRIGGER, Math.abs(currentController.getLTriggerValue()) >= 0.1F);
+        states.setState(Buttons.RIGHT_TRIGGER, Math.abs(currentController.getRTriggerValue()) >= 0.1F);
+        states.setState(Buttons.DPAD_UP, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
+        states.setState(Buttons.DPAD_DOWN, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
+        states.setState(Buttons.DPAD_LEFT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
+        states.setState(Buttons.DPAD_RIGHT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+        Minecraft.getInstance().enqueue(() -> this.processButtons(states));
     }
 
-    private void processButton(int index, boolean state)
+    private void processButtons(ButtonStates states)
     {
+        ButtonBinding.tick();
+        for(int i = 0; i < Buttons.BUTTONS.length; i++)
+        {
+            this.processButton(Buttons.BUTTONS[i], states);
+        }
+    }
+
+    private void processButton(int index, ButtonStates newStates)
+    {
+        boolean state = newStates.getState(index);
+
         if(Minecraft.getInstance().currentScreen instanceof ControllerLayoutScreen && state)
         {
             if(((ControllerLayoutScreen) Minecraft.getInstance().currentScreen).onButtonInput(index))
