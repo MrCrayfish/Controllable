@@ -339,7 +339,6 @@ public class ControllerInput
                 {
                     float deadZoneTrimX = (controller.getRThumbStickXValue() > 0 ? 1 : -1) * deadZone;
                     this.targetYaw = (turnEvent.getYawSpeed() * (controller.getRThumbStickXValue() - deadZoneTrimX) / (1.0F - deadZone)) * 0.33F;
-                    this.targetPitch = (turnEvent.getPitchSpeed() * controller.getRThumbStickYValue() / (1.0F - deadZone)) * 0.33F;
                 }
             }
 
@@ -351,7 +350,6 @@ public class ControllerInput
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
                     float deadZoneTrimY = (controller.getRThumbStickYValue() > 0 ? 1 : -1) * deadZone;
-                    this.targetYaw = (turnEvent.getYawSpeed() * controller.getRThumbStickXValue() / (1.0F - deadZone)) * 0.33F;
                     this.targetPitch = (turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() - deadZoneTrimY) / (1.0F - deadZone)) * 0.33F;
                 }
             }
