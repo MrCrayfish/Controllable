@@ -37,7 +37,7 @@ public class Config
             public final ForgeConfigSpec.BooleanValue virtualMouse;
             public final ForgeConfigSpec.BooleanValue consoleHotbar;
             public final ForgeConfigSpec.EnumValue<CursorType> cursorType;
-            public final ForgeConfigSpec.ConfigValue<ControllerIcons> controllerIcons;
+            public final ForgeConfigSpec.EnumValue<ControllerIcons> controllerIcons;
             public final ForgeConfigSpec.BooleanValue invertLook;
             public final ForgeConfigSpec.DoubleValue deadZone;
             public final ForgeConfigSpec.DoubleValue rotationSpeed;
