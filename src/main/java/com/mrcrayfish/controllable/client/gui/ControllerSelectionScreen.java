@@ -55,7 +55,7 @@ public class ControllerSelectionScreen extends Screen
     {
         this.renderBackground(matrixStack);
         this.listControllers.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.drawString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
