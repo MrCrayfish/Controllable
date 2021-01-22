@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
@@ -115,7 +116,7 @@ public class ControllerInput
             if(mc.currentScreen == null || mc.currentScreen instanceof ControllerLayoutScreen)
                 return;
 
-            float deadZone = (float) Math.min(1.0F, Controllable.getOptions().getDeadZone() + 0.25F);
+            float deadZone = (float) Math.min(1.0F, Config.CLIENT.options.deadZone.get() + 0.25F);
 
             /* Only need to run code if left thumb stick has input */
             boolean moving = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
@@ -128,7 +129,7 @@ public class ControllerInput
                 {
                     double mouseX = mc.mouseHelper.getMouseX();
                     double mouseY = mc.mouseHelper.getMouseY();
-                    if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse())
+                    if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get())
                     {
                         mouseX = this.virtualMouseX;
                         mouseY = this.virtualMouseY;
@@ -160,7 +161,7 @@ public class ControllerInput
 
             if(Math.abs(this.mouseSpeedX) > 0F || Math.abs(this.mouseSpeedY) > 0F)
             {
-                double mouseSpeed = Controllable.getOptions().getMouseSpeed() * mc.getMainWindow().getGuiScaleFactor();
+                double mouseSpeed = Config.CLIENT.options.mouseSpeed.get() * mc.getMainWindow().getGuiScaleFactor();
 
                 // When hovering over slots, slows down the mouse speed to make it easier
                 if(mc.currentScreen instanceof ContainerScreen)
@@ -198,7 +199,7 @@ public class ControllerInput
                 this.handleCreativeScrolling((CreativeScreen) mc.currentScreen, controller);
             }
 
-            if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse())
+            if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get())
             {
                 Screen screen = mc.currentScreen;
                 if(screen != null && (this.targetMouseX != this.prevTargetMouseX || this.targetMouseY != this.prevTargetMouseY))
@@ -260,7 +261,7 @@ public class ControllerInput
                 float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
                 double mouseX = (this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * partialTicks + 0.5);
                 double mouseY = (this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * partialTicks + 0.5);
-                if(Controllable.getOptions().isVirtualMouse())
+                if(Config.CLIENT.options.virtualMouse.get())
                 {
                     this.virtualMouseX = mouseX;
                     this.virtualMouseY = mouseY;
@@ -276,11 +277,11 @@ public class ControllerInput
     @SubscribeEvent(receiveCanceled = true)
     public void onRenderScreen(GuiScreenEvent.DrawScreenEvent.Post event)
     {
-        if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && lastUse > 0)
+        if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && lastUse > 0)
         {
             RenderSystem.pushMatrix();
             {
-                CursorType type = Controllable.getOptions().getCursorType();
+                CursorType type = Config.CLIENT.options.cursorType.get();
                 Minecraft minecraft = event.getGui().getMinecraft();
                 if(minecraft.player == null || (minecraft.player.inventory.getItemStack().isEmpty() || type == CursorType.CONSOLE))
                 {
@@ -330,7 +331,7 @@ public class ControllerInput
         if(mc.currentScreen == null && (this.targetYaw != 0F || this.targetPitch != 0F))
         {
             float elapsedTicks = Minecraft.getInstance().getTickLength();
-            player.rotateTowards((this.targetYaw / 0.15) * elapsedTicks, (this.targetPitch / 0.15) * (Controllable.getOptions().isInvertLook() ? -1 : 1) * elapsedTicks);
+            player.rotateTowards((this.targetYaw / 0.15) * elapsedTicks, (this.targetPitch / 0.15) * (Config.CLIENT.options.invertLook.get() ? -1 : 1) * elapsedTicks);
             if(player.getRidingEntity() != null)
             {
                 player.getRidingEntity().applyOrientationToEntity(player);
@@ -358,13 +359,13 @@ public class ControllerInput
 
         if(mc.currentScreen == null)
         {
-            float deadZone = (float) Controllable.getOptions().getDeadZone();
+            float deadZone = Config.CLIENT.options.deadZone.get().floatValue();
 
             /* Handles rotating the yaw of player */
             if(Math.abs(controller.getRThumbStickXValue()) >= deadZone)
             {
                 this.lastUse = 100;
-                double rotationSpeed = Controllable.getOptions().getRotationSpeed();
+                double rotationSpeed = Config.CLIENT.options.rotationSpeed.get();
                 ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
@@ -376,7 +377,7 @@ public class ControllerInput
             if(Math.abs(controller.getRThumbStickYValue()) >= deadZone)
             {
                 this.lastUse = 100;
-                double rotationSpeed = Controllable.getOptions().getRotationSpeed();
+                double rotationSpeed = Config.CLIENT.options.rotationSpeed.get();
                 ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
@@ -457,7 +458,7 @@ public class ControllerInput
         {
             if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.Move(controller)))
             {
-                float deadZone = (float) Controllable.getOptions().getDeadZone();
+                float deadZone = Config.CLIENT.options.deadZone.get().floatValue();
 
                 if(Math.abs(controller.getLThumbStickYValue()) >= deadZone)
                 {
@@ -850,10 +851,10 @@ public class ControllerInput
         {
             double mouseX = mc.mouseHelper.getMouseX();
             double mouseY = mc.mouseHelper.getMouseY();
-            if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && lastUse > 0)
+            if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && this.lastUse > 0)
             {
-                mouseX = virtualMouseX;
-                mouseY = virtualMouseY;
+                mouseX = this.virtualMouseX;
+                mouseY = this.virtualMouseY;
             }
             mouseX = mouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
             mouseY = mouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
@@ -892,7 +893,7 @@ public class ControllerInput
         {
             double mouseX = mc.mouseHelper.getMouseX();
             double mouseY = mc.mouseHelper.getMouseY();
-            if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && lastUse > 0)
+            if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && lastUse > 0)
             {
                 mouseX = this.virtualMouseX;
                 mouseY = this.virtualMouseY;

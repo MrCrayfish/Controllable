@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.mixin.client.jei;
 
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerInput;
 import mezz.jei.input.MouseUtil;
@@ -47,6 +48,6 @@ public class MouseUtilMixin
 
     private static boolean isVirtualMouseActive(ControllerInput input)
     {
-        return Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && input.getLastUse() > 0;
+        return Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && input.getLastUse() > 0;
     }
 }

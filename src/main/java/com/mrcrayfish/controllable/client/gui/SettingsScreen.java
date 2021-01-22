@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.AbstractOption;
@@ -42,14 +43,14 @@ public class SettingsScreen extends Screen
     @Override
     public void removed()
     {
-        Controllable.getOptions().saveOptions();
+        Config.save();
     }
 
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);
-        this.drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 }

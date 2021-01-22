@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.mixin.client;
 
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
@@ -52,7 +53,7 @@ public class MinecraftMixin
         Controller controller = Controllable.getController();
         if(controller != null && ButtonBindings.ATTACK.isButtonDown())
         {
-            boolean usingVirtualMouse = (Controllable.getOptions().isVirtualMouse() && Controllable.getInput().getLastUse() > 0);
+            boolean usingVirtualMouse = (Config.CLIENT.options.virtualMouse.get() && Controllable.getInput().getLastUse() > 0);
             return mc.currentScreen == null && (mc.mouseHelper.isMouseGrabbed() || usingVirtualMouse);
         }
         return false;

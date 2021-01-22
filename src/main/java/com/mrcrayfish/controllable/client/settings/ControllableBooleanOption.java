@@ -21,6 +21,5 @@ public class ControllableBooleanOption extends BooleanOption
     public void nextValue(GameSettings settings)
     {
         this.set(settings, String.valueOf(!this.get(settings)));
-        Controllable.getOptions().saveOptions();
     }
 }

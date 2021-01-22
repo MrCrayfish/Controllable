@@ -35,7 +35,6 @@ public class ControllableEnumOption<T extends Enum<T> & IStringSerializable> ext
     private void nextEnum(GameSettings options)
     {
         this.set(options, this.getEnum(++ordinal));
-        Controllable.getOptions().saveOptions();
     }
 
     public void set(GameSettings options, T t)

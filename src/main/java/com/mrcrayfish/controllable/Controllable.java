@@ -64,14 +64,13 @@ public class Controllable extends ControllerAdapter
         File configFolder = new File(mc.gameDir, "config");
 
         ControllerProperties.load(configFolder);
-        Controllable.options = new ControllerOptions(mc.gameDir);
 
         /* Loads up the controller manager and setup shutdown cleanup */
         Controllable.manager = new SDL2ControllerManager();
         Controllable.manager.addListenerAndRunForConnectedControllers(this);
 
         /* Attempts to load the first controller connected if auto select is enabled */
-        if(options.isAutoSelect() && manager.getControllers().size > 0)
+        if(Config.CLIENT.options.autoSelect.get() && manager.getControllers().size > 0)
         {
             com.badlogic.gdx.controllers.Controller controller = manager.getControllers().get(0);
             if(controller instanceof SDL2Controller)
@@ -101,7 +100,7 @@ public class Controllable extends ControllerAdapter
             {
                 if(Controllable.controller == null)
                 {
-                    if(options.isAutoSelect())
+                    if(Config.CLIENT.options.autoSelect.get())
                     {
                         setController((SDL2Controller) sdlController);
                     }
@@ -129,7 +128,7 @@ public class Controllable extends ControllerAdapter
 
                     setController(null);
 
-                    if(options.isAutoSelect() && manager.getControllers().size > 0)
+                    if(Config.CLIENT.options.autoSelect.get() && manager.getControllers().size > 0)
                     {
                         setController((SDL2Controller) manager.getControllers().get(0));
                     }

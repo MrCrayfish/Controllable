@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.mixin.client;
 
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerInput;
 import net.minecraft.client.Minecraft;
@@ -22,7 +23,7 @@ public class GameRendererMixin
     private void drawScreen(Args args)
     {
         ControllerInput input = Controllable.getInput();
-        if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && input.getLastUse() > 0)
+        if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && input.getLastUse() > 0)
         {
             Minecraft minecraft = Minecraft.getInstance();
             int mouseX = (int) (input.getVirtualMouseX() * (double) minecraft.getMainWindow().getScaledWidth() / (double) minecraft.getMainWindow().getWidth());

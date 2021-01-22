@@ -5,7 +5,7 @@ import net.minecraft.util.IStringSerializable;
 /**
  * Author: MrCrayfish
  */
-public enum ControllerType implements IStringSerializable
+public enum ControllerIcons implements IStringSerializable
 {
     DEFAULT("default"),
     PLAYSTATION("playstation"),
@@ -13,7 +13,7 @@ public enum ControllerType implements IStringSerializable
 
     String name;
 
-    ControllerType(String name)
+    ControllerIcons(String name)
     {
         this.name = name;
     }
@@ -24,13 +24,13 @@ public enum ControllerType implements IStringSerializable
         return this.name;
     }
 
-    public static ControllerType byName(String name)
+    public static ControllerIcons byName(String name)
     {
-        for(ControllerType controllerType : values())
+        for(ControllerIcons controllerIcons : values())
         {
-            if(controllerType.name.equals(name))
+            if(controllerIcons.name.equals(name))
             {
-                return controllerType;
+                return controllerIcons;
             }
         }
         return DEFAULT;

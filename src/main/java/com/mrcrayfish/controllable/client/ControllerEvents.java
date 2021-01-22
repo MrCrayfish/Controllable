@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.UseAction;
@@ -23,7 +24,7 @@ public class ControllerEvents
             return;
         }
 
-        if(!Controllable.getOptions().useForceFeedback())
+        if(!Config.CLIENT.options.forceFeedback.get())
         {
             return;
         }
@@ -73,7 +74,7 @@ public class ControllerEvents
         }
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.world != null && Controllable.getOptions().useForceFeedback())
+        if(mc.world != null && Config.CLIENT.options.forceFeedback.get())
         {
             if(this.prevHealth == -1)
             {

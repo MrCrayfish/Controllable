@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.event.AvailableActionsEvent;
@@ -235,7 +236,7 @@ public class RenderEvents
                     }
 
                     int texU = remappedButton * 13;
-                    int texV = Controllable.getOptions().getControllerType().ordinal() * 13;
+                    int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
                     int size = 13;
 
                     int x = side == Action.Side.LEFT ? 5 : mc.getMainWindow().getScaledWidth() - 5 - size;
@@ -267,7 +268,7 @@ public class RenderEvents
                 }
             }
 
-            if(mc.player != null && mc.currentScreen == null && Controllable.getOptions().isRenderMiniPlayer())
+            if(mc.player != null && mc.currentScreen == null && Config.CLIENT.options.renderMiniPlayer.get())
             {
                 if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
                 {

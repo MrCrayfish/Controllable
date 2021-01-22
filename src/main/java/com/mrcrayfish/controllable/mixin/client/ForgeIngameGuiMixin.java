@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.mixin.client;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
@@ -25,7 +26,7 @@ public class ForgeIngameGuiMixin
     @Inject(method = "renderRecordOverlay", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;pushMatrix()V", shift = At.Shift.AFTER))
     private void renderRecordOverlay(int width, int height, float partialTicks, MatrixStack matrixStack, CallbackInfo ci)
     {
-        if(Controllable.getOptions().useConsoleHotbar())
+        if(Config.CLIENT.options.consoleHotbar.get())
         {
             RenderSystem.translated(0, -20, 0);
         }
