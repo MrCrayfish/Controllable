@@ -312,6 +312,17 @@ public class ControllerInput
             return;
 
         Minecraft mc = Minecraft.getInstance();
+        double mouseX = this.virtualMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+        double mouseY = this.virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
+        if(mc.currentScreen != null)
+        {
+            IGuiEventListener hoveredListener = mc.currentScreen.children().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+            if(hoveredListener instanceof AbstractList)
+            {
+                this.handleListScrolling((AbstractList) hoveredListener, controller);
+            }
+        }
+
         PlayerEntity player = mc.player;
         if(player == null)
             return;
@@ -801,6 +812,28 @@ public class ControllerInput
         {
             e.printStackTrace();
         }
+    }
+
+    private void handleListScrolling(AbstractList list, Controller controller)
+    {
+        double dir = 0;
+        if(Math.abs(controller.getRThumbStickYValue()) >= 0.2F)
+        {
+            this.lastUse = 100;
+            dir = controller.getRThumbStickYValue();
+        }
+        if(controller.getSDL2Controller().getButton(SDL_CONTROLLER_BUTTON_DPAD_UP))
+        {
+            this.lastUse = 100;
+            dir = -1.0;
+        }
+        else if(controller.getSDL2Controller().getButton(SDL_CONTROLLER_BUTTON_DPAD_DOWN))
+        {
+            this.lastUse = 100;
+            dir = 1.0;
+        }
+        dir *= Minecraft.getInstance().getTickLength();
+        list.setScrollAmount(list.getScrollAmount() + dir * 10);
     }
 
     /**
