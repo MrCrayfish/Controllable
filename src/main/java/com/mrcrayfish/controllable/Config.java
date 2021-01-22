@@ -24,7 +24,7 @@ public class Config
             this.controllerPollInterval = builder
                     .comment("The time in milliseconds to wait before polling the controller. The lower the value the better the input latency but drains the controller battery faster.")
                     .translation("controllable.configgui.controllerPollInterval")
-                    .defineInRange("renderOllieStrengthBar", 8L, 1L, 128L);
+                    .defineInRange("controllerPollInterval", 8L, 1L, 128L);
             this.options = new Options(builder);
             builder.pop();
         }
