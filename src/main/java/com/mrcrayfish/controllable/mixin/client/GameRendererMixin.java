@@ -18,7 +18,7 @@ public class GameRendererMixin
     /**
      * Fixes the mouse position when virtual mouse is turned on for controllers.
      */
-    @ModifyArgs(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;drawScreen(Lnet/minecraft/client/gui/screen/Screen;Lcom/mojang/blaze3d/matrix/MatrixStack;IIF)V"))
+    @ModifyArgs(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;drawScreen(Lnet/minecraft/client/gui/screen/Screen;Lcom/mojang/blaze3d/matrix/MatrixStack;IIF)V", remap = false))
     private void drawScreen(Args args)
     {
         ControllerInput input = Controllable.getInput();
