@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.client.settings.PointOfView;
 import net.minecraft.client.util.NativeUtil;
 import net.minecraft.entity.player.PlayerEntity;
@@ -114,7 +115,7 @@ public class ControllerInput
             if(mc.currentScreen == null || mc.currentScreen instanceof ControllerLayoutScreen)
                 return;
 
-            float deadZone = (float) Controllable.getOptions().getDeadZone();
+            float deadZone = (float) Math.min(1.0F, Controllable.getOptions().getDeadZone() + 0.25F);
 
             /* Only need to run code if left thumb stick has input */
             boolean moving = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
@@ -157,9 +158,28 @@ public class ControllerInput
                 }
             }
 
-            if(Math.abs(this.mouseSpeedX) > 0.05F || Math.abs(this.mouseSpeedY) > 0.05F)
+            if(Math.abs(this.mouseSpeedX) > 0F || Math.abs(this.mouseSpeedY) > 0F)
             {
                 double mouseSpeed = Controllable.getOptions().getMouseSpeed() * mc.getMainWindow().getGuiScaleFactor();
+
+                // When hovering over slots, slows down the mouse speed to make it easier
+                if(mc.currentScreen instanceof ContainerScreen)
+                {
+                    ContainerScreen screen = (ContainerScreen) mc.currentScreen;
+                    if(screen.getSlotUnderMouse() != null)
+                    {
+                        mouseSpeed *= 0.5;
+                    }
+                }
+
+                double mouseX = this.virtualMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+                double mouseY = this.virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
+                IGuiEventListener hoveredListener = mc.currentScreen.children().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+                if(hoveredListener != null && !(hoveredListener instanceof AbstractList))
+                {
+                    mouseSpeed *= 0.4;
+                }
+
                 this.targetMouseX += mouseSpeed * this.mouseSpeedX;
                 this.targetMouseX = MathHelper.clamp(this.targetMouseX, 0, mc.getMainWindow().getWidth());
                 this.targetMouseY += mouseSpeed * this.mouseSpeedY;
