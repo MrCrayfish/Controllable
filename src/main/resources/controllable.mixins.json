@@ -1,0 +1,18 @@
+{
+    "required": true,
+    "package": "com.mrcrayfish.controllable.mixin",
+    "compatibilityLevel": "JAVA_8",
+    "minVersion": "0.8",
+    "refmap": "controllable.refmap.json",
+    "client": [
+        "client.ContainerScreenMixin",
+        "client.ForgeIngameGuiMixin",
+        "client.GameRendererMixin",
+        "client.IngameGuiMixin",
+        "client.MinecraftMixin",
+        "client.jei.MouseUtilMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

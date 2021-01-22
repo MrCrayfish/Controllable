@@ -600,9 +600,16 @@ public class ControllerInput
                 {
                     invokeMouseClick(mc.currentScreen, 1);
                 }
-                else if(button == Buttons.B && mc.player != null && mc.player.inventory.getItemStack().isEmpty())
+                else if(button == Buttons.B && mc.player != null)
                 {
-                    invokeMouseClick(mc.currentScreen, 0);
+                    if(mc.player.inventory.getItemStack().isEmpty())
+                    {
+                        invokeMouseClick(mc.currentScreen, 0);
+                    }
+                    else
+                    {
+                        invokeMouseReleased(mc.currentScreen, 1);
+                    }
                 }
             }
         }
