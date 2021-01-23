@@ -9,9 +9,12 @@ import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
 
@@ -233,11 +236,13 @@ public class ControllerLayoutScreen extends Screen
             if(!this.states.getState(index))
             {
                 this.states.setState(index, true);
+                Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON, 1.0F));
             }
         }
         else if(this.states.getState(index))
         {
             this.states.setState(index, false);
+            Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON, 0.9F));
         }
     }
 
