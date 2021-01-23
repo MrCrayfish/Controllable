@@ -40,7 +40,7 @@ public class ControllerLayoutScreen extends Screen
 
     protected ControllerLayoutScreen(Screen parentScreen)
     {
-        super(new TranslationTextComponent("controllable.gui.title.binding"));
+        super(new TranslationTextComponent("controllable.gui.title.layout"));
         this.parentScreen = parentScreen;
     }
 
