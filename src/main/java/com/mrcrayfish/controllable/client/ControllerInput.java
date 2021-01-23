@@ -87,6 +87,11 @@ public class ControllerInput
         return this.lastUse;
     }
 
+    public void resetLastUse()
+    {
+        this.lastUse = 0;
+    }
+
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event)
     {

@@ -10,6 +10,7 @@
         "client.GameRendererMixin",
         "client.IngameGuiMixin",
         "client.MinecraftMixin",
+        "client.MouseHelperMixin",
         "client.jei.MouseUtilMixin"
     ],
     "injectors": {
