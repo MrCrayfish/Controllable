@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mrcrayfish.controllable.ButtonStates;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.Buttons;
@@ -30,6 +31,7 @@ public class ControllerLayoutScreen extends Screen
 
     private int configureButton = -1;
     private Screen parentScreen;
+    private LayoutButtonStates states = new LayoutButtonStates();
     private Map<Integer, Integer> reassignments;
     private Button resetButton;
 
@@ -147,7 +149,6 @@ public class ControllerLayoutScreen extends Screen
     {
         if(this.configureButton != -1)
         {
-            //TODO make it so assignments are not applied immediately until applied until "Done" is pressed
             if(button != this.configureButton)
             {
                 this.reassignments.putIfAbsent(this.configureButton, -1);
@@ -186,9 +187,40 @@ public class ControllerLayoutScreen extends Screen
         }
     }
 
-    public Map<Integer, Integer> getReassignments()
+    public void processButton(int index, ButtonStates newStates)
     {
-        return this.reassignments;
+        boolean state = newStates.getState(index);
+
+        if(state && this.onButtonInput(index))
+        {
+            return;
+        }
+
+        Controller controller = Controllable.getController();
+        if(controller == null)
+        {
+            return;
+        }
+
+        index = this.remap(index);
+
+        //No binding so don't perform any action
+        if(index == -1)
+        {
+            return;
+        }
+
+        if(state)
+        {
+            if(!this.states.getState(index))
+            {
+                this.states.setState(index, true);
+            }
+        }
+        else if(this.states.getState(index))
+        {
+            this.states.setState(index, false);
+        }
     }
 
     public int remap(int button)
@@ -199,5 +231,24 @@ public class ControllerLayoutScreen extends Screen
             return value;
         }
         return button;
+    }
+
+    public boolean isButtonPressed(int button)
+    {
+        return this.states.getState(button);
+    }
+
+    public Map<Integer, Integer> getReassignments()
+    {
+        return this.reassignments;
+    }
+
+    public static class LayoutButtonStates extends ButtonStates
+    {
+        @Override
+        public void setState(int index, boolean state)
+        {
+            super.setState(index, state);
+        }
     }
 }

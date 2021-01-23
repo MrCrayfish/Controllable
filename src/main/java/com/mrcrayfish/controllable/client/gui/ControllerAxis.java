@@ -33,7 +33,7 @@ public class ControllerAxis extends ControllerButton
                     break;
             }
 
-            if(!Controllable.isButtonPressed(this.button))
+            if(!this.screen.isButtonPressed(this.button))
             {
                 RenderSystem.translated(0, -5, 0);
             }

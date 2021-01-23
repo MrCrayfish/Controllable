@@ -509,11 +509,6 @@ public class ControllerInput
 
     public void handleButtonInput(Controller controller, int button, boolean state)
     {
-        if(Minecraft.getInstance().currentScreen instanceof ControllerLayoutScreen)
-        {
-            return;
-        }
-
         this.lastUse = 100;
 
         ControllerEvent.ButtonInput eventInput = new ControllerEvent.ButtonInput(controller, button, state);

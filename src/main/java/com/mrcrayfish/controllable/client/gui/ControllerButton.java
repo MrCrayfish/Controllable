@@ -6,7 +6,6 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Controller;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.loading.FMLLoader;
 
 import java.util.Map;
@@ -53,7 +52,7 @@ public class ControllerButton extends AbstractGui
         {
             buttonV += this.height * 2;
         }
-        else if(controller != null && Controllable.isButtonPressed(this.button) || selected)
+        else if(controller != null && this.screen.isButtonPressed(this.button) || selected)
         {
             buttonV += this.height;
         }

@@ -224,12 +224,10 @@ public class Controllable extends ControllerAdapter
         boolean state = newStates.getState(index);
 
         Screen screen = Minecraft.getInstance().currentScreen;
-        if(screen instanceof ControllerLayoutScreen && state)
+        if(screen instanceof ControllerLayoutScreen)
         {
-            if(((ControllerLayoutScreen) Minecraft.getInstance().currentScreen).onButtonInput(index))
-            {
-                return;
-            }
+            ((ControllerLayoutScreen) screen).processButton(index, newStates);
+            return;
         }
 
         if (controller == null)
@@ -237,12 +235,7 @@ public class Controllable extends ControllerAdapter
             return;
         }
 
-        if(screen instanceof ControllerLayoutScreen)
-        {
-            ControllerLayoutScreen layout = (ControllerLayoutScreen) screen;
-            index = layout.remap(index);
-        }
-        else if(controller.getMapping() != null)
+        if(controller.getMapping() != null)
         {
             index = controller.getMapping().remap(index);
         }
