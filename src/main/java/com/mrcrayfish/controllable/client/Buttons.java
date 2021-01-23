@@ -25,4 +25,23 @@ public class Buttons
 
     public static final int LENGTH = 17;
     public static final int[] BUTTONS = {A, B, X, Y, SELECT, HOME, START, LEFT_THUMB_STICK, RIGHT_THUMB_STICK, LEFT_BUMPER, RIGHT_BUMPER, LEFT_TRIGGER, RIGHT_TRIGGER, DPAD_UP, DPAD_DOWN, DPAD_LEFT, DPAD_RIGHT};
+    public static final String[] NAMES = {
+        "controllable.button.a",
+        "controllable.button.b",
+        "controllable.button.x",
+        "controllable.button.y",
+        "controllable.button.select",
+        "controllable.button.home",
+        "controllable.button.start",
+        "controllable.button.left_thumb_stick",
+        "controllable.button.right_thumb_stick",
+        "controllable.button.left_bumper",
+        "controllable.button.right_bumper",
+        "controllable.button.left_trigger",
+        "controllable.button.right_trigger",
+        "controllable.button.dpad_up",
+        "controllable.button.dpad_down",
+        "controllable.button.dpad_left",
+        "controllable.button.dpad_right"
+    };
 }

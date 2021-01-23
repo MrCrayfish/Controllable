@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client.gui;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.ButtonStates;
@@ -15,13 +16,11 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Author: MrCrayfish
@@ -120,6 +119,12 @@ public class ControllerLayoutScreen extends Screen
         {
             this.fillGradient(matrixStack, 0, 0, this.width, this.height, -1072689136, -804253680);
             drawCenteredString(matrixStack, this.font, new TranslationTextComponent("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
+        }
+
+        ControllerButton button = this.controllerButtons.stream().filter(ControllerButton::isHovered).findFirst().orElse(null);
+        if(button != null)
+        {
+            this.func_243308_b(matrixStack, Lists.newArrayList(new TranslationTextComponent("controllable.gui.layout.button", new TranslationTextComponent(Buttons.NAMES[button.getButton()]).func_240699_a_(TextFormatting.BLUE)), new TranslationTextComponent("controllable.gui.layout.remap").func_240699_a_(TextFormatting.GOLD)), mouseX, mouseY);
         }
     }
 
