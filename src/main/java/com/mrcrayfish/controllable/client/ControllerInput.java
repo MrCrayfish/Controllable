@@ -543,6 +543,13 @@ public class ControllerInput
                         mc.displayGuiScreen(new InventoryScreen(mc.player));
                     }
                 }
+                else if(ButtonBindings.SPRINT.isButtonPressed())
+                {
+                    if(mc.player != null)
+                    {
+                        mc.player.setSprinting(true);
+                    }
+                }
                 else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
                     if(mc.player != null && !mc.player.abilities.isFlying && !mc.player.isPassenger())
@@ -568,7 +575,6 @@ public class ControllerInput
                 {
                     if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
                     {
-
                         mc.getConnection().sendPacket(new CPlayerDiggingPacket(CPlayerDiggingPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
                     }
                 }
