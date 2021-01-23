@@ -123,6 +123,7 @@ public class ControllerLayoutScreen extends Screen
         {
             this.fillGradient(matrixStack, 0, 0, this.width, this.height, -1072689136, -804253680);
             drawCenteredString(matrixStack, this.font, new TranslationTextComponent("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
+            return;
         }
 
         ControllerButton button = this.controllerButtons.stream().filter(ControllerButton::isHovered).findFirst().orElse(null);
