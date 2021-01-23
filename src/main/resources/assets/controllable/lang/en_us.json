@@ -31,6 +31,7 @@
   "controllable.gui.layout.press_button": "Listening for button input. Press ESC to cancel",
   "controllable.gui.layout.remap": "Click to change mapping...",
   "controllable.gui.layout.button": "Button: %s",
+  "controllable.gui.layout.missing_mapping": "Missing Mapping!",
   "controllable.options.forceFeedback": "Vibration",
   "controllable.options.autoSelect": "Auto Select",
   "controllable.options.deadZone": "Dead Zone",

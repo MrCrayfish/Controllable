@@ -72,7 +72,7 @@ public class ControllerButton extends AbstractGui
         }
 
         // Draws an exclamation if the button has no button assigned to it!
-        if(!reassignments.values().contains(this.button) && this.screen.remap(this.button) != this.button)
+        if(this.isMissingMapping())
         {
             Minecraft.getInstance().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
             blit(matrixStack, buttonX + (buttonWidth - 4) / 2, buttonY + (buttonHeight - 15) / 2, 4, 15, 88, 0, 4, 15, 256, 256);
@@ -98,5 +98,10 @@ public class ControllerButton extends AbstractGui
     public boolean isHovered()
     {
         return this.hovered;
+    }
+
+    public boolean isMissingMapping()
+    {
+        return !this.screen.getReassignments().values().contains(this.button) && this.screen.remap(this.button) != this.button;
     }
 }

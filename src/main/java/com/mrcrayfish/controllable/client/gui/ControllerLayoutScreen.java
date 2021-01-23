@@ -16,6 +16,7 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
@@ -126,7 +127,14 @@ public class ControllerLayoutScreen extends Screen
         ControllerButton button = this.controllerButtons.stream().filter(ControllerButton::isHovered).findFirst().orElse(null);
         if(button != null)
         {
-            this.func_243308_b(matrixStack, Lists.newArrayList(new TranslationTextComponent("controllable.gui.layout.button", new TranslationTextComponent(Buttons.NAMES[button.getButton()]).func_240699_a_(TextFormatting.BLUE)), new TranslationTextComponent("controllable.gui.layout.remap").func_240699_a_(TextFormatting.GOLD)), mouseX, mouseY);
+            List<ITextComponent> components = new ArrayList<>();
+            components.add(new TranslationTextComponent("controllable.gui.layout.button", new TranslationTextComponent(Buttons.NAMES[button.getButton()]).func_240699_a_(TextFormatting.BLUE)));
+            if(button.isMissingMapping())
+            {
+                components.add(new TranslationTextComponent("controllable.gui.layout.missing_mapping").func_240699_a_(TextFormatting.RED));
+            }
+            components.add(new TranslationTextComponent("controllable.gui.layout.remap").func_240699_a_(TextFormatting.GOLD));
+            this.func_243308_b(matrixStack, components, mouseX, mouseY);
         }
     }
 
