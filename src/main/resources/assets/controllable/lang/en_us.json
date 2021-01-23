@@ -32,6 +32,7 @@
   "controllable.gui.layout.remap": "Click to change mapping...",
   "controllable.gui.layout.button": "Button: %s",
   "controllable.gui.layout.missing_mapping": "Missing Mapping!",
+  "controllable.gui.layout.mapped_to": "Mapped Index: %s",
   "controllable.options.forceFeedback": "Vibration",
   "controllable.options.autoSelect": "Auto Select",
   "controllable.options.deadZone": "Dead Zone",
