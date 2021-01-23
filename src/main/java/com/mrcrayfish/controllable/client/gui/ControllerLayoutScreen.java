@@ -31,6 +31,7 @@ public class ControllerLayoutScreen extends Screen
     private int configureButton = -1;
     private Screen parentScreen;
     private Map<Integer, Integer> reassignments;
+    private Button resetButton;
 
     protected ControllerLayoutScreen(Screen parentScreen)
     {
@@ -73,14 +74,24 @@ public class ControllerLayoutScreen extends Screen
         this.controllerButtons.add(new ControllerAxis(this, Buttons.LEFT_THUMB_STICK, 9, 12, 0, 0, 7, 7, 5));
         this.controllerButtons.add(new ControllerAxis(this, Buttons.RIGHT_THUMB_STICK, 22, 12, 0, 0, 7, 7, 5));
 
-        this.addButton(new Button(this.width / 2 - 154, this.height - 32, 150, 20, new TranslationTextComponent("gui.done"), (button) -> {
+        this.addButton(new Button(this.width / 2 - 154, this.height - 32, 100, 20, new TranslationTextComponent("gui.done"), (button) -> {
             this.updateControllerMapping();
             this.minecraft.displayGuiScreen(this.parentScreen);
         }));
 
-        this.addButton(new Button(this.width / 2 + 4, this.height - 32, 150, 20, new TranslationTextComponent("gui.cancel"), (button) -> {
+        this.resetButton = this.addButton(new Button(this.width / 2 - 50, this.height - 32, 100, 20, new TranslationTextComponent("controllable.gui.reset"), (button) -> {
+            this.reassignments.clear();
+        }));
+
+        this.addButton(new Button(this.width / 2 + 54, this.height - 32, 100, 20, new TranslationTextComponent("gui.cancel"), (button) -> {
             this.minecraft.displayGuiScreen(this.parentScreen);
         }));
+    }
+
+    @Override
+    public void tick()
+    {
+        this.resetButton.active = !this.reassignments.isEmpty();
     }
 
     @Override

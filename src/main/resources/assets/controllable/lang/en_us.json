@@ -26,6 +26,7 @@
   "controllable.gui.settings": "Settings",
   "controllable.gui.binding": "Bindings",
   "controllable.gui.back": "Back",
+  "controllable.gui.reset": "Reset",
   "controllable.options.forceFeedback": "Vibration",
   "controllable.options.autoSelect": "Auto Select",
   "controllable.options.deadZone": "Dead Zone",
