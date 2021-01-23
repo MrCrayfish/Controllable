@@ -59,17 +59,17 @@ public class ControllerOptions
         Config.save();
     }, (gameSettings, controllableEnumOption) -> {
         CursorType cursorType = controllableEnumOption.get(gameSettings);
-        return new TranslationTextComponent("controllable.cursor." + cursorType.getString());
+        return new TranslationTextComponent("controllable.options.cursorType.format", new TranslationTextComponent("controllable.cursor." + cursorType.getString()));
     });
 
-    public static final ControllableEnumOption<ControllerIcons> CONTROLLER_TYPE = new ControllableEnumOption<>("controllable.options.controllerIcons", ControllerIcons.class, gameSettings -> {
+    public static final ControllableEnumOption<ControllerIcons> CONTROLLER_ICONS = new ControllableEnumOption<>("controllable.options.controllerIcons", ControllerIcons.class, gameSettings -> {
         return Config.CLIENT.options.controllerIcons.get();
     }, (gameSettings, controllerIcons) -> {
         Config.CLIENT.options.controllerIcons.set(controllerIcons);
         Config.save();
     }, (gameSettings, controllableEnumOption) -> {
         ControllerIcons controllerIcons = controllableEnumOption.get(gameSettings);
-        return new TranslationTextComponent("controllable.controller." + controllerIcons.getString());
+        return new TranslationTextComponent("controllable.options.controllerIcons.format", new TranslationTextComponent("controllable.controller." + controllerIcons.getString()));
     });
 
     public static final BooleanOption INVERT_LOOK = new ControllableBooleanOption("controllable.options.invertLook", gameSettings -> {
