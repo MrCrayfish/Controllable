@@ -151,15 +151,33 @@ public class ControllerLayoutScreen extends Screen
         {
             if(button != this.configureButton)
             {
+                // Sets the target
                 this.reassignments.putIfAbsent(this.configureButton, -1);
+
+                // Reset any assignments that targets the configuration button and set to -1
+                for(Integer key : this.reassignments.keySet())
+                {
+                    if(this.reassignments.get(key) == this.configureButton)
+                    {
+                        this.reassignments.put(key, -1);
+                    }
+                }
+
+                // Finally set the new mapping
                 this.reassignments.put(button, this.configureButton);
             }
             else
             {
-                Integer oldButton = this.reassignments.remove(button);
-                if(oldButton != null)
+                // Remove reassignment because button is back to it's default mapping
+                this.reassignments.remove(button);
+
+                // Reset any assignments that targets the button and set to -1
+                for(Integer key : this.reassignments.keySet())
                 {
-                    this.reassignments.values().removeIf(b -> b == (int) oldButton);
+                    if(this.reassignments.get(key) == button)
+                    {
+                        this.reassignments.put(key, -1);
+                    }
                 }
             }
             this.configureButton = -1;
