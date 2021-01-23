@@ -30,7 +30,6 @@ public class Controllable extends ControllerAdapter
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
-    private static ControllerOptions options;
     private static SDL2ControllerManager manager;
     private static Controller controller;
     private static ControllerInput input;
@@ -46,11 +45,6 @@ public class Controllable extends ControllerAdapter
     public static Controller getController()
     {
         return controller;
-    }
-
-    public static ControllerOptions getOptions()
-    {
-        return options;
     }
 
     public static ControllerInput getInput()
