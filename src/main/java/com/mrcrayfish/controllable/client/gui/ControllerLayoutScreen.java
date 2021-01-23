@@ -32,7 +32,7 @@ public class ControllerLayoutScreen extends Screen
 
     protected ControllerLayoutScreen(Screen parentScreen)
     {
-        super(new TranslationTextComponent("controllable.gui.title.layout"));
+        super(new TranslationTextComponent("controllable.gui.title.binding"));
         this.parentScreen = parentScreen;
     }
 
@@ -65,7 +65,7 @@ public class ControllerLayoutScreen extends Screen
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(matrixStack);
+        this.renderDirtBackground(0);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         Minecraft.getInstance().getTextureManager().bindTexture(TEXTURE);
@@ -76,7 +76,7 @@ public class ControllerLayoutScreen extends Screen
         blit(matrixStack, x, y, width, height, 50, 0, 38, 29, 256, 256); //TODO test
         RenderSystem.disableBlend();
         this.controllerButtons.forEach(controllerButton -> controllerButton.draw(matrixStack, x, y, mouseX, mouseY, this.configureButton == controllerButton.button));
-        this.drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
