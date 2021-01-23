@@ -62,6 +62,7 @@ public class ControllerLayoutScreen extends Screen
     @Override
     protected void init()
     {
+        this.controllerButtons.clear();
         this.controllerButtons.add(new ControllerButton(this, Buttons.A, 29, 9, 7, 0, 3, 3, 5));
         this.controllerButtons.add(new ControllerButton(this, Buttons.B, 32, 6, 13, 0, 3, 3, 5));
         this.controllerButtons.add(new ControllerButton(this, Buttons.X, 26, 6, 16, 0, 3, 3, 5));
