@@ -35,6 +35,7 @@ public class ControllerLayoutScreen extends Screen
     private Screen parentScreen;
     private LayoutButtonStates states = new LayoutButtonStates();
     private Map<Integer, Integer> reassignments;
+    private Button doneButton;
     private Button resetButton;
 
     protected ControllerLayoutScreen(Screen parentScreen)
@@ -78,7 +79,7 @@ public class ControllerLayoutScreen extends Screen
         this.controllerButtons.add(new ControllerAxis(this, Buttons.LEFT_THUMB_STICK, 9, 12, 0, 0, 7, 7, 5));
         this.controllerButtons.add(new ControllerAxis(this, Buttons.RIGHT_THUMB_STICK, 22, 12, 0, 0, 7, 7, 5));
 
-        this.addButton(new Button(this.width / 2 - 154, this.height - 32, 100, 20, new TranslationTextComponent("gui.done"), (button) -> {
+        this.doneButton = this.addButton(new Button(this.width / 2 - 154, this.height - 32, 100, 20, new TranslationTextComponent("gui.done"), (button) -> {
             this.updateControllerMapping();
             this.minecraft.displayGuiScreen(this.parentScreen);
         }));
@@ -96,6 +97,7 @@ public class ControllerLayoutScreen extends Screen
     public void tick()
     {
         this.resetButton.active = !this.reassignments.isEmpty();
+        this.doneButton.active = this.reassignments.values().stream().noneMatch(b -> b == -1);
     }
 
     @Override
