@@ -42,11 +42,7 @@ public class ControllerLayoutScreen extends Screen
     {
         super(new TranslationTextComponent("controllable.gui.title.layout"));
         this.parentScreen = parentScreen;
-    }
 
-    @Override
-    protected void init()
-    {
         Controller controller = Controllable.getController();
         if(controller != null)
         {
@@ -60,7 +56,11 @@ public class ControllerLayoutScreen extends Screen
                 this.reassignments = new HashMap<>();
             }
         }
+    }
 
+    @Override
+    protected void init()
+    {
         this.controllerButtons.add(new ControllerButton(this, Buttons.A, 29, 9, 7, 0, 3, 3, 5));
         this.controllerButtons.add(new ControllerButton(this, Buttons.B, 32, 6, 13, 0, 3, 3, 5));
         this.controllerButtons.add(new ControllerButton(this, Buttons.X, 26, 6, 16, 0, 3, 3, 5));
