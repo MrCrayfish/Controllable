@@ -22,6 +22,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.network.play.client.CPlayerDiggingPacket;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ScreenShotHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
@@ -587,6 +588,15 @@ public class ControllerInput
                     if(mc.player != null)
                     {
                         mc.displayInGameMenu(false);
+                    }
+                }
+                else if(ButtonBindings.SCREENSHOT.isButtonPressed())
+                {
+                    if(mc.world != null)
+                    {
+                        ScreenShotHelper.saveScreenshot(mc.gameDir, mc.getMainWindow().getFramebufferWidth(), mc.getMainWindow().getFramebufferHeight(), mc.getFramebuffer(), (textComponent) -> {
+                            mc.execute(() -> mc.ingameGUI.getChatGUI().printChatMessage(textComponent));
+                        });
                     }
                 }
                 else if(mc.player != null && !mc.player.isHandActive())
