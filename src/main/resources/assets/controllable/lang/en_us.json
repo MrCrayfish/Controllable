@@ -27,6 +27,7 @@
   "controllable.gui.binding": "Bindings",
   "controllable.gui.back": "Back",
   "controllable.gui.reset": "Reset",
+  "controllable.gui.layout.press_button": "Listening for button input. Press ESC to cancel",
   "controllable.options.forceFeedback": "Vibration",
   "controllable.options.autoSelect": "Auto Select",
   "controllable.options.deadZone": "Dead Zone",
