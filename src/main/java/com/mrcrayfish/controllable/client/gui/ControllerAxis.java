@@ -35,7 +35,7 @@ public class ControllerAxis extends ControllerButton
 
             if(!Controllable.isButtonPressed(this.button))
             {
-                RenderSystem.translated(0, -2.5, 0);
+                RenderSystem.translated(0, -5, 0);
             }
         }
         super.draw(matrixStack, x, y, mouseX, mouseY, selected);
