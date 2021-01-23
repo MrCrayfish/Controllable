@@ -26,10 +26,10 @@ public class ControllerAxis extends ControllerButton
             switch(this.button)
             {
                 case Buttons.LEFT_THUMB_STICK:
-                    RenderSystem.translatef(controller.getLThumbStickXValue() * 5, -controller.getLThumbStickYValue() * 5, 0);
+                    RenderSystem.translatef(controller.getLThumbStickXValue() * 5, controller.getLThumbStickYValue() * 5, 0);
                     break;
                 case Buttons.RIGHT_THUMB_STICK:
-                    RenderSystem.translatef(controller.getRThumbStickXValue() * 5, -controller.getRThumbStickYValue() * 5, 0);
+                    RenderSystem.translatef(controller.getRThumbStickXValue() * 5, controller.getRThumbStickYValue() * 5, 0);
                     break;
             }
 
