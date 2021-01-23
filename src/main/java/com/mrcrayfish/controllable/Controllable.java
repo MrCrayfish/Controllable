@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -222,7 +223,8 @@ public class Controllable extends ControllerAdapter
     {
         boolean state = newStates.getState(index);
 
-        if(Minecraft.getInstance().currentScreen instanceof ControllerLayoutScreen && state)
+        Screen screen = Minecraft.getInstance().currentScreen;
+        if(screen instanceof ControllerLayoutScreen && state)
         {
             if(((ControllerLayoutScreen) Minecraft.getInstance().currentScreen).onButtonInput(index))
             {
@@ -235,7 +237,12 @@ public class Controllable extends ControllerAdapter
             return;
         }
 
-        if(controller.getMapping() != null)
+        if(screen instanceof ControllerLayoutScreen)
+        {
+            ControllerLayoutScreen layout = (ControllerLayoutScreen) screen;
+            index = layout.remap(index);
+        }
+        else if(controller.getMapping() != null)
         {
             index = controller.getMapping().remap(index);
         }

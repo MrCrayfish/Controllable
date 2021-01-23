@@ -172,6 +172,11 @@ public class Mappings
             return this.reassignments;
         }
 
+        public void setReassignments(Map<Integer, Integer> reassignments)
+        {
+            this.reassignments = reassignments;
+        }
+
         public boolean isInternal()
         {
             return internal;

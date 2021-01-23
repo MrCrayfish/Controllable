@@ -11,9 +11,9 @@ import com.mrcrayfish.controllable.client.Controller;
  */
 public class ControllerAxis extends ControllerButton
 {
-    public ControllerAxis(int button, int x, int y, int u, int v, int width, int height, int scale)
+    public ControllerAxis(ControllerLayoutScreen screen, int button, int x, int y, int u, int v, int width, int height, int scale)
     {
-        super(button, x, y, u, v, width, height, scale);
+        super(screen, button, x, y, u, v, width, height, scale);
     }
 
     @Override

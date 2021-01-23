@@ -16,6 +16,7 @@ import java.util.Map;
  */
 public class ControllerButton extends AbstractGui
 {
+    protected ControllerLayoutScreen screen;
     protected int button;
     private int x, y;
     private int u, v;
@@ -23,8 +24,9 @@ public class ControllerButton extends AbstractGui
     private int scale;
     private boolean hovered;
 
-    public ControllerButton(int button, int x, int y, int u, int v, int width, int height, int scale)
+    public ControllerButton(ControllerLayoutScreen screen, int button, int x, int y, int u, int v, int width, int height, int scale)
     {
+        this.screen = screen;
         this.button = button;
         this.x = x;
         this.y = y;
@@ -59,29 +61,23 @@ public class ControllerButton extends AbstractGui
         RenderSystem.disableBlend();
 
         int remappedButton = this.button;
-        if(controller != null && controller.getMapping() != null)
+
+        Map<Integer, Integer> reassignments = this.screen.getReassignments();
+        for(Integer key : reassignments.keySet())
         {
-            Map<Integer, Integer> reassignments = controller.getMapping().getReassignments();
-            for(Integer key : reassignments.keySet())
+            if(reassignments.get(key) == this.button)
             {
-                if(reassignments.get(key) == this.button)
-                {
-                    remappedButton = key;
-                    break;
-                }
+                remappedButton = key;
+                break;
             }
         }
 
         // Draws an exclamation if the button has no button assigned to it!
-        if(controller != null && controller.getMapping() != null)
+        if(!reassignments.values().contains(this.button) && this.screen.remap(this.button) != this.button)
         {
-            Map<Integer, Integer> reassignments = controller.getMapping().getReassignments();
-            if(!reassignments.values().contains(this.button) &&  controller.getMapping().remap(this.button) != this.button)
-            {
-                Minecraft.getInstance().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
-                blit(matrixStack, buttonX + (buttonWidth - 4) / 2, buttonY + (buttonHeight - 15) / 2, 4, 15, 88, 0, 4, 15, 256, 256);
-                return;
-            }
+            Minecraft.getInstance().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
+            blit(matrixStack, buttonX + (buttonWidth - 4) / 2, buttonY + (buttonHeight - 15) / 2, 4, 15, 88, 0, 4, 15, 256, 256);
+            return;
         }
 
         if(!FMLLoader.isProduction())
