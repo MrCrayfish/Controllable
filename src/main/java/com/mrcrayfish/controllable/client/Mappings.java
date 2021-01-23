@@ -147,14 +147,14 @@ public class Mappings
     {
         private String id;
         private String name;
-        private BiMap<Integer, Integer> reassignments;
+        private Map<Integer, Integer> reassignments;
         private boolean internal;
 
         public Entry(String id, String name, Map<Integer, Integer> reassignments)
         {
             this.id = id;
             this.name = name;
-            this.reassignments = HashBiMap.create(reassignments);
+            this.reassignments = reassignments;
         }
 
         public String getId()
@@ -167,9 +167,9 @@ public class Mappings
             return name;
         }
 
-        public BiMap<Integer, Integer> getReassignments()
+        public Map<Integer, Integer> getReassignments()
         {
-            return reassignments;
+            return this.reassignments;
         }
 
         public boolean isInternal()

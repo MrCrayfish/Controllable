@@ -3,8 +3,13 @@ package com.mrcrayfish.controllable.client.gui;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.Controller;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.loading.FMLLoader;
+
+import java.util.Map;
 
 /**
  * Author: MrCrayfish
@@ -40,17 +45,54 @@ public class ControllerButton extends AbstractGui
         int buttonY = y + this.y * this.scale;
         int buttonWidth = this.width * this.scale;
         int buttonHeight = this.height * this.scale;
+        Controller controller = Controllable.getController();
         this.hovered = mouseX >= buttonX && mouseY >= buttonY && mouseX < buttonX + buttonWidth && mouseY < buttonY + buttonHeight;
         if(this.hovered)
         {
             buttonV += this.height * 2;
         }
-        else if(Controllable.getController() != null && Controllable.isButtonPressed(this.button) || selected)
+        else if(controller != null && Controllable.isButtonPressed(this.button) || selected)
         {
             buttonV += this.height;
         }
         blit(matrixStack, buttonX, buttonY, this.width * this.scale, this.height * this.scale, buttonU, buttonV, this.width, this.height, 256, 256);
         RenderSystem.disableBlend();
+
+        int remappedButton = this.button;
+        if(controller != null && controller.getMapping() != null)
+        {
+            Map<Integer, Integer> reassignments = controller.getMapping().getReassignments();
+            for(Integer key : reassignments.keySet())
+            {
+                if(reassignments.get(key) == this.button)
+                {
+                    remappedButton = key;
+                    break;
+                }
+            }
+        }
+
+        // Draws an exclamation if the button has no button assigned to it!
+        if(controller != null && controller.getMapping() != null)
+        {
+            Map<Integer, Integer> reassignments = controller.getMapping().getReassignments();
+            if(!reassignments.values().contains(this.button) &&  controller.getMapping().remap(this.button) != this.button)
+            {
+                Minecraft.getInstance().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
+                blit(matrixStack, buttonX + (buttonWidth - 4) / 2, buttonY + (buttonHeight - 15) / 2, 4, 15, 88, 0, 4, 15, 256, 256);
+                return;
+            }
+        }
+
+        if(!FMLLoader.isProduction())
+        {
+            matrixStack.push();
+            matrixStack.translate(0.5, 0.5, 0);
+            String mapping = String.valueOf(remappedButton);
+            int width = Minecraft.getInstance().fontRenderer.getStringWidth(mapping);
+            drawString(matrixStack, Minecraft.getInstance().fontRenderer, mapping, buttonX + (buttonWidth - width) / 2, buttonY + (buttonHeight - 9) / 2, 0xFFFFFFFF);
+            matrixStack.pop();
+        }
     }
 
     public int getButton()

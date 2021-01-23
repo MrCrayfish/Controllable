@@ -17,6 +17,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Author: MrCrayfish
@@ -78,6 +79,11 @@ public class ControllerLayoutScreen extends Screen
         this.controllerButtons.forEach(controllerButton -> controllerButton.draw(matrixStack, x, y, mouseX, mouseY, this.configureButton == controllerButton.button));
         drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
+
+        if(this.configureButton != -1)
+        {
+            this.fillGradient(matrixStack, 0, 0, this.width, this.height, -1072689136, -804253680);
+        }
     }
 
     @Override
@@ -110,6 +116,7 @@ public class ControllerLayoutScreen extends Screen
     {
         if(this.configureButton != -1)
         {
+            //TODO make it so assignments are not applied immediately until applied until "Done" is pressed
             Controller controller = Controllable.getController();
             if(controller != null)
             {
@@ -119,19 +126,19 @@ public class ControllerLayoutScreen extends Screen
                     entry = new Mappings.Entry(controller.getName(), controller.getName(), new HashMap<>());
                     controller.setMapping(entry);
                 }
+                Map<Integer, Integer> reassignments = entry.getReassignments();
                 if(button != this.configureButton)
                 {
-                    entry.getReassignments().putIfAbsent(this.configureButton, -1);
-                    entry.getReassignments().put(button, this.configureButton);
+                    reassignments.putIfAbsent(this.configureButton, -1);
+                    reassignments.put(button, this.configureButton);
                 }
                 else
                 {
-                    Integer originalButton = entry.getReassignments().inverse().get(this.configureButton);
-                    if(originalButton != null)
+                    Integer oldButton = reassignments.remove(button);
+                    if(oldButton != null)
                     {
-                        entry.getReassignments().remove(originalButton);
+                        reassignments.values().removeIf(b -> b == (int) oldButton);
                     }
-                    entry.getReassignments().remove(button);
                 }
                 this.configureButton = -1;
                 entry.save();
