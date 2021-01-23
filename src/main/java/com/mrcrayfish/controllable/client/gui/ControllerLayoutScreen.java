@@ -69,8 +69,8 @@ public class ControllerLayoutScreen extends Screen
         this.controllerButtons.add(new ControllerButton(this, Buttons.Y, 29, 3, 10, 0, 3, 3, 5));
         this.controllerButtons.add(new ControllerButton(this, Buttons.LEFT_BUMPER, 5, -2, 25, 0, 7, 3, 5));
         this.controllerButtons.add(new ControllerButton(this, Buttons.RIGHT_BUMPER, 26, -2, 32, 0, 7, 3, 5));
-        this.controllerButtons.add(new ControllerButton(this, Buttons.LEFT_TRIGGER, 5, -10, 39, 0, 7, 6, 5));
-        this.controllerButtons.add(new ControllerButton(this, Buttons.RIGHT_TRIGGER, 26, -10, 39, 0, 7, 6, 5));
+        this.controllerButtons.add(new ControllerButton(this, Buttons.LEFT_TRIGGER, -10, 0, 39, 0, 7, 6, 5));
+        this.controllerButtons.add(new ControllerButton(this, Buttons.RIGHT_TRIGGER, 41, 0, 39, 0, 7, 6, 5));
         this.controllerButtons.add(new ControllerButton(this, Buttons.DPAD_DOWN, 6, 9, 19, 0, 3, 3, 5));
         this.controllerButtons.add(new ControllerButton(this, Buttons.DPAD_RIGHT, 9, 6, 19, 0, 3, 3, 5));
         this.controllerButtons.add(new ControllerButton(this, Buttons.DPAD_LEFT, 3, 6, 19, 0, 3, 3, 5));
@@ -110,10 +110,10 @@ public class ControllerLayoutScreen extends Screen
         RenderSystem.enableBlend();
         Minecraft.getInstance().getTextureManager().bindTexture(TEXTURE);
         int width = 38 * 5;
-        int height = 29 * 5;
+        int height = 25 * 5;
         int x = this.width / 2 - width / 2;
         int y = this.height / 2 - 50;
-        blit(matrixStack, x, y, width, height, 50, 0, 38, 29, 256, 256); //TODO test
+        blit(matrixStack, x, y, width, height, 50, 0, 38, 25, 256, 256); //TODO test
         RenderSystem.disableBlend();
         this.controllerButtons.forEach(controllerButton -> controllerButton.draw(matrixStack, x, y, mouseX, mouseY, this.configureButton == controllerButton.button));
         drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
@@ -133,6 +133,23 @@ public class ControllerLayoutScreen extends Screen
             if(button.isMissingMapping())
             {
                 components.add(new TranslationTextComponent("controllable.gui.layout.missing_mapping").func_240699_a_(TextFormatting.RED));
+            }
+            else
+            {
+                int remappedButton = button.getButton();
+                if(!button.isMissingMapping())
+                {
+                    Map<Integer, Integer> reassignments = this.reassignments;
+                    for(Integer key : reassignments.keySet())
+                    {
+                        if(reassignments.get(key) == remappedButton)
+                        {
+                            remappedButton = key;
+                            break;
+                        }
+                    }
+                }
+                components.add(new TranslationTextComponent("controllable.gui.layout.mapped_to", new StringTextComponent(String.valueOf(remappedButton)).func_240699_a_(TextFormatting.BLUE)));
             }
             components.add(new TranslationTextComponent("controllable.gui.layout.remap").func_240699_a_(TextFormatting.GOLD));
             this.func_243308_b(matrixStack, components, mouseX, mouseY);
