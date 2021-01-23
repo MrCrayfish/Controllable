@@ -110,7 +110,7 @@ public class ControllerInput
             if(controller == null)
                 return;
 
-            if(Math.abs(controller.getLTriggerValue()) >= 0.1F || Math.abs(controller.getRTriggerValue()) >= 0.1F)
+            if((Math.abs(controller.getLTriggerValue()) >= 0.1F || Math.abs(controller.getRTriggerValue()) >= 0.1F) && !(Minecraft.getInstance().currentScreen instanceof ControllerLayoutScreen))
             {
                 this.lastUse = 100;
             }
