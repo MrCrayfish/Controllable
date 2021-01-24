@@ -37,7 +37,7 @@ public class ControllerLayoutScreen extends Screen
     private boolean validLayout;
     private Screen parentScreen;
     private LayoutButtonStates states = new LayoutButtonStates();
-    private Map<Integer, Integer> reassignments;
+    private Mappings.Entry entry;
     private Button doneButton;
     private Button resetButton;
 
@@ -52,11 +52,11 @@ public class ControllerLayoutScreen extends Screen
             Mappings.Entry entry = controller.getMapping();
             if(entry != null)
             {
-                this.reassignments = new HashMap<>(entry.getReassignments());
+                this.entry = entry.copy();
             }
             else
             {
-                this.reassignments = new HashMap<>();
+                this.entry = new Mappings.Entry(controller.getName(), controller.getName(), new HashMap<>());
             }
         }
     }
@@ -89,7 +89,7 @@ public class ControllerLayoutScreen extends Screen
         }));
 
         this.resetButton = this.addButton(new Button(this.width / 2 - 50, this.height - 32, 100, 20, new TranslationTextComponent("controllable.gui.reset"), (button) -> {
-            this.reassignments.clear();
+            this.entry.getReassignments().clear();
         }));
 
         this.addButton(new Button(this.width / 2 + 54, this.height - 32, 100, 20, new TranslationTextComponent("gui.cancel"), (button) -> {
@@ -100,8 +100,8 @@ public class ControllerLayoutScreen extends Screen
     @Override
     public void tick()
     {
-        this.resetButton.active = !this.reassignments.isEmpty();
-        this.validLayout = this.reassignments.values().stream().noneMatch(b -> b == -1);
+        this.resetButton.active = !this.entry.getReassignments().isEmpty();
+        this.validLayout = this.entry.getReassignments().values().stream().noneMatch(b -> b == -1);
         this.doneButton.setMessage(new TranslationTextComponent("gui.done").mergeStyle(this.validLayout ? TextFormatting.WHITE : TextFormatting.RED));
     }
 
@@ -145,7 +145,7 @@ public class ControllerLayoutScreen extends Screen
                 int remappedButton = button.getButton();
                 if(!button.isMissingMapping())
                 {
-                    Map<Integer, Integer> reassignments = this.reassignments;
+                    Map<Integer, Integer> reassignments = this.entry.getReassignments();
                     for(Integer key : reassignments.keySet())
                     {
                         if(reassignments.get(key) == remappedButton)
@@ -200,34 +200,35 @@ public class ControllerLayoutScreen extends Screen
     {
         if(this.configureButton != -1)
         {
+            Map<Integer, Integer> reassignments = this.entry.getReassignments();
             if(button != this.configureButton)
             {
                 // Sets the target
-                this.reassignments.putIfAbsent(this.configureButton, -1);
+                reassignments.putIfAbsent(this.configureButton, -1);
 
                 // Reset any assignments that targets the configuration button and set to -1
-                for(Integer key : this.reassignments.keySet())
+                for(Integer key : reassignments.keySet())
                 {
-                    if(this.reassignments.get(key) == this.configureButton)
+                    if(reassignments.get(key) == this.configureButton)
                     {
-                        this.reassignments.put(key, -1);
+                        reassignments.put(key, -1);
                     }
                 }
 
                 // Finally set the new mapping
-                this.reassignments.put(button, this.configureButton);
+                reassignments.put(button, this.configureButton);
             }
             else
             {
                 // Remove reassignment because button is back to it's default mapping
-                this.reassignments.remove(button);
+                reassignments.remove(button);
 
                 // Reset any assignments that targets the button and set to -1
-                for(Integer key : this.reassignments.keySet())
+                for(Integer key : reassignments.keySet())
                 {
-                    if(this.reassignments.get(key) == button)
+                    if(reassignments.get(key) == button)
                     {
-                        this.reassignments.put(key, -1);
+                        reassignments.put(key, -1);
                     }
                 }
             }
@@ -242,17 +243,8 @@ public class ControllerLayoutScreen extends Screen
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            Mappings.Entry entry = controller.getMapping();
-            if(entry == null)
-            {
-                entry = new Mappings.Entry(controller.getName(), controller.getName(), this.reassignments);
-                controller.setMapping(entry);
-            }
-            else
-            {
-                entry.setReassignments(this.reassignments);
-            }
-            entry.save();
+            controller.setMapping(this.entry);
+            this.entry.save();
         }
     }
 
@@ -296,12 +288,7 @@ public class ControllerLayoutScreen extends Screen
 
     public int remap(int button)
     {
-        Integer value = this.reassignments.get(button);
-        if(value != null)
-        {
-            return value;
-        }
-        return button;
+        return this.entry.remap(button);
     }
 
     public boolean isButtonPressed(int button)
@@ -311,7 +298,7 @@ public class ControllerLayoutScreen extends Screen
 
     public Map<Integer, Integer> getReassignments()
     {
-        return this.reassignments;
+        return this.entry.getReassignments();
     }
 
     private void drawMultiLineCenteredString(MatrixStack matrixStack, FontRenderer font, ITextComponent component, int x, int y, int width, int color)

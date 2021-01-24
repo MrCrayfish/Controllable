@@ -179,17 +179,22 @@ public class Mappings
 
         public boolean isInternal()
         {
-            return internal;
+            return this.internal;
         }
 
         public int remap(int button)
         {
-            Integer value = reassignments.get(button);
+            Integer value = this.reassignments.get(button);
             if(value != null)
             {
                 return value;
             }
             return button;
+        }
+
+        public Entry copy()
+        {
+            return new Entry(this.id, this.name, new HashMap<>(this.reassignments));
         }
 
         public void save()
