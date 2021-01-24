@@ -8,8 +8,10 @@ import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
+import com.mrcrayfish.controllable.client.gui.widget.ImageStateButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
+import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
@@ -40,6 +42,7 @@ public class ControllerLayoutScreen extends Screen
     private Mappings.Entry entry;
     private Button doneButton;
     private Button resetButton;
+    private Button switchButton;
 
     protected ControllerLayoutScreen(Screen parentScreen)
     {
@@ -94,6 +97,13 @@ public class ControllerLayoutScreen extends Screen
 
         this.addButton(new Button(this.width / 2 + 54, this.height - 32, 100, 20, new TranslationTextComponent("gui.cancel"), (button) -> {
             this.minecraft.displayGuiScreen(this.parentScreen);
+        }));
+
+        int width = 38 * 5;
+        int x = this.width / 2 - width / 2;
+        int y = this.height / 2 - 50 - 35;
+        this.switchButton = this.addButton(new ImageStateButton(x + width / 2 - 10, y + 90, 20, TEXTURE, 92, 0, () -> this.entry.isThumbsticksSwitched(), button -> {
+            this.entry.setSwitchThumbsticks(!this.entry.isThumbsticksSwitched());
         }));
     }
 
@@ -159,6 +169,22 @@ public class ControllerLayoutScreen extends Screen
             }
             components.add(new TranslationTextComponent("controllable.gui.layout.remap").mergeStyle(TextFormatting.GRAY));
             this.func_243308_b(matrixStack, components, mouseX, mouseY);
+        }
+
+        if(this.switchButton.isHovered())
+        {
+            List<IReorderingProcessor> components = new ArrayList<>();
+            components.add(new TranslationTextComponent("controllable.gui.layout.switch_thumbsticks").func_241878_f());
+            components.addAll(this.font.trimStringToWidth(new TranslationTextComponent("controllable.gui.layout.switch_thumbsticks.info").mergeStyle(TextFormatting.GRAY), 180));
+            if(this.entry.isThumbsticksSwitched())
+            {
+                components.add(new TranslationTextComponent("controllable.gui.layout.switch_thumbsticks.enabled").mergeStyle(TextFormatting.BLUE).func_241878_f());
+            }
+            else
+            {
+                components.add(new TranslationTextComponent("controllable.gui.layout.switch_thumbsticks.disabled").mergeStyle(TextFormatting.RED).func_241878_f());
+            }
+            this.renderTooltip(matrixStack, components, mouseX, mouseY - 50);
         }
 
         if(!this.validLayout && this.doneButton.isHovered())

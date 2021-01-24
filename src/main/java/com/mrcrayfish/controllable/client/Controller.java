@@ -104,7 +104,7 @@ public class Controller
      */
     public float getLThumbStickXValue()
     {
-        return this.controller.getAxis(SDL_CONTROLLER_AXIS_LEFTX);
+        return this.controller.getAxis(this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_RIGHTX : SDL_CONTROLLER_AXIS_LEFTX);
     }
 
     /**
@@ -114,7 +114,7 @@ public class Controller
      */
     public float getLThumbStickYValue()
     {
-        return this.controller.getAxis(SDL_CONTROLLER_AXIS_LEFTY);
+        return this.controller.getAxis(this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_RIGHTY : SDL_CONTROLLER_AXIS_LEFTY);
     }
 
     /**
@@ -124,7 +124,7 @@ public class Controller
      */
     public float getRThumbStickXValue()
     {
-        return this.controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTX);
+        return this.controller.getAxis(this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_LEFTX : SDL_CONTROLLER_AXIS_RIGHTX);
     }
 
     /**
@@ -134,7 +134,7 @@ public class Controller
      */
     public float getRThumbStickYValue()
     {
-        return this.controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTY);
+        return this.controller.getAxis(this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_LEFTY : SDL_CONTROLLER_AXIS_RIGHTY);
     }
 
     /**
@@ -156,5 +156,10 @@ public class Controller
     public Mappings.Entry getMapping()
     {
         return this.mapping;
+    }
+
+    private boolean isThumbsticksSwitched()
+    {
+        return this.mapping != null && this.mapping.isThumbsticksSwitched();
     }
 }
