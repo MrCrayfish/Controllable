@@ -181,7 +181,7 @@ public class ControllerInput
 
                 double mouseX = this.virtualMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
                 double mouseY = this.virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
-                IGuiEventListener hoveredListener = mc.currentScreen.children().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+                IGuiEventListener hoveredListener = mc.currentScreen.getEventListeners().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
                 if(hoveredListener != null && !(hoveredListener instanceof AbstractList))
                 {
                     mouseSpeed *= 0.4;
@@ -323,7 +323,7 @@ public class ControllerInput
         double mouseY = this.virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
         if(mc.currentScreen != null)
         {
-            IGuiEventListener hoveredListener = mc.currentScreen.children().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+            IGuiEventListener hoveredListener = mc.currentScreen.getEventListeners().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
             if(hoveredListener instanceof AbstractList)
             {
                 this.handleListScrolling((AbstractList) hoveredListener, controller);
@@ -687,11 +687,11 @@ public class ControllerInput
     private void cycleThirdPersonView()
     {
         Minecraft mc = Minecraft.getInstance();
-        PointOfView pointOfView = mc.gameSettings.func_243230_g();
-        mc.gameSettings.func_243229_a(pointOfView.func_243194_c());
-        if(pointOfView.func_243192_a() != mc.gameSettings.func_243230_g().func_243192_a())
+        PointOfView pointOfView = mc.gameSettings.getPointOfView();
+        mc.gameSettings.setPointOfView(pointOfView.func_243194_c());
+        if(pointOfView.func_243192_a() != mc.gameSettings.getPointOfView().func_243192_a())
         {
-            mc.gameRenderer.loadEntityShader(mc.gameSettings.func_243230_g().func_243192_a() ? mc.getRenderViewEntity() : null);
+            mc.gameRenderer.loadEntityShader(mc.gameSettings.getPointOfView().func_243192_a() ? mc.getRenderViewEntity() : null);
         }
     }
 

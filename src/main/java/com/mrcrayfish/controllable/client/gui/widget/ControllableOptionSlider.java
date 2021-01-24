@@ -1,6 +1,5 @@
 package com.mrcrayfish.controllable.client.gui.widget;
 
-import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.gui.widget.OptionSlider;
 import net.minecraft.client.settings.SliderPercentageOption;
@@ -21,6 +20,6 @@ public class ControllableOptionSlider extends OptionSlider
     @Override
     protected void func_230972_a_()
     {
-        this.option.set(this.field_238477_a_, this.option.denormalizeValue(this.field_230683_b_));
+        this.option.set(this.settings, this.option.denormalizeValue(this.sliderValue));
     }
 }

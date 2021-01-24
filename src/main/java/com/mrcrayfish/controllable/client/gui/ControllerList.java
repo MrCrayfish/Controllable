@@ -47,7 +47,7 @@ public class ControllerList extends ExtendedList<ControllerEntry>
             return;
         }
 
-        List<ControllerEntry> entries = this.children();
+        List<ControllerEntry> entries = this.getEventListeners();
         for(ControllerEntry entry : entries)
         {
             if(entry.getSdl2Controller() == controller.getSDL2Controller())

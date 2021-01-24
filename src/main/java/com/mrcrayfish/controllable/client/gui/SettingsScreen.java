@@ -34,13 +34,13 @@ public class SettingsScreen extends Screen
             this.addButton(option.createWidget(this.minecraft.gameSettings, x, y, 150));
         }
 
-        this.addButton(new Button(this.width / 2 - 100, this.height / 6 + 24 * (OPTIONS.length + 1) / 2, 200, 20, DialogTexts.field_240632_c_, (button) -> {
+        this.addButton(new Button(this.width / 2 - 100, this.height / 6 + 24 * (OPTIONS.length + 1) / 2, 200, 20, DialogTexts.GUI_BACK, (button) -> {
             this.minecraft.displayGuiScreen(this.parentScreen);
         }));
     }
 
     @Override
-    public void removed()
+    public void onClose()
     {
         Config.save();
     }
