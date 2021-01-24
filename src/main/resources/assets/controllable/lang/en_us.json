@@ -33,6 +33,7 @@
   "controllable.gui.layout.button": "Button: %s",
   "controllable.gui.layout.missing_mapping": "Missing Mapping!",
   "controllable.gui.layout.mapped_to": "Mapped Index: %s",
+  "controllable.gui.layout.info": "Use this visual controller to test if your buttons and thumbsticks match your physical controller. If the wrong button is pressed, you can remap it by clicking the button on the visual controller. If an exclamation icon is shown over a button, it means it has no mapping to the physical controller.",
   "controllable.options.forceFeedback": "Vibration",
   "controllable.options.autoSelect": "Auto Select",
   "controllable.options.deadZone": "Dead Zone",

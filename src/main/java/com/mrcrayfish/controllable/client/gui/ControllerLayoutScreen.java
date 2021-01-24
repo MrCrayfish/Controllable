@@ -1,6 +1,5 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.ButtonStates;
@@ -11,10 +10,11 @@ import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -22,7 +22,10 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Author: MrCrayfish
@@ -113,11 +116,13 @@ public class ControllerLayoutScreen extends Screen
         int width = 38 * 5;
         int height = 25 * 5;
         int x = this.width / 2 - width / 2;
-        int y = this.height / 2 - 50;
+        int y = this.height / 2 - 50 - 35;
         blit(matrixStack, x, y, width, height, 50, 0, 38, 25, 256, 256); //TODO test
         RenderSystem.disableBlend();
         this.controllerButtons.forEach(controllerButton -> controllerButton.draw(matrixStack, x, y, mouseX, mouseY, this.configureButton == controllerButton.button));
         drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        this.drawMultiLineCenteredString(matrixStack, this.font, new TranslationTextComponent("controllable.gui.layout.info").mergeStyle(TextFormatting.GRAY), x + width / 2, y + 135, width + 190, 0xFFFFFFFF);
+
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         if(this.configureButton != -1)
@@ -300,6 +305,15 @@ public class ControllerLayoutScreen extends Screen
     public Map<Integer, Integer> getReassignments()
     {
         return this.reassignments;
+    }
+
+    private void drawMultiLineCenteredString(MatrixStack matrixStack, FontRenderer font, ITextComponent component, int x, int y, int width, int color)
+    {
+        for(IReorderingProcessor s : font.trimStringToWidth(component, width))
+        {
+            font.func_238407_a_(matrixStack, s, (float) (x - font.func_243245_a(s) / 2.0), y, color);
+            y += font.FONT_HEIGHT;
+        }
     }
 
     public static class LayoutButtonStates extends ButtonStates
