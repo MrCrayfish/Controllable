@@ -22,10 +22,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Author: MrCrayfish
@@ -37,6 +34,7 @@ public class ControllerLayoutScreen extends Screen
     private List<ControllerButton> controllerButtons = new ArrayList<>();
 
     private int configureButton = -1;
+    private boolean validLayout;
     private Screen parentScreen;
     private LayoutButtonStates states = new LayoutButtonStates();
     private Map<Integer, Integer> reassignments;
@@ -103,7 +101,7 @@ public class ControllerLayoutScreen extends Screen
     public void tick()
     {
         this.resetButton.active = !this.reassignments.isEmpty();
-        this.doneButton.active = this.reassignments.values().stream().noneMatch(b -> b == -1);
+        this.validLayout = this.reassignments.values().stream().noneMatch(b -> b == -1);
     }
 
     @Override
@@ -158,8 +156,16 @@ public class ControllerLayoutScreen extends Screen
                 }
                 components.add(new TranslationTextComponent("controllable.gui.layout.mapped_to", new StringTextComponent(String.valueOf(remappedButton)).mergeStyle(TextFormatting.BLUE)));
             }
-            components.add(new TranslationTextComponent("controllable.gui.layout.remap").mergeStyle(TextFormatting.GOLD));
+            components.add(new TranslationTextComponent("controllable.gui.layout.remap").mergeStyle(TextFormatting.GRAY));
             this.func_243308_b(matrixStack, components, mouseX, mouseY);
+        }
+
+        if(!this.validLayout && this.doneButton.isHovered())
+        {
+            List<IReorderingProcessor> components = new ArrayList<>();
+            components.add(new TranslationTextComponent("controllable.gui.layout.warning").mergeStyle(TextFormatting.RED).func_241878_f());
+            components.addAll(this.font.trimStringToWidth(new TranslationTextComponent("controllable.gui.layout.invalid_layout").mergeStyle(TextFormatting.GRAY), 180));
+            this.renderTooltip(matrixStack, components, mouseX, mouseY - 50);
         }
     }
 
