@@ -102,6 +102,7 @@ public class ControllerLayoutScreen extends Screen
     {
         this.resetButton.active = !this.reassignments.isEmpty();
         this.validLayout = this.reassignments.values().stream().noneMatch(b -> b == -1);
+        this.doneButton.setMessage(new TranslationTextComponent("gui.done").mergeStyle(this.validLayout ? TextFormatting.WHITE : TextFormatting.RED));
     }
 
     @Override
