@@ -1,6 +1,7 @@
 {
     "required": true,
     "package": "com.mrcrayfish.controllable.mixin",
+    "plugin": "com.mrcrayfish.controllable.mixin.ControllableMixinPlugin",
     "compatibilityLevel": "JAVA_8",
     "minVersion": "0.8",
     "refmap": "controllable.refmap.json",
@@ -8,6 +9,7 @@
         "client.ContainerScreenMixin",
         "client.ForgeIngameGuiMixin",
         "client.GameRendererMixin",
+        "client.OptifineGameRendererMixin",
         "client.IngameGuiMixin",
         "client.MinecraftMixin",
         "client.MouseHelperMixin",
