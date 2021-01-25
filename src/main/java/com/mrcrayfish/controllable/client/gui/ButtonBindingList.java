@@ -11,8 +11,8 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.widget.list.AbstractOptionList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
@@ -129,6 +129,18 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
             this.deleteButton.y = y;
             this.deleteButton.active = !this.binding.isDefault();
             this.deleteButton.render(matrixStack, mouseX, mouseY, partialTicks);
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button)
+        {
+            if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.bindingButton.isHovered())
+            {
+                this.binding.setButton(-1);
+                this.bindingButton.playDownSound(Minecraft.getInstance().getSoundHandler());
+                return true;
+            }
+            return super.mouseClicked(mouseX, mouseY, button);
         }
     }
 }
