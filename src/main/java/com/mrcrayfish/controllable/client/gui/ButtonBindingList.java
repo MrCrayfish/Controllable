@@ -57,6 +57,14 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         });
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    {
+        if(this.screen.isWaitingForButtonInput())
+            return true;
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
     abstract class Entry extends AbstractOptionList.Entry<Entry> {}
 
     protected class CategoryEntry extends Entry

@@ -231,12 +231,6 @@ public class Controllable extends ControllerAdapter
             return;
         }
 
-        if(screen instanceof ButtonBindingScreen)
-        {
-            ((ButtonBindingScreen) screen).processButton(index, newStates);
-            return;
-        }
-
         if (controller == null)
         {
             return;
@@ -260,6 +254,13 @@ public class Controllable extends ControllerAdapter
             if(!states.getState(index))
             {
                 states.setState(index, true);
+                if(screen instanceof ButtonBindingScreen)
+                {
+                    if(((ButtonBindingScreen) screen).processButton(index))
+                    {
+                        return;
+                    }
+                }
                 input.handleButtonInput(controller, index, true);
             }
         }

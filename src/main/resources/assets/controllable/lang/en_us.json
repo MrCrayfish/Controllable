@@ -32,6 +32,7 @@
   "controllable.gui.save": "Save",
   "controllable.gui.reset": "Reset",
   "controllable.gui.layout": "Mappings",
+  "controllable.gui.resetBinds": "Reset Binds",
   "controllable.gui.layout.press_button": "Listening for button input. Press ESC to cancel",
   "controllable.gui.layout.remap": "Click to change mapping...",
   "controllable.gui.layout.button": "Button: %s",

@@ -13,8 +13,6 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Map;
-
 /**
  * Author: MrCrayfish
  */
@@ -34,6 +32,11 @@ public class ButtonBindingScreen extends Screen
     void setSelectedBinding(ButtonBinding selectedBinding)
     {
         this.selectedBinding = selectedBinding;
+    }
+
+    boolean isWaitingForButtonInput()
+    {
+        return this.selectedBinding != null;
     }
 
     @Override
@@ -76,6 +79,16 @@ public class ButtonBindingScreen extends Screen
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    {
+        if(this.selectedBinding != null)
+        {
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
     public boolean keyPressed(int key, int scanCode, int mods)
     {
         if(key == GLFW.GLFW_KEY_ESCAPE && this.selectedBinding != null)
@@ -86,26 +99,15 @@ public class ButtonBindingScreen extends Screen
         return super.keyPressed(key, scanCode, mods);
     }
 
-    public void processButton(int index, ButtonStates newStates)
+    public boolean processButton(int index)
     {
-        boolean state = newStates.getState(index);
-
-        Controller controller = Controllable.getController();
-        if(controller == null)
-        {
-            return;
-        }
-
-        if(controller.getMapping() != null)
-        {
-            index = controller.getMapping().remap(index);
-        }
-
-        if(state && this.selectedBinding != null)
+        if(this.selectedBinding != null)
         {
             this.selectedBinding.setButton(index);
             this.selectedBinding = null;
             //TODO resolve conflicts
+            return true;
         }
+        return false;
     }
 }
