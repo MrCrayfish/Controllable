@@ -38,13 +38,7 @@ public class ButtonBindingButton extends Button
         if(controller == null)
             return;
 
-        int remappedButton = this.binding.getButton();
-        Mappings.Entry mapping = controller.getMapping();
-        if(mapping != null)
-        {
-            remappedButton = mapping.remap(remappedButton);
-        }
-        int texU = remappedButton * 13;
+        int texU = this.binding.getButton() * 13;
         int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
         int size = 13;
         Minecraft.getInstance().getTextureManager().bindTexture(RenderEvents.CONTROLLER_BUTTONS);

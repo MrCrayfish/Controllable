@@ -3,10 +3,14 @@ package com.mrcrayfish.controllable.client.gui;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.ButtonStates;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBinding;
+import com.mrcrayfish.controllable.client.Controller;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.Map;
 
 /**
  * Author: MrCrayfish
@@ -76,6 +80,18 @@ public class ButtonBindingScreen extends Screen
     public void processButton(int index, ButtonStates newStates)
     {
         boolean state = newStates.getState(index);
+
+        Controller controller = Controllable.getController();
+        if(controller == null)
+        {
+            return;
+        }
+
+        if(controller.getMapping() != null)
+        {
+            index = controller.getMapping().remap(index);
+        }
+
         if(state && this.selectedBinding != null)
         {
             this.selectedBinding.setButton(index);
