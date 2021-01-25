@@ -447,9 +447,12 @@ public class ControllerInput
 
         if(mc.player.abilities.isFlying || mc.player.isPassenger())
         {
-            this.lastUse = 100;
             this.sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
             this.sneaking |= ButtonBindings.SNEAK.isButtonDown();
+            if(ButtonBindings.SNEAK.isButtonDown())
+            {
+                this.lastUse = 100;
+            }
             this.isFlying = true;
         }
         else if(this.isFlying)
