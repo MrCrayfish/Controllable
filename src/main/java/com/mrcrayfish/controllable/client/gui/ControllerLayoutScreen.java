@@ -90,7 +90,7 @@ public class ControllerLayoutScreen extends Screen
         this.controllerButtons.add(new ControllerAxis(this, Buttons.LEFT_THUMB_STICK, 9, 12, 0, 0, 7, 7, 5));
         this.controllerButtons.add(new ControllerAxis(this, Buttons.RIGHT_THUMB_STICK, 22, 12, 0, 0, 7, 7, 5));
 
-        this.doneButton = this.addButton(new Button(this.width / 2 - 154, this.height - 32, 100, 20, new TranslationTextComponent("gui.done"), (button) -> {
+        this.doneButton = this.addButton(new Button(this.width / 2 - 154, this.height - 32, 100, 20, new TranslationTextComponent("controllable.gui.save"), (button) -> {
             this.updateControllerMapping();
             this.minecraft.displayGuiScreen(this.parentScreen);
         }));
@@ -128,7 +128,7 @@ public class ControllerLayoutScreen extends Screen
         changed |= this.entry.isFlipRightY();
         this.resetButton.active = changed;
         this.validLayout = this.entry.getReassignments().values().stream().noneMatch(b -> b == -1);
-        this.doneButton.setMessage(new TranslationTextComponent("gui.done").mergeStyle(this.validLayout ? TextFormatting.WHITE : TextFormatting.RED));
+        this.doneButton.setMessage(new TranslationTextComponent("controllable.gui.save").mergeStyle(this.validLayout ? TextFormatting.WHITE : TextFormatting.RED));
     }
 
     @Override
