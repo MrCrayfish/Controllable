@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class RenderEvents
 {
-    private static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Reference.MOD_ID, "textures/gui/buttons.png");
+    public static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Reference.MOD_ID, "textures/gui/buttons.png");
 
     private Map<Integer, Action> actions = new HashMap<>();
 

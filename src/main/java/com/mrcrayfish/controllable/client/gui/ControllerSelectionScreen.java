@@ -65,7 +65,7 @@ public class ControllerSelectionScreen extends Screen
 
     private void handleConfigure(Button button)
     {
-        this.minecraft.displayGuiScreen(new ControllerLayoutScreen(this));
+        this.minecraft.displayGuiScreen(new ButtonBindingScreen(this));
     }
 
     private void handleCancel(Button button)

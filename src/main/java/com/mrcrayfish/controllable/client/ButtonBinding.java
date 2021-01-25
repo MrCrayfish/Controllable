@@ -1,33 +1,39 @@
 package com.mrcrayfish.controllable.client;
 
+import com.google.common.collect.ImmutableList;
+import net.minecraft.client.resources.I18n;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Author: MrCrayfish
  */
-public class ButtonBinding
+public class ButtonBinding implements Comparable<ButtonBinding>
 {
-    private static final List<ButtonBinding> BINDINGS = new ArrayList<>();
+    static final List<ButtonBinding> BINDINGS = new ArrayList<>();
 
+    private final int defaultButton;
     private int button;
     private String descriptionKey;
     private String category;
-    private boolean ignoreConflict;
+    private boolean reserved;
     private boolean pressed;
     private int pressedTime;
 
-    public ButtonBinding(int button, String descriptionKey)
+    ButtonBinding(int button, String descriptionKey, String category, boolean reserved)
     {
-        this(button, descriptionKey, false);
-    }
-
-    public ButtonBinding(int button, String descriptionKey, boolean ignoreConflict)
-    {
+        this.defaultButton = button;
         this.button = button;
         this.descriptionKey = descriptionKey;
-        this.ignoreConflict = ignoreConflict;
+        this.category = category;
+        this.reserved = reserved;
         BINDINGS.add(this);
+    }
+
+    public ButtonBinding(int button, String descriptionKey, String category)
+    {
+        this(button, descriptionKey, category, false);
     }
 
     public int getButton()
@@ -45,6 +51,21 @@ public class ButtonBinding
         return this.descriptionKey;
     }
 
+    public String getCategory()
+    {
+        return this.category;
+    }
+
+    public boolean isReserved()
+    {
+        return this.reserved;
+    }
+
+    public boolean isDefault()
+    {
+        return this.button == this.defaultButton;
+    }
+
     public boolean isButtonPressed()
     {
         return this.pressed && this.pressedTime == 0;
@@ -53,6 +74,11 @@ public class ButtonBinding
     public boolean isButtonDown()
     {
         return this.pressed;
+    }
+
+    public void reset()
+    {
+        this.button = this.defaultButton;
     }
 
     public static void tick()
@@ -87,5 +113,11 @@ public class ButtonBinding
         {
             binding.pressed = false;
         }
+    }
+
+    @Override
+    public int compareTo(ButtonBinding o)
+    {
+        return I18n.format(this.descriptionKey).compareTo(I18n.format(o.descriptionKey));
     }
 }

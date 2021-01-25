@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.gui.widget;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
@@ -30,6 +31,8 @@ public class ImageButton extends Button
     {
         super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
         Minecraft.getInstance().getTextureManager().bindTexture(this.texture);
+        if(!this.active) RenderSystem.color4f(0.5F, 0.5F, 0.5F, 1.0F);
         this.blit(matrixStack, this.x + (this.width - this.imageWidth) / 2, this.y + 2, this.imageU, this.imageV, this.imageWidth, this.imageHeight);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 }

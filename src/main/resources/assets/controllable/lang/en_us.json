@@ -23,6 +23,7 @@
   "controllable.gui.title.select_controller": "Select a Controller",
   "controllable.gui.title.settings": "Settings",
   "controllable.gui.title.binging": "Bindings",
+  "controllable.gui.title.button_binding": "Button Bindings",
   "controllable.gui.title.layout": "Layout",
   "controllable.gui.title.thumbstick_settings": "Thumbstick Settings",
   "controllable.gui.settings": "Settings",
@@ -84,5 +85,7 @@
   "controllable.button.dpad_up": "Up",
   "controllable.button.dpad_down": "Down",
   "controllable.button.dpad_left": "Left",
-  "controllable.button.dpad_right": "Right"
+  "controllable.button.dpad_right": "Right",
+  "controllable.key.nextHotbarItem": "Scroll Hotbar Right",
+  "controllable.key.previousHotbarItem": "Scroll Hotbar Left"
 }
