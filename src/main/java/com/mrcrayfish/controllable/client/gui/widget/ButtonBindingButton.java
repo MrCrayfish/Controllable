@@ -24,6 +24,11 @@ public class ButtonBindingButton extends Button
         this.binding = binding;
     }
 
+    public ButtonBinding getBinding()
+    {
+        return this.binding;
+    }
+
     @Override
     public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {

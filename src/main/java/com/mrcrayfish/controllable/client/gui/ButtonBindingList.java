@@ -21,11 +21,13 @@ import java.util.*;
  */
 public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entry>
 {
+    private ButtonBindingScreen screen;
     private Map<String, List<ButtonBinding>> categories = new LinkedHashMap<>();
 
-    public ButtonBindingList(Minecraft mc, int widthIn, int heightIn, int topIn, int bottomIn, int itemHeightIn)
+    public ButtonBindingList(ButtonBindingScreen screen, Minecraft mc, int widthIn, int heightIn, int topIn, int bottomIn, int itemHeightIn)
     {
         super(mc, widthIn, heightIn, topIn, bottomIn, itemHeightIn);
+        this.screen = screen;
 
         // Initialize map with categories to have a predictable order (map is linked)
         this.categories.put("key.categories.movement", new ArrayList<>());
@@ -102,7 +104,7 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
             this.binding = binding;
             this.label = new TranslationTextComponent(binding.getDescription());
             this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> {
-                //TODO listen for input
+                ButtonBindingList.this.screen.setSelectedBinding(this.binding);
             });
             this.deleteButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button -> {
                 binding.reset();
