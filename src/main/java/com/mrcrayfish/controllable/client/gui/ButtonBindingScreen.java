@@ -5,8 +5,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.ButtonStates;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBinding;
+import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
+import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
 
@@ -18,6 +21,7 @@ import java.util.Map;
 public class ButtonBindingScreen extends Screen
 {
     private Screen parentScreen;
+    private Button buttonReset;
     private ButtonBindingList bindingList;
     private ButtonBinding selectedBinding = null;
 
@@ -37,6 +41,21 @@ public class ButtonBindingScreen extends Screen
     {
         this.bindingList = new ButtonBindingList(this, this.minecraft, this.width, this.height, 32, this.height - 44, 20);
         this.children.add(this.bindingList);
+
+        this.buttonReset = this.addButton(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslationTextComponent("controllable.gui.resetBinds"), (button) -> {
+            ButtonBindings.getBindings().forEach(ButtonBinding::reset);
+        }));
+        this.buttonReset.active = ButtonBindings.getBindings().stream().noneMatch(ButtonBinding::isDefault);
+
+        this.addButton(new Button(this.width / 2 - 155 + 160, this.height - 29, 150, 20, DialogTexts.GUI_DONE, (button) -> {
+            this.minecraft.displayGuiScreen(this.parentScreen);
+        }));
+    }
+
+    @Override
+    public void tick()
+    {
+        this.buttonReset.active = !ButtonBindings.getBindings().stream().allMatch(ButtonBinding::isDefault);
     }
 
     @Override
@@ -54,16 +73,6 @@ public class ButtonBindingScreen extends Screen
             drawCenteredString(matrixStack, this.font, new TranslationTextComponent("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
         }
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button)
-    {
-        if(this.selectedBinding != null)
-        {
-            return true;
-        }
-        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
