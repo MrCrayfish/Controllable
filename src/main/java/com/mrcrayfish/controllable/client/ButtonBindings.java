@@ -23,9 +23,7 @@ public class ButtonBindings
     public static final ButtonBinding SCREENSHOT = new ButtonBinding(-1, "key.screenshot", "key.categories.misc");
     public static final ButtonBinding SCROLL_LEFT = new ButtonBinding(Buttons.LEFT_BUMPER, "controllable.key.previousHotbarItem", "key.categories.inventory");
     public static final ButtonBinding SCROLL_RIGHT = new ButtonBinding(Buttons.RIGHT_BUMPER, "controllable.key.nextHotbarItem", "key.categories.inventory");
-
-    // TODO prevent start button from being remapped
-    public static final ButtonBinding PAUSE_GAME = new ButtonBinding(Buttons.START, "key.pauseGame", "key.categories.gameplay", true);
+    public static final ButtonBinding PAUSE_GAME = new ButtonBinding(Buttons.START, "controllable.key.pauseGame", "key.categories.misc");
 
     public static List<ButtonBinding> getBindings()
     {

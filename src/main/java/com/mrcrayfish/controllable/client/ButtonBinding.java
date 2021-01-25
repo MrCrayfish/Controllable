@@ -17,23 +17,16 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     private int button;
     private String descriptionKey;
     private String category;
-    private boolean reserved;
     private boolean pressed;
     private int pressedTime;
 
-    ButtonBinding(int button, String descriptionKey, String category, boolean reserved)
+    ButtonBinding(int button, String descriptionKey, String category)
     {
         this.defaultButton = button;
         this.button = button;
         this.descriptionKey = descriptionKey;
         this.category = category;
-        this.reserved = reserved;
         BINDINGS.add(this);
-    }
-
-    public ButtonBinding(int button, String descriptionKey, String category)
-    {
-        this(button, descriptionKey, category, false);
     }
 
     public int getButton()
@@ -54,11 +47,6 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     public String getCategory()
     {
         return this.category;
-    }
-
-    public boolean isReserved()
-    {
-        return this.reserved;
     }
 
     public boolean isDefault()

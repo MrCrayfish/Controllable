@@ -39,7 +39,7 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         this.categories.put("key.categories.misc", new ArrayList<>());
 
         // Add all button bindings to the appropriate category or create a new one
-        ButtonBindings.getBindings().stream().filter(binding -> !binding.isReserved()).forEach(binding ->
+        ButtonBindings.getBindings().forEach(binding ->
         {
             List<ButtonBinding> list = this.categories.computeIfAbsent(binding.getCategory(), category -> new ArrayList<>());
             list.add(binding);

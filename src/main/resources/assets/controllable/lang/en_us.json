@@ -90,5 +90,6 @@
   "controllable.button.dpad_left": "Left",
   "controllable.button.dpad_right": "Right",
   "controllable.key.nextHotbarItem": "Scroll Hotbar Right",
-  "controllable.key.previousHotbarItem": "Scroll Hotbar Left"
+  "controllable.key.previousHotbarItem": "Scroll Hotbar Left",
+  "controllable.key.pauseGame": "Pause Game"
 }
