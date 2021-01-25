@@ -133,6 +133,10 @@ public class Mappings
         private String name;
         private Map<Integer, Integer> reassignments;
         private boolean switchThumbsticks;
+        private boolean flipLeftX;
+        private boolean flipLeftY;
+        private boolean flipRightX;
+        private boolean flipRightY;
         private boolean internal;
 
         private Entry() {}
@@ -169,6 +173,46 @@ public class Mappings
             this.switchThumbsticks = switchThumbsticks;
         }
 
+        public boolean isFlipLeftX()
+        {
+            return this.flipLeftX;
+        }
+
+        public void setFlipLeftX(boolean flipLeftX)
+        {
+            this.flipLeftX = flipLeftX;
+        }
+
+        public boolean isFlipLeftY()
+        {
+            return this.flipLeftY;
+        }
+
+        public void setFlipLeftY(boolean flipLeftY)
+        {
+            this.flipLeftY = flipLeftY;
+        }
+
+        public boolean isFlipRightX()
+        {
+            return this.flipRightX;
+        }
+
+        public void setFlipRightX(boolean flipRightX)
+        {
+            this.flipRightX = flipRightX;
+        }
+
+        public boolean isFlipRightY()
+        {
+            return this.flipRightY;
+        }
+
+        public void setFlipRightY(boolean flipRightY)
+        {
+            this.flipRightY = flipRightY;
+        }
+
         public boolean isInternal()
         {
             return this.internal;
@@ -186,8 +230,15 @@ public class Mappings
 
         public Entry copy()
         {
-            Entry entry = new Entry(this.id, this.name, new HashMap<>(this.reassignments));
+            Entry entry = new Entry();
+            entry.id = this.id;
+            entry.name = this.name;
+            entry.reassignments = new HashMap<>(this.reassignments);
             entry.switchThumbsticks = this.switchThumbsticks;
+            entry.flipLeftX = this.flipLeftX;
+            entry.flipLeftY = this.flipLeftY;
+            entry.flipRightX = this.flipRightX;
+            entry.flipRightY = this.flipRightY;
             return entry;
         }
 
@@ -217,7 +268,13 @@ public class Mappings
                 JsonObject object = new JsonObject();
                 object.addProperty("id", src.id);
                 object.addProperty("name", src.name);
-                object.addProperty("switchThumbsticks", src.switchThumbsticks);
+                JsonObject thumbsticks = new JsonObject();
+                thumbsticks.addProperty("switch", src.switchThumbsticks);
+                thumbsticks.addProperty("flipLeftX", src.flipLeftX);
+                thumbsticks.addProperty("flipLeftY", src.flipLeftY);
+                thumbsticks.addProperty("flipRightX", src.flipRightX);
+                thumbsticks.addProperty("flipRightY", src.flipRightY);
+                object.add("thumbsticks", thumbsticks);
                 JsonArray array = new JsonArray();
                 src.reassignments.forEach((index, with) -> {
                     JsonObject entry = new JsonObject();
@@ -236,9 +293,14 @@ public class Mappings
                 JsonObject object = json.getAsJsonObject();
                 entry.id = object.get("id").getAsString();
                 entry.name = object.get("name").getAsString();
-                if(object.has("switchThumbsticks"))
+                JsonObject thumbsticks = object.getAsJsonObject("thumbsticks");
+                if(thumbsticks != null)
                 {
-                    entry.switchThumbsticks = object.get("switchThumbsticks").getAsBoolean();
+                    entry.switchThumbsticks = this.getBoolean(thumbsticks, "switchThumbsticks", false);
+                    entry.flipLeftX = this.getBoolean(thumbsticks, "flipLeftX", false);
+                    entry.flipLeftY = this.getBoolean(thumbsticks, "flipLeftY", false);
+                    entry.flipRightX = this.getBoolean(thumbsticks, "flipRightX", false);
+                    entry.flipRightY = this.getBoolean(thumbsticks, "flipRightY", false);
                 }
                 Map<Integer, Integer> reassignments = new HashMap<>();
                 object.getAsJsonArray("reassign").forEach(e -> {
@@ -247,6 +309,15 @@ public class Mappings
                 });
                 entry.reassignments = reassignments;
                 return entry;
+            }
+
+            private boolean getBoolean(JsonObject object, String name, boolean defaultVal)
+            {
+                if(object.has(name))
+                {
+                    return object.get(name).getAsBoolean();
+                }
+                return defaultVal;
             }
         }
     }

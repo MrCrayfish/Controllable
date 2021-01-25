@@ -8,13 +8,17 @@ import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
-import com.mrcrayfish.controllable.client.gui.widget.ImageStateButton;
+import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.settings.ControllableBooleanOption;
+import net.minecraft.client.AbstractOption;
+import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.widget.list.OptionsRowList;
 import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
@@ -42,7 +46,7 @@ public class ControllerLayoutScreen extends Screen
     private Mappings.Entry entry;
     private Button doneButton;
     private Button resetButton;
-    private Button switchButton;
+    private Button thumbstickButton;
 
     protected ControllerLayoutScreen(Screen parentScreen)
     {
@@ -93,6 +97,11 @@ public class ControllerLayoutScreen extends Screen
 
         this.resetButton = this.addButton(new Button(this.width / 2 - 50, this.height - 32, 100, 20, new TranslationTextComponent("controllable.gui.reset"), (button) -> {
             this.entry.getReassignments().clear();
+            this.entry.setSwitchThumbsticks(false);
+            this.entry.setFlipLeftX(false);
+            this.entry.setFlipLeftY(false);
+            this.entry.setFlipRightX(false);
+            this.entry.setFlipRightY(false);
         }));
 
         this.addButton(new Button(this.width / 2 + 54, this.height - 32, 100, 20, new TranslationTextComponent("gui.cancel"), (button) -> {
@@ -102,15 +111,22 @@ public class ControllerLayoutScreen extends Screen
         int width = 38 * 5;
         int x = this.width / 2 - width / 2;
         int y = this.height / 2 - 50 - 35;
-        this.switchButton = this.addButton(new ImageStateButton(x + width / 2 - 10, y + 90, 20, TEXTURE, 92, 0, () -> this.entry.isThumbsticksSwitched(), button -> {
-            this.entry.setSwitchThumbsticks(!this.entry.isThumbsticksSwitched());
+
+        this.thumbstickButton = this.addButton(new ImageButton(x + width / 2 - 10, y + 90, 20, TEXTURE, 92, 0, 16, 16, button -> {
+            this.minecraft.displayGuiScreen(new ThumbstickSettingsScreen(this));
         }));
     }
 
     @Override
     public void tick()
     {
-        this.resetButton.active = !this.entry.getReassignments().isEmpty();
+        boolean changed = !this.entry.getReassignments().isEmpty();
+        changed |= this.entry.isThumbsticksSwitched();
+        changed |= this.entry.isFlipLeftX();
+        changed |= this.entry.isFlipLeftY();
+        changed |= this.entry.isFlipRightX();
+        changed |= this.entry.isFlipRightY();
+        this.resetButton.active = changed;
         this.validLayout = this.entry.getReassignments().values().stream().noneMatch(b -> b == -1);
         this.doneButton.setMessage(new TranslationTextComponent("gui.done").mergeStyle(this.validLayout ? TextFormatting.WHITE : TextFormatting.RED));
     }
@@ -123,21 +139,21 @@ public class ControllerLayoutScreen extends Screen
         RenderSystem.enableBlend();
         Minecraft.getInstance().getTextureManager().bindTexture(TEXTURE);
         int width = 38 * 5;
-        int height = 25 * 5;
+        int height = 24 * 5;
         int x = this.width / 2 - width / 2;
         int y = this.height / 2 - 50 - 35;
-        blit(matrixStack, x, y, width, height, 50, 0, 38, 25, 256, 256); //TODO test
-        RenderSystem.disableBlend();
+        blit(matrixStack, x, y, width, height, 50, 0, 38, 24, 256, 256);
         this.controllerButtons.forEach(controllerButton -> controllerButton.draw(matrixStack, x, y, mouseX, mouseY, this.configureButton == controllerButton.button));
         drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
         this.drawMultiLineCenteredString(matrixStack, this.font, new TranslationTextComponent("controllable.gui.layout.info").mergeStyle(TextFormatting.GRAY), x + width / 2, y + 135, width + 190, 0xFFFFFFFF);
-
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         if(this.configureButton != -1)
         {
+            RenderSystem.disableDepthTest();
             this.fillGradient(matrixStack, 0, 0, this.width, this.height, -1072689136, -804253680);
             drawCenteredString(matrixStack, this.font, new TranslationTextComponent("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
+            RenderSystem.enableDepthTest();
             return;
         }
 
@@ -171,22 +187,6 @@ public class ControllerLayoutScreen extends Screen
             this.func_243308_b(matrixStack, components, mouseX, mouseY);
         }
 
-        if(this.switchButton.isHovered())
-        {
-            List<IReorderingProcessor> components = new ArrayList<>();
-            components.add(new TranslationTextComponent("controllable.gui.layout.switch_thumbsticks").func_241878_f());
-            components.addAll(this.font.trimStringToWidth(new TranslationTextComponent("controllable.gui.layout.switch_thumbsticks.info").mergeStyle(TextFormatting.GRAY), 180));
-            if(this.entry.isThumbsticksSwitched())
-            {
-                components.add(new TranslationTextComponent("controllable.gui.layout.switch_thumbsticks.enabled").mergeStyle(TextFormatting.BLUE).func_241878_f());
-            }
-            else
-            {
-                components.add(new TranslationTextComponent("controllable.gui.layout.switch_thumbsticks.disabled").mergeStyle(TextFormatting.RED).func_241878_f());
-            }
-            this.renderTooltip(matrixStack, components, mouseX, mouseY - 50);
-        }
-
         if(!this.validLayout && this.doneButton.isHovered())
         {
             List<IReorderingProcessor> components = new ArrayList<>();
@@ -194,12 +194,17 @@ public class ControllerLayoutScreen extends Screen
             components.addAll(this.font.trimStringToWidth(new TranslationTextComponent("controllable.gui.layout.invalid_layout").mergeStyle(TextFormatting.GRAY), 180));
             this.renderTooltip(matrixStack, components, mouseX, mouseY - 50);
         }
+
+        if(this.thumbstickButton.isHovered())
+        {
+            this.renderTooltip(matrixStack, new TranslationTextComponent("controllable.gui.layout.thumbsticks"), mouseX, mouseY);
+        }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
     {
-        if(mouseButton == 0)
+        if(mouseButton == 0 && this.configureButton == -1)
         {
             ControllerButton button = this.controllerButtons.stream().filter(ControllerButton::isHovered).findFirst().orElse(null);
             if(button != null)
@@ -325,6 +330,11 @@ public class ControllerLayoutScreen extends Screen
     public Map<Integer, Integer> getReassignments()
     {
         return this.entry.getReassignments();
+    }
+
+    public Mappings.Entry getEntry()
+    {
+        return this.entry;
     }
 
     private void drawMultiLineCenteredString(MatrixStack matrixStack, FontRenderer font, ITextComponent component, int x, int y, int width, int color)

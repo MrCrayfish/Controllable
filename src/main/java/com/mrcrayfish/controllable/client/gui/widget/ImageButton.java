@@ -6,24 +6,23 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 
-import java.util.function.Supplier;
-
 /**
  * Author: MrCrayfish
  */
-public class ImageStateButton extends Button
+public class ImageButton extends Button
 {
     private ResourceLocation texture;
-    private int u, v;
-    private Supplier<Boolean> state;
+    private int imageU, imageV;
+    private int imageWidth, imageHeight;
 
-    public ImageStateButton(int x, int y, int width, ResourceLocation texture, int u, int v, Supplier<Boolean> state, IPressable onPress)
+    public ImageButton(int x, int y, int width, ResourceLocation texture, int imageU, int imageV, int imageWidth, int imageHeight, IPressable onPress)
     {
         super(x, y, width, 20, StringTextComponent.EMPTY, onPress);
         this.texture = texture;
-        this.u = u;
-        this.v = v;
-        this.state = state;
+        this.imageU = imageU;
+        this.imageV = imageV;
+        this.imageWidth = imageWidth;
+        this.imageHeight = imageHeight;
     }
 
     @Override
@@ -31,7 +30,6 @@ public class ImageStateButton extends Button
     {
         super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
         Minecraft.getInstance().getTextureManager().bindTexture(this.texture);
-        int offset = this.state.get() ? 16 : 0;
-        this.blit(matrixStack, this.x + 2, this.y + 2, this.u + offset, this.v, 16, 16);
+        this.blit(matrixStack, this.x + (this.width - this.imageWidth) / 2, this.y + 2, this.imageU, this.imageV, this.imageWidth, this.imageHeight);
     }
 }

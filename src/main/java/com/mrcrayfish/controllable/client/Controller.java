@@ -104,7 +104,8 @@ public class Controller
      */
     public float getLThumbStickXValue()
     {
-        return this.controller.getAxis(this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_RIGHTX : SDL_CONTROLLER_AXIS_LEFTX);
+        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_RIGHTX : SDL_CONTROLLER_AXIS_LEFTX;
+        return this.controller.getAxis(axis) * (this.isFlipLeftX() ? -1 : 1);
     }
 
     /**
@@ -114,7 +115,8 @@ public class Controller
      */
     public float getLThumbStickYValue()
     {
-        return this.controller.getAxis(this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_RIGHTY : SDL_CONTROLLER_AXIS_LEFTY);
+        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_RIGHTY : SDL_CONTROLLER_AXIS_LEFTY;
+        return this.controller.getAxis(axis) * (this.isFlipLeftY() ? -1 : 1);
     }
 
     /**
@@ -124,7 +126,8 @@ public class Controller
      */
     public float getRThumbStickXValue()
     {
-        return this.controller.getAxis(this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_LEFTX : SDL_CONTROLLER_AXIS_RIGHTX);
+        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_LEFTX : SDL_CONTROLLER_AXIS_RIGHTX;
+        return this.controller.getAxis(axis) * (this.isFlipRightX() ? -1 : 1);
     }
 
     /**
@@ -134,7 +137,8 @@ public class Controller
      */
     public float getRThumbStickYValue()
     {
-        return this.controller.getAxis(this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_LEFTY : SDL_CONTROLLER_AXIS_RIGHTY);
+        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_LEFTY : SDL_CONTROLLER_AXIS_RIGHTY;
+        return this.controller.getAxis(axis) * (this.isFlipRightY() ? -1 : 1);
     }
 
     /**
@@ -161,5 +165,25 @@ public class Controller
     private boolean isThumbsticksSwitched()
     {
         return this.mapping != null && this.mapping.isThumbsticksSwitched();
+    }
+
+    public boolean isFlipLeftX()
+    {
+        return this.mapping != null && this.mapping.isFlipLeftX();
+    }
+
+    public boolean isFlipLeftY()
+    {
+        return this.mapping != null && this.mapping.isFlipLeftY();
+    }
+
+    public boolean isFlipRightX()
+    {
+        return this.mapping != null && this.mapping.isFlipRightX();
+    }
+
+    public boolean isFlipRightY()
+    {
+        return this.mapping != null && this.mapping.isFlipRightY();
     }
 }
