@@ -47,11 +47,13 @@ public class ButtonBindingScreen extends Screen
 
         this.buttonReset = this.addButton(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslationTextComponent("controllable.gui.resetBinds"), (button) -> {
             ButtonBindings.getBindings().forEach(ButtonBinding::reset);
+            ButtonBinding.resetBindingHash();
         }));
         this.buttonReset.active = ButtonBindings.getBindings().stream().noneMatch(ButtonBinding::isDefault);
 
         this.addButton(new Button(this.width / 2 - 155 + 160, this.height - 29, 150, 20, DialogTexts.GUI_DONE, (button) -> {
             this.minecraft.displayGuiScreen(this.parentScreen);
+            ButtonBinding.resetBindingHash();
         }));
     }
 
@@ -105,7 +107,7 @@ public class ButtonBindingScreen extends Screen
         {
             this.selectedBinding.setButton(index);
             this.selectedBinding = null;
-            //TODO resolve conflicts
+            ButtonBinding.resetBindingHash();
             return true;
         }
         return false;

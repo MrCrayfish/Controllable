@@ -1,10 +1,12 @@
 package com.mrcrayfish.controllable.client;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraft.client.resources.I18n;
+import net.minecraftforge.client.settings.IKeyConflictContext;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Author: MrCrayfish
@@ -12,21 +14,25 @@ import java.util.List;
 public class ButtonBinding implements Comparable<ButtonBinding>
 {
     static final List<ButtonBinding> BINDINGS = new ArrayList<>();
+    private static final Map<Integer, List<ButtonBinding>> HASH = new HashMap<>();
 
     private final int defaultButton;
     private int button;
     private String descriptionKey;
     private String category;
+    private IKeyConflictContext context;
     private boolean pressed;
     private int pressedTime;
 
-    ButtonBinding(int button, String descriptionKey, String category)
+    ButtonBinding(int button, String descriptionKey, String category, IKeyConflictContext context)
     {
         this.defaultButton = button;
         this.button = button;
         this.descriptionKey = descriptionKey;
         this.category = category;
+        this.context = context;
         BINDINGS.add(this);
+        HASH.computeIfAbsent(button, i -> new ArrayList<>()).add(this);
     }
 
     public int getButton()
@@ -56,12 +62,12 @@ public class ButtonBinding implements Comparable<ButtonBinding>
 
     public boolean isButtonPressed()
     {
-        return this.pressed && this.pressedTime == 0;
+        return this.pressed && this.pressedTime == 0 && this.isActiveAndValidContext();
     }
 
     public boolean isButtonDown()
     {
-        return this.pressed;
+        return this.pressed && this.isActiveAndValidContext();
     }
 
     public void reset()
@@ -82,11 +88,12 @@ public class ButtonBinding implements Comparable<ButtonBinding>
 
     public static void setButtonState(int button, boolean state)
     {
-        for(ButtonBinding binding : BINDINGS)
+        List<ButtonBinding> bindings = HASH.get(button);
+        for(ButtonBinding binding : bindings)
         {
-            if(binding.getButton() == button)
+            binding.pressed = state;
+            if(state)
             {
-                binding.pressed = state;
                 binding.pressedTime = 0;
             }
         }
@@ -103,9 +110,51 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         }
     }
 
+    public static void resetBindingHash()
+    {
+        HASH.clear();
+        BINDINGS.forEach(binding -> HASH.computeIfAbsent(binding.getButton(), i -> new ArrayList<>()).add(binding));
+    }
+
     @Override
     public int compareTo(ButtonBinding o)
     {
         return I18n.format(this.descriptionKey).compareTo(I18n.format(o.descriptionKey));
+    }
+
+    public boolean isConflictingContext()
+    {
+        List<ButtonBinding> bindings = HASH.get(this.button);
+
+        if(bindings == null)
+            return false;
+
+        for(ButtonBinding binding : bindings)
+        {
+            if(this.conflicts(binding))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the context is active and that this binding does not conflict with any other binding.
+     */
+    private boolean isActiveAndValidContext()
+    {
+        return this.context.isActive() && !this.isConflictingContext();
+    }
+
+    /**
+     * Tests if the given binding conflicts with this binding
+     *
+     * @param binding the binding to test against
+     * @return true if the bindings conflict
+     */
+    private boolean conflicts(ButtonBinding binding)
+    {
+        return this != binding && this.button == binding.getButton() && this.context.conflicts(binding.context);
     }
 }

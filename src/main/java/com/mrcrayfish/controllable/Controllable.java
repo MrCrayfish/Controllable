@@ -4,15 +4,17 @@ import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingScreen;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
-import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.libsdl.SDL_Error;
@@ -39,6 +41,7 @@ public class Controllable extends ControllerAdapter
     public Controllable()
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onLoadComplete);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.clientSpec);
         MinecraftForge.EVENT_BUS.register(this);
     }
@@ -85,6 +88,14 @@ public class Controllable extends ControllerAdapter
         MinecraftForge.EVENT_BUS.register(new ControllerEvents());
 
         this.startControllerThread();
+    }
+
+    private void onLoadComplete(FMLLoadCompleteEvent event)
+    {
+        if(FMLLoader.getDist() != Dist.CLIENT)
+            return;
+
+        ButtonBinding.resetBindingHash();
     }
 
     @Override

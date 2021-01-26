@@ -11,6 +11,7 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.widget.list.AbstractOptionList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
 
@@ -116,7 +117,7 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
             });
             this.deleteButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button -> {
                 binding.reset();
-                //TODO fix conflicts
+                ButtonBinding.resetBindingHash();
             });
         }
 
@@ -127,9 +128,11 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         }
 
         @Override
+        @SuppressWarnings("ConstantConditions")
         public void render(MatrixStack matrixStack, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
-            ButtonBindingList.this.minecraft.fontRenderer.func_243246_a(matrixStack, this.label, left, y + 6, 0xFFAAAAAA);
+            int color = this.binding.isConflictingContext() ? TextFormatting.RED.getColor() : TextFormatting.GRAY.getColor();
+            ButtonBindingList.this.minecraft.fontRenderer.func_243246_a(matrixStack, this.label, left, y + 6, color);
             this.bindingButton.x = left + width - 45;
             this.bindingButton.y = y;
             this.bindingButton.render(matrixStack, mouseX,mouseY, partialTicks);
