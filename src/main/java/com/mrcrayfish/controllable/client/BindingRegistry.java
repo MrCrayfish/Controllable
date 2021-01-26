@@ -60,7 +60,8 @@ public class BindingRegistry
 
     List<ButtonBinding> getBindingListForButton(int button)
     {
-        return ImmutableList.copyOf(this.idToButtonList.get(button));
+        List<ButtonBinding> list = this.idToButtonList.get(button);
+        return list != null ? ImmutableList.copyOf(list) : ImmutableList.of();
     }
 
     public List<ButtonBinding> getBindings()
