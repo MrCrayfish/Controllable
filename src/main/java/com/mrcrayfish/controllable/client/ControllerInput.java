@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -23,6 +24,7 @@ import net.minecraft.network.play.client.CPlayerDiggingPacket;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ScreenShotHelper;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
@@ -622,18 +624,20 @@ public class ControllerInput
                         mc.player.closeScreen();
                     }
                 }
-                else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
+                else if(ButtonBindings.PREVIOUS_CREATIVE_TAB.isButtonPressed())
                 {
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
                         scrollCreativeTabs((CreativeScreen) mc.currentScreen, 1);
+                        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                     }
                 }
-                else if(ButtonBindings.SCROLL_LEFT.isButtonPressed())
+                else if(ButtonBindings.NEXT_CREATIVE_TAB.isButtonPressed())
                 {
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
                         scrollCreativeTabs((CreativeScreen) mc.currentScreen, -1);
+                        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                     }
                 }
                 else if(ButtonBindings.PAUSE_GAME.isButtonPressed())

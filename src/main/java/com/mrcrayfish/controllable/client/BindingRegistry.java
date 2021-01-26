@@ -32,6 +32,8 @@ public class BindingRegistry
         getInstance().register(ButtonBindings.SCROLL_LEFT);
         getInstance().register(ButtonBindings.SCROLL_RIGHT);
         getInstance().register(ButtonBindings.PAUSE_GAME);
+        getInstance().register(ButtonBindings.NEXT_CREATIVE_TAB);
+        getInstance().register(ButtonBindings.PREVIOUS_CREATIVE_TAB);
     }
 
     private static BindingRegistry instance;

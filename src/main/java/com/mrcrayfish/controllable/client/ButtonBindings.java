@@ -22,4 +22,6 @@ public class ButtonBindings
     public static final ButtonBinding SCROLL_LEFT = new ButtonBinding(Buttons.LEFT_BUMPER, "controllable.key.previousHotbarItem", "key.categories.inventory", KeyConflictContext.IN_GAME);
     public static final ButtonBinding SCROLL_RIGHT = new ButtonBinding(Buttons.RIGHT_BUMPER, "controllable.key.nextHotbarItem", "key.categories.inventory", KeyConflictContext.IN_GAME);
     public static final ButtonBinding PAUSE_GAME = new ButtonBinding(Buttons.START, "controllable.key.pauseGame", "key.categories.misc", KeyConflictContext.UNIVERSAL);
+    public static final ButtonBinding NEXT_CREATIVE_TAB = new ButtonBinding(Buttons.LEFT_BUMPER, "controllable.key.previousCreativeTab", "key.categories.inventory", KeyConflictContext.GUI);
+    public static final ButtonBinding PREVIOUS_CREATIVE_TAB = new ButtonBinding(Buttons.RIGHT_BUMPER, "controllable.key.nextCreativeTab", "key.categories.inventory", KeyConflictContext.GUI);
 }
