@@ -117,7 +117,9 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
             });
             this.deleteButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button -> {
                 binding.reset();
-                BindingRegistry.getInstance().resetBindingHash();
+                BindingRegistry registry = BindingRegistry.getInstance();
+                registry.resetBindingHash();
+                registry.save();
             });
         }
 
