@@ -10,7 +10,7 @@ license="GNU General Public License 3.0"
 
 [[mods]]
 modId="controllable"
-version="0.8.4"
+version="0.9.0"
 displayName="Controllable"
 description='''
 Adds the ability to use a controller to play Minecraft
