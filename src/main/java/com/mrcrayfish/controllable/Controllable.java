@@ -37,6 +37,7 @@ public class Controllable extends ControllerAdapter
     private static SDL2ControllerManager manager;
     private static Controller controller;
     private static ControllerInput input;
+    private static File configFolder;
 
     public Controllable()
     {
@@ -57,10 +58,15 @@ public class Controllable extends ControllerAdapter
         return input;
     }
 
+    public static File getConfigFolder()
+    {
+        return configFolder;
+    }
+
     private void onClientSetup(FMLClientSetupEvent event)
     {
         Minecraft mc = event.getMinecraftSupplier().get();
-        File configFolder = new File(mc.gameDir, "config");
+        configFolder = new File(mc.gameDir, "config");
 
         ControllerProperties.load(configFolder);
 
@@ -95,7 +101,7 @@ public class Controllable extends ControllerAdapter
         if(FMLLoader.getDist() != Dist.CLIENT)
             return;
 
-        ButtonBinding.resetBindingHash();
+        BindingRegistry.getInstance().load();
     }
 
     @Override

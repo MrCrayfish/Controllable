@@ -1,9 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraftforge.client.settings.KeyConflictContext;
-
-import java.util.List;
 
 /**
  * Author: MrCrayfish
@@ -25,14 +22,4 @@ public class ButtonBindings
     public static final ButtonBinding SCROLL_LEFT = new ButtonBinding(Buttons.LEFT_BUMPER, "controllable.key.previousHotbarItem", "key.categories.inventory", KeyConflictContext.IN_GAME);
     public static final ButtonBinding SCROLL_RIGHT = new ButtonBinding(Buttons.RIGHT_BUMPER, "controllable.key.nextHotbarItem", "key.categories.inventory", KeyConflictContext.IN_GAME);
     public static final ButtonBinding PAUSE_GAME = new ButtonBinding(Buttons.START, "controllable.key.pauseGame", "key.categories.misc", KeyConflictContext.UNIVERSAL);
-
-    static
-    {
-        ButtonBinding.resetBindingHash();
-    }
-
-    public static List<ButtonBinding> getBindings()
-    {
-        return ImmutableList.copyOf(ButtonBinding.BINDINGS);
-    }
 }

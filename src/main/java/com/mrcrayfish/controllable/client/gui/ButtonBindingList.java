@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.gui;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
@@ -40,7 +41,7 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         this.categories.put("key.categories.misc", new ArrayList<>());
 
         // Add all button bindings to the appropriate category or create a new one
-        ButtonBindings.getBindings().forEach(binding ->
+        BindingRegistry.getInstance().getBindings().forEach(binding ->
         {
             List<ButtonBinding> list = this.categories.computeIfAbsent(binding.getCategory(), category -> new ArrayList<>());
             list.add(binding);
@@ -94,7 +95,6 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         @Override
         public void render(MatrixStack matrixStack, int x, int y, int p_230432_4_, int p_230432_5_, int itemHeight, int p_230432_7_, int p_230432_8_, boolean selected, float partialTicks)
         {
-            //System.out.println(x + " " + y + " " + p_230432_4_ + " " + p_230432_5_ + " " + itemHeight + " " + p_230432_7_ + " " + p_230432_8_);
             float labelX = ButtonBindingList.this.minecraft.currentScreen.width / 2F - this.labelWidth / 2F;
             float labelY = y + itemHeight - 9 - 1;
             ButtonBindingList.this.minecraft.fontRenderer.func_243248_b(matrixStack, this.label, labelX, labelY, 0xFFFFFFFF);
@@ -117,7 +117,7 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
             });
             this.deleteButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button -> {
                 binding.reset();
-                ButtonBinding.resetBindingHash();
+                BindingRegistry.getInstance().resetBindingHash();
             });
         }
 

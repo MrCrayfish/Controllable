@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.ButtonStates;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
@@ -46,21 +47,25 @@ public class ButtonBindingScreen extends Screen
         this.children.add(this.bindingList);
 
         this.buttonReset = this.addButton(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslationTextComponent("controllable.gui.resetBinds"), (button) -> {
-            ButtonBindings.getBindings().forEach(ButtonBinding::reset);
-            ButtonBinding.resetBindingHash();
+            BindingRegistry registry = BindingRegistry.getInstance();
+            registry.getBindings().forEach(ButtonBinding::reset);
+            registry.resetBindingHash();
+            registry.save();
         }));
-        this.buttonReset.active = ButtonBindings.getBindings().stream().noneMatch(ButtonBinding::isDefault);
+        this.buttonReset.active = BindingRegistry.getInstance().getBindings().stream().noneMatch(ButtonBinding::isDefault);
 
         this.addButton(new Button(this.width / 2 - 155 + 160, this.height - 29, 150, 20, DialogTexts.GUI_DONE, (button) -> {
             this.minecraft.displayGuiScreen(this.parentScreen);
-            ButtonBinding.resetBindingHash();
+            BindingRegistry registry = BindingRegistry.getInstance();
+            registry.resetBindingHash();
+            registry.save();
         }));
     }
 
     @Override
     public void tick()
     {
-        this.buttonReset.active = !ButtonBindings.getBindings().stream().allMatch(ButtonBinding::isDefault);
+        this.buttonReset.active = !BindingRegistry.getInstance().getBindings().stream().allMatch(ButtonBinding::isDefault);
     }
 
     @Override
@@ -107,7 +112,9 @@ public class ButtonBindingScreen extends Screen
         {
             this.selectedBinding.setButton(index);
             this.selectedBinding = null;
-            ButtonBinding.resetBindingHash();
+            BindingRegistry registry = BindingRegistry.getInstance();
+            registry.resetBindingHash();
+            registry.save();
             return true;
         }
         return false;
