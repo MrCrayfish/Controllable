@@ -744,8 +744,8 @@ public class ControllerInput
 
             Minecraft mc = Minecraft.getInstance();
             ContainerScreen guiContainer = (ContainerScreen) screen;
-            int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
-            int guiTop = (guiContainer.height - guiContainer.getYSize()) / 2;
+            int guiLeft = guiContainer.getGuiLeft();
+            int guiTop = guiContainer.getGuiTop();
             int mouseX = (int) (this.targetMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth());
             int mouseY = (int) (this.targetMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight());
 
