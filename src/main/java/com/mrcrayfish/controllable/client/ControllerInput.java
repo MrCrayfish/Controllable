@@ -796,8 +796,8 @@ public class ControllerInput
             }
             else
             {
-                this.mouseSpeedX *= 0.1F;
-                this.mouseSpeedY *= 0.1F;
+                this.mouseSpeedX = 0.0F;
+                this.mouseSpeedY = 0.0F;
             }
         }
         else
