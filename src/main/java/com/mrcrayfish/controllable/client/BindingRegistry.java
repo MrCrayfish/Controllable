@@ -4,10 +4,11 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.mrcrayfish.controllable.Controllable;
-import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundNBT;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -81,7 +82,9 @@ public class BindingRegistry
     public void resetBindingHash()
     {
         this.idToButtonList.clear();
-        this.bindings.forEach(binding -> this.idToButtonList.computeIfAbsent(binding.getButton(), i -> new ArrayList<>()).add(binding));
+        this.bindings.stream().filter(binding -> binding.getButton() != -1).forEach(binding -> {
+            this.idToButtonList.computeIfAbsent(binding.getButton(), i -> new ArrayList<>()).add(binding);
+        });
     }
 
     public void load()
