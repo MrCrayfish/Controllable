@@ -93,5 +93,9 @@
   "controllable.key.previousHotbarItem": "Scroll Hotbar Left",
   "controllable.key.pauseGame": "Pause Game",
   "controllable.key.previousCreativeTab": "Previous Creative Tab",
-  "controllable.key.nextCreativeTab": "Next Creative Tab"
+  "controllable.key.nextCreativeTab": "Next Creative Tab",
+  "controllable.key.moveDown": "Navigate Down",
+  "controllable.key.moveLeft": "Navigate Left",
+  "controllable.key.moveRight": "Navigate Right",
+  "controllable.key.moveUp": "Navigate Up"
 }
