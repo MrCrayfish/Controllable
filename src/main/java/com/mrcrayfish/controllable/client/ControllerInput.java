@@ -201,12 +201,15 @@ public class ControllerInput
                 if(mc.currentScreen instanceof IRecipeShownListener)
                 {
                     RecipeBookGui recipeBook = ((IRecipeShownListener) mc.currentScreen).getRecipeGui();
-                    eventListeners.add(((RecipeBookGuiMixin) recipeBook).getToggleRecipesBtn());
-                    eventListeners.addAll(((RecipeBookGuiMixin) recipeBook).getRecipeTabs());
-                    RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
-                    eventListeners.addAll(((RecipeBookPageMixin) recipeBookPage).getButtons());
-                    eventListeners.add(((RecipeBookPageMixin) recipeBookPage).getForwardButton());
-                    eventListeners.add(((RecipeBookPageMixin) recipeBookPage).getBackButton());
+                    if(recipeBook.isVisible())
+                    {
+                        eventListeners.add(((RecipeBookGuiMixin) recipeBook).getToggleRecipesBtn());
+                        eventListeners.addAll(((RecipeBookGuiMixin) recipeBook).getRecipeTabs());
+                        RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
+                        eventListeners.addAll(((RecipeBookPageMixin) recipeBookPage).getButtons());
+                        eventListeners.add(((RecipeBookPageMixin) recipeBookPage).getForwardButton());
+                        eventListeners.add(((RecipeBookPageMixin) recipeBookPage).getBackButton());
+                    }
                 }
                 IGuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
                 if(hoveredListener != null && !(hoveredListener instanceof AbstractList))
@@ -831,13 +834,15 @@ public class ControllerInput
         if(screen instanceof IRecipeShownListener)
         {
             RecipeBookGui recipeBook = ((IRecipeShownListener) screen).getRecipeGui();
-            widgets.add(((RecipeBookGuiMixin) recipeBook).getToggleRecipesBtn());
-            widgets.addAll(((RecipeBookGuiMixin) recipeBook).getRecipeTabs());
-
-            RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
-            widgets.addAll(((RecipeBookPageMixin) recipeBookPage).getButtons());
-            widgets.add(((RecipeBookPageMixin) recipeBookPage).getForwardButton());
-            widgets.add(((RecipeBookPageMixin) recipeBookPage).getBackButton());
+            if(recipeBook.isVisible())
+            {
+                widgets.add(((RecipeBookGuiMixin) recipeBook).getToggleRecipesBtn());
+                widgets.addAll(((RecipeBookGuiMixin) recipeBook).getRecipeTabs());
+                RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
+                widgets.addAll(((RecipeBookPageMixin) recipeBookPage).getButtons());
+                widgets.add(((RecipeBookPageMixin) recipeBookPage).getForwardButton());
+                widgets.add(((RecipeBookPageMixin) recipeBookPage).getBackButton());
+            }
         }
 
         for(Widget widget : widgets)
