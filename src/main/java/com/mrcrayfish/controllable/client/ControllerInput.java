@@ -679,6 +679,22 @@ public class ControllerInput
                         this.scrollRecipePage(recipeShownListener.getRecipeGui(), -1);
                     }
                 }
+                else if(ButtonBindings.NEXT_RECIPE_TAB.isButtonPressed())
+                {
+                    if(mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        IRecipeShownListener recipeShownListener = (IRecipeShownListener) mc.currentScreen;
+                        this.scrollRecipeTab(recipeShownListener.getRecipeGui(), -1);
+                    }
+                }
+                else if(ButtonBindings.PREVIOUS_RECIPE_TAB.isButtonPressed())
+                {
+                    if(mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        IRecipeShownListener recipeShownListener = (IRecipeShownListener) mc.currentScreen;
+                        this.scrollRecipeTab(recipeShownListener.getRecipeGui(), 1);
+                    }
+                }
                 else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
                 {
                     if(mc.currentScreen instanceof IngameMenuScreen)
@@ -786,23 +802,21 @@ public class ControllerInput
         }
     }
 
-    //TODO
-    private void scrollRecipeTabs()
+    private void scrollRecipeTab(RecipeBookGui recipeBook, int dir)
     {
-        /*for(RecipeTabToggleWidget recipetabtogglewidget : this.recipeTabs)
+        RecipeBookGuiMixin recipeBookMixin = ((RecipeBookGuiMixin) recipeBook);
+        RecipeTabToggleWidget currentTab = recipeBookMixin.getCurrentTab();
+        List<RecipeTabToggleWidget> tabs = recipeBookMixin.getRecipeTabs();
+        int nextTabIndex = tabs.indexOf(currentTab) + dir;
+        if(nextTabIndex >= 0 && nextTabIndex < tabs.size())
         {
-            if (recipetabtogglewidget.mouseClicked(mouseX, mouseY, button))
-            {
-                if (this.currentTab != recipetabtogglewidget) {
-                    this.currentTab.setStateTriggered(false);
-                    this.currentTab = recipetabtogglewidget;
-                    this.currentTab.setStateTriggered(true);
-                    this.updateCollections(true);
-                }
-
-                return true;
-            }
-        }*/
+            RecipeTabToggleWidget newTab = tabs.get(nextTabIndex);
+            currentTab.setStateTriggered(false);
+            recipeBookMixin.setCurrentTab(newTab);
+            newTab.setStateTriggered(true);
+            recipeBookMixin.invokeUpdateCollections(true);
+            Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        }
     }
 
     private void scrollRecipePage(RecipeBookGui recipeBook, int dir)

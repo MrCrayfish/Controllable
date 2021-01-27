@@ -6,6 +6,7 @@ import net.minecraft.client.gui.recipebook.RecipeTabToggleWidget;
 import net.minecraft.client.gui.widget.ToggleWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.List;
 
@@ -23,4 +24,13 @@ public interface RecipeBookGuiMixin
 
     @Accessor("recipeBookPage")
     RecipeBookPage getRecipeBookPage();
+
+    @Accessor("currentTab")
+    RecipeTabToggleWidget getCurrentTab();
+
+    @Accessor("currentTab")
+    void setCurrentTab(RecipeTabToggleWidget tab);
+
+    @Invoker("updateCollections")
+    void invokeUpdateCollections(boolean resetPages);
 }

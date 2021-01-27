@@ -94,6 +94,8 @@
   "controllable.key.pauseGame": "Pause Game",
   "controllable.key.previousCreativeTab": "Previous Creative Tab / Recipe Page",
   "controllable.key.nextCreativeTab": "Next Creative Tab / Recipe Page",
+  "controllable.key.previousRecipeTab": "Previous Recipe Tab",
+  "controllable.key.nextRecipeTab": "Next Recipe Tab",
   "controllable.key.moveDown": "Navigate Down",
   "controllable.key.moveLeft": "Navigate Left",
   "controllable.key.moveRight": "Navigate Right",

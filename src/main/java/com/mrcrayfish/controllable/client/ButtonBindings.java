@@ -24,6 +24,8 @@ public class ButtonBindings
     public static final ButtonBinding PAUSE_GAME = new ButtonBinding(Buttons.START, "controllable.key.pauseGame", "key.categories.misc", KeyConflictContext.UNIVERSAL);
     public static final ButtonBinding NEXT_CREATIVE_TAB = new ButtonBinding(Buttons.LEFT_BUMPER, "controllable.key.previousCreativeTab", "key.categories.inventory", KeyConflictContext.GUI);
     public static final ButtonBinding PREVIOUS_CREATIVE_TAB = new ButtonBinding(Buttons.RIGHT_BUMPER, "controllable.key.nextCreativeTab", "key.categories.inventory", KeyConflictContext.GUI);
+    public static final ButtonBinding NEXT_RECIPE_TAB = new ButtonBinding(Buttons.LEFT_TRIGGER, "controllable.key.previousRecipeTab", "key.categories.inventory", KeyConflictContext.GUI);
+    public static final ButtonBinding PREVIOUS_RECIPE_TAB = new ButtonBinding(Buttons.RIGHT_TRIGGER, "controllable.key.nextRecipeTab", "key.categories.inventory", KeyConflictContext.GUI);
     public static final ButtonBinding NAVIGATE_UP = new ButtonBinding(Buttons.DPAD_UP, "controllable.key.moveUp", "key.categories.ui", KeyConflictContext.GUI);
     public static final ButtonBinding NAVIGATE_DOWN = new ButtonBinding(Buttons.DPAD_DOWN, "controllable.key.moveDown", "key.categories.ui", KeyConflictContext.GUI);
     public static final ButtonBinding NAVIGATE_LEFT = new ButtonBinding(Buttons.DPAD_LEFT, "controllable.key.moveLeft", "key.categories.ui", KeyConflictContext.GUI);
