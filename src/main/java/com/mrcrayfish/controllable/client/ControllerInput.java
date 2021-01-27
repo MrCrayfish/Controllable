@@ -228,7 +228,7 @@ public class ControllerInput
             if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get())
             {
                 Screen screen = mc.currentScreen;
-                if(screen != null && (this.targetMouseX != this.prevTargetMouseX || this.targetMouseY != this.prevTargetMouseY))
+                if(screen != null)
                 {
                     if(mc.loadingGui == null)
                     {
