@@ -771,6 +771,30 @@ public class ControllerInput
         int mouseX = (int) (this.targetMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth());
         int mouseY = (int) (this.targetMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight());
 
+        List<NavigationPoint> points = this.gatherNavigationPoints(screen);
+
+        // Get only the points that are in the target direction
+        List<NavigationPoint> targetPoints = points.stream().filter(point -> navigate.getPredicate().test(point, mouseX, mouseY)).collect(Collectors.toList());
+        if(targetPoints.isEmpty())
+            return;
+
+        Vector3d mousePos = new Vector3d(mouseX, mouseY, 0);
+        Optional<NavigationPoint> minimumPointOptional = targetPoints.stream().min(navigate.getMinComparator(mouseX, mouseY));
+        double minimumDelta = navigate.getKeyExtractor().apply(minimumPointOptional.get(), mousePos) + 10;
+        Optional<NavigationPoint> targetPointOptional = targetPoints.stream().filter(point -> navigate.getKeyExtractor().apply(point, mousePos) <= minimumDelta).min(Comparator.comparing(p -> p.distanceTo(mouseX, mouseY)));
+        if(targetPointOptional.isPresent())
+        {
+            NavigationPoint targetPoint = targetPointOptional.get();
+            int screenX = (int) (targetPoint.getX() / ((double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth()));
+            int screenY = (int) (targetPoint.getY() / ((double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight()));
+            this.virtualMouseX = this.targetMouseX = this.prevTargetMouseX = screenX;
+            this.virtualMouseY = this.targetMouseY = this.prevTargetMouseY = screenY;
+            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 2.0F));
+        }
+    }
+
+    private List<NavigationPoint> gatherNavigationPoints(Screen screen)
+    {
         List<NavigationPoint> points = new ArrayList<>();
 
         if(screen instanceof ContainerScreen)
@@ -788,39 +812,36 @@ public class ControllerInput
             }
         }
 
+        List<Widget> widgets = new ArrayList<>();
         for(IGuiEventListener listener : screen.getEventListeners())
         {
             if(listener instanceof Widget)
             {
-                Widget widget = (Widget) listener;
-                if(widget.isHovered() || !widget.visible)
-                    continue;
-                int posX = widget.x + widget.getWidth() / 2;
-                int posY = widget.y + widget.getHeightRealms() / 2;
-                points.add(new WidgetNavigationPoint(posX, posY, widget));
+                widgets.add((Widget) listener);
             }
         }
 
-        //List<NavigationPoint> filteredPoints = points.stream().filter(point -> navigate.getPredicate().test(point, mouseX, mouseY)).collect(Collectors.toList());
-
-        // Get only the points that are in the target direction
-        List<NavigationPoint> targetPoints = points.stream().filter(point -> navigate.getPredicate().test(point, mouseX, mouseY)).collect(Collectors.toList());
-        if(targetPoints.isEmpty())
-            return;
-
-        Vector3d mousePos = new Vector3d(mouseX, mouseY, 0);
-        Optional<NavigationPoint> minimumPointOptional = targetPoints.stream().min(navigate.getMinComparator(mouseX, mouseY));
-        double minimumDelta = navigate.getKeyExtractor().apply(minimumPointOptional.get(), mousePos);
-        Optional<NavigationPoint> targetPointOptional = targetPoints.stream().filter(point -> navigate.getKeyExtractor().apply(point, mousePos) <= minimumDelta).min(Comparator.comparing(p -> p.distanceTo(mouseX, mouseY)));
-        if(targetPointOptional.isPresent())
+        if(screen instanceof IRecipeShownListener)
         {
-            NavigationPoint targetPoint = targetPointOptional.get();
-            int screenX = (int) (targetPoint.getX() / ((double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth()));
-            int screenY = (int) (targetPoint.getY() / ((double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight()));
-            this.virtualMouseX = this.targetMouseX = this.prevTargetMouseX = screenX;
-            this.virtualMouseY = this.targetMouseY = this.prevTargetMouseY = screenY;
-            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 2.0F));
+            RecipeBookGui recipeBook = ((IRecipeShownListener) screen).getRecipeGui();
+            widgets.add(((RecipeBookGuiMixin) recipeBook).getToggleRecipesBtn());
+
+            RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
+            widgets.addAll(((RecipeBookPageMixin) recipeBookPage).getButtons());
+            widgets.add(((RecipeBookPageMixin) recipeBookPage).getForwardButton());
+            widgets.add(((RecipeBookPageMixin) recipeBookPage).getBackButton());
         }
+
+        for(Widget widget : widgets)
+        {
+            if(widget == null || widget.isHovered() || !widget.visible)
+                continue;
+            int posX = widget.x + widget.getWidth() / 2;
+            int posY = widget.y + widget.getHeightRealms() / 2;
+            points.add(new WidgetNavigationPoint(posX, posY, widget));
+        }
+
+        return points;
     }
 
     private void moveMouseToClosestSlot(boolean moving, Screen screen)
