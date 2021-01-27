@@ -6,14 +6,22 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
+import com.mrcrayfish.controllable.mixin.client.RecipeBookGuiMixin;
+import com.mrcrayfish.controllable.mixin.client.RecipeBookPageMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.recipebook.IRecipeShownListener;
+import net.minecraft.client.gui.recipebook.RecipeBookGui;
+import net.minecraft.client.gui.recipebook.RecipeBookPage;
+import net.minecraft.client.gui.recipebook.RecipeWidget;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.ToggleWidget;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.client.settings.PointOfView;
 import net.minecraft.client.util.NativeUtil;
@@ -27,6 +35,8 @@ import net.minecraft.util.ScreenShotHelper;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector2f;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -42,6 +52,14 @@ import org.lwjgl.glfw.GLFW;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_DOWN;
 import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_UP;
@@ -647,6 +665,22 @@ public class ControllerInput
                         mc.displayGuiScreen(null);
                     }
                 }
+                else if(ButtonBindings.NAVIGATE_UP.isButtonPressed())
+                {
+                    this.navigateMouse(mc.currentScreen, Navigate.UP);
+                }
+                else if(ButtonBindings.NAVIGATE_DOWN.isButtonPressed())
+                {
+                    this.navigateMouse(mc.currentScreen, Navigate.DOWN);
+                }
+                else if(ButtonBindings.NAVIGATE_LEFT.isButtonPressed())
+                {
+                    this.navigateMouse(mc.currentScreen, Navigate.LEFT);
+                }
+                else if(ButtonBindings.NAVIGATE_RIGHT.isButtonPressed())
+                {
+                    this.navigateMouse(mc.currentScreen, Navigate.RIGHT);
+                }
                 else if(button == Buttons.A)
                 {
                     invokeMouseClick(mc.currentScreen, 0);
@@ -731,6 +765,64 @@ public class ControllerInput
         }
     }
 
+    private void navigateMouse(Screen screen, Navigate navigate)
+    {
+        Minecraft mc = Minecraft.getInstance();
+        int mouseX = (int) (this.targetMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth());
+        int mouseY = (int) (this.targetMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight());
+
+        List<NavigationPoint> points = new ArrayList<>();
+
+        if(screen instanceof ContainerScreen)
+        {
+            ContainerScreen containerScreen = (ContainerScreen) screen;
+            int guiLeft = containerScreen.getGuiLeft();
+            int guiTop = containerScreen.getGuiTop();
+            for(Slot slot : containerScreen.getContainer().inventorySlots)
+            {
+                if(containerScreen.getSlotUnderMouse() == slot)
+                    continue;
+                int posX = guiLeft + slot.xPos + 8;
+                int posY = guiTop + slot.yPos + 8;
+                points.add(new SlotNavigationPoint(posX, posY, slot));
+            }
+        }
+
+        for(IGuiEventListener listener : screen.getEventListeners())
+        {
+            if(listener instanceof Widget)
+            {
+                Widget widget = (Widget) listener;
+                if(widget.isHovered() || !widget.visible)
+                    continue;
+                int posX = widget.x + widget.getWidth() / 2;
+                int posY = widget.y + widget.getHeightRealms() / 2;
+                points.add(new WidgetNavigationPoint(posX, posY, widget));
+            }
+        }
+
+        //List<NavigationPoint> filteredPoints = points.stream().filter(point -> navigate.getPredicate().test(point, mouseX, mouseY)).collect(Collectors.toList());
+
+        // Get only the points that are in the target direction
+        List<NavigationPoint> targetPoints = points.stream().filter(point -> navigate.getPredicate().test(point, mouseX, mouseY)).collect(Collectors.toList());
+        if(targetPoints.isEmpty())
+            return;
+
+        Vector3d mousePos = new Vector3d(mouseX, mouseY, 0);
+        Optional<NavigationPoint> minimumPointOptional = targetPoints.stream().min(navigate.getMinComparator(mouseX, mouseY));
+        double minimumDelta = navigate.getKeyExtractor().apply(minimumPointOptional.get(), mousePos);
+        Optional<NavigationPoint> targetPointOptional = targetPoints.stream().filter(point -> navigate.getKeyExtractor().apply(point, mousePos) <= minimumDelta).min(Comparator.comparing(p -> p.distanceTo(mouseX, mouseY)));
+        if(targetPointOptional.isPresent())
+        {
+            NavigationPoint targetPoint = targetPointOptional.get();
+            int screenX = (int) (targetPoint.getX() / ((double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth()));
+            int screenY = (int) (targetPoint.getY() / ((double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight()));
+            this.virtualMouseX = this.targetMouseX = this.prevTargetMouseX = screenX;
+            this.virtualMouseY = this.targetMouseY = this.prevTargetMouseY = screenY;
+            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 2.0F));
+        }
+    }
+
     private void moveMouseToClosestSlot(boolean moving, Screen screen)
     {
         this.nearSlot = false;
@@ -748,8 +840,6 @@ public class ControllerInput
             int guiTop = guiContainer.getGuiTop();
             int mouseX = (int) (this.targetMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth());
             int mouseY = (int) (this.targetMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight());
-
-            //Slot closestSlot = guiContainer.getSlotUnderMouse();
 
             /* Finds the closest slot in the GUI within 14 pixels (inclusive) */
             Slot closestSlot = null;
@@ -941,5 +1031,127 @@ public class ControllerInput
                 }
             }, "mouseReleased event handler", screen.getClass().getCanonicalName());
         }
+    }
+
+    private enum Navigate
+    {
+        UP((p, x, y) -> p.getY() < y, (p, v) -> Math.abs(p.getX() - v.x)),
+        DOWN((p, x, y) -> p.getY() > y + 1, (p, v) -> Math.abs(p.getX() - v.x)),
+        LEFT((p, x, y) -> p.getX() < x, (p, v) -> Math.abs(p.getY() - v.y)),
+        RIGHT((p, x, y) -> p.getX() > x + 1, (p, v) -> Math.abs(p.getY() - v.y));
+
+        private NavigatePredicate predicate;
+        private BiFunction<? super NavigationPoint, Vector3d, Double> keyExtractor;
+
+        Navigate(NavigatePredicate predicate, BiFunction<? super NavigationPoint, Vector3d, Double> keyExtractor)
+        {
+            this.predicate = predicate;
+            this.keyExtractor = keyExtractor;
+        }
+
+        public NavigatePredicate getPredicate()
+        {
+            return this.predicate;
+        }
+
+        public BiFunction<? super NavigationPoint, Vector3d, Double> getKeyExtractor()
+        {
+            return this.keyExtractor;
+        }
+
+        public Comparator<NavigationPoint> getMinComparator(int mouseX, int mouseY)
+        {
+            return Comparator.comparing(p -> this.keyExtractor.apply(p, new Vector3d(mouseX, mouseY, 0)));
+        }
+
+        public static void main(String[] args)
+        {
+            int slotX = 10;
+            int slotY = 20;
+            int mouseX = 50;
+            int mouseY = 20;
+            angle(new SlotNavigationPoint(slotX, slotY, null), mouseX, mouseY, 0);
+        }
+
+        private static boolean angle(NavigationPoint point, int mouseX, int mouseY, double offset)
+        {
+            double angle = Math.toDegrees(Math.atan2(point.y - mouseY, point.x - mouseX)) + offset;
+            return angle > -45 && angle < 45;
+        }
+    }
+
+    private static abstract class NavigationPoint
+    {
+        private final double x, y;
+        private final Type type;
+
+        public NavigationPoint(double x, double y, Type type)
+        {
+            this.x = x;
+            this.y = y;
+            this.type = type;
+        }
+
+        public double distanceTo(double x, double y)
+        {
+            return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
+        }
+
+        public double getX()
+        {
+            return this.x;
+        }
+
+        public double getY()
+        {
+            return this.y;
+        }
+
+        public Type getType()
+        {
+            return this.type;
+        }
+
+        protected enum Type
+        {
+            WIDGET, SLOT;
+        }
+    }
+
+    private static class WidgetNavigationPoint extends NavigationPoint
+    {
+        private Widget widget;
+
+        public WidgetNavigationPoint(double x, double y, Widget widget)
+        {
+            super(x, y, Type.WIDGET);
+            this.widget = widget;
+        }
+
+        public Widget getWidget()
+        {
+            return this.widget;
+        }
+    }
+
+    private static class SlotNavigationPoint extends NavigationPoint
+    {
+        private Slot slot;
+
+        public SlotNavigationPoint(double x, double y, Slot slot)
+        {
+            super(x, y, Type.SLOT);
+            this.slot = slot;
+        }
+
+        public Slot getSlot()
+        {
+            return this.slot;
+        }
+    }
+
+    private interface NavigatePredicate
+    {
+        boolean test(NavigationPoint point, int mouseX, int mouseY);
     }
 }
