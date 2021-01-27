@@ -43,7 +43,7 @@ public class ButtonBindingScreen extends Screen
     @Override
     protected void init()
     {
-        this.bindingList = new ButtonBindingList(this, this.minecraft, this.width, this.height, 32, this.height - 44, 20);
+        this.bindingList = new ButtonBindingList(this, this.minecraft, this.width + 10, this.height, 32, this.height - 44, 20);
         this.children.add(this.bindingList);
 
         this.buttonReset = this.addButton(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslationTextComponent("controllable.gui.resetBinds"), (button) -> {

@@ -15,6 +15,7 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
 import net.minecraft.client.gui.recipebook.RecipeBookPage;
+import net.minecraft.client.gui.recipebook.RecipeTabToggleWidget;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -656,16 +657,26 @@ public class ControllerInput
                 {
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
-                        scrollCreativeTabs((CreativeScreen) mc.currentScreen, 1);
+                        this.scrollCreativeTabs((CreativeScreen) mc.currentScreen, 1);
                         Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                    }
+                    else if(mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        IRecipeShownListener recipeShownListener = (IRecipeShownListener) mc.currentScreen;
+                        this.scrollRecipePage(recipeShownListener.getRecipeGui(), 1);
                     }
                 }
                 else if(ButtonBindings.NEXT_CREATIVE_TAB.isButtonPressed())
                 {
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
-                        scrollCreativeTabs((CreativeScreen) mc.currentScreen, -1);
+                        this.scrollCreativeTabs((CreativeScreen) mc.currentScreen, -1);
                         Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                    }
+                    else if(mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        IRecipeShownListener recipeShownListener = (IRecipeShownListener) mc.currentScreen;
+                        this.scrollRecipePage(recipeShownListener.getRecipeGui(), -1);
                     }
                 }
                 else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
@@ -772,6 +783,37 @@ public class ControllerInput
         catch(IllegalAccessException | InvocationTargetException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    //TODO
+    private void scrollRecipeTabs()
+    {
+        /*for(RecipeTabToggleWidget recipetabtogglewidget : this.recipeTabs)
+        {
+            if (recipetabtogglewidget.mouseClicked(mouseX, mouseY, button))
+            {
+                if (this.currentTab != recipetabtogglewidget) {
+                    this.currentTab.setStateTriggered(false);
+                    this.currentTab = recipetabtogglewidget;
+                    this.currentTab.setStateTriggered(true);
+                    this.updateCollections(true);
+                }
+
+                return true;
+            }
+        }*/
+    }
+
+    private void scrollRecipePage(RecipeBookGui recipeBook, int dir)
+    {
+        RecipeBookPageMixin page = (RecipeBookPageMixin)((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
+        if(dir > 0 && page.getForwardButton().visible || dir < 0 && page.getBackButton().visible)
+        {
+            int currentPage = page.getCurrentPage();
+            page.setCurrentPage(currentPage + dir);
+            page.invokeUpdateButtonsForPage();
+            Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
         }
     }
 

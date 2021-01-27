@@ -5,6 +5,7 @@ import net.minecraft.client.gui.recipebook.RecipeWidget;
 import net.minecraft.client.gui.widget.ToggleWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.List;
 
@@ -22,4 +23,13 @@ public interface RecipeBookPageMixin
 
     @Accessor("backButton")
     ToggleWidget getBackButton();
+
+    @Accessor("currentPage")
+    int getCurrentPage();
+
+    @Accessor("currentPage")
+    void setCurrentPage(int page);
+
+    @Invoker("updateButtonsForPage")
+    void invokeUpdateButtonsForPage();
 }
