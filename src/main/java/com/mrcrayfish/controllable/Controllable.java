@@ -8,6 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -38,6 +40,7 @@ public class Controllable extends ControllerAdapter
     private static Controller controller;
     private static ControllerInput input;
     private static File configFolder;
+    private static boolean jeiLoaded;
 
     public Controllable()
     {
@@ -63,10 +66,16 @@ public class Controllable extends ControllerAdapter
         return configFolder;
     }
 
+    public static boolean isJeiLoaded()
+    {
+        return jeiLoaded;
+    }
+
     private void onClientSetup(FMLClientSetupEvent event)
     {
         Minecraft mc = event.getMinecraftSupplier().get();
         configFolder = new File(mc.gameDir, "config");
+        jeiLoaded = ModList.get().isLoaded("jei");
 
         ControllerProperties.load(configFolder);
 

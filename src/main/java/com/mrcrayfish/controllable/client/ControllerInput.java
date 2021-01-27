@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
+import com.mrcrayfish.controllable.integration.JustEnoughItems;
 import com.mrcrayfish.controllable.mixin.client.CreativeScreenMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookGuiMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageMixin;
@@ -925,6 +926,11 @@ public class ControllerInput
             }
         }
 
+        if(Controllable.isJeiLoaded())
+        {
+            points.addAll(JustEnoughItems.getNavigationPoints());
+        }
+
         return points;
     }
 
@@ -1201,7 +1207,7 @@ public class ControllerInput
         }
     }
 
-    private static abstract class NavigationPoint
+    public static abstract class NavigationPoint
     {
         private final double x, y;
         private final Type type;
@@ -1239,7 +1245,7 @@ public class ControllerInput
         }
     }
 
-    private static class WidgetNavigationPoint extends NavigationPoint
+    public static class WidgetNavigationPoint extends NavigationPoint
     {
         private Widget widget;
 
@@ -1271,7 +1277,7 @@ public class ControllerInput
         }
     }
 
-    private static class BasicNavigationPoint extends NavigationPoint
+    public static class BasicNavigationPoint extends NavigationPoint
     {
         public BasicNavigationPoint(double x, double y)
         {

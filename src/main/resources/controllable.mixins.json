@@ -16,7 +16,11 @@
         "client.MouseHelperMixin",
         "client.RecipeBookGuiMixin",
         "client.RecipeBookPageMixin",
-        "client.jei.MouseUtilMixin"
+        "client.jei.MouseUtilMixin",
+        "client.jei.IngredientListOverlayMixin",
+        "client.jei.IngredientGridWithNavigationMixin",
+        "client.jei.IngredientGridMixin",
+        "client.jei.PageNavigationMixin"
     ],
     "injectors": {
         "defaultRequire": 1
