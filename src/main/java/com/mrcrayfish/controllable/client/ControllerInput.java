@@ -201,6 +201,8 @@ public class ControllerInput
                 if(mc.currentScreen instanceof IRecipeShownListener)
                 {
                     RecipeBookGui recipeBook = ((IRecipeShownListener) mc.currentScreen).getRecipeGui();
+                    eventListeners.add(((RecipeBookGuiMixin) recipeBook).getToggleRecipesBtn());
+                    eventListeners.addAll(((RecipeBookGuiMixin) recipeBook).getRecipeTabs());
                     RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
                     eventListeners.addAll(((RecipeBookPageMixin) recipeBookPage).getButtons());
                     eventListeners.add(((RecipeBookPageMixin) recipeBookPage).getForwardButton());
@@ -830,6 +832,7 @@ public class ControllerInput
         {
             RecipeBookGui recipeBook = ((IRecipeShownListener) screen).getRecipeGui();
             widgets.add(((RecipeBookGuiMixin) recipeBook).getToggleRecipesBtn());
+            widgets.addAll(((RecipeBookGuiMixin) recipeBook).getRecipeTabs());
 
             RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
             widgets.addAll(((RecipeBookPageMixin) recipeBookPage).getButtons());
