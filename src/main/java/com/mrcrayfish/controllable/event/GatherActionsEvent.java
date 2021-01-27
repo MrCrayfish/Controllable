@@ -9,17 +9,16 @@ import java.util.Map;
 /**
  * Author: MrCrayfish
  */
-@Deprecated
-public class AvailableActionsEvent extends Event
+public class GatherActionsEvent extends Event
 {
-    private Map<Integer, Action> actions;
+    private Map<ButtonBinding, Action> actions;
 
-    public AvailableActionsEvent(Map<Integer, Action> actions)
+    public GatherActionsEvent(Map<ButtonBinding, Action> actions)
     {
         this.actions = actions;
     }
 
-    public Map<Integer, Action> getActions()
+    public Map<ButtonBinding, Action> getActions()
     {
         return this.actions;
     }

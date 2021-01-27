@@ -143,4 +143,16 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     {
         return this != binding && this.button == binding.getButton() && this.context.conflicts(binding.context);
     }
+
+    @Override
+    public int hashCode()
+    {
+        return this.descriptionKey.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        return this == obj;
+    }
 }
