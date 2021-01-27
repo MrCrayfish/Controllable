@@ -49,6 +49,8 @@ public class RenderEvents
         {
             this.actions = new HashMap<>();
 
+            boolean verbose = Config.CLIENT.options.verboseActions.get();
+
             if(mc.currentScreen instanceof ContainerScreen)
             {
                 if(mc.player.inventory.getItemStack().isEmpty())
@@ -171,22 +173,25 @@ public class RenderEvents
                     this.actions.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.interact"), Action.Side.RIGHT));
                 }
 
-                //actions.put(Buttons.A, new Action(I18n.format("controllable.action.jump"), Action.Side.LEFT)); //TODO make a verbose action config option
+                if(verbose)
+                {
+                    this.actions.put(ButtonBindings.JUMP, new Action(I18n.format("controllable.action.jump"), Action.Side.LEFT));
+                }
 
                 this.actions.put(ButtonBindings.INVENTORY, new Action(I18n.format("controllable.action.inventory"), Action.Side.LEFT));
 
-                if(!mc.player.getHeldItemOffhand().isEmpty() || !mc.player.inventory.getCurrentItem().isEmpty())
+                if(verbose && (!mc.player.getHeldItemOffhand().isEmpty() || !mc.player.inventory.getCurrentItem().isEmpty()))
                 {
-                    //actions.put(Buttons.X, new Action(I18n.format("controllable.action.swap_hands"), Action.Side.LEFT));  //TODO make a verbose action config option
+                    this.actions.put(ButtonBindings.SWAP_HANDS, new Action(I18n.format("controllable.action.swap_hands"), Action.Side.LEFT));
                 }
 
                 if(mc.player.isPassenger())
                 {
                     this.actions.put(ButtonBindings.SNEAK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
                 }
-                else
+                else if(verbose)
                 {
-                    //actions.put(Buttons.LEFT_THUMB_STICK, new Action(I18n.format("controllable.action.sneak"), Action.Side.RIGHT));  //TODO make a verbose action config option
+                    this.actions.put(ButtonBindings.SNEAK, new Action(I18n.format("controllable.action.sneak"), Action.Side.RIGHT));
                 }
 
                 if(!mc.player.inventory.getCurrentItem().isEmpty())

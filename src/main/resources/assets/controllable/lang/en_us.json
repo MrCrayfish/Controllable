@@ -58,6 +58,7 @@
   "controllable.options.controllerIcons": "Icons",
   "controllable.options.controllerIcons.format": "Icons: %s",
   "controllable.options.invertLook": "Invert Look",
+  "controllable.options.verboseActions": "Verbose Actions",
   "controllable.options.switchThumbsticks": "Switch Thumbsticks",
   "controllable.options.flipLeftThumbstickX": "Flip Left X-Axis",
   "controllable.options.flipLeftThumbstickY": "Flip Left Y-Axis",

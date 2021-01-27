@@ -108,4 +108,11 @@ public class ControllerOptions
         double mouseSpeed = Config.CLIENT.options.mouseSpeed.get();
         return new TranslationTextComponent("controllable.options.mouseSpeed.format", FORMAT.format(mouseSpeed));
     });
+
+    public static final BooleanOption VERBOSE_ACTIONS = new ControllableBooleanOption("controllable.options.verboseActions", gameSettings -> {
+        return Config.CLIENT.options.verboseActions.get();
+    }, (gameSettings, value) -> {
+        Config.CLIENT.options.verboseActions.set(value);
+        Config.save();
+    });
 }
