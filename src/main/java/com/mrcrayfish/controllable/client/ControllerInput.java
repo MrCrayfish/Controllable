@@ -197,10 +197,19 @@ public class ControllerInput
 
                 double mouseX = this.virtualMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
                 double mouseY = this.virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
-                IGuiEventListener hoveredListener = mc.currentScreen.getEventListeners().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+                List<IGuiEventListener> eventListeners = new ArrayList<>(mc.currentScreen.getEventListeners());
+                if(mc.currentScreen instanceof IRecipeShownListener)
+                {
+                    RecipeBookGui recipeBook = ((IRecipeShownListener) mc.currentScreen).getRecipeGui();
+                    RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
+                    eventListeners.addAll(((RecipeBookPageMixin) recipeBookPage).getButtons());
+                    eventListeners.add(((RecipeBookPageMixin) recipeBookPage).getForwardButton());
+                    eventListeners.add(((RecipeBookPageMixin) recipeBookPage).getBackButton());
+                }
+                IGuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
                 if(hoveredListener != null && !(hoveredListener instanceof AbstractList))
                 {
-                    mouseSpeed *= 0.4;
+                    mouseSpeed *= 0.6;
                 }
 
                 this.targetMouseX += mouseSpeed * this.mouseSpeedX;
