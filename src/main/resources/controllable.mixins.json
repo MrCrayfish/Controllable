@@ -7,6 +7,7 @@
     "refmap": "controllable.refmap.json",
     "client": [
         "client.ContainerScreenMixin",
+        "client.CreativeScreenMixin",
         "client.ForgeIngameGuiMixin",
         "client.GameRendererMixin",
         "client.OptifineGameRendererMixin",

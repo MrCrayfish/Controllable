@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.event.ControllerEvent;
+import com.mrcrayfish.controllable.mixin.client.CreativeScreenMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookGuiMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageMixin;
 import net.minecraft.client.Minecraft;
@@ -14,13 +15,11 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
 import net.minecraft.client.gui.recipebook.RecipeBookPage;
-import net.minecraft.client.gui.recipebook.RecipeWidget;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
-import net.minecraft.client.gui.widget.ToggleWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.client.settings.PointOfView;
@@ -35,7 +34,6 @@ import net.minecraft.util.ScreenShotHelper;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector2f;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -57,8 +55,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_DOWN;
@@ -841,7 +837,38 @@ public class ControllerInput
             points.add(new WidgetNavigationPoint(posX, posY, widget));
         }
 
+        if(screen instanceof CreativeScreen)
+        {
+            int tabPage = CreativeScreenMixin.getTabPage();
+            int start = tabPage * 10;
+            int end = Math.min(ItemGroup.GROUPS.length, ((tabPage + 1) * 10 + 2));
+            for(int i = start; i < end; i++)
+            {
+                ItemGroup group = ItemGroup.GROUPS[i];
+                if(group != null)
+                {
+                    points.add(this.getCreativeTabPoint((CreativeScreen) screen, group));
+                }
+            }
+        }
+
         return points;
+    }
+
+    /**
+     * Gets the navigation point of a creative tab.
+     */
+    private BasicNavigationPoint getCreativeTabPoint(ContainerScreen screen, ItemGroup group)
+    {
+        boolean topRow = group.isOnTopRow();
+        int column = group.getColumn();
+        int width = 28;
+        int height = 32;
+        int x = screen.getGuiLeft() + width * column;
+        int y = screen.getGuiTop();
+        x = group.isAlignedRight() ? screen.getGuiLeft() + screen.getXSize() - width * (6 - column) : (column > 0 ? x + column : x);
+        y = topRow ? y - width : y + (screen.getYSize() - 4);
+        return new BasicNavigationPoint(x + width / 2.0, y + height / 2.0);
     }
 
     private void moveMouseToClosestSlot(boolean moving, Screen screen)
@@ -1135,7 +1162,7 @@ public class ControllerInput
 
         protected enum Type
         {
-            WIDGET, SLOT;
+            BASIC, WIDGET, SLOT;
         }
     }
 
@@ -1168,6 +1195,14 @@ public class ControllerInput
         public Slot getSlot()
         {
             return this.slot;
+        }
+    }
+
+    private static class BasicNavigationPoint extends NavigationPoint
+    {
+        public BasicNavigationPoint(double x, double y)
+        {
+            super(x, y, Type.BASIC);
         }
     }
 
