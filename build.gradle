@@ -100,9 +100,6 @@ jar {
             "Signing-Fingerprint": project.hasProperty('fingerprint') ? project.property('fingerprint') : 'unsigned'
         ])
     }
-    from {
-        configurations.libraries.collect { it.isDirectory() ? it : zipTree(it) }
-    }
 }
 
 Properties keyStoreProperties = new Properties()
