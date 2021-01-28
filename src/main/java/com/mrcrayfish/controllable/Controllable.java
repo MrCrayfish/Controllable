@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable;
 
-import com.badlogic.gdx.controllers.ControllerAdapter;
+import com.google.common.io.ByteStreams;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingScreen;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
@@ -9,7 +9,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -19,24 +18,22 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.libsdl.SDL_Error;
-import uk.co.electronstudio.sdl2gdx.SDL2Controller;
-import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.MemoryUtil;
 
 import javax.annotation.Nullable;
-import java.io.File;
-
-import static org.libsdl.SDL.*;
+import java.io.*;
+import java.nio.ByteBuffer;
 
 /**
  * Author: MrCrayfish
  */
 @Mod(Reference.MOD_ID)
-public class Controllable extends ControllerAdapter
+public class Controllable implements IControllerListener
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
-    private static SDL2ControllerManager manager;
+    private static ControllerManager manager;
     private static Controller controller;
     private static ControllerInput input;
     private static File configFolder;
@@ -79,17 +76,27 @@ public class Controllable extends ControllerAdapter
 
         ControllerProperties.load(configFolder);
 
-        /* Loads up the controller manager and setup shutdown cleanup */
-        Controllable.manager = new SDL2ControllerManager();
-        Controllable.manager.addListenerAndRunForConnectedControllers(this);
+        try(InputStream is = Mappings.class.getResourceAsStream("/gamecontrollerdb.txt"))
+        {
+            byte[] bytes = ByteStreams.toByteArray(is);
+            ByteBuffer buffer = MemoryUtil.memASCIISafe(new String(bytes));
+            GLFW.glfwUpdateGamepadMappings(buffer);
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        /* Loads up the controller manager and adds a listener */
+        Controllable.manager = new ControllerManager();
+        Controllable.manager.addControllerListener(this);
 
         /* Attempts to load the first controller connected if auto select is enabled */
-        if(Config.CLIENT.options.autoSelect.get() && manager.getControllers().size > 0)
+        if(Config.CLIENT.options.autoSelect.get())
         {
-            com.badlogic.gdx.controllers.Controller controller = manager.getControllers().get(0);
-            if(controller instanceof SDL2Controller)
+            if(GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_1) && GLFW.glfwJoystickIsGamepad(GLFW.GLFW_JOYSTICK_1))
             {
-                setController((SDL2Controller) controller);
+                setController(new Controller(GLFW.GLFW_JOYSTICK_1));
             }
         }
 
@@ -114,45 +121,43 @@ public class Controllable extends ControllerAdapter
     }
 
     @Override
-    public void connected(com.badlogic.gdx.controllers.Controller sdlController)
+    public void connected(int jid)
     {
         Minecraft.getInstance().enqueue(() ->
         {
-            if(sdlController instanceof SDL2Controller)
+            if(Controllable.controller == null)
             {
-                if(Controllable.controller == null)
+                if(Config.CLIENT.options.autoSelect.get())
                 {
-                    if(Config.CLIENT.options.autoSelect.get())
-                    {
-                        setController((SDL2Controller) sdlController);
-                    }
+                    setController(new Controller(jid));
+                }
 
-                    Minecraft mc = Minecraft.getInstance();
-                    if(mc.player != null)
-                    {
-                        Minecraft.getInstance().getToastGui().add(new ControllerToast(true, Controllable.controller.getName()));
-                    }
+                Minecraft mc = Minecraft.getInstance();
+                if(mc.player != null && Controllable.controller != null)
+                {
+                    Minecraft.getInstance().getToastGui().add(new ControllerToast(true, Controllable.controller.getName()));
                 }
             }
         });
     }
 
     @Override
-    public void disconnected(com.badlogic.gdx.controllers.Controller sdlController)
+    public void disconnected(int jid)
     {
         Minecraft.getInstance().enqueue(() ->
         {
             if(Controllable.controller != null)
             {
-                if(Controllable.controller.getSDL2Controller() == sdlController)
+                if(Controllable.controller.getJid() == jid)
                 {
                     Controller oldController = Controllable.controller;
 
                     setController(null);
 
-                    if(Config.CLIENT.options.autoSelect.get() && manager.getControllers().size > 0)
+                    if(Config.CLIENT.options.autoSelect.get() && manager.getControllerCount() > 0)
                     {
-                        setController((SDL2Controller) manager.getControllers().get(0));
+                        //TODO get next available controller
+                        //setController((SDL2Controller) manager.getControllers().get(0));
                     }
 
                     Minecraft mc = Minecraft.getInstance();
@@ -165,11 +170,10 @@ public class Controllable extends ControllerAdapter
         });
     }
 
-    public static void setController(@Nullable SDL2Controller sdl2Controller)
+    public static void setController(@Nullable Controller controller)
     {
-        if(sdl2Controller != null)
+        if(controller != null)
         {
-            Controller controller = new Controller(sdl2Controller);
             Controllable.controller = controller;
             Mappings.updateControllerMappings(controller);
         }
@@ -186,25 +190,22 @@ public class Controllable extends ControllerAdapter
             final long pollInterval = Config.CLIENT.controllerPollInterval.get();
             while(Minecraft.getInstance().isRunning())
             {
+                //TODO probably going to crash due to it not being on the main thread
+                boolean updated = controller.updateGamepadState();
+                if(!updated)
+                {
+                    setController(null);
+                }
+                this.gatherAndQueueControllerInput();
                 try
                 {
-                    manager.pollState();
-                    this.gatherAndQueueControllerInput();
-                    try
-                    {
-                        Thread.sleep(pollInterval);
-                    }
-                    catch(InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
+                    Thread.sleep(pollInterval);
                 }
-                catch(SDL_Error e)
+                catch(InterruptedException e)
                 {
                     e.printStackTrace();
                 }
             }
-            manager.close();
         };
         Thread controllerPollThread = new Thread(r, "Controller Input");
         controllerPollThread.setDaemon(true);
@@ -217,23 +218,23 @@ public class Controllable extends ControllerAdapter
         if(currentController == null)
             return;
         ButtonStates states = new ButtonStates();
-        states.setState(Buttons.A, this.getButtonState(SDL_CONTROLLER_BUTTON_A));
-        states.setState(Buttons.B, this.getButtonState(SDL_CONTROLLER_BUTTON_B));
-        states.setState(Buttons.X, this.getButtonState(SDL_CONTROLLER_BUTTON_X));
-        states.setState(Buttons.Y, this.getButtonState(SDL_CONTROLLER_BUTTON_Y));
-        states.setState(Buttons.SELECT, this.getButtonState(SDL_CONTROLLER_BUTTON_BACK));
-        states.setState(Buttons.HOME, this.getButtonState(SDL_CONTROLLER_BUTTON_GUIDE));
-        states.setState(Buttons.START, this.getButtonState(SDL_CONTROLLER_BUTTON_START));
-        states.setState(Buttons.LEFT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSTICK));
-        states.setState(Buttons.RIGHT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
-        states.setState(Buttons.LEFT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
-        states.setState(Buttons.RIGHT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
+        states.setState(Buttons.A, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_A));
+        states.setState(Buttons.B, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_B));
+        states.setState(Buttons.X, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_X));
+        states.setState(Buttons.Y, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_Y));
+        states.setState(Buttons.SELECT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_BACK));
+        states.setState(Buttons.HOME, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_GUIDE));
+        states.setState(Buttons.START, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_START));
+        states.setState(Buttons.LEFT_THUMB_STICK, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB));
+        states.setState(Buttons.RIGHT_THUMB_STICK, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB));
+        states.setState(Buttons.LEFT_BUMPER, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER));
+        states.setState(Buttons.RIGHT_BUMPER, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER));
         states.setState(Buttons.LEFT_TRIGGER, Math.abs(currentController.getLTriggerValue()) >= 0.1F);
         states.setState(Buttons.RIGHT_TRIGGER, Math.abs(currentController.getRTriggerValue()) >= 0.1F);
-        states.setState(Buttons.DPAD_UP, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
-        states.setState(Buttons.DPAD_DOWN, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
-        states.setState(Buttons.DPAD_LEFT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
-        states.setState(Buttons.DPAD_RIGHT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+        states.setState(Buttons.DPAD_UP, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP));
+        states.setState(Buttons.DPAD_DOWN, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
+        states.setState(Buttons.DPAD_LEFT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
+        states.setState(Buttons.DPAD_RIGHT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
         Minecraft.getInstance().enqueue(() -> this.processButtons(states));
     }
 
@@ -311,6 +312,6 @@ public class Controllable extends ControllerAdapter
 
     private boolean getButtonState(int buttonCode)
     {
-        return controller != null && controller.getSDL2Controller().getButton(buttonCode);
+        return controller != null && controller.getGamepadState().buttons(buttonCode) == GLFW.GLFW_PRESS;
     }
 }

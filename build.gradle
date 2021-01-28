@@ -68,11 +68,6 @@ minecraft {
     }
 }
 
-configurations {
-    libraries
-    compile.extendsFrom libraries
-}
-
 repositories {
     jcenter()
     maven {
@@ -89,7 +84,6 @@ repositories {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.3-34.1.0'
-    libraries "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
     compile fg.deobf("mezz.jei:jei-1.16.3:7.6.0.51")
 }
 

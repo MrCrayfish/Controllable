@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.mixin.client;
 
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.ControllerInput;
 import net.minecraft.client.MouseHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,6 +17,10 @@ public class MouseHelperMixin
     @Inject(method = "cursorPosCallback", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHelper;updatePlayerLook()V"))
     private void beforeUpdateLook(long handle, double x, double y, CallbackInfo ci)
     {
-        Controllable.getInput().resetLastUse();
+        ControllerInput input = Controllable.getInput();
+        if(input != null)
+        {
+            input.resetLastUse();
+        }
     }
 }

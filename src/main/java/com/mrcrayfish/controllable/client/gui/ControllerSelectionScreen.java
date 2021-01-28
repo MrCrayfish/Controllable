@@ -1,10 +1,10 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mrcrayfish.controllable.client.ControllerManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.TranslationTextComponent;
-import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 
 /**
  * Author: MrCrayfish
@@ -12,7 +12,7 @@ import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 public class ControllerSelectionScreen extends Screen
 {
     private int controllerCount;
-    private SDL2ControllerManager manager;
+    private ControllerManager manager;
     private ControllerList listControllers;
     private Screen previousScreen;
     private Button btnSettings;
@@ -20,17 +20,18 @@ public class ControllerSelectionScreen extends Screen
     private Button btnLayout;
     private Button btnBack;
 
-    public ControllerSelectionScreen(SDL2ControllerManager manager, Screen previousScreen)
+    public ControllerSelectionScreen(ControllerManager manager, Screen previousScreen)
     {
         super(new TranslationTextComponent("controllable.gui.title.select_controller"));
         this.manager = manager;
         this.previousScreen = previousScreen;
-        this.controllerCount = manager.getControllers().size;
+        this.controllerCount = manager.getControllerCount();
     }
 
     @Override
     protected void init()
     {
+        this.manager.update();
         this.listControllers = new ControllerList(this.manager, this.minecraft, this.width, this.height, 32, this.height - 44, 20);
         this.children.add(this.listControllers);
         this.btnSettings = this.addButton(new Button(this.width / 2 - 154, this.height - 32, 72, 20, new TranslationTextComponent("controllable.gui.settings"), this::handleSettings));
@@ -43,9 +44,9 @@ public class ControllerSelectionScreen extends Screen
     @Override
     public void tick()
     {
-        if(this.controllerCount != this.manager.getControllers().size)
+        if(this.controllerCount != this.manager.getControllerCount())
         {
-            this.controllerCount = this.manager.getControllers().size;
+            this.controllerCount = this.manager.getControllerCount();
             this.listControllers.reload();
         }
         this.btnRemap.active = this.listControllers.getSelected() != null;

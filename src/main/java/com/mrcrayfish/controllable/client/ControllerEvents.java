@@ -55,7 +55,7 @@ public class ControllerEvents
                     magnitudeFactor = MathHelper.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 1.5F) / 1.5F;
                     break;
             }
-            controller.getSDL2Controller().rumble(0.5F * magnitudeFactor, 0.5F * magnitudeFactor, 50); //50ms is one tick
+            //controller.getGamepadState().rumble(0.5F * magnitudeFactor, 0.5F * magnitudeFactor, 50); //50ms is one tick
         }
     }
 
@@ -84,7 +84,7 @@ public class ControllerEvents
             {
                 float difference = this.prevHealth - mc.player.getHealth();
                 float magnitude = difference / mc.player.getMaxHealth();
-                controller.getSDL2Controller().rumble(1.0F, 1.0F, (int) (800 * magnitude));
+                //controller.getGamepadState().rumble(1.0F, 1.0F, (int) (800 * magnitude));
                 this.prevHealth = mc.player.getHealth();
             }
             else

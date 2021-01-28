@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.util.ResourceLocation;
-import uk.co.electronstudio.sdl2gdx.SDL2Controller;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 
@@ -18,26 +18,26 @@ import java.awt.*;
 public final class ControllerEntry extends ExtendedList.AbstractListEntry<ControllerEntry>
 {
     private ControllerList controllerList;
-    private Controller controller;
+    private int jid;
 
-    public ControllerEntry(ControllerList controllerList, SDL2Controller sdl2Controller)
+    public ControllerEntry(ControllerList controllerList, int jid)
     {
         this.controllerList = controllerList;
-        this.controller = new Controller(sdl2Controller);
+        this.jid = jid;
     }
 
-    SDL2Controller getSdl2Controller()
+    public int getJid()
     {
-        return this.controller.getSDL2Controller();
+        return this.jid;
     }
 
     @Override
     public void render(MatrixStack matrixStack, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
     {
-        if(!this.controller.getSDL2Controller().isConnected())
+        String controllerName = GLFW.glfwGetGamepadName(this.jid);
+        if(controllerName == null)
             return;
-
-        Minecraft.getInstance().fontRenderer.drawStringWithShadow(matrixStack, this.controller.getName(), left + 20, top + 4, Color.WHITE.getRGB());
+        Minecraft.getInstance().fontRenderer.drawStringWithShadow(matrixStack, controllerName, left + 20, top + 4, Color.WHITE.getRGB());
         if(this.controllerList.getSelected() == this)
         {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -52,7 +52,7 @@ public final class ControllerEntry extends ExtendedList.AbstractListEntry<Contro
         if(this.controllerList.getSelected() != this)
         {
             this.controllerList.setSelected(this);
-            Controllable.setController(this.controller.getSDL2Controller());
+            Controllable.setController(new Controller(this.jid));
         }
         else
         {

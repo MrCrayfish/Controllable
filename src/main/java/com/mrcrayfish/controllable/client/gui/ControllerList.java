@@ -1,16 +1,15 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.badlogic.gdx.utils.Array;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Controller;
+import com.mrcrayfish.controllable.client.ControllerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import uk.co.electronstudio.sdl2gdx.SDL2Controller;
-import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Author: MrCrayfish
@@ -18,9 +17,9 @@ import java.util.List;
 @OnlyIn(Dist.CLIENT)
 public class ControllerList extends ExtendedList<ControllerEntry>
 {
-    private SDL2ControllerManager manager;
+    private ControllerManager manager;
 
-    public ControllerList(SDL2ControllerManager manager, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
+    public ControllerList(ControllerManager manager, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
     {
         super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
         this.manager = manager;
@@ -30,11 +29,10 @@ public class ControllerList extends ExtendedList<ControllerEntry>
     public void reload()
     {
         this.clearEntries();
-        Array<com.badlogic.gdx.controllers.Controller> controllers = this.manager.getControllers();
-        for(int i = 0; i < controllers.size; i++)
-        {
-            this.addEntry(new ControllerEntry(this, (SDL2Controller) controllers.get(i)));
-        }
+        Map<Integer, String> controllers = this.manager.getControllers();
+        controllers.forEach((jid, name) -> {
+            this.addEntry(new ControllerEntry(this, jid));
+        });
         this.updateSelected();
     }
 
@@ -50,7 +48,7 @@ public class ControllerList extends ExtendedList<ControllerEntry>
         List<ControllerEntry> entries = this.getEventListeners();
         for(ControllerEntry entry : entries)
         {
-            if(entry.getSdl2Controller() == controller.getSDL2Controller())
+            if(entry.getJid() == controller.getJid())
             {
                 this.setSelected(entry);
                 break;

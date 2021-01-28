@@ -59,9 +59,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_DOWN;
-import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_UP;
-
 /**
  * Author: MrCrayfish
  */
@@ -1062,16 +1059,6 @@ public class ControllerInput
         {
             this.lastUse = 100;
             dir = controller.getRThumbStickYValue();
-        }
-        if(controller.getSDL2Controller().getButton(SDL_CONTROLLER_BUTTON_DPAD_UP))
-        {
-            this.lastUse = 100;
-            dir = -1.0;
-        }
-        else if(controller.getSDL2Controller().getButton(SDL_CONTROLLER_BUTTON_DPAD_DOWN))
-        {
-            this.lastUse = 100;
-            dir = 1.0;
         }
         dir *= Minecraft.getInstance().getTickLength();
         list.setScrollAmount(list.getScrollAmount() + dir * 10);

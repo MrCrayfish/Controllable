@@ -2,11 +2,10 @@ package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.ButtonStates;
 import net.minecraft.client.resources.I18n;
-import uk.co.electronstudio.sdl2gdx.SDL2Controller;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWGamepadState;
 
 import javax.annotation.Nullable;
-
-import static org.libsdl.SDL.*;
 
 /**
  *  A wrapper class that aims to reduce the exposure to the underlying controller library. This class
@@ -15,27 +14,44 @@ import static org.libsdl.SDL.*;
  */
 public class Controller
 {
+    private final int jid;
+    private GLFWGamepadState controller;
+    private ButtonStates states;
     private String cachedName;
     private Mappings.Entry mapping;
-    private SDL2Controller controller;
-    private ButtonStates states;
 
-    public Controller(SDL2Controller controller)
+    public Controller(int jid)
     {
-        this.controller = controller;
+        this.jid = jid;
+        this.controller = GLFWGamepadState.create();
         this.states = new ButtonStates();
         this.getName(); //cache the name straight away
     }
 
+    public int getJid()
+    {
+        return this.jid;
+    }
+
     /**
-     * Gets the underlying {@link SDL2Controller} of this this controller instance.
+     * Gets the underlying {@link GLFWGamepadState} of this this controller instance.
      * This is gives you direct access to the controller state.
      *
      * @return the sdl2controller controller instance
      */
-    public SDL2Controller getSDL2Controller()
+    public GLFWGamepadState getGamepadState()
     {
         return this.controller;
+    }
+
+    /**
+     * Updates the state of the gamepad.
+     *
+     * @return True if successfully updated otherwise controller is disconnected
+     */
+    public boolean updateGamepadState()
+    {
+        return GLFW.glfwGetGamepadState(this.jid, this.controller);
     }
 
     /**
@@ -53,11 +69,11 @@ public class Controller
      */
     public String getName()
     {
-        if(this.controller.isConnected())
+        if(GLFW.glfwJoystickPresent(this.jid))
         {
             if(this.cachedName == null)
             {
-                this.cachedName = this.controller.getName().replace("SDL GameController ", "").replace("SDL Joystick ", "").replace("HIDAPI:","");
+                this.cachedName = GLFW.glfwGetGamepadName(this.jid);
             }
             return this.cachedName;
         }
@@ -84,7 +100,7 @@ public class Controller
      */
     public float getLTriggerValue()
     {
-        return this.controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+        return (this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) + 1.0F) / 2.0F;
     }
 
     /**
@@ -94,7 +110,7 @@ public class Controller
      */
     public float getRTriggerValue()
     {
-        return this.controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+        return (this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER) + 1.0F) / 2.0F;
     }
 
     /**
@@ -104,8 +120,8 @@ public class Controller
      */
     public float getLThumbStickXValue()
     {
-        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_RIGHTX : SDL_CONTROLLER_AXIS_LEFTX;
-        return this.controller.getAxis(axis) * (this.isFlipLeftX() ? -1 : 1);
+        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X : GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
+        return this.controller.axes(axis) * (this.isFlipLeftX() ? -1 : 1);
     }
 
     /**
@@ -115,8 +131,8 @@ public class Controller
      */
     public float getLThumbStickYValue()
     {
-        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_RIGHTY : SDL_CONTROLLER_AXIS_LEFTY;
-        return this.controller.getAxis(axis) * (this.isFlipLeftY() ? -1 : 1);
+        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y : GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
+        return this.controller.axes(axis) * (this.isFlipLeftY() ? -1 : 1);
     }
 
     /**
@@ -126,8 +142,8 @@ public class Controller
      */
     public float getRThumbStickXValue()
     {
-        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_LEFTX : SDL_CONTROLLER_AXIS_RIGHTX;
-        return this.controller.getAxis(axis) * (this.isFlipRightX() ? -1 : 1);
+        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_LEFT_X : GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
+        return this.controller.axes(axis) * (this.isFlipRightX() ? -1 : 1);
     }
 
     /**
@@ -137,8 +153,8 @@ public class Controller
      */
     public float getRThumbStickYValue()
     {
-        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_LEFTY : SDL_CONTROLLER_AXIS_RIGHTY;
-        return this.controller.getAxis(axis) * (this.isFlipRightY() ? -1 : 1);
+        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y : GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y ;
+        return this.controller.axes(axis) * (this.isFlipRightY() ? -1 : 1);
     }
 
     /**
