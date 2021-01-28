@@ -49,7 +49,11 @@ public class RenderEvents
         {
             this.actions = new HashMap<>();
 
-            boolean verbose = Config.CLIENT.options.verboseActions.get();
+            ActionVisibility visibility = Config.CLIENT.options.showActions.get();
+            if(visibility == ActionVisibility.NONE)
+                return;
+
+            boolean verbose = visibility == ActionVisibility.ALL;
 
             if(mc.currentScreen instanceof ContainerScreen)
             {
@@ -201,7 +205,7 @@ public class RenderEvents
             }
 
             MinecraftForge.EVENT_BUS.post(new AvailableActionsEvent(this.oldActions));
-            MinecraftForge.EVENT_BUS.post(new GatherActionsEvent(this.actions));
+            MinecraftForge.EVENT_BUS.post(new GatherActionsEvent(this.actions, visibility));
         }
     }
 

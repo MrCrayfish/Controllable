@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable;
 
+import com.mrcrayfish.controllable.client.ActionVisibility;
 import com.mrcrayfish.controllable.client.ControllerIcons;
 import com.mrcrayfish.controllable.client.CursorType;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -42,7 +43,7 @@ public class Config
             public final ForgeConfigSpec.DoubleValue deadZone;
             public final ForgeConfigSpec.DoubleValue rotationSpeed;
             public final ForgeConfigSpec.DoubleValue mouseSpeed;
-            public final ForgeConfigSpec.BooleanValue verboseActions;
+            public final ForgeConfigSpec.EnumValue<ActionVisibility> showActions;
 
             public Options(ForgeConfigSpec.Builder builder)
             {
@@ -59,7 +60,7 @@ public class Config
                     this.deadZone = builder.comment("The distance you have to move the thumbstick before it's input is registered. This fixes drifting as some thumbsticks don't center to zero.").defineInRange("deadZone", 0.15, 0.0, 1.0);
                     this.rotationSpeed = builder.comment("The speed which the camera turns in game").defineInRange("rotationSpeed", 25.0, 0.0, 50.0);
                     this.mouseSpeed = builder.comment("The speed which the cursor or virtual mouse moves around the screen").defineInRange("mouseSpeed", 15.0, 0.0, 50.0);
-                    this.verboseActions = builder.comment("If true, shows common actions when displaying available on the screen").define("verboseActions", false);
+                    this.showActions = builder.comment("If true, shows common actions when displaying available on the screen").defineEnum("showActions", ActionVisibility.MINIMAL);
                 }
                 builder.pop();
             }

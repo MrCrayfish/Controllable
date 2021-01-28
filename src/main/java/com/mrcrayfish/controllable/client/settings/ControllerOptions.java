@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.settings;
 
 import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.client.ActionVisibility;
 import com.mrcrayfish.controllable.client.ControllerIcons;
 import com.mrcrayfish.controllable.client.CursorType;
 import net.minecraft.client.settings.BooleanOption;
@@ -109,10 +110,13 @@ public class ControllerOptions
         return new TranslationTextComponent("controllable.options.mouseSpeed.format", FORMAT.format(mouseSpeed));
     });
 
-    public static final BooleanOption VERBOSE_ACTIONS = new ControllableBooleanOption("controllable.options.verboseActions", gameSettings -> {
-        return Config.CLIENT.options.verboseActions.get();
+    public static final ControllableEnumOption<ActionVisibility> SHOW_ACTIONS = new ControllableEnumOption<>("controllable.options.showActions", ActionVisibility.class, gameSettings -> {
+        return Config.CLIENT.options.showActions.get();
     }, (gameSettings, value) -> {
-        Config.CLIENT.options.verboseActions.set(value);
+        Config.CLIENT.options.showActions.set(value);
         Config.save();
+    }, (gameSettings, option) -> {
+        ActionVisibility visibility = option.get(gameSettings);
+        return new TranslationTextComponent("controllable.options.showActions.format", new TranslationTextComponent("controllable.actionVisibility." + visibility.getString()));
     });
 }
