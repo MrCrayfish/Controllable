@@ -97,7 +97,8 @@ jar {
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"MrCrayfish",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "Signing-Fingerprint": project.hasProperty('fingerprint') ? project.property('fingerprint') : 'unsigned'
+            "Signing-Fingerprint": project.hasProperty('fingerprint') ? project.property('fingerprint') : 'unsigned',
+            "MixinConfigs" : "controllable.mixins.json"
         ])
     }
 }
