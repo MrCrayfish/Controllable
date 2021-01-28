@@ -230,8 +230,8 @@ public class Controllable implements IControllerListener
         states.setState(Buttons.RIGHT_THUMB_STICK, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB));
         states.setState(Buttons.LEFT_BUMPER, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER));
         states.setState(Buttons.RIGHT_BUMPER, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER));
-        states.setState(Buttons.LEFT_TRIGGER, Math.abs(currentController.getLTriggerValue()) >= 0.1F);
-        states.setState(Buttons.RIGHT_TRIGGER, Math.abs(currentController.getRTriggerValue()) >= 0.1F);
+        states.setState(Buttons.LEFT_TRIGGER, currentController.getLTriggerValue() >= 0.1F);
+        states.setState(Buttons.RIGHT_TRIGGER, currentController.getRTriggerValue() >= 0.1F);
         states.setState(Buttons.DPAD_UP, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP));
         states.setState(Buttons.DPAD_DOWN, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
         states.setState(Buttons.DPAD_LEFT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
