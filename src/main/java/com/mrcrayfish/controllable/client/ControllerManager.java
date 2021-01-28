@@ -14,15 +14,46 @@ public class ControllerManager
 
     public void update()
     {
-        this.controllers.clear();
+        int connectedCount = 0;
+        for(int jid = GLFW.GLFW_JOYSTICK_1; jid <= GLFW.GLFW_JOYSTICK_LAST; jid++)
+        {
+            if(GLFW.glfwJoystickIsGamepad(jid))
+            {
+                connectedCount++;
+            }
+        }
+
+        if(connectedCount == this.controllers.size())
+            return;
+
+        Map<Integer, String> oldControllers = this.controllers;
+        Map<Integer, String> newControllers = new HashMap<>();
         for(int jid = GLFW.GLFW_JOYSTICK_1; jid <= GLFW.GLFW_JOYSTICK_LAST; jid++)
         {
             if(GLFW.glfwJoystickIsGamepad(jid))
             {
                 String controllerName = GLFW.glfwGetGamepadName(jid);
-                this.controllers.put(jid, controllerName);
+                newControllers.put(jid, controllerName);
             }
         }
+
+        this.controllers = newControllers;
+
+        newControllers.forEach((jid, name) ->
+        {
+            if(!oldControllers.containsKey(jid))
+            {
+                this.listeners.forEach(listener -> listener.connected(jid));
+            }
+        });
+
+        oldControllers.forEach((jid, name) ->
+        {
+            if(!newControllers.containsKey(jid))
+            {
+                this.listeners.forEach(listener -> listener.disconnected(jid));
+            }
+        });
     }
 
     public Map<Integer, String> getControllers()

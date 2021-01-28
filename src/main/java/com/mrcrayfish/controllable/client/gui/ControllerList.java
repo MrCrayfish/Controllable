@@ -36,7 +36,7 @@ public class ControllerList extends ExtendedList<ControllerEntry>
         this.updateSelected();
     }
 
-    private void updateSelected()
+    public void updateSelected()
     {
         Controller controller = Controllable.getController();
         if(controller == null)

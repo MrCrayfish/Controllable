@@ -24,6 +24,8 @@ import org.lwjgl.system.MemoryUtil;
 import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.Comparator;
+import java.util.Optional;
 
 /**
  * Author: MrCrayfish
@@ -156,8 +158,8 @@ public class Controllable implements IControllerListener
 
                     if(Config.CLIENT.options.autoSelect.get() && manager.getControllerCount() > 0)
                     {
-                        //TODO get next available controller
-                        //setController((SDL2Controller) manager.getControllers().get(0));
+                        Optional<Integer> optional = manager.getControllers().keySet().stream().min(Comparator.comparing(i -> i));
+                        optional.ifPresent(minJid -> setController(new Controller(minJid)));
                     }
 
                     Minecraft mc = Minecraft.getInstance();
@@ -190,13 +192,12 @@ public class Controllable implements IControllerListener
             final long pollInterval = Config.CLIENT.controllerPollInterval.get();
             while(Minecraft.getInstance().isRunning())
             {
-                //TODO probably going to crash due to it not being on the main thread
-                boolean updated = controller.updateGamepadState();
-                if(!updated)
+                manager.update();
+                if(controller != null)
                 {
-                    setController(null);
+                    controller.updateGamepadState();
+                    this.gatherAndQueueControllerInput();
                 }
-                this.gatherAndQueueControllerInput();
                 try
                 {
                     Thread.sleep(pollInterval);
