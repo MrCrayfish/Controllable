@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(CreativeScreen.class)
 public interface CreativeScreenMixin
 {
-    @Accessor("tabPage")
+    @Accessor(value = "tabPage", remap = false)
     static int getTabPage() {
         throw new AssertionError();
     }
