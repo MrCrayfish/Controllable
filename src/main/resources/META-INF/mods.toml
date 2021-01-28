@@ -25,3 +25,9 @@ description="Adds the ability to use a controller to play Minecraft"
    versionRange="[1.16.3,1.17)"
    ordering="NONE"
    side="CLIENT"
+[[dependencies.controllable]]
+   modId="jei"
+   mandatory=false
+   versionRange="[7.6.0,)"
+   ordering="NONE"
+   side="CLIENT"
