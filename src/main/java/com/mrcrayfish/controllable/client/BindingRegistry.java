@@ -44,7 +44,7 @@ public class BindingRegistry
         
         getInstance().register(ButtonBindings.TRANSFER_ITEM);
         getInstance().register(ButtonBindings.SPLIT_ITEM);
-        getInstance().register(ButtonBindings.PREVIOUS_MENU);
+        getInstance().register(ButtonBindings.CLOSE_MENU);
         getInstance().register(ButtonBindings.INTERACT_UI);
     }
 
