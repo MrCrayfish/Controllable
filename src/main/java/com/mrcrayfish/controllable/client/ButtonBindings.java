@@ -10,7 +10,7 @@ public class ButtonBindings
     public static final ButtonBinding JUMP = new ButtonBinding(Buttons.A, "key.jump", "key.categories.movement", KeyConflictContext.IN_GAME);
     public static final ButtonBinding SNEAK = new ButtonBinding(Buttons.RIGHT_THUMB_STICK, "key.sneak", "key.categories.movement", KeyConflictContext.IN_GAME);
     public static final ButtonBinding SPRINT = new ButtonBinding(Buttons.LEFT_THUMB_STICK, "key.sprint", "key.categories.movement", KeyConflictContext.IN_GAME);
-    public static final ButtonBinding INVENTORY = new ButtonBinding(Buttons.Y, "key.inventory", "key.categories.inventory", KeyConflictContext.UNIVERSAL);
+    public static final ButtonBinding INVENTORY = new ButtonBinding(Buttons.Y, "key.inventory", "key.categories.inventory", KeyConflictContext.IN_GAME);
     public static final ButtonBinding SWAP_HANDS = new ButtonBinding(Buttons.X, "key.swapOffhand", "key.categories.gameplay", KeyConflictContext.IN_GAME);
     public static final ButtonBinding DROP_ITEM = new ButtonBinding(Buttons.DPAD_DOWN, "key.drop", "key.categories.gameplay", KeyConflictContext.IN_GAME);
     public static final ButtonBinding USE_ITEM = new ButtonBinding(Buttons.LEFT_TRIGGER, "key.use", "key.categories.gameplay", KeyConflictContext.IN_GAME);
@@ -30,4 +30,9 @@ public class ButtonBindings
     public static final ButtonBinding NAVIGATE_DOWN = new ButtonBinding(Buttons.DPAD_DOWN, "controllable.key.moveDown", "key.categories.ui", KeyConflictContext.GUI);
     public static final ButtonBinding NAVIGATE_LEFT = new ButtonBinding(Buttons.DPAD_LEFT, "controllable.key.moveLeft", "key.categories.ui", KeyConflictContext.GUI);
     public static final ButtonBinding NAVIGATE_RIGHT = new ButtonBinding(Buttons.DPAD_RIGHT, "controllable.key.moveRight", "key.categories.ui", KeyConflictContext.GUI);
+
+    public static final ButtonBinding INTERACT_UI = new ButtonBinding(Buttons.A, "controllable.key.interactUI", "key.categories.ui", KeyConflictContext.GUI);
+    public static final ButtonBinding TRANSFER_ITEM = new ButtonBinding(Buttons.X, "controllable.key.transferItem", "key.categories.ui", KeyConflictContext.GUI);
+    public static final ButtonBinding SPLIT_ITEM = new ButtonBinding(Buttons.Y, "controllable.key.splitItem", "key.categories.ui", KeyConflictContext.GUI);
+    public static final ButtonBinding CLOSE_MENU = new ButtonBinding(Buttons.B, "controllable.key.closeMenu", "key.categories.ui", KeyConflictContext.GUI);
 }

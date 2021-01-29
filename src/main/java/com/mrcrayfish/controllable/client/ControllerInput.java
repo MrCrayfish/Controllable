@@ -644,6 +644,9 @@ public class ControllerInput
             }
             else
             {
+                ContainerScreen screenAsContainer = null;
+                if (mc.currentScreen instanceof ContainerScreen) 
+                    screenAsContainer = (ContainerScreen) mc.currentScreen;
                 if(ButtonBindings.INVENTORY.isButtonPressed())
                 {
                     if(mc.player != null)
@@ -716,14 +719,38 @@ public class ControllerInput
                 {
                     this.navigateMouse(mc.currentScreen, Navigate.RIGHT);
                 }
-                else if(button == Buttons.A)
+                else if(ButtonBindings.TRANSFER_ITEM.isButtonPressed() && screenAsContainer.getSlotUnderMouse()!=null && screenAsContainer!=null)
+                {
+                        invokeMouseClick(mc.currentScreen, 0);
+                }
+                else if(ButtonBindings.SPLIT_ITEM.isButtonPressed() && screenAsContainer!=null && screenAsContainer.getSlotUnderMouse()!=null)
+                {
+                        invokeMouseClick(mc.currentScreen, 1);
+                }
+                else if(ButtonBindings.INTERACT_UI.isButtonPressed() && screenAsContainer!=null && screenAsContainer.getSlotUnderMouse()!=null && mc.player != null)
+                {
+                        if(mc.player.inventory.getItemStack().isEmpty())
+                        {
+                            invokeMouseClick(mc.currentScreen, 0);
+                        }
+                        else
+                        {
+                            invokeMouseReleased(mc.currentScreen, 1);
+                        }
+                }
+                else if (ButtonBindings.CLOSE_MENU.isButtonPressed())
+                {
+                    mc.currentScreen.closeScreen();
+                }
+                else if(ButtonBindings.INTERACT_UI.isButtonPressed())
                 {
                     invokeMouseClick(mc.currentScreen, 0);
                 }
-                else if(button == Buttons.X)
+                else if(ButtonBindings.SPLIT_ITEM.isButtonPressed())
                 {
                     invokeMouseClick(mc.currentScreen, 1);
                 }
+                /*
                 else if(button == Buttons.B && mc.player != null)
                 {
                     if(mc.player.inventory.getItemStack().isEmpty())
@@ -734,7 +761,7 @@ public class ControllerInput
                     {
                         invokeMouseReleased(mc.currentScreen, 1);
                     }
-                }
+                }*/
             }
         }
         else

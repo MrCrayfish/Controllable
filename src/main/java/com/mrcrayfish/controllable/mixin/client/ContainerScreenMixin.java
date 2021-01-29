@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.mixin.client;
 
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.Buttons;
+import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.inventory.container.ClickType;
@@ -77,6 +77,6 @@ public abstract class ContainerScreenMixin
     private static boolean canQuickMove()
     {
         Controller controller = Controllable.getController();
-        return controller != null && Controllable.isButtonPressed(Buttons.B);
+        return controller != null && ButtonBindings.TRANSFER_ITEM.isButtonDown();
     }
 }

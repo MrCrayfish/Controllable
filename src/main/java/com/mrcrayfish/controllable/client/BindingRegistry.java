@@ -41,6 +41,11 @@ public class BindingRegistry
         getInstance().register(ButtonBindings.NAVIGATE_DOWN);
         getInstance().register(ButtonBindings.NAVIGATE_LEFT);
         getInstance().register(ButtonBindings.NAVIGATE_RIGHT);
+        
+        getInstance().register(ButtonBindings.TRANSFER_ITEM);
+        getInstance().register(ButtonBindings.SPLIT_ITEM);
+        getInstance().register(ButtonBindings.PREVIOUS_MENU);
+        getInstance().register(ButtonBindings.INTERACT_UI);
     }
 
     private static BindingRegistry instance;
