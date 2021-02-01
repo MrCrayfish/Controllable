@@ -851,8 +851,17 @@ public class ControllerInput
             NavigationPoint targetPoint = targetPointOptional.get();
             int screenX = (int) (targetPoint.getX() / ((double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth()));
             int screenY = (int) (targetPoint.getY() / ((double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight()));
-            this.virtualMouseX = this.targetMouseX = this.prevTargetMouseX = screenX;
-            this.virtualMouseY = this.targetMouseY = this.prevTargetMouseY = screenY;
+            this.targetMouseX = this.prevTargetMouseX = screenX;
+            this.targetMouseY = this.prevTargetMouseY = screenY;
+            if(Config.CLIENT.options.virtualMouse.get())
+            {
+                this.virtualMouseX = screenX;
+                this.virtualMouseY = screenY;
+            }
+            else
+            {
+                GLFW.glfwSetCursorPos(mc.getMainWindow().getHandle(), screenX, screenY);
+            }
             mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 2.0F));
         }
     }
