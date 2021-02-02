@@ -72,10 +72,10 @@ public class ControllerInput
     private boolean sneaking = false;
     private boolean isFlying = false;
     private boolean nearSlot = false;
+    private boolean moving = false;
+    private boolean preventReset;
     private double virtualMouseX;
     private double virtualMouseY;
-    private float prevXAxis;
-    private float prevYAxis;
     private int prevTargetMouseX;
     private int prevTargetMouseY;
     private int targetMouseX;
@@ -98,6 +98,11 @@ public class ControllerInput
         return this.virtualMouseY;
     }
 
+    private void setControllerInUse()
+    {
+        this.lastUse = 100;
+    }
+
     public int getLastUse()
     {
         return this.lastUse;
@@ -105,7 +110,11 @@ public class ControllerInput
 
     public void resetLastUse()
     {
-        this.lastUse = 0;
+        if(!this.preventReset)
+        {
+            this.lastUse = 0;
+        }
+        this.preventReset = false;
     }
 
     @SubscribeEvent
@@ -125,9 +134,9 @@ public class ControllerInput
             if(controller == null)
                 return;
 
-            if((Math.abs(controller.getLTriggerValue()) >= 0.1F || Math.abs(controller.getRTriggerValue()) >= 0.1F) && !(Minecraft.getInstance().currentScreen instanceof ControllerLayoutScreen))
+            if((Math.abs(controller.getLTriggerValue()) >= 0.2F || Math.abs(controller.getRTriggerValue()) >= 0.2F) && !(Minecraft.getInstance().currentScreen instanceof ControllerLayoutScreen))
             {
-                this.lastUse = 100;
+                this.setControllerInUse();
             }
 
             Minecraft mc = Minecraft.getInstance();
@@ -140,13 +149,14 @@ public class ControllerInput
             float deadZone = (float) Math.min(1.0F, Config.CLIENT.options.deadZone.get() + 0.25F);
 
             /* Only need to run code if left thumb stick has input */
-            boolean moving = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
-            if(moving)
+            boolean lastMoving = this.moving;
+            this.moving = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
+            if(this.moving)
             {
                 /* Updates the target mouse position when the initial thumb stick movement is
                  * detected. This fixes an issue when the user moves the cursor with the mouse then
                  * switching back to controller, the cursor would jump to old target mouse position. */
-                if(Math.abs(this.prevXAxis) < deadZone && Math.abs(this.prevYAxis) < deadZone)
+                if(!lastMoving)
                 {
                     double mouseX = mc.mouseHelper.getMouseX();
                     double mouseY = mc.mouseHelper.getMouseY();
@@ -159,31 +169,19 @@ public class ControllerInput
                     this.prevTargetMouseY = this.targetMouseY = (int) mouseY;
                 }
 
-                float xAxis = (controller.getLThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickXValue());
-                if(Math.abs(xAxis) >= deadZone)
-                {
-                    this.mouseSpeedX = xAxis;
-                }
-                else
-                {
-                    this.mouseSpeedX = 0.0F;
-                }
+                float xAxis = controller.getLThumbStickXValue();
+                this.mouseSpeedX = Math.abs(xAxis) >= deadZone ? Math.signum(xAxis) * (Math.abs(xAxis) - deadZone) / (1.0F - deadZone) : 0.0F;
 
-                float yAxis = (controller.getLThumbStickYValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickYValue());
-                if(Math.abs(yAxis) >= deadZone)
-                {
-                    this.mouseSpeedY = yAxis;
-                }
-                else
-                {
-                    this.mouseSpeedY = 0.0F;
-                }
+                float yAxis = controller.getLThumbStickYValue();
+                this.mouseSpeedY = Math.abs(yAxis) >= deadZone ? Math.signum(yAxis) * (Math.abs(yAxis) - deadZone) / (1.0F - deadZone) : 0.0F;
 
-                this.lastUse = 100;
+                this.setControllerInUse();
             }
 
             if(this.lastUse <= 0)
             {
+                this.mouseSpeedX = 0F;
+                this.mouseSpeedY = 0F;
                 return;
             }
 
@@ -227,48 +225,20 @@ public class ControllerInput
                 this.targetMouseX = MathHelper.clamp(this.targetMouseX, 0, mc.getMainWindow().getWidth());
                 this.targetMouseY += mouseSpeed * this.mouseSpeedY;
                 this.targetMouseY = MathHelper.clamp(this.targetMouseY, 0, mc.getMainWindow().getHeight());
+                this.setControllerInUse();
                 this.moved = true;
             }
 
-            this.prevXAxis = controller.getLThumbStickXValue();
-            this.prevYAxis = controller.getLThumbStickYValue();
-
-            this.moveMouseToClosestSlot(moving, mc.currentScreen);
+            this.moveMouseToClosestSlot(this.moving, mc.currentScreen);
 
             if(mc.currentScreen instanceof CreativeScreen)
             {
                 this.handleCreativeScrolling((CreativeScreen) mc.currentScreen, controller);
             }
 
-            if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get())
+            if(Config.CLIENT.options.virtualMouse.get() && (this.targetMouseX != this.prevTargetMouseX || this.targetMouseY != this.prevTargetMouseY))
             {
-                Screen screen = mc.currentScreen;
-                if(screen != null)
-                {
-                    if(mc.loadingGui == null)
-                    {
-                        double mouseX = this.virtualMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
-                        double mouseY = this.virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
-                        Screen.wrapScreenError(() -> screen.mouseMoved(mouseX, mouseY), "mouseMoved event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
-                        if(mc.mouseHelper.activeButton != -1 && mc.mouseHelper.eventTime > 0.0D)
-                        {
-                            double dragX = (this.targetMouseX - this.prevTargetMouseX) * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
-                            double dragY = (this.targetMouseY - this.prevTargetMouseY) * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
-                            Screen.wrapScreenError(() ->
-                            {
-                                if(net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPre(screen, mouseX, mouseY, mc.mouseHelper.activeButton, dragX, dragY))
-                                {
-                                    return;
-                                }
-                                if(((IGuiEventListener) screen).mouseDragged(mouseX, mouseY, mc.mouseHelper.activeButton, dragX, dragY))
-                                {
-                                    return;
-                                }
-                                net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPost(screen, mouseX, mouseY, mc.mouseHelper.activeButton, dragX, dragY);
-                            }, "mouseDragged event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
-                        }
-                    }
-                }
+                this.performMouseDrag(this.virtualMouseX, this.virtualMouseY, this.targetMouseX - this.prevTargetMouseX, this.targetMouseY - this.prevTargetMouseY);
             }
         }
     }
@@ -302,14 +272,41 @@ public class ControllerInput
                 float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
                 double mouseX = (this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * partialTicks + 0.5);
                 double mouseY = (this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * partialTicks + 0.5);
-                if(Config.CLIENT.options.virtualMouse.get())
+                this.setMousePosition(mouseX, mouseY);
+            }
+        }
+    }
+
+    private void performMouseDrag(double mouseX, double mouseY, double dragX, double dragY)
+    {
+        if(Controllable.getController() != null)
+        {
+            Minecraft mc = Minecraft.getInstance();
+            Screen screen = mc.currentScreen;
+            if(screen != null)
+            {
+                if(mc.loadingGui == null)
                 {
-                    this.virtualMouseX = mouseX;
-                    this.virtualMouseY = mouseY;
-                }
-                else
-                {
-                    GLFW.glfwSetCursorPos(mc.getMainWindow().getHandle(), mouseX, mouseY);
+                    double finalMouseX = mouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+                    double finalMouseY = mouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
+                    Screen.wrapScreenError(() -> screen.mouseMoved(finalMouseX, finalMouseY), "mouseMoved event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
+                    if(mc.mouseHelper.activeButton != -1 && mc.mouseHelper.eventTime > 0.0D)
+                    {
+                        Screen.wrapScreenError(() ->
+                        {
+                            double finalDragX = dragX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+                            double finalDragY = dragY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
+                            if(net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPre(screen, finalMouseX, finalMouseY, mc.mouseHelper.activeButton, finalDragX, finalDragY))
+                            {
+                                return;
+                            }
+                            if(((IGuiEventListener) screen).mouseDragged(finalMouseX, finalMouseY, mc.mouseHelper.activeButton, finalDragX, finalDragY))
+                            {
+                                return;
+                            }
+                            net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPost(screen, finalMouseX, finalMouseY, mc.mouseHelper.activeButton, finalDragX, finalDragY);
+                        }, "mouseDragged event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
+                    }
                 }
             }
         }
@@ -405,7 +402,7 @@ public class ControllerInput
             /* Handles rotating the yaw of player */
             if(Math.abs(controller.getRThumbStickXValue()) >= deadZone)
             {
-                this.lastUse = 100;
+                this.setControllerInUse();
                 double rotationSpeed = Config.CLIENT.options.rotationSpeed.get();
                 ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
@@ -417,7 +414,7 @@ public class ControllerInput
 
             if(Math.abs(controller.getRThumbStickYValue()) >= deadZone)
             {
-                this.lastUse = 100;
+                this.setControllerInUse();
                 double rotationSpeed = Config.CLIENT.options.rotationSpeed.get();
                 ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
@@ -432,7 +429,7 @@ public class ControllerInput
         {
             if(ButtonBindings.DROP_ITEM.isButtonDown())
             {
-                this.lastUse = 100;
+                this.setControllerInUse();
                 this.dropCounter++;
             }
         }
@@ -486,7 +483,7 @@ public class ControllerInput
             this.sneaking |= ButtonBindings.SNEAK.isButtonDown();
             if(ButtonBindings.SNEAK.isButtonDown())
             {
-                this.lastUse = 100;
+                this.setControllerInUse();
             }
             this.isFlying = true;
         }
@@ -506,7 +503,7 @@ public class ControllerInput
 
                 if(Math.abs(controller.getLThumbStickYValue()) >= deadZone)
                 {
-                    this.lastUse = 100;
+                    this.setControllerInUse();
                     int dir = controller.getLThumbStickYValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().forwardKeyDown = dir > 0;
                     event.getMovementInput().backKeyDown = dir < 0;
@@ -520,7 +517,7 @@ public class ControllerInput
 
                 if(Math.abs(controller.getLThumbStickXValue()) >= deadZone)
                 {
-                    this.lastUse = 100;
+                    this.setControllerInUse();
                     int dir = controller.getLThumbStickXValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().rightKeyDown = dir < 0;
                     event.getMovementInput().leftKeyDown = dir > 0;
@@ -547,7 +544,7 @@ public class ControllerInput
 
     public void handleButtonInput(Controller controller, int button, boolean state)
     {
-        this.lastUse = 100;
+        this.setControllerInUse();
 
         ControllerEvent.ButtonInput eventInput = new ControllerEvent.ButtonInput(controller, button, state);
         if(MinecraftForge.EVENT_BUS.post(eventInput))
@@ -779,7 +776,7 @@ public class ControllerInput
 
     private void scrollCreativeTabs(CreativeScreen creative, int dir)
     {
-        this.lastUse = 100;
+        this.setControllerInUse();
 
         try
         {
@@ -854,21 +851,17 @@ public class ControllerInput
         Optional<NavigationPoint> targetPointOptional = targetPoints.stream().filter(point -> navigate.getKeyExtractor().apply(point, mousePos) <= minimumDelta).min(Comparator.comparing(p -> p.distanceTo(mouseX, mouseY)));
         if(targetPointOptional.isPresent())
         {
+            this.performMouseDrag(this.targetMouseX, this.targetMouseY, 0, 0);
             NavigationPoint targetPoint = targetPointOptional.get();
             int screenX = (int) (targetPoint.getX() / ((double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth()));
             int screenY = (int) (targetPoint.getY() / ((double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight()));
+            double lastTargetMouseX = this.targetMouseX;
+            double lastTargetMouseY = this.targetMouseY;
             this.targetMouseX = this.prevTargetMouseX = screenX;
             this.targetMouseY = this.prevTargetMouseY = screenY;
-            if(Config.CLIENT.options.virtualMouse.get())
-            {
-                this.virtualMouseX = screenX;
-                this.virtualMouseY = screenY;
-            }
-            else
-            {
-                GLFW.glfwSetCursorPos(mc.getMainWindow().getHandle(), screenX, screenY);
-            }
+            this.setMousePosition(screenX, screenY);
             mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 2.0F));
+            this.performMouseDrag(this.targetMouseX, this.targetMouseY, screenX - lastTargetMouseX, screenY - lastTargetMouseY);
         }
     }
 
@@ -1036,6 +1029,21 @@ public class ControllerInput
         }
     }
 
+    private void setMousePosition(double mouseX, double mouseY)
+    {
+        if(Config.CLIENT.options.virtualMouse.get())
+        {
+            this.virtualMouseX = mouseX;
+            this.virtualMouseY = mouseY;
+        }
+        else
+        {
+            Minecraft mc = Minecraft.getInstance();
+            GLFW.glfwSetCursorPos(mc.getMainWindow().getHandle(), mouseX, mouseY);
+            this.preventReset = true;
+        }
+    }
+
     private void handleCreativeScrolling(CreativeScreen creative, Controller controller)
     {
         try
@@ -1072,7 +1080,7 @@ public class ControllerInput
         double dir = 0;
         if(Math.abs(controller.getRThumbStickYValue()) >= 0.2F)
         {
-            this.lastUse = 100;
+            this.setControllerInUse();
             dir = controller.getRThumbStickYValue();
         }
         dir *= Minecraft.getInstance().getTickLength();
