@@ -178,6 +178,13 @@ public class ControllerInput
                 {
                     this.mouseSpeedY = 0.0F;
                 }
+
+                this.lastUse = 100;
+            }
+
+            if(this.lastUse <= 0)
+            {
+                return;
             }
 
             if(Math.abs(this.mouseSpeedX) > 0F || Math.abs(this.mouseSpeedY) > 0F)
@@ -220,7 +227,6 @@ public class ControllerInput
                 this.targetMouseX = MathHelper.clamp(this.targetMouseX, 0, mc.getMainWindow().getWidth());
                 this.targetMouseY += mouseSpeed * this.mouseSpeedY;
                 this.targetMouseY = MathHelper.clamp(this.targetMouseY, 0, mc.getMainWindow().getHeight());
-                this.lastUse = 100;
                 this.moved = true;
             }
 
