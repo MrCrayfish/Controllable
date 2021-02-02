@@ -17,14 +17,21 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     private IKeyConflictContext context;
     private boolean pressed;
     private int pressedTime;
+    private boolean reserved;
 
     public ButtonBinding(int button, String descriptionKey, String category, IKeyConflictContext context)
+    {
+        this(button, descriptionKey, category, context, false);
+    }
+
+    ButtonBinding(int button, String descriptionKey, String category, IKeyConflictContext context, boolean reserved)
     {
         this.defaultButton = button;
         this.button = button;
         this.descriptionKey = descriptionKey;
         this.category = category;
         this.context = context;
+        this.reserved = reserved;
     }
 
     public int getButton()
@@ -55,6 +62,11 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     public boolean isButtonPressed()
     {
         return this.pressed && this.pressedTime == 0 && this.isActiveAndValidContext();
+    }
+
+    public boolean isNotReserved()
+    {
+        return !this.reserved;
     }
 
     public boolean isButtonDown()

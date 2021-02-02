@@ -41,6 +41,9 @@ public class BindingRegistry
         getInstance().register(ButtonBindings.NAVIGATE_DOWN);
         getInstance().register(ButtonBindings.NAVIGATE_LEFT);
         getInstance().register(ButtonBindings.NAVIGATE_RIGHT);
+        getInstance().register(ButtonBindings.PICKUP_ITEM);
+        getInstance().register(ButtonBindings.QUICK_MOVE);
+        getInstance().register(ButtonBindings.SPLIT_STACK);
     }
 
     private static BindingRegistry instance;
@@ -100,7 +103,7 @@ public class BindingRegistry
         {
             Properties properties = new Properties();
             properties.load(reader);
-            this.bindings.forEach(binding ->
+            this.bindings.stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
             {
                 String name = properties.getProperty(binding.getDescription(), Buttons.getNameForButton(binding.getButton()));
                 if(name != null)
@@ -119,7 +122,7 @@ public class BindingRegistry
     public void save()
     {
         Properties properties = new Properties();
-        this.bindings.forEach(binding ->
+        this.bindings.stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
         {
             String name = Buttons.getNameForButton(binding.getButton());
             if(name != null)

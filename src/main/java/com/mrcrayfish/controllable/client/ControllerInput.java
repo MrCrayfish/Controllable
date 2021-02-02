@@ -719,15 +719,15 @@ public class ControllerInput
                 {
                     this.navigateMouse(mc.currentScreen, Navigate.RIGHT);
                 }
-                else if(button == Buttons.A)
+                else if(button == ButtonBindings.PICKUP_ITEM.getButton())
                 {
                     invokeMouseClick(mc.currentScreen, 0);
                 }
-                else if(button == Buttons.X)
+                else if(button == ButtonBindings.SPLIT_STACK.getButton())
                 {
                     invokeMouseClick(mc.currentScreen, 1);
                 }
-                else if(button == Buttons.B && mc.player != null)
+                else if(button == ButtonBindings.QUICK_MOVE.getButton() && mc.player != null)
                 {
                     if(mc.player.inventory.getItemStack().isEmpty())
                     {
@@ -748,11 +748,11 @@ public class ControllerInput
             }
             else
             {
-                if(button == Buttons.A)
+                if(button == ButtonBindings.PICKUP_ITEM.getButton())
                 {
                     invokeMouseReleased(mc.currentScreen, 0);
                 }
-                else if(button == Buttons.X)
+                else if(button == ButtonBindings.SPLIT_STACK.getButton())
                 {
                     invokeMouseReleased(mc.currentScreen, 1);
                 }

@@ -30,4 +30,7 @@ public class ButtonBindings
     public static final ButtonBinding NAVIGATE_DOWN = new ButtonBinding(Buttons.DPAD_DOWN, "controllable.key.moveDown", "key.categories.ui", KeyConflictContext.GUI);
     public static final ButtonBinding NAVIGATE_LEFT = new ButtonBinding(Buttons.DPAD_LEFT, "controllable.key.moveLeft", "key.categories.ui", KeyConflictContext.GUI);
     public static final ButtonBinding NAVIGATE_RIGHT = new ButtonBinding(Buttons.DPAD_RIGHT, "controllable.key.moveRight", "key.categories.ui", KeyConflictContext.GUI);
+    public static final ButtonBinding PICKUP_ITEM = new ButtonBinding(Buttons.A, "controllable.key.pickupItem", "key.categories.ui", KeyConflictContext.GUI, true);
+    public static final ButtonBinding QUICK_MOVE = new ButtonBinding(Buttons.B, "controllable.key.quickMove", "key.categories.ui", KeyConflictContext.GUI, true);
+    public static final ButtonBinding SPLIT_STACK = new ButtonBinding(Buttons.X, "controllable.key.splitStack", "key.categories.ui", KeyConflictContext.GUI, true);
 }
