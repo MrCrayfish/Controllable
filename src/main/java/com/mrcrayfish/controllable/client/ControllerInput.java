@@ -353,7 +353,7 @@ public class ControllerInput
         Minecraft mc = Minecraft.getInstance();
         double mouseX = this.virtualMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
         double mouseY = this.virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
-        if(mc.currentScreen != null)
+        if(mc.currentScreen != null && this.lastUse > 0)
         {
             IGuiEventListener hoveredListener = mc.currentScreen.getEventListeners().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
             if(hoveredListener instanceof AbstractList)
