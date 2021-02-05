@@ -1,7 +1,8 @@
 package com.mrcrayfish.controllable.integration;
 
-import com.google.common.collect.ImmutableList;
-import com.mrcrayfish.controllable.client.ControllerInput;
+import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
+import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
+import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.mixin.client.jei.IngredientGridMixin;
 import com.mrcrayfish.controllable.mixin.client.jei.IngredientGridWithNavigationMixin;
 import com.mrcrayfish.controllable.mixin.client.jei.IngredientListOverlayMixin;
@@ -24,9 +25,9 @@ import java.util.List;
  */
 public class JustEnoughItems
 {
-    public static List<ControllerInput.NavigationPoint> getNavigationPoints()
+    public static List<NavigationPoint> getNavigationPoints()
     {
-        List<ControllerInput.NavigationPoint> points = new ArrayList<>();
+        List<NavigationPoint> points = new ArrayList<>();
         JeiRuntime runtime = Internal.getRuntime();
         if(runtime != null && runtime.getIngredientListOverlay().isListDisplayed())
         {
@@ -39,14 +40,14 @@ public class JustEnoughItems
             for(IngredientListSlot slot : slots)
             {
                 Rectangle2d area = slot.getArea();
-                points.add(new ControllerInput.BasicNavigationPoint(area.getX() + area.getWidth() / 2.0, area.getY() + area.getHeight() / 2.0));
+                points.add(new BasicNavigationPoint(area.getX() + area.getWidth() / 2.0, area.getY() + area.getHeight() / 2.0));
             }
 
             PageNavigation navigation = ((IngredientGridWithNavigationMixin) ingredientGridWithNavigation).getNavigation();
             Widget backButton = ((PageNavigationMixin) navigation).getBackButton();
-            points.add(new ControllerInput.WidgetNavigationPoint(backButton.x + backButton.getWidth() / 2.0, backButton.y + backButton.getHeightRealms() / 2.0, backButton));
+            points.add(new WidgetNavigationPoint(backButton.x + backButton.getWidth() / 2.0, backButton.y + backButton.getHeightRealms() / 2.0, backButton));
             Widget nextButton = ((PageNavigationMixin) navigation).getNextButton();
-            points.add(new ControllerInput.WidgetNavigationPoint(nextButton.x + nextButton.getWidth() / 2.0, nextButton.y + nextButton.getHeightRealms() / 2.0, nextButton));
+            points.add(new WidgetNavigationPoint(nextButton.x + nextButton.getWidth() / 2.0, nextButton.y + nextButton.getHeightRealms() / 2.0, nextButton));
         }
         return points;
     }

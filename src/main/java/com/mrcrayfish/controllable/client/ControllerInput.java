@@ -5,7 +5,12 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
+import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
+import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
+import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.event.ControllerEvent;
+import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
 import com.mrcrayfish.controllable.integration.JustEnoughItems;
 import com.mrcrayfish.controllable.mixin.client.CreativeScreenMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookGuiMixin;
@@ -840,6 +845,11 @@ public class ControllerInput
 
         List<NavigationPoint> points = this.gatherNavigationPoints(screen);
 
+        // Gather any extra navigation points from event
+        GatherNavigationPointsEvent event = new GatherNavigationPointsEvent();
+        MinecraftForge.EVENT_BUS.post(event);
+        points.addAll(event.getPoints());
+
         // Get only the points that are in the target direction
         List<NavigationPoint> targetPoints = points.stream().filter(point -> navigate.getPredicate().test(point, mouseX, mouseY)).collect(Collectors.toList());
         if(targetPoints.isEmpty())
@@ -1212,86 +1222,8 @@ public class ControllerInput
 
         private static boolean angle(NavigationPoint point, int mouseX, int mouseY, double offset)
         {
-            double angle = Math.toDegrees(Math.atan2(point.y - mouseY, point.x - mouseX)) + offset;
+            double angle = Math.toDegrees(Math.atan2(point.getY() - mouseY, point.getX() - mouseX)) + offset;
             return angle > -45 && angle < 45;
-        }
-    }
-
-    public static abstract class NavigationPoint
-    {
-        private final double x, y;
-        private final Type type;
-
-        public NavigationPoint(double x, double y, Type type)
-        {
-            this.x = x;
-            this.y = y;
-            this.type = type;
-        }
-
-        public double distanceTo(double x, double y)
-        {
-            return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
-        }
-
-        public double getX()
-        {
-            return this.x;
-        }
-
-        public double getY()
-        {
-            return this.y;
-        }
-
-        public Type getType()
-        {
-            return this.type;
-        }
-
-        protected enum Type
-        {
-            BASIC, WIDGET, SLOT;
-        }
-    }
-
-    public static class WidgetNavigationPoint extends NavigationPoint
-    {
-        private Widget widget;
-
-        public WidgetNavigationPoint(double x, double y, Widget widget)
-        {
-            super(x, y, Type.WIDGET);
-            this.widget = widget;
-        }
-
-        public Widget getWidget()
-        {
-            return this.widget;
-        }
-    }
-
-    private static class SlotNavigationPoint extends NavigationPoint
-    {
-        private Slot slot;
-
-        public SlotNavigationPoint(double x, double y, Slot slot)
-        {
-            super(x, y, Type.SLOT);
-            this.slot = slot;
-        }
-
-        public Slot getSlot()
-        {
-            return this.slot;
-        }
-    }
-
-    public static class BasicNavigationPoint extends NavigationPoint
-    {
-        public BasicNavigationPoint(double x, double y)
-        {
-            super(x, y, Type.BASIC);
         }
     }
 
