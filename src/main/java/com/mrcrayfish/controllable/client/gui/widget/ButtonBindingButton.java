@@ -5,7 +5,6 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.Controller;
-import com.mrcrayfish.controllable.client.Mappings;
 import com.mrcrayfish.controllable.client.RenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;

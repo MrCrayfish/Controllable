@@ -1,6 +1,5 @@
 package com.mrcrayfish.controllable.client.settings;
 
-import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.settings.BooleanOption;
 

@@ -22,7 +22,9 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
 import javax.annotation.Nullable;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Comparator;
 import java.util.Optional;

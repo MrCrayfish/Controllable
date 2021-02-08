@@ -1,7 +1,5 @@
 package com.mrcrayfish.controllable.client;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.Minecraft;

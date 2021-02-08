@@ -1,9 +1,7 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.settings.ControllableBooleanOption;
-import net.minecraft.client.AbstractOption;
 import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;

@@ -2,12 +2,8 @@ package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mrcrayfish.controllable.ButtonStates;
-import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.ButtonBindings;
-import com.mrcrayfish.controllable.client.Controller;
 import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;

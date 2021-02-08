@@ -9,16 +9,11 @@ import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
-import com.mrcrayfish.controllable.client.settings.ControllableBooleanOption;
-import net.minecraft.client.AbstractOption;
-import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.widget.list.OptionsRowList;
 import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
@@ -28,7 +23,10 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Author: MrCrayfish

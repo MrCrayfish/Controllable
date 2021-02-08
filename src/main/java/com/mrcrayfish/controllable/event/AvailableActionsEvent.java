@@ -1,7 +1,6 @@
 package com.mrcrayfish.controllable.event;
 
 import com.mrcrayfish.controllable.client.Action;
-import com.mrcrayfish.controllable.client.ButtonBinding;
 import net.minecraftforge.eventbus.api.Event;
 
 import java.util.Map;
