@@ -17,7 +17,7 @@ public class ButtonBindings
     public static final ButtonBinding ATTACK = new ButtonBinding(Buttons.RIGHT_TRIGGER, "key.attack", "key.categories.gameplay", KeyConflictContext.IN_GAME);
     public static final ButtonBinding PICK_BLOCK = new ButtonBinding(Buttons.DPAD_LEFT, "key.pickItem", "key.categories.gameplay", KeyConflictContext.IN_GAME);
     public static final ButtonBinding PLAYER_LIST = new ButtonBinding(Buttons.SELECT, "key.playerlist", "key.categories.multiplayer", KeyConflictContext.IN_GAME);
-    public static final ButtonBinding TOGGLE_PERSPECTIVE = new ButtonBinding(Buttons.DPAD_UP, "key.togglePerspective", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding TOGGLE_PERSPECTIVE = new ButtonBinding(Buttons.DPAD_UP, "key.togglePerspective", "key.categories.gameplay", KeyConflictContext.IN_GAME);
     public static final ButtonBinding SCREENSHOT = new ButtonBinding(-1, "key.screenshot", "key.categories.misc", KeyConflictContext.UNIVERSAL);
     public static final ButtonBinding SCROLL_LEFT = new ButtonBinding(Buttons.LEFT_BUMPER, "controllable.key.previousHotbarItem", "key.categories.gameplay", KeyConflictContext.IN_GAME);
     public static final ButtonBinding SCROLL_RIGHT = new ButtonBinding(Buttons.RIGHT_BUMPER, "controllable.key.nextHotbarItem", "key.categories.gameplay", KeyConflictContext.IN_GAME);
