@@ -5,13 +5,18 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+
+import javax.annotation.Nullable;
 
 /**
  * Author: MrCrayfish
@@ -19,6 +24,9 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 @Mixin(Minecraft.class)
 public class MinecraftMixin
 {
+    @Shadow
+    public ClientPlayerEntity player;
+
     @ModifyArgs(method = "processKeyBinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;sendClickBlockToController(Z)V"))
     private void sendClickBlockToController(Args args)
     {
@@ -59,4 +67,12 @@ public class MinecraftMixin
         return false;
     }
 
+    @Inject(method = "isEntityGlowing", at = @At(value = "HEAD"), cancellable = true)
+    private void isEntityGlowing(Entity entity, CallbackInfoReturnable<Boolean> cir)
+    {
+        if(this.player != null && this.player.isSpectator() && ButtonBindings.HIGHLIGHT_PLAYERS.isButtonDown() && entity.getType() == EntityType.PLAYER)
+        {
+            cir.setReturnValue(true);
+        }
+    }
 }

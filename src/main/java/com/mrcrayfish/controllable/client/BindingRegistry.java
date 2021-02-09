@@ -44,6 +44,10 @@ public class BindingRegistry
         getInstance().register(ButtonBindings.PICKUP_ITEM);
         getInstance().register(ButtonBindings.QUICK_MOVE);
         getInstance().register(ButtonBindings.SPLIT_STACK);
+        getInstance().register(ButtonBindings.ADVANCEMENTS);
+        getInstance().register(ButtonBindings.HIGHLIGHT_PLAYERS);
+        getInstance().register(ButtonBindings.CINEMATIC_CAMERA);
+        getInstance().register(ButtonBindings.FULLSCREEN);
     }
 
     private static BindingRegistry instance;

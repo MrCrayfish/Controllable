@@ -33,4 +33,9 @@ public class ButtonBindings
     public static final ButtonBinding PICKUP_ITEM = new ButtonBinding(Buttons.A, "controllable.key.pickupItem", "key.categories.ui", KeyConflictContext.GUI, true);
     public static final ButtonBinding QUICK_MOVE = new ButtonBinding(Buttons.B, "controllable.key.quickMove", "key.categories.ui", KeyConflictContext.GUI, true);
     public static final ButtonBinding SPLIT_STACK = new ButtonBinding(Buttons.X, "controllable.key.splitStack", "key.categories.ui", KeyConflictContext.GUI, true);
+    //public static final ButtonBinding SOCIAL_INTERACTIONS = new ButtonBinding(-1, "controllable.key.socialInteractions", "key.categories.multiplayer", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding ADVANCEMENTS = new ButtonBinding(-1, "key.advancements", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding HIGHLIGHT_PLAYERS = new ButtonBinding(-1, "key.spectatorOutlines", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding CINEMATIC_CAMERA = new ButtonBinding(-1, "key.smoothCamera", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding FULLSCREEN = new ButtonBinding(-1, "key.fullscreen", "key.categories.misc", KeyConflictContext.UNIVERSAL);
 }

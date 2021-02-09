@@ -18,6 +18,7 @@ import com.mrcrayfish.controllable.mixin.client.RecipeBookPageMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
 import net.minecraft.client.gui.recipebook.RecipeBookPage;
@@ -565,7 +566,22 @@ public class ControllerInput
         Minecraft mc = Minecraft.getInstance();
         if(state)
         {
-            if(mc.currentScreen == null)
+            if(ButtonBindings.FULLSCREEN.isButtonPressed())
+            {
+                mc.getMainWindow().toggleFullscreen();
+                mc.gameSettings.fullscreen = mc.getMainWindow().isFullscreen();
+                mc.gameSettings.saveOptions();
+            }
+            else if(ButtonBindings.SCREENSHOT.isButtonPressed())
+            {
+                if(mc.world != null)
+                {
+                    ScreenShotHelper.saveScreenshot(mc.gameDir, mc.getMainWindow().getFramebufferWidth(), mc.getMainWindow().getFramebufferHeight(), mc.getFramebuffer(), (textComponent) -> {
+                        mc.execute(() -> mc.ingameGUI.getChatGUI().printChatMessage(textComponent));
+                    });
+                }
+            }
+            else if(mc.currentScreen == null)
             {
                 if(ButtonBindings.INVENTORY.isButtonPressed())
                 {
@@ -625,13 +641,18 @@ public class ControllerInput
                         mc.displayInGameMenu(false);
                     }
                 }
-                else if(ButtonBindings.SCREENSHOT.isButtonPressed())
+                else if(ButtonBindings.ADVANCEMENTS.isButtonPressed())
                 {
-                    if(mc.world != null)
+                    if(mc.player != null)
                     {
-                        ScreenShotHelper.saveScreenshot(mc.gameDir, mc.getMainWindow().getFramebufferWidth(), mc.getMainWindow().getFramebufferHeight(), mc.getFramebuffer(), (textComponent) -> {
-                            mc.execute(() -> mc.ingameGUI.getChatGUI().printChatMessage(textComponent));
-                        });
+                        mc.displayGuiScreen(new AdvancementsScreen(mc.player.connection.getAdvancementManager()));
+                    }
+                }
+                else if(ButtonBindings.CINEMATIC_CAMERA.isButtonPressed())
+                {
+                    if(mc.player != null)
+                    {
+                        mc.gameSettings.smoothCamera = !mc.gameSettings.smoothCamera;
                     }
                 }
                 else if(mc.player != null && !mc.player.isHandActive())
