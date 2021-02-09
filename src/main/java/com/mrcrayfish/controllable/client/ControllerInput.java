@@ -17,6 +17,7 @@ import com.mrcrayfish.controllable.mixin.client.RecipeBookGuiMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.recipebook.IRecipeShownListener;
@@ -32,6 +33,7 @@ import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.client.settings.PointOfView;
 import net.minecraft.client.util.NativeUtil;
+import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemGroup;
@@ -519,6 +521,11 @@ public class ControllerInput
                     {
                         event.getMovementInput().moveForward *= 0.3D;
                     }
+                }
+
+                if(player.getRidingEntity() instanceof BoatEntity)
+                {
+                    deadZone = 0.5F;
                 }
 
                 if(Math.abs(controller.getLThumbStickXValue()) >= deadZone)
