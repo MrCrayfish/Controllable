@@ -105,5 +105,6 @@
     "controllable.key.moveLeft": "Navigate Left",
     "controllable.key.moveRight": "Navigate Right",
     "controllable.key.moveUp": "Navigate Up",
-    "controllable.key.debugInfo": "Show Debug Info"
+    "controllable.key.debugInfo": "Show Debug Info",
+    "controllable.tooltip.craft": "Click to Craft Item"
 }

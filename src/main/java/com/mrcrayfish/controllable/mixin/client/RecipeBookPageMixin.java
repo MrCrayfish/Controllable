@@ -1,11 +1,14 @@
 package com.mrcrayfish.controllable.mixin.client;
 
+import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.gui.recipebook.RecipeBookPage;
-import net.minecraft.client.gui.recipebook.RecipeWidget;
-import net.minecraft.client.gui.widget.ToggleWidget;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.util.List;
 
@@ -13,23 +16,15 @@ import java.util.List;
  * Author: MrCrayfish
  */
 @Mixin(RecipeBookPage.class)
-public interface RecipeBookPageMixin
+public class RecipeBookPageMixin
 {
-    @Accessor("buttons")
-    List<RecipeWidget> getButtons();
-
-    @Accessor("forwardButton")
-    ToggleWidget getForwardButton();
-
-    @Accessor("backButton")
-    ToggleWidget getBackButton();
-
-    @Accessor("currentPage")
-    int getCurrentPage();
-
-    @Accessor("currentPage")
-    void setCurrentPage(int page);
-
-    @Invoker("updateButtonsForPage")
-    void invokeUpdateButtonsForPage();
+    @ModifyArgs(method = "func_238926_a_", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;func_243308_b(Lcom/mojang/blaze3d/matrix/MatrixStack;Ljava/util/List;II)V"))
+    private void modifyRenderToolTip(Args args)
+    {
+        if(Controllable.getInput().isControllerInUse())
+        {
+            List<ITextComponent> components = args.get(1);
+            components.add(new TranslationTextComponent("controllable.tooltip.craft").mergeStyle(TextFormatting.BOLD).mergeStyle(TextFormatting.BLUE));
+        }
+    }
 }

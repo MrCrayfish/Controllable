@@ -15,6 +15,7 @@
         "client.MinecraftMixin",
         "client.MouseHelperMixin",
         "client.RecipeBookGuiMixin",
+        "client.RecipeBookPageAccessor",
         "client.RecipeBookPageMixin",
         "client.jei.MouseUtilMixin",
         "client.jei.IngredientListOverlayMixin",

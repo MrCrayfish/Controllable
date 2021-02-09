@@ -14,16 +14,12 @@ import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
 import com.mrcrayfish.controllable.integration.JustEnoughItems;
 import com.mrcrayfish.controllable.mixin.client.CreativeScreenMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookGuiMixin;
-import com.mrcrayfish.controllable.mixin.client.RecipeBookPageMixin;
+import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.advancements.AdvancementsScreen;
-import net.minecraft.client.gui.recipebook.IRecipeShownListener;
-import net.minecraft.client.gui.recipebook.RecipeBookGui;
-import net.minecraft.client.gui.recipebook.RecipeBookPage;
-import net.minecraft.client.gui.recipebook.RecipeTabToggleWidget;
+import net.minecraft.client.gui.recipebook.*;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -35,6 +31,7 @@ import net.minecraft.client.settings.PointOfView;
 import net.minecraft.client.util.NativeUtil;
 import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.container.RecipeBookContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.network.play.client.CPlayerDiggingPacket;
@@ -109,6 +106,11 @@ public class ControllerInput
     private void setControllerInUse()
     {
         this.lastUse = 100;
+    }
+
+    public boolean isControllerInUse()
+    {
+        return this.lastUse > 0;
     }
 
     public int getLastUse()
@@ -218,9 +220,9 @@ public class ControllerInput
                         eventListeners.add(((RecipeBookGuiMixin) recipeBook).getToggleRecipesBtn());
                         eventListeners.addAll(((RecipeBookGuiMixin) recipeBook).getRecipeTabs());
                         RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
-                        eventListeners.addAll(((RecipeBookPageMixin) recipeBookPage).getButtons());
-                        eventListeners.add(((RecipeBookPageMixin) recipeBookPage).getForwardButton());
-                        eventListeners.add(((RecipeBookPageMixin) recipeBookPage).getBackButton());
+                        eventListeners.addAll(((RecipeBookPageAccessor) recipeBookPage).getButtons());
+                        eventListeners.add(((RecipeBookPageAccessor) recipeBookPage).getForwardButton());
+                        eventListeners.add(((RecipeBookPageAccessor) recipeBookPage).getBackButton());
                     }
                 }
                 IGuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
@@ -759,6 +761,7 @@ public class ControllerInput
                 else if(button == ButtonBindings.PICKUP_ITEM.getButton())
                 {
                     invokeMouseClick(mc.currentScreen, 0);
+                    this.craftRecipeBookItem();
                 }
                 else if(button == ButtonBindings.SPLIT_STACK.getButton())
                 {
@@ -859,7 +862,7 @@ public class ControllerInput
 
     private void scrollRecipePage(RecipeBookGui recipeBook, int dir)
     {
-        RecipeBookPageMixin page = (RecipeBookPageMixin)((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
+        RecipeBookPageAccessor page = (RecipeBookPageAccessor)((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
         if(dir > 0 && page.getForwardButton().visible || dir < 0 && page.getBackButton().visible)
         {
             int currentPage = page.getCurrentPage();
@@ -943,9 +946,9 @@ public class ControllerInput
                 widgets.add(((RecipeBookGuiMixin) recipeBook).getToggleRecipesBtn());
                 widgets.addAll(((RecipeBookGuiMixin) recipeBook).getRecipeTabs());
                 RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
-                widgets.addAll(((RecipeBookPageMixin) recipeBookPage).getButtons());
-                widgets.add(((RecipeBookPageMixin) recipeBookPage).getForwardButton());
-                widgets.add(((RecipeBookPageMixin) recipeBookPage).getBackButton());
+                widgets.addAll(((RecipeBookPageAccessor) recipeBookPage).getButtons());
+                widgets.add(((RecipeBookPageAccessor) recipeBookPage).getForwardButton());
+                widgets.add(((RecipeBookPageAccessor) recipeBookPage).getBackButton());
             }
         }
 
@@ -995,6 +998,40 @@ public class ControllerInput
         x = group.isAlignedRight() ? screen.getGuiLeft() + screen.getXSize() - width * (6 - column) : (column > 0 ? x + column : x);
         y = topRow ? y - width : y + (screen.getYSize() - 4);
         return new BasicNavigationPoint(x + width / 2.0, y + height / 2.0);
+    }
+
+    private void craftRecipeBookItem()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.player == null)
+            return;
+
+        if(!(mc.currentScreen instanceof ContainerScreen) || !(mc.currentScreen instanceof IRecipeShownListener))
+            return;
+
+        IRecipeShownListener listener = (IRecipeShownListener) mc.currentScreen;
+        if(!listener.getRecipeGui().isVisible())
+            return;
+
+        ContainerScreen screen = (ContainerScreen) mc.currentScreen;
+        if(!(screen.getContainer() instanceof RecipeBookContainer))
+            return;
+
+        RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) listener.getRecipeGui()).getRecipeBookPage();
+        RecipeWidget recipe = ((RecipeBookPageAccessor) recipeBookPage).getButtons().stream().filter(Widget::isHovered).findFirst().orElse(null);
+        if(recipe != null)
+        {
+            RecipeBookContainer container = (RecipeBookContainer) screen.getContainer();
+            Slot slot = container.getSlot(container.getOutputSlot());
+            if(mc.player.inventory.getItemStack().isEmpty())
+            {
+                this.invokeMouseClick(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screen.getGuiLeft() + slot.xPos + 8, screen.getGuiTop() + slot.yPos + 8);
+            }
+            else
+            {
+                this.invokeMouseReleased(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screen.getGuiLeft() + slot.xPos + 8, screen.getGuiTop() + slot.yPos + 8);
+            }
+        }
     }
 
     private void moveMouseToClosestSlot(boolean moving, Screen screen)
@@ -1129,6 +1166,28 @@ public class ControllerInput
         list.setScrollAmount(list.getScrollAmount() + dir * 10);
     }
 
+    private double getMouseX()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        double mouseX = mc.mouseHelper.getMouseX();
+        if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && this.lastUse > 0)
+        {
+            mouseX = this.virtualMouseX;
+        }
+        return mouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+    }
+
+    private double getMouseY()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        double mouseY = mc.mouseHelper.getMouseY();
+        if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && this.lastUse > 0)
+        {
+            mouseY = this.virtualMouseY;
+        }
+        return mouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
+    }
+
     /**
      * Invokes a mouse click in a GUI. This is modified version that is designed for controllers.
      * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
@@ -1138,34 +1197,32 @@ public class ControllerInput
      */
     private void invokeMouseClick(Screen screen, int button)
     {
+        if(screen != null)
+        {
+            double mouseX = this.getMouseX();
+            double mouseY = this.getMouseY();
+            this.invokeMouseClick(screen, button, mouseX, mouseY);
+        }
+    }
+
+    private void invokeMouseClick(Screen screen, int button, double mouseX, double mouseY)
+    {
         Minecraft mc = Minecraft.getInstance();
         if(screen != null)
         {
-            double mouseX = mc.mouseHelper.getMouseX();
-            double mouseY = mc.mouseHelper.getMouseY();
-            if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && this.lastUse > 0)
-            {
-                mouseX = this.virtualMouseX;
-                mouseY = this.virtualMouseY;
-            }
-            mouseX = mouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
-            mouseY = mouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
-
             mc.mouseHelper.activeButton = button;
             mc.mouseHelper.eventTime = NativeUtil.getTime();
 
-            double finalMouseX = mouseX;
-            double finalMouseY = mouseY;
             Screen.wrapScreenError(() ->
             {
-                boolean cancelled = ForgeHooksClient.onGuiMouseClickedPre(screen, finalMouseX, finalMouseY, button);
+                boolean cancelled = ForgeHooksClient.onGuiMouseClickedPre(screen, mouseX, mouseY, button);
                 if(!cancelled)
                 {
-                    cancelled = screen.mouseClicked(finalMouseX, finalMouseY, button);
+                    cancelled = screen.mouseClicked(mouseX, mouseY, button);
                 }
                 if(!cancelled)
                 {
-                    ForgeHooksClient.onGuiMouseClickedPost(screen, finalMouseX, finalMouseY, button);
+                    ForgeHooksClient.onGuiMouseClickedPost(screen, mouseX, mouseY, button);
                 }
             }, "mouseClicked event handler", screen.getClass().getCanonicalName());
         }
@@ -1180,33 +1237,31 @@ public class ControllerInput
      */
     private void invokeMouseReleased(Screen screen, int button)
     {
+        if(screen != null)
+        {
+            double mouseX = this.getMouseX();
+            double mouseY = this.getMouseY();
+            this.invokeMouseReleased(screen, button, mouseX, mouseY);
+        }
+    }
+
+    private void invokeMouseReleased(Screen screen, int button, double mouseX, double mouseY)
+    {
         Minecraft mc = Minecraft.getInstance();
         if(screen != null)
         {
-            double mouseX = mc.mouseHelper.getMouseX();
-            double mouseY = mc.mouseHelper.getMouseY();
-            if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && lastUse > 0)
-            {
-                mouseX = this.virtualMouseX;
-                mouseY = this.virtualMouseY;
-            }
-            mouseX = mouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
-            mouseY = mouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
-
             mc.mouseHelper.activeButton = -1;
 
-            double finalMouseX = mouseX;
-            double finalMouseY = mouseY;
             Screen.wrapScreenError(() ->
             {
-                boolean cancelled = ForgeHooksClient.onGuiMouseReleasedPre(screen, finalMouseX, finalMouseY, button);
+                boolean cancelled = ForgeHooksClient.onGuiMouseReleasedPre(screen, mouseX, mouseY, button);
                 if(!cancelled)
                 {
-                    cancelled = screen.mouseReleased(finalMouseX, finalMouseY, button);
+                    cancelled = screen.mouseReleased(mouseX, mouseY, button);
                 }
                 if(!cancelled)
                 {
-                    ForgeHooksClient.onGuiMouseReleasedPost(screen, finalMouseX, finalMouseY, button);
+                    ForgeHooksClient.onGuiMouseReleasedPost(screen, mouseX, mouseY, button);
                 }
             }, "mouseReleased event handler", screen.getClass().getCanonicalName());
         }
