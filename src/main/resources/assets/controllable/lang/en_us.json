@@ -65,6 +65,7 @@
     "controllable.options.flipLeftThumbstickY": "Flip Left Y-Axis",
     "controllable.options.flipRightThumbstickX": "Flip Right X-Axis",
     "controllable.options.flipRightThumbstickY": "Flip Right Y-Axis",
+    "controllable.options.quickCraft": "Quick Craft",
     "controllable.controller.default": "Default",
     "controllable.controller.playstation": "Playstation",
     "controllable.controller.xbox": "Xbox",

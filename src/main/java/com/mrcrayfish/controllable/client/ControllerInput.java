@@ -761,7 +761,11 @@ public class ControllerInput
                 else if(button == ButtonBindings.PICKUP_ITEM.getButton())
                 {
                     invokeMouseClick(mc.currentScreen, 0);
-                    this.craftRecipeBookItem();
+
+                    if(Config.CLIENT.options.quickCraft.get())
+                    {
+                        this.craftRecipeBookItem();
+                    }
                 }
                 else if(button == ButtonBindings.SPLIT_STACK.getButton())
                 {

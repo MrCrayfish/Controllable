@@ -119,4 +119,11 @@ public class ControllerOptions
         ActionVisibility visibility = option.get(gameSettings);
         return new TranslationTextComponent("controllable.options.showActions.format", new TranslationTextComponent("controllable.actionVisibility." + visibility.getString()));
     });
+
+    public static final BooleanOption QUICK_CRAFT = new ControllableBooleanOption("controllable.options.quickCraft", gameSettings -> {
+        return Config.CLIENT.options.quickCraft.get();
+    }, (gameSettings, value) -> {
+        Config.CLIENT.options.quickCraft.set(value);
+        Config.save();
+    });
 }

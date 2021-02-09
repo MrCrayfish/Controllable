@@ -44,6 +44,7 @@ public class Config
             public final ForgeConfigSpec.DoubleValue rotationSpeed;
             public final ForgeConfigSpec.DoubleValue mouseSpeed;
             public final ForgeConfigSpec.EnumValue<ActionVisibility> showActions;
+            public final ForgeConfigSpec.BooleanValue quickCraft;
 
             public Options(ForgeConfigSpec.Builder builder)
             {
@@ -61,6 +62,7 @@ public class Config
                     this.rotationSpeed = builder.comment("The speed which the camera turns in game").defineInRange("rotationSpeed", 25.0, 0.0, 50.0);
                     this.mouseSpeed = builder.comment("The speed which the cursor or virtual mouse moves around the screen").defineInRange("mouseSpeed", 15.0, 0.0, 50.0);
                     this.showActions = builder.comment("If true, shows common actions when displaying available on the screen").defineEnum("showActions", ActionVisibility.MINIMAL);
+                    this.quickCraft = builder.comment("If true, allows you to craft quickly when clicking an item in the recipe book").define("quickCraft", true);
                 }
                 builder.pop();
             }
