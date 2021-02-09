@@ -104,5 +104,6 @@
     "controllable.key.moveDown": "Navigate Down",
     "controllable.key.moveLeft": "Navigate Left",
     "controllable.key.moveRight": "Navigate Right",
-    "controllable.key.moveUp": "Navigate Up"
+    "controllable.key.moveUp": "Navigate Up",
+    "controllable.key.debugInfo": "Show Debug Info"
 }

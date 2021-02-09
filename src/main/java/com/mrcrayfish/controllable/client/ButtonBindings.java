@@ -38,4 +38,5 @@ public class ButtonBindings
     public static final ButtonBinding HIGHLIGHT_PLAYERS = new ButtonBinding(-1, "key.spectatorOutlines", "key.categories.misc", KeyConflictContext.IN_GAME);
     public static final ButtonBinding CINEMATIC_CAMERA = new ButtonBinding(-1, "key.smoothCamera", "key.categories.misc", KeyConflictContext.IN_GAME);
     public static final ButtonBinding FULLSCREEN = new ButtonBinding(-1, "key.fullscreen", "key.categories.misc", KeyConflictContext.UNIVERSAL);
+    public static final ButtonBinding DEBUG_INFO = new ButtonBinding(-1, "controllable.key.debugInfo", "key.categories.misc", KeyConflictContext.IN_GAME);
 }

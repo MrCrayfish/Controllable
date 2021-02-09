@@ -655,6 +655,10 @@ public class ControllerInput
                         mc.gameSettings.smoothCamera = !mc.gameSettings.smoothCamera;
                     }
                 }
+                else if(ButtonBindings.DEBUG_INFO.isButtonPressed())
+                {
+                    mc.gameSettings.showDebugInfo = !mc.gameSettings.showDebugInfo;
+                }
                 else if(mc.player != null && !mc.player.isHandActive())
                 {
                     if(ButtonBindings.ATTACK.isButtonPressed())
