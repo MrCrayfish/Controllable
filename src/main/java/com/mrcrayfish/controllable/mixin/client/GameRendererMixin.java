@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 /**
@@ -30,6 +31,15 @@ public class GameRendererMixin
             int mouseY = (int) (input.getVirtualMouseY() * (double) minecraft.getMainWindow().getScaledHeight() / (double) minecraft.getMainWindow().getHeight());
             args.set(2, mouseX);
             args.set(3, mouseY);
+        }
+    }
+
+    @Redirect(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;displayInGameMenu(Z)V"))
+    private void onPause(Minecraft minecraft, boolean pauseOnly)
+    {
+        if(Controllable.getController() == null || !Config.CLIENT.options.virtualMouse.get())
+        {
+            minecraft.displayInGameMenu(false);
         }
     }
 }
