@@ -1,9 +1,8 @@
 package com.mrcrayfish.controllable.client;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.gui.ControllerSelectionScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
 import net.minecraft.client.Minecraft;
@@ -12,7 +11,6 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 
 import java.util.List;
 
@@ -41,9 +39,9 @@ public class GuiEvents
         EXCLUDED_TYPES = builder.build();
     }
 
-    private SDL2ControllerManager manager;
+    private ControllerManager manager;
 
-    public GuiEvents(SDL2ControllerManager manager)
+    public GuiEvents(ControllerManager manager)
     {
         this.manager = manager;
     }
@@ -64,7 +62,7 @@ public class GuiEvents
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRenderOverlay(RenderGameOverlayEvent.Pre event)
     {
-        if(Controllable.getOptions().useConsoleHotbar())
+        if(Config.CLIENT.options.consoleHotbar.get())
         {
             if(EXCLUDED_TYPES.contains(event.getType()))
             {
@@ -77,7 +75,7 @@ public class GuiEvents
     @SubscribeEvent
     public void onRenderOverlay(RenderGameOverlayEvent.Post event)
     {
-        if(Controllable.getOptions().useConsoleHotbar())
+        if(Config.CLIENT.options.consoleHotbar.get())
         {
             if(EXCLUDED_TYPES.contains(event.getType()))
             {

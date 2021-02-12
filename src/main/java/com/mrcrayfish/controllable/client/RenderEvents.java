@@ -1,10 +1,12 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.event.AvailableActionsEvent;
+import com.mrcrayfish.controllable.event.GatherActionsEvent;
 import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
 import net.minecraft.block.ContainerBlock;
@@ -27,6 +29,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.awt.*;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +37,7 @@ import java.util.Map;
  */
 public class RenderEvents
 {
-    private static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Reference.MOD_ID, "textures/gui/buttons.png");
+    public static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Reference.MOD_ID, "textures/gui/buttons.png");
 
     private Map<Integer, Action> actions = new HashMap<>();
 
@@ -44,7 +47,15 @@ public class RenderEvents
         Minecraft mc = Minecraft.getInstance();
         if(event.phase == TickEvent.Phase.START && mc.player != null && !mc.gameSettings.hideGUI)
         {
-            actions = new HashMap<>();
+            this.actions.clear();
+
+            Map<ButtonBinding, Action> actionMap = new LinkedHashMap<>();
+
+            ActionVisibility visibility = Config.CLIENT.options.showActions.get();
+            if(visibility == ActionVisibility.NONE)
+                return;
+
+            boolean verbose = visibility == ActionVisibility.ALL;
 
             if(mc.currentScreen instanceof ContainerScreen)
             {
@@ -56,19 +67,19 @@ public class RenderEvents
                         Slot slot = container.getSlotUnderMouse();
                         if(slot.getHasStack())
                         {
-                            actions.put(Buttons.A, new Action(I18n.format("controllable.action.pickup_stack"), Action.Side.LEFT));
-                            actions.put(Buttons.X, new Action(I18n.format("controllable.action.pickup_item"), Action.Side.LEFT));
-                            actions.put(Buttons.B, new Action(I18n.format("controllable.action.quick_move"), Action.Side.LEFT));
+                            actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(I18n.format("controllable.action.pickup_stack"), Action.Side.LEFT));
+                            actionMap.put(ButtonBindings.SPLIT_STACK, new Action(I18n.format("controllable.action.pickup_item"), Action.Side.LEFT));
+                            actionMap.put(ButtonBindings.QUICK_MOVE, new Action(I18n.format("controllable.action.quick_move"), Action.Side.LEFT));
                         }
                     }
                 }
                 else
                 {
-                    actions.put(Buttons.A, new Action(I18n.format("controllable.action.place_stack"), Action.Side.LEFT));
-                    actions.put(Buttons.X, new Action(I18n.format("controllable.action.place_item"), Action.Side.LEFT));
+                    actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(I18n.format("controllable.action.place_stack"), Action.Side.LEFT));
+                    actionMap.put(ButtonBindings.SPLIT_STACK, new Action(I18n.format("controllable.action.place_item"), Action.Side.LEFT));
                 }
 
-                actions.put(Buttons.Y, new Action(I18n.format("controllable.action.close_inventory"), Action.Side.RIGHT));
+                actionMap.put(ButtonBindings.INVENTORY, new Action(I18n.format("controllable.action.close_inventory"), Action.Side.RIGHT));
             }
             else if(mc.currentScreen == null)
             {
@@ -84,11 +95,11 @@ public class RenderEvents
                 {
                     if(blockHit)
                     {
-                        actions.put(Buttons.RIGHT_TRIGGER, new Action(I18n.format("controllable.action.break"), Action.Side.RIGHT));
+                        actionMap.put(ButtonBindings.ATTACK, new Action(I18n.format("controllable.action.break"), Action.Side.RIGHT));
                     }
                     else
                     {
-                        actions.put(Buttons.RIGHT_TRIGGER, new Action(I18n.format("controllable.action.attack"), Action.Side.RIGHT));
+                        actionMap.put(ButtonBindings.ATTACK, new Action(I18n.format("controllable.action.attack"), Action.Side.RIGHT));
                     }
                 }
 
@@ -100,17 +111,17 @@ public class RenderEvents
                         case EAT:
                             if(mc.player.getFoodStats().needFood())
                             {
-                                actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
                             }
                             break;
                         case DRINK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
+                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
                             break;
                         case BLOCK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
+                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
                             break;
                         case BOW:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
+                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
                             break;
                     }
                 }
@@ -123,17 +134,17 @@ public class RenderEvents
                         case EAT:
                             if(mc.player.getFoodStats().needFood())
                             {
-                                actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
                             }
                             break;
                         case DRINK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
+                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
                             break;
                         case BLOCK:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
+                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
                             break;
                         case BOW:
-                            actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
+                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
                             break;
                     }
                 }
@@ -155,44 +166,49 @@ public class RenderEvents
                                 actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
                             }
                         }*/
-                        actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
+                        actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
                     }
                 }
                 else if(!currentItem.isEmpty() && !mc.player.isHandActive())
                 {
-                    actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.use_item"), Action.Side.RIGHT));
+                    actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.use_item"), Action.Side.RIGHT));
                 }
 
-                if(!mc.player.func_225608_bj_() && blockHit && canOpenBlock && !mc.player.isHandActive())
+                if(!mc.player.isCrouching() && blockHit && canOpenBlock && !mc.player.isHandActive())
                 {
-                    actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.interact"), Action.Side.RIGHT));
+                    actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.interact"), Action.Side.RIGHT));
                 }
 
-                //actions.put(Buttons.A, new Action(I18n.format("controllable.action.jump"), Action.Side.LEFT)); //TODO make a verbose action config option
-
-                actions.put(Buttons.Y, new Action(I18n.format("controllable.action.inventory"), Action.Side.LEFT));
-
-                if(!mc.player.getHeldItemOffhand().isEmpty() || !mc.player.inventory.getCurrentItem().isEmpty())
+                if(verbose)
                 {
-                    //actions.put(Buttons.X, new Action(I18n.format("controllable.action.swap_hands"), Action.Side.LEFT));  //TODO make a verbose action config option
+                    actionMap.put(ButtonBindings.JUMP, new Action(I18n.format("controllable.action.jump"), Action.Side.LEFT));
+                }
+
+                actionMap.put(ButtonBindings.INVENTORY, new Action(I18n.format("controllable.action.inventory"), Action.Side.LEFT));
+
+                if(verbose && (!mc.player.getHeldItemOffhand().isEmpty() || !mc.player.inventory.getCurrentItem().isEmpty()))
+                {
+                    actionMap.put(ButtonBindings.SWAP_HANDS, new Action(I18n.format("controllable.action.swap_hands"), Action.Side.LEFT));
                 }
 
                 if(mc.player.isPassenger())
                 {
-                    actions.put(Buttons.LEFT_THUMB_STICK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
+                    actionMap.put(ButtonBindings.SNEAK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
                 }
-                else
+                else if(verbose)
                 {
-                    //actions.put(Buttons.LEFT_THUMB_STICK, new Action(I18n.format("controllable.action.sneak"), Action.Side.RIGHT));  //TODO make a verbose action config option
+                    actionMap.put(ButtonBindings.SNEAK, new Action(I18n.format("controllable.action.sneak"), Action.Side.RIGHT));
                 }
 
                 if(!mc.player.inventory.getCurrentItem().isEmpty())
                 {
-                    actions.put(Buttons.DPAD_DOWN, new Action(I18n.format("controllable.action.drop_item"), Action.Side.LEFT));
+                    actionMap.put(ButtonBindings.DROP_ITEM, new Action(I18n.format("controllable.action.drop_item"), Action.Side.LEFT));
                 }
             }
 
-            MinecraftForge.EVENT_BUS.post(new AvailableActionsEvent(actions));
+            MinecraftForge.EVENT_BUS.post(new AvailableActionsEvent(this.actions));
+            MinecraftForge.EVENT_BUS.post(new GatherActionsEvent(actionMap, visibility));
+            actionMap.forEach((binding, action) -> this.actions.put(binding.getButton(), action));
         }
     }
 
@@ -221,11 +237,12 @@ public class RenderEvents
 
                 int leftIndex = 0;
                 int rightIndex = 0;
-                for(Integer button : actions.keySet())
+                for(int button : this.actions.keySet())
                 {
-                    Action action = actions.get(button);
+                    Action action = this.actions.get(button);
                     Action.Side side = action.getSide();
 
+/*
                     int remappedButton = button;
                     Controller controller = Controllable.getController();
                     Mappings.Entry mapping = controller.getMapping();
@@ -233,9 +250,10 @@ public class RenderEvents
                     {
                         remappedButton = mapping.remap(button);
                     }
+*/
 
-                    int texU = remappedButton * 13;
-                    int texV = Controllable.getOptions().getControllerType().ordinal() * 13;
+                    int texU = button * 13;
+                    int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
                     int size = 13;
 
                     int x = side == Action.Side.LEFT ? 5 : mc.getMainWindow().getScaledWidth() - 5 - size;
@@ -266,7 +284,7 @@ public class RenderEvents
                 }
             }
 
-            if(mc.player != null && mc.currentScreen == null && Controllable.getOptions().isRenderMiniPlayer())
+            if(mc.player != null && mc.currentScreen == null && Config.CLIENT.options.renderMiniPlayer.get())
             {
                 if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
                 {

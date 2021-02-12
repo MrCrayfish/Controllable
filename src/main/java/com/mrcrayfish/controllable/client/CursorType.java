@@ -21,7 +21,7 @@ public enum CursorType implements IStringSerializable
     @Override
     public String getName()
     {
-        return id;
+        return this.id;
     }
 
     public static CursorType byId(String id)

@@ -1,29 +1,33 @@
 modLoader="javafml"
-loaderVersion="[30,)"
-updateJSONURL="https://raw.githubusercontent.com/MrCrayfish/Controllable/master/update.json"
+loaderVersion="[31,)"
+updateJSONURL="https://raw.githubusercontent.com/MrCrayfish/ModUpdates/master/controllable/update.json"
 issueTrackerURL="https://github.com/MrCrayfish/Controllable/issues"
 displayURL="https://mrcrayfish.com/mods?id=controllable"
-logoFile="logo.png"
-credits=""
+logoFile="controllable.png"
 authors="MrCrayfish"
+license="GNU General Public License 3.0"
 
 [[mods]]
 modId="controllable"
-version="0.8.0"
+version="0.11.0"
 displayName="Controllable"
-description='''
-Adds the ability to use a controller to play Minecraft
-'''
+description="Adds the ability to use a controller to play Minecraft"
 
 [[dependencies.controllable]]
    modId="forge"
    mandatory=true
-   versionRange="[30.0.0,)"
+   versionRange="[31.2.0,)"
    ordering="NONE"
    side="CLIENT"
 [[dependencies.controllable]]
    modId="minecraft"
    mandatory=true
-   versionRange="[1.15.1,1.16)"
+   versionRange="[1.15.2]"
+   ordering="NONE"
+   side="CLIENT"
+[[dependencies.controllable]]
+   modId="jei"
+   mandatory=false
+   versionRange="[6.0.3,)"
    ordering="NONE"
    side="CLIENT"

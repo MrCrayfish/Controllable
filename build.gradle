@@ -1,21 +1,28 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://repo.spongepowered.org/maven' }
         jcenter()
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = "1.15.2-0.8.0"
+version = "0.11.0-1.15.2"
 group = "com.mrcrayfish" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "controllable"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+mixin {
+    add sourceSets.main, "controllable.refmap.json"
+}
 
 minecraft {
     mappings channel: 'snapshot', version: '20200122-1.15.1'
@@ -27,6 +34,7 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+            arg "-mixin.config=controllable.mixins.json"
             mods {
                 controllable {
                     source sourceSets.main
@@ -38,6 +46,7 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+            arg "-mixin.config=controllable.mixins.json"
             mods {
                 controllable {
                     source sourceSets.main
@@ -59,21 +68,23 @@ minecraft {
     }
 }
 
-configurations {
-    libraries
-    compile.extendsFrom libraries
-}
-
-dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.0.14'
-}
-
 repositories {
     jcenter()
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.k-4u.nl"
+    }
 }
 
 dependencies {
-    libraries "uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.+"
+    minecraft 'net.minecraftforge:forge:1.15.2-31.2.45'
+    compile fg.deobf("mezz.jei:jei-1.15.2:6.0.3.15")
 }
 
 jar {
@@ -86,11 +97,9 @@ jar {
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"MrCrayfish",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "Signing-Fingerprint": project.hasProperty('fingerprint') ? project.property('fingerprint') : 'unsigned'
+            "Signing-Fingerprint": project.hasProperty('fingerprint') ? project.property('fingerprint') : 'unsigned',
+            "MixinConfigs" : "controllable.mixins.json"
         ])
-    }
-    from {
-        configurations.libraries.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 

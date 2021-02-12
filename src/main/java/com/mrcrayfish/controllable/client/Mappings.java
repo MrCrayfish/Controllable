@@ -1,7 +1,5 @@
 package com.mrcrayfish.controllable.client;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.Minecraft;
@@ -17,6 +15,8 @@ import java.util.Map;
  */
 public class Mappings
 {
+    private static final Gson GSON = new GsonBuilder().registerTypeAdapter(Entry.class, new Entry.Serializer()).create();
+
     private static final Map<String, Entry> MAPPINGS = new HashMap<>();
 
     private static boolean loaded = false;
@@ -97,7 +97,9 @@ public class Mappings
     {
         try(Reader reader = new InputStreamReader(Mappings.class.getResourceAsStream("/mappings/" + mappingName + ".json")))
         {
-            loadMapping(reader).internal = true;
+            Entry entry = GSON.fromJson(reader, Entry.class);
+            entry.internal = true;
+            MAPPINGS.put(entry.getId(), entry);
         }
         catch(IOException e)
         {
@@ -109,33 +111,13 @@ public class Mappings
     {
         try(Reader reader = new InputStreamReader(new FileInputStream(file)))
         {
-            loadMapping(reader);
+            Entry entry = GSON.fromJson(reader, Entry.class);
+            MAPPINGS.put(entry.getId(), entry);
         }
         catch(IOException e)
         {
             e.printStackTrace();
         }
-    }
-
-    private static Entry loadMapping(Reader reader)
-    {
-        JsonElement element = new JsonParser().parse(reader);
-        String id = element.getAsJsonObject().get("id").getAsString();
-        String name = element.getAsJsonObject().get("name").getAsString();
-        Map<Integer, Integer> reassignments = new HashMap<>();
-        if(element.getAsJsonObject().has("reassign"))
-        {
-            JsonArray array = element.getAsJsonObject().get("reassign").getAsJsonArray();
-            array.forEach(jsonElement ->
-            {
-                int index = jsonElement.getAsJsonObject().get("index").getAsInt();
-                int with = jsonElement.getAsJsonObject().get("with").getAsInt();
-                reassignments.put(index, with);
-            });
-        }
-        Entry entry = new Entry(id, name, reassignments);
-        MAPPINGS.put(id, entry);
-        return entry;
     }
 
     public static void updateControllerMappings(Controller controller)
@@ -147,14 +129,21 @@ public class Mappings
     {
         private String id;
         private String name;
-        private BiMap<Integer, Integer> reassignments;
+        private Map<Integer, Integer> reassignments;
+        private boolean switchThumbsticks;
+        private boolean flipLeftX;
+        private boolean flipLeftY;
+        private boolean flipRightX;
+        private boolean flipRightY;
         private boolean internal;
+
+        private Entry() {}
 
         public Entry(String id, String name, Map<Integer, Integer> reassignments)
         {
             this.id = id;
             this.name = name;
-            this.reassignments = HashBiMap.create(reassignments);
+            this.reassignments = reassignments;
         }
 
         public String getId()
@@ -167,24 +156,88 @@ public class Mappings
             return name;
         }
 
-        public BiMap<Integer, Integer> getReassignments()
+        public Map<Integer, Integer> getReassignments()
         {
-            return reassignments;
+            return this.reassignments;
+        }
+
+        public boolean isThumbsticksSwitched()
+        {
+            return switchThumbsticks;
+        }
+
+        public void setSwitchThumbsticks(boolean switchThumbsticks)
+        {
+            this.switchThumbsticks = switchThumbsticks;
+        }
+
+        public boolean isFlipLeftX()
+        {
+            return this.flipLeftX;
+        }
+
+        public void setFlipLeftX(boolean flipLeftX)
+        {
+            this.flipLeftX = flipLeftX;
+        }
+
+        public boolean isFlipLeftY()
+        {
+            return this.flipLeftY;
+        }
+
+        public void setFlipLeftY(boolean flipLeftY)
+        {
+            this.flipLeftY = flipLeftY;
+        }
+
+        public boolean isFlipRightX()
+        {
+            return this.flipRightX;
+        }
+
+        public void setFlipRightX(boolean flipRightX)
+        {
+            this.flipRightX = flipRightX;
+        }
+
+        public boolean isFlipRightY()
+        {
+            return this.flipRightY;
+        }
+
+        public void setFlipRightY(boolean flipRightY)
+        {
+            this.flipRightY = flipRightY;
         }
 
         public boolean isInternal()
         {
-            return internal;
+            return this.internal;
         }
 
         public int remap(int button)
         {
-            Integer value = reassignments.get(button);
+            Integer value = this.reassignments.get(button);
             if(value != null)
             {
                 return value;
             }
             return button;
+        }
+
+        public Entry copy()
+        {
+            Entry entry = new Entry();
+            entry.id = this.id;
+            entry.name = this.name;
+            entry.reassignments = new HashMap<>(this.reassignments);
+            entry.switchThumbsticks = this.switchThumbsticks;
+            entry.flipLeftX = this.flipLeftX;
+            entry.flipLeftY = this.flipLeftY;
+            entry.flipRightX = this.flipRightX;
+            entry.flipRightY = this.flipRightY;
+            return entry;
         }
 
         public void save()
@@ -194,10 +247,7 @@ public class Mappings
                 File mappingsFolder = new File(Minecraft.getInstance().gameDir, "config/controllable/mappings");
                 mappingsFolder.mkdirs();
                 String name = id.replaceAll("\\s+", "_").toLowerCase(Locale.ENGLISH) + ".json";
-                GsonBuilder builder = new GsonBuilder();
-                builder.registerTypeAdapter(Entry.class, new Serializer());
-                Gson gson = builder.create();
-                String json = gson.toJson(this);
+                String json = GSON.toJson(this);
                 FileOutputStream fos = new FileOutputStream(new File(mappingsFolder, name));
                 fos.write(json.getBytes());
                 fos.close();
@@ -208,7 +258,7 @@ public class Mappings
             }
         }
 
-        public static class Serializer implements JsonSerializer<Entry>
+        public static class Serializer implements JsonSerializer<Entry>, JsonDeserializer<Entry>
         {
             @Override
             public JsonElement serialize(Entry src, Type typeOfSrc, JsonSerializationContext context)
@@ -216,6 +266,13 @@ public class Mappings
                 JsonObject object = new JsonObject();
                 object.addProperty("id", src.id);
                 object.addProperty("name", src.name);
+                JsonObject thumbsticks = new JsonObject();
+                thumbsticks.addProperty("switch", src.switchThumbsticks);
+                thumbsticks.addProperty("flipLeftX", src.flipLeftX);
+                thumbsticks.addProperty("flipLeftY", src.flipLeftY);
+                thumbsticks.addProperty("flipRightX", src.flipRightX);
+                thumbsticks.addProperty("flipRightY", src.flipRightY);
+                object.add("thumbsticks", thumbsticks);
                 JsonArray array = new JsonArray();
                 src.reassignments.forEach((index, with) -> {
                     JsonObject entry = new JsonObject();
@@ -225,6 +282,40 @@ public class Mappings
                 });
                 object.add("reassign", array);
                 return object;
+            }
+
+            @Override
+            public Entry deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
+            {
+                Entry entry = new Entry();
+                JsonObject object = json.getAsJsonObject();
+                entry.id = object.get("id").getAsString();
+                entry.name = object.get("name").getAsString();
+                JsonObject thumbsticks = object.getAsJsonObject("thumbsticks");
+                if(thumbsticks != null)
+                {
+                    entry.switchThumbsticks = this.getBoolean(thumbsticks, "switchThumbsticks", false);
+                    entry.flipLeftX = this.getBoolean(thumbsticks, "flipLeftX", false);
+                    entry.flipLeftY = this.getBoolean(thumbsticks, "flipLeftY", false);
+                    entry.flipRightX = this.getBoolean(thumbsticks, "flipRightX", false);
+                    entry.flipRightY = this.getBoolean(thumbsticks, "flipRightY", false);
+                }
+                Map<Integer, Integer> reassignments = new HashMap<>();
+                object.getAsJsonArray("reassign").forEach(e -> {
+                    JsonObject o = e.getAsJsonObject();
+                    reassignments.put(o.get("index").getAsInt(), o.get("with").getAsInt());
+                });
+                entry.reassignments = reassignments;
+                return entry;
+            }
+
+            private boolean getBoolean(JsonObject object, String name, boolean defaultVal)
+            {
+                if(object.has(name))
+                {
+                    return object.get(name).getAsBoolean();
+                }
+                return defaultVal;
             }
         }
     }

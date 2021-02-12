@@ -8,6 +8,7 @@ import java.util.Map;
 /**
  * Author: MrCrayfish
  */
+@Deprecated
 public class AvailableActionsEvent extends Event
 {
     private Map<Integer, Action> actions;
@@ -19,6 +20,6 @@ public class AvailableActionsEvent extends Event
 
     public Map<Integer, Action> getActions()
     {
-        return actions;
+        return this.actions;
     }
 }

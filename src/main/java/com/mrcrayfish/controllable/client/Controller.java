@@ -2,11 +2,10 @@ package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.ButtonStates;
 import net.minecraft.client.resources.I18n;
-import uk.co.electronstudio.sdl2gdx.SDL2Controller;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWGamepadState;
 
 import javax.annotation.Nullable;
-
-import static org.libsdl.SDL.*;
 
 /**
  *  A wrapper class that aims to reduce the exposure to the underlying controller library. This class
@@ -15,27 +14,44 @@ import static org.libsdl.SDL.*;
  */
 public class Controller
 {
+    private final int jid;
+    private GLFWGamepadState controller;
+    private ButtonStates states;
     private String cachedName;
     private Mappings.Entry mapping;
-    private SDL2Controller controller;
-    private ButtonStates states;
 
-    public Controller(SDL2Controller controller)
+    public Controller(int jid)
     {
-        this.controller = controller;
+        this.jid = jid;
+        this.controller = GLFWGamepadState.create();
         this.states = new ButtonStates();
         this.getName(); //cache the name straight away
     }
 
+    public int getJid()
+    {
+        return this.jid;
+    }
+
     /**
-     * Gets the underlying {@link SDL2Controller} of this this controller instance.
+     * Gets the underlying {@link GLFWGamepadState} of this this controller instance.
      * This is gives you direct access to the controller state.
      *
      * @return the sdl2controller controller instance
      */
-    public SDL2Controller getSDL2Controller()
+    public GLFWGamepadState getGamepadState()
     {
-        return controller;
+        return this.controller;
+    }
+
+    /**
+     * Updates the state of the gamepad.
+     *
+     * @return True if successfully updated otherwise controller is disconnected
+     */
+    public boolean updateGamepadState()
+    {
+        return GLFW.glfwGetGamepadState(this.jid, this.controller);
     }
 
     /**
@@ -43,7 +59,7 @@ public class Controller
      */
     public ButtonStates getButtonsStates()
     {
-        return states;
+        return this.states;
     }
 
     /**
@@ -53,11 +69,11 @@ public class Controller
      */
     public String getName()
     {
-        if(this.controller.isConnected())
+        if(GLFW.glfwJoystickPresent(this.jid))
         {
             if(this.cachedName == null)
             {
-                this.cachedName = this.controller.getName().replace("SDL GameController ", "").replace("SDL Joystick ", "");
+                this.cachedName = GLFW.glfwGetGamepadName(this.jid);
             }
             return this.cachedName;
         }
@@ -74,7 +90,7 @@ public class Controller
      */
     public boolean isButtonPressed(int button)
     {
-        return states.getState(button);
+        return this.states.getState(button);
     }
 
     /**
@@ -84,7 +100,7 @@ public class Controller
      */
     public float getLTriggerValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+        return (this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) + 1.0F) / 2.0F;
     }
 
     /**
@@ -94,7 +110,7 @@ public class Controller
      */
     public float getRTriggerValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+        return (this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER) + 1.0F) / 2.0F;
     }
 
     /**
@@ -104,7 +120,8 @@ public class Controller
      */
     public float getLThumbStickXValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_LEFTX);
+        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X : GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
+        return this.controller.axes(axis) * (this.isFlipLeftX() ? -1 : 1);
     }
 
     /**
@@ -114,7 +131,8 @@ public class Controller
      */
     public float getLThumbStickYValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_LEFTY);
+        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y : GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
+        return this.controller.axes(axis) * (this.isFlipLeftY() ? -1 : 1);
     }
 
     /**
@@ -124,7 +142,8 @@ public class Controller
      */
     public float getRThumbStickXValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTX);
+        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_LEFT_X : GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
+        return this.controller.axes(axis) * (this.isFlipRightX() ? -1 : 1);
     }
 
     /**
@@ -134,7 +153,8 @@ public class Controller
      */
     public float getRThumbStickYValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTY);
+        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y : GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y ;
+        return this.controller.axes(axis) * (this.isFlipRightY() ? -1 : 1);
     }
 
     /**
@@ -155,6 +175,31 @@ public class Controller
     @Nullable
     public Mappings.Entry getMapping()
     {
-        return mapping;
+        return this.mapping;
+    }
+
+    private boolean isThumbsticksSwitched()
+    {
+        return this.mapping != null && this.mapping.isThumbsticksSwitched();
+    }
+
+    public boolean isFlipLeftX()
+    {
+        return this.mapping != null && this.mapping.isFlipLeftX();
+    }
+
+    public boolean isFlipLeftY()
+    {
+        return this.mapping != null && this.mapping.isFlipLeftY();
+    }
+
+    public boolean isFlipRightX()
+    {
+        return this.mapping != null && this.mapping.isFlipRightX();
+    }
+
+    public boolean isFlipRightY()
+    {
+        return this.mapping != null && this.mapping.isFlipRightY();
     }
 }

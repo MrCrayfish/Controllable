@@ -1,26 +1,46 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
+import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
+import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
+import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.event.ControllerEvent;
+import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
+import com.mrcrayfish.controllable.integration.JustEnoughItems;
+import com.mrcrayfish.controllable.mixin.client.CreativeScreenMixin;
+import com.mrcrayfish.controllable.mixin.client.RecipeBookGuiMixin;
+import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.advancements.AdvancementsScreen;
+import net.minecraft.client.gui.recipebook.*;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.client.util.NativeUtil;
+import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.container.RecipeBookContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.network.play.client.CPlayerDiggingPacket;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ScreenShotHelper;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -36,9 +56,12 @@ import org.lwjgl.glfw.GLFW;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_DOWN;
-import static org.libsdl.SDL.SDL_CONTROLLER_BUTTON_DPAD_UP;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * Author: MrCrayfish
@@ -53,10 +76,10 @@ public class ControllerInput
     private boolean sneaking = false;
     private boolean isFlying = false;
     private boolean nearSlot = false;
+    private boolean moving = false;
+    private boolean preventReset;
     private double virtualMouseX;
     private double virtualMouseY;
-    private float prevXAxis;
-    private float prevYAxis;
     private int prevTargetMouseX;
     private int prevTargetMouseY;
     private int targetMouseX;
@@ -71,17 +94,36 @@ public class ControllerInput
 
     public double getVirtualMouseX()
     {
-        return virtualMouseX;
+        return this.virtualMouseX;
     }
 
     public double getVirtualMouseY()
     {
-        return virtualMouseY;
+        return this.virtualMouseY;
+    }
+
+    private void setControllerInUse()
+    {
+        this.lastUse = 100;
+    }
+
+    public boolean isControllerInUse()
+    {
+        return this.lastUse > 0;
     }
 
     public int getLastUse()
     {
-        return lastUse;
+        return this.lastUse;
+    }
+
+    public void resetLastUse()
+    {
+        if(!this.preventReset)
+        {
+            this.lastUse = 0;
+        }
+        this.preventReset = false;
     }
 
     @SubscribeEvent
@@ -89,21 +131,21 @@ public class ControllerInput
     {
         if(event.phase == TickEvent.Phase.START)
         {
-            prevTargetMouseX = targetMouseX;
-            prevTargetMouseY = targetMouseY;
+            this.prevTargetMouseX = this.targetMouseX;
+            this.prevTargetMouseY = this.targetMouseY;
 
-            if(lastUse > 0)
+            if(this.lastUse > 0)
             {
-                lastUse--;
+                this.lastUse--;
             }
 
             Controller controller = Controllable.getController();
             if(controller == null)
                 return;
 
-            if(Math.abs(controller.getLTriggerValue()) >= 0.1F || Math.abs(controller.getRTriggerValue()) >= 0.1F)
+            if((Math.abs(controller.getLTriggerValue()) >= 0.2F || Math.abs(controller.getRTriggerValue()) >= 0.2F) && !(Minecraft.getInstance().currentScreen instanceof ControllerLayoutScreen))
             {
-                lastUse = 100;
+                this.setControllerInUse();
             }
 
             Minecraft mc = Minecraft.getInstance();
@@ -113,99 +155,99 @@ public class ControllerInput
             if(mc.currentScreen == null || mc.currentScreen instanceof ControllerLayoutScreen)
                 return;
 
-            float deadZone = (float) Controllable.getOptions().getDeadZone();
+            float deadZone = (float) Math.min(1.0F, Config.CLIENT.options.deadZone.get() + 0.25F);
 
             /* Only need to run code if left thumb stick has input */
-            boolean moving = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
-            if(moving)
+            boolean lastMoving = this.moving;
+            this.moving = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
+            if(this.moving)
             {
                 /* Updates the target mouse position when the initial thumb stick movement is
                  * detected. This fixes an issue when the user moves the cursor with the mouse then
                  * switching back to controller, the cursor would jump to old target mouse position. */
-                if(Math.abs(prevXAxis) < deadZone && Math.abs(prevYAxis) < deadZone)
+                if(!lastMoving)
                 {
                     double mouseX = mc.mouseHelper.getMouseX();
                     double mouseY = mc.mouseHelper.getMouseY();
-                    if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse())
+                    if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get())
                     {
-                        mouseX = virtualMouseX;
-                        mouseY = virtualMouseY;
+                        mouseX = this.virtualMouseX;
+                        mouseY = this.virtualMouseY;
                     }
-                    prevTargetMouseX = targetMouseX = (int) mouseX;
-                    prevTargetMouseY = targetMouseY = (int) mouseY;
+                    this.prevTargetMouseX = this.targetMouseX = (int) mouseX;
+                    this.prevTargetMouseY = this.targetMouseY = (int) mouseY;
                 }
 
-                float xAxis = (controller.getLThumbStickXValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickXValue());
-                if(Math.abs(xAxis) >= deadZone)
-                {
-                    mouseSpeedX = xAxis;
-                }
-                else
-                {
-                    mouseSpeedX = 0.0F;
-                }
+                float xAxis = controller.getLThumbStickXValue();
+                this.mouseSpeedX = Math.abs(xAxis) >= deadZone ? Math.signum(xAxis) * (Math.abs(xAxis) - deadZone) / (1.0F - deadZone) : 0.0F;
 
-                float yAxis = (controller.getLThumbStickYValue() > 0.0F ? 1 : -1) * Math.abs(controller.getLThumbStickYValue());
-                if(Math.abs(yAxis) >= deadZone)
-                {
-                    mouseSpeedY = yAxis;
-                }
-                else
-                {
-                    mouseSpeedY = 0.0F;
-                }
+                float yAxis = controller.getLThumbStickYValue();
+                this.mouseSpeedY = Math.abs(yAxis) >= deadZone ? Math.signum(yAxis) * (Math.abs(yAxis) - deadZone) / (1.0F - deadZone) : 0.0F;
+
+                this.setControllerInUse();
             }
 
-            if(Math.abs(mouseSpeedX) > 0.05F || Math.abs(mouseSpeedY) > 0.05F)
+            if(this.lastUse <= 0)
             {
-                double mouseSpeed = Controllable.getOptions().getMouseSpeed() * mc.getMainWindow().getGuiScaleFactor();
-                targetMouseX += mouseSpeed * mouseSpeedX;
-                targetMouseX = MathHelper.clamp(targetMouseX, 0, mc.getMainWindow().getWidth());
-                targetMouseY += mouseSpeed * mouseSpeedY;
-                targetMouseY = MathHelper.clamp(targetMouseY, 0, mc.getMainWindow().getHeight());
-                lastUse = 100;
-                moved = true;
+                this.mouseSpeedX = 0F;
+                this.mouseSpeedY = 0F;
+                return;
             }
 
-            prevXAxis = controller.getLThumbStickXValue();
-            prevYAxis = controller.getLThumbStickYValue();
+            if(Math.abs(this.mouseSpeedX) > 0F || Math.abs(this.mouseSpeedY) > 0F)
+            {
+                double mouseSpeed = Config.CLIENT.options.mouseSpeed.get() * mc.getMainWindow().getGuiScaleFactor();
 
-            this.moveMouseToClosestSlot(moving, mc.currentScreen);
+                // When hovering over slots, slows down the mouse speed to make it easier
+                if(mc.currentScreen instanceof ContainerScreen)
+                {
+                    ContainerScreen screen = (ContainerScreen) mc.currentScreen;
+                    if(screen.getSlotUnderMouse() != null)
+                    {
+                        mouseSpeed *= 0.5;
+                    }
+                }
+
+                double mouseX = this.virtualMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+                double mouseY = this.virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
+                List<IGuiEventListener> eventListeners = new ArrayList<>(mc.currentScreen.children());
+                if(mc.currentScreen instanceof IRecipeShownListener)
+                {
+                    RecipeBookGui recipeBook = ((IRecipeShownListener) mc.currentScreen).getRecipeGui();
+                    if(recipeBook.isVisible())
+                    {
+                        eventListeners.add(((RecipeBookGuiMixin) recipeBook).getToggleRecipesBtn());
+                        eventListeners.addAll(((RecipeBookGuiMixin) recipeBook).getRecipeTabs());
+                        RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
+                        eventListeners.addAll(((RecipeBookPageAccessor) recipeBookPage).getButtons());
+                        eventListeners.add(((RecipeBookPageAccessor) recipeBookPage).getForwardButton());
+                        eventListeners.add(((RecipeBookPageAccessor) recipeBookPage).getBackButton());
+                    }
+                }
+                IGuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+                if(hoveredListener != null && !(hoveredListener instanceof AbstractList))
+                {
+                    mouseSpeed *= 0.6;
+                }
+
+                this.targetMouseX += mouseSpeed * this.mouseSpeedX;
+                this.targetMouseX = MathHelper.clamp(this.targetMouseX, 0, mc.getMainWindow().getWidth());
+                this.targetMouseY += mouseSpeed * this.mouseSpeedY;
+                this.targetMouseY = MathHelper.clamp(this.targetMouseY, 0, mc.getMainWindow().getHeight());
+                this.setControllerInUse();
+                this.moved = true;
+            }
+
+            this.moveMouseToClosestSlot(this.moving, mc.currentScreen);
 
             if(mc.currentScreen instanceof CreativeScreen)
             {
                 this.handleCreativeScrolling((CreativeScreen) mc.currentScreen, controller);
             }
 
-            if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse())
+            if(Config.CLIENT.options.virtualMouse.get() && (this.targetMouseX != this.prevTargetMouseX || this.targetMouseY != this.prevTargetMouseY))
             {
-                Screen screen = mc.currentScreen;
-                if(screen != null && (targetMouseX != prevTargetMouseX || targetMouseY != prevTargetMouseY))
-                {
-                    if(mc.loadingGui == null)
-                    {
-                        double mouseX = virtualMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
-                        double mouseY = virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
-                        Screen.wrapScreenError(() -> screen.mouseMoved(mouseX, mouseY), "mouseMoved event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
-                        if(mc.mouseHelper.activeButton != -1 && mc.mouseHelper.eventTime > 0.0D)
-                        {
-                            double dragX = (targetMouseX - prevTargetMouseX) * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
-                            double dragY = (targetMouseY - prevTargetMouseY) * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
-                            Screen.wrapScreenError(() ->
-                            {
-                                if(net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPre(screen, mouseX, mouseY, mc.mouseHelper.activeButton, dragX, dragY))
-                                {
-                                    return;
-                                }
-                                if(((IGuiEventListener) screen).mouseDragged(mouseX, mouseY, mc.mouseHelper.activeButton, dragX, dragY))
-                                {
-                                    return;
-                                }
-                                net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPost(screen, mouseX, mouseY, mc.mouseHelper.activeButton, dragX, dragY);
-                            }, "mouseDragged event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
-                        }
-                    }
-                }
+                this.performMouseDrag(this.virtualMouseX, this.virtualMouseY, this.targetMouseX - this.prevTargetMouseX, this.targetMouseY - this.prevTargetMouseY);
             }
         }
     }
@@ -216,12 +258,12 @@ public class ControllerInput
         Minecraft mc = Minecraft.getInstance();
         if(mc.currentScreen == null)
         {
-            nearSlot = false;
-            moved = false;
-            mouseSpeedX = 0.0;
-            mouseSpeedY = 0.0;
-            virtualMouseX = targetMouseX = prevTargetMouseX = (int) (mc.getMainWindow().getWidth() / 2F);
-            virtualMouseY = targetMouseY = prevTargetMouseY = (int) (mc.getMainWindow().getHeight() / 2F);
+            this.nearSlot = false;
+            this.moved = false;
+            this.mouseSpeedX = 0.0;
+            this.mouseSpeedY = 0.0;
+            this.virtualMouseX = this.targetMouseX = this.prevTargetMouseX = (int) (mc.getMainWindow().getWidth() / 2F);
+            this.virtualMouseY = this.targetMouseY = this.prevTargetMouseY = (int) (mc.getMainWindow().getHeight() / 2F);
         }
     }
 
@@ -232,21 +274,48 @@ public class ControllerInput
          * mouse position is different to the previous tick's position. This allows for the mouse
          * to still be used as input. */
         Minecraft mc = Minecraft.getInstance();
-        if(mc.currentScreen != null && (targetMouseX != prevTargetMouseX || targetMouseY != prevTargetMouseY))
+        if(mc.currentScreen != null && (this.targetMouseX != this.prevTargetMouseX || this.targetMouseY != this.prevTargetMouseY))
         {
             if(!(mc.currentScreen instanceof ControllerLayoutScreen))
             {
                 float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
-                double mouseX = (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * partialTicks + 0.5);
-                double mouseY = (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * partialTicks + 0.5);
-                if(Controllable.getOptions().isVirtualMouse())
+                double mouseX = (this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * partialTicks + 0.5);
+                double mouseY = (this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * partialTicks + 0.5);
+                this.setMousePosition(mouseX, mouseY);
+            }
+        }
+    }
+
+    private void performMouseDrag(double mouseX, double mouseY, double dragX, double dragY)
+    {
+        if(Controllable.getController() != null)
+        {
+            Minecraft mc = Minecraft.getInstance();
+            Screen screen = mc.currentScreen;
+            if(screen != null)
+            {
+                if(mc.loadingGui == null)
                 {
-                    virtualMouseX = mouseX;
-                    virtualMouseY = mouseY;
-                }
-                else
-                {
-                    GLFW.glfwSetCursorPos(mc.getMainWindow().getHandle(), mouseX, mouseY);
+                    double finalMouseX = mouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+                    double finalMouseY = mouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
+                    Screen.wrapScreenError(() -> screen.mouseMoved(finalMouseX, finalMouseY), "mouseMoved event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
+                    if(mc.mouseHelper.activeButton != -1 && mc.mouseHelper.eventTime > 0.0D)
+                    {
+                        Screen.wrapScreenError(() ->
+                        {
+                            double finalDragX = dragX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+                            double finalDragY = dragY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
+                            if(net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPre(screen, finalMouseX, finalMouseY, mc.mouseHelper.activeButton, finalDragX, finalDragY))
+                            {
+                                return;
+                            }
+                            if(((IGuiEventListener) screen).mouseDragged(finalMouseX, finalMouseY, mc.mouseHelper.activeButton, finalDragX, finalDragY))
+                            {
+                                return;
+                            }
+                            net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPost(screen, finalMouseX, finalMouseY, mc.mouseHelper.activeButton, finalDragX, finalDragY);
+                        }, "mouseDragged event handler", ((IGuiEventListener) screen).getClass().getCanonicalName());
+                    }
                 }
             }
         }
@@ -255,16 +324,16 @@ public class ControllerInput
     @SubscribeEvent(receiveCanceled = true)
     public void onRenderScreen(GuiScreenEvent.DrawScreenEvent.Post event)
     {
-        if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && lastUse > 0)
+        if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && lastUse > 0)
         {
             RenderSystem.pushMatrix();
             {
-                CursorType type = Controllable.getOptions().getCursorType();
+                CursorType type = Config.CLIENT.options.cursorType.get();
                 Minecraft minecraft = event.getGui().getMinecraft();
                 if(minecraft.player == null || (minecraft.player.inventory.getItemStack().isEmpty() || type == CursorType.CONSOLE))
                 {
-                    double mouseX = (prevTargetMouseX + (targetMouseX - prevTargetMouseX) * Minecraft.getInstance().getRenderPartialTicks());
-                    double mouseY = (prevTargetMouseY + (targetMouseY - prevTargetMouseY) * Minecraft.getInstance().getRenderPartialTicks());
+                    double mouseX = (this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * Minecraft.getInstance().getRenderPartialTicks());
+                    double mouseY = (this.prevTargetMouseY + (this.targetMouseY - this.prevTargetMouseY) * Minecraft.getInstance().getRenderPartialTicks());
                     RenderSystem.translated(mouseX / minecraft.getMainWindow().getGuiScaleFactor(), mouseY / minecraft.getMainWindow().getGuiScaleFactor(), 500);
                     RenderSystem.color3f(1.0F, 1.0F, 1.0F);
                     RenderSystem.disableLighting();
@@ -273,7 +342,7 @@ public class ControllerInput
                     {
                         RenderSystem.scaled(0.5, 0.5, 0.5);
                     }
-                    Screen.blit(-8, -8, 16, 16, nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
+                    Screen.blit(-8, -8, 16, 16, this.nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
                 }
             }
             RenderSystem.popMatrix();
@@ -291,14 +360,25 @@ public class ControllerInput
             return;
 
         Minecraft mc = Minecraft.getInstance();
+        double mouseX = this.virtualMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+        double mouseY = this.virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
+        if(mc.currentScreen != null && this.lastUse > 0)
+        {
+            IGuiEventListener hoveredListener = mc.currentScreen.children().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+            if(hoveredListener instanceof AbstractList)
+            {
+                this.handleListScrolling((AbstractList) hoveredListener, controller);
+            }
+        }
+
         PlayerEntity player = mc.player;
         if(player == null)
             return;
 
-        if(mc.currentScreen == null && (targetYaw != 0F || targetPitch != 0F))
+        if(mc.currentScreen == null && (this.targetYaw != 0F || this.targetPitch != 0F))
         {
             float elapsedTicks = Minecraft.getInstance().getTickLength();
-            player.rotateTowards((targetYaw / 0.15) * elapsedTicks, (targetPitch / 0.15) * (Controllable.getOptions().isInvertLook() ? -1 : 1) * elapsedTicks);
+            player.rotateTowards((this.targetYaw / 0.15) * elapsedTicks, (this.targetPitch / 0.15) * (Config.CLIENT.options.invertLook.get() ? -1 : 1) * elapsedTicks);
             if(player.getRidingEntity() != null)
             {
                 player.getRidingEntity().applyOrientationToEntity(player);
@@ -312,8 +392,8 @@ public class ControllerInput
         if(event.phase == TickEvent.Phase.END)
             return;
 
-        targetYaw = 0F;
-        targetPitch = 0F;
+        this.targetYaw = 0F;
+        this.targetPitch = 0F;
 
         Minecraft mc = Minecraft.getInstance();
         PlayerEntity player = mc.player;
@@ -326,31 +406,30 @@ public class ControllerInput
 
         if(mc.currentScreen == null)
         {
-            float deadZone = (float) Controllable.getOptions().getDeadZone();
+            float deadZone = Config.CLIENT.options.deadZone.get().floatValue();
 
             /* Handles rotating the yaw of player */
             if(Math.abs(controller.getRThumbStickXValue()) >= deadZone)
             {
-                lastUse = 100;
-                double rotationSpeed = Controllable.getOptions().getRotationSpeed();
+                this.setControllerInUse();
+                double rotationSpeed = Config.CLIENT.options.rotationSpeed.get();
                 ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
-                    float deadZoneTrim = (controller.getRThumbStickXValue() > 0 ? 1 : -1) * deadZone;
-                    float rotationYaw = (turnEvent.getYawSpeed() * (controller.getRThumbStickXValue() - deadZoneTrim) / (1.0F - deadZone)) * 0.33F;
-                    targetYaw = rotationYaw;
+                    float deadZoneTrimX = (controller.getRThumbStickXValue() > 0 ? 1 : -1) * deadZone;
+                    this.targetYaw = (turnEvent.getYawSpeed() * (controller.getRThumbStickXValue() - deadZoneTrimX) / (1.0F - deadZone)) * 0.33F;
                 }
             }
+
             if(Math.abs(controller.getRThumbStickYValue()) >= deadZone)
             {
-                lastUse = 100;
-                double rotationSpeed = Controllable.getOptions().getRotationSpeed();
+                this.setControllerInUse();
+                double rotationSpeed = Config.CLIENT.options.rotationSpeed.get();
                 ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
-                    float deadZoneTrim = (controller.getRThumbStickYValue() > 0 ? 1 : -1) * deadZone;
-                    float rotationPitch = (turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() - deadZoneTrim) / (1.0F - deadZone)) * 0.33F;
-                    targetPitch = rotationPitch;
+                    float deadZoneTrimY = (controller.getRThumbStickYValue() > 0 ? 1 : -1) * deadZone;
+                    this.targetPitch = (turnEvent.getPitchSpeed() * (controller.getRThumbStickYValue() - deadZoneTrimY) / (1.0F - deadZone)) * 0.33F;
                 }
             }
         }
@@ -359,26 +438,26 @@ public class ControllerInput
         {
             if(ButtonBindings.DROP_ITEM.isButtonDown())
             {
-                lastUse = 100;
-                dropCounter++;
+                this.setControllerInUse();
+                this.dropCounter++;
             }
         }
 
-        if(dropCounter > 20)
+        if(this.dropCounter > 20)
         {
             if (!mc.player.isSpectator())
             {
                 mc.player.func_225609_n_(true);
             }
-            dropCounter = 0;
+            this.dropCounter = 0;
         }
-        else if(dropCounter > 0 && !ButtonBindings.DROP_ITEM.isButtonDown())
+        else if(this.dropCounter > 0 && !ButtonBindings.DROP_ITEM.isButtonDown())
         {
             if (!mc.player.isSpectator())
             {
                 mc.player.func_225609_n_(false);
             }
-            dropCounter = 0;
+            this.dropCounter = 0;
         }
     }
 
@@ -395,42 +474,45 @@ public class ControllerInput
 
         Minecraft mc = Minecraft.getInstance();
 
-        if(keyboardSneaking && !mc.gameSettings.keyBindSneak.isKeyDown())
+        if(this.keyboardSneaking && !mc.gameSettings.keyBindSneak.isKeyDown())
         {
-            sneaking = false;
-            keyboardSneaking = false;
+            this.sneaking = false;
+            this.keyboardSneaking = false;
         }
 
         if(mc.gameSettings.keyBindSneak.isKeyDown())
         {
-            sneaking = true;
-            keyboardSneaking = true;
+            this.sneaking = true;
+            this.keyboardSneaking = true;
         }
 
         if(mc.player.abilities.isFlying || mc.player.isPassenger())
         {
-            lastUse = 100;
-            sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
-            sneaking |= ButtonBindings.SNEAK.isButtonDown();
-            isFlying = true;
+            this.sneaking = mc.gameSettings.keyBindSneak.isKeyDown();
+            this.sneaking |= ButtonBindings.SNEAK.isButtonDown();
+            if(ButtonBindings.SNEAK.isButtonDown())
+            {
+                this.setControllerInUse();
+            }
+            this.isFlying = true;
         }
-        else if(isFlying)
+        else if(this.isFlying)
         {
-            sneaking = false;
-            isFlying = false;
+            this.sneaking = false;
+            this.isFlying = false;
         }
 
-        event.getMovementInput().field_228350_h_ = sneaking;
+        event.getMovementInput().field_228350_h_ = this.sneaking;
 
         if(mc.currentScreen == null)
         {
             if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.Move(controller)))
             {
-                float deadZone = (float) Controllable.getOptions().getDeadZone();
+                float deadZone = Config.CLIENT.options.deadZone.get().floatValue();
 
                 if(Math.abs(controller.getLThumbStickYValue()) >= deadZone)
                 {
-                    lastUse = 100;
+                    this.setControllerInUse();
                     int dir = controller.getLThumbStickYValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().forwardKeyDown = dir > 0;
                     event.getMovementInput().backKeyDown = dir < 0;
@@ -442,9 +524,14 @@ public class ControllerInput
                     }
                 }
 
+                if(player.getRidingEntity() instanceof BoatEntity)
+                {
+                    deadZone = 0.5F;
+                }
+
                 if(Math.abs(controller.getLThumbStickXValue()) >= deadZone)
                 {
-                    lastUse = 100;
+                    this.setControllerInUse();
                     int dir = controller.getLThumbStickXValue() > 0.0F ? -1 : 1;
                     event.getMovementInput().rightKeyDown = dir < 0;
                     event.getMovementInput().leftKeyDown = dir > 0;
@@ -471,12 +558,7 @@ public class ControllerInput
 
     public void handleButtonInput(Controller controller, int button, boolean state)
     {
-        if(Minecraft.getInstance().currentScreen instanceof ControllerLayoutScreen)
-        {
-            return;
-        }
-
-        lastUse = 100;
+        this.setControllerInUse();
 
         ControllerEvent.ButtonInput eventInput = new ControllerEvent.ButtonInput(controller, button, state);
         if(MinecraftForge.EVENT_BUS.post(eventInput))
@@ -492,7 +574,22 @@ public class ControllerInput
         Minecraft mc = Minecraft.getInstance();
         if(state)
         {
-            if(mc.currentScreen == null)
+            if(ButtonBindings.FULLSCREEN.isButtonPressed())
+            {
+                mc.getMainWindow().toggleFullscreen();
+                mc.gameSettings.fullscreen = mc.getMainWindow().isFullscreen();
+                mc.gameSettings.saveOptions();
+            }
+            else if(ButtonBindings.SCREENSHOT.isButtonPressed())
+            {
+                if(mc.world != null)
+                {
+                    ScreenShotHelper.saveScreenshot(mc.gameDir, mc.getMainWindow().getFramebufferWidth(), mc.getMainWindow().getFramebufferHeight(), mc.getFramebuffer(), (textComponent) -> {
+                        mc.execute(() -> mc.ingameGUI.getChatGUI().printChatMessage(textComponent));
+                    });
+                }
+            }
+            else if(mc.currentScreen == null)
             {
                 if(ButtonBindings.INVENTORY.isButtonPressed())
                 {
@@ -506,11 +603,18 @@ public class ControllerInput
                         mc.displayGuiScreen(new InventoryScreen(mc.player));
                     }
                 }
+                else if(ButtonBindings.SPRINT.isButtonPressed())
+                {
+                    if(mc.player != null)
+                    {
+                        mc.player.setSprinting(true);
+                    }
+                }
                 else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
                     if(mc.player != null && !mc.player.abilities.isFlying && !mc.player.isPassenger())
                     {
-                        sneaking = !sneaking;
+                        this.sneaking = !this.sneaking;
                     }
                 }
                 else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
@@ -531,7 +635,6 @@ public class ControllerInput
                 {
                     if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
                     {
-
                         mc.getConnection().sendPacket(new CPlayerDiggingPacket(CPlayerDiggingPacket.Action.SWAP_HELD_ITEMS, BlockPos.ZERO, Direction.DOWN));
                     }
                 }
@@ -545,6 +648,24 @@ public class ControllerInput
                     {
                         mc.displayInGameMenu(false);
                     }
+                }
+                else if(ButtonBindings.ADVANCEMENTS.isButtonPressed())
+                {
+                    if(mc.player != null)
+                    {
+                        mc.displayGuiScreen(new AdvancementsScreen(mc.player.connection.getAdvancementManager()));
+                    }
+                }
+                else if(ButtonBindings.CINEMATIC_CAMERA.isButtonPressed())
+                {
+                    if(mc.player != null)
+                    {
+                        mc.gameSettings.smoothCamera = !mc.gameSettings.smoothCamera;
+                    }
+                }
+                else if(ButtonBindings.DEBUG_INFO.isButtonPressed())
+                {
+                    mc.gameSettings.showDebugInfo = !mc.gameSettings.showDebugInfo;
                 }
                 else if(mc.player != null && !mc.player.isHandActive())
                 {
@@ -571,18 +692,46 @@ public class ControllerInput
                         mc.player.closeScreen();
                     }
                 }
-                else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
+                else if(ButtonBindings.PREVIOUS_CREATIVE_TAB.isButtonPressed())
                 {
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
-                        scrollCreativeTabs((CreativeScreen) mc.currentScreen, 1);
+                        this.scrollCreativeTabs((CreativeScreen) mc.currentScreen, 1);
+                        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                    }
+                    else if(mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        IRecipeShownListener recipeShownListener = (IRecipeShownListener) mc.currentScreen;
+                        this.scrollRecipePage(recipeShownListener.getRecipeGui(), 1);
                     }
                 }
-                else if(ButtonBindings.SCROLL_LEFT.isButtonPressed())
+                else if(ButtonBindings.NEXT_CREATIVE_TAB.isButtonPressed())
                 {
                     if(mc.currentScreen instanceof CreativeScreen)
                     {
-                        scrollCreativeTabs((CreativeScreen) mc.currentScreen, -1);
+                        this.scrollCreativeTabs((CreativeScreen) mc.currentScreen, -1);
+                        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                    }
+                    else if(mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        IRecipeShownListener recipeShownListener = (IRecipeShownListener) mc.currentScreen;
+                        this.scrollRecipePage(recipeShownListener.getRecipeGui(), -1);
+                    }
+                }
+                else if(ButtonBindings.NEXT_RECIPE_TAB.isButtonPressed())
+                {
+                    if(mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        IRecipeShownListener recipeShownListener = (IRecipeShownListener) mc.currentScreen;
+                        this.scrollRecipeTab(recipeShownListener.getRecipeGui(), -1);
+                    }
+                }
+                else if(ButtonBindings.PREVIOUS_RECIPE_TAB.isButtonPressed())
+                {
+                    if(mc.currentScreen instanceof IRecipeShownListener)
+                    {
+                        IRecipeShownListener recipeShownListener = (IRecipeShownListener) mc.currentScreen;
+                        this.scrollRecipeTab(recipeShownListener.getRecipeGui(), 1);
                     }
                 }
                 else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
@@ -592,17 +741,45 @@ public class ControllerInput
                         mc.displayGuiScreen(null);
                     }
                 }
-                else if(button == Buttons.A)
+                else if(ButtonBindings.NAVIGATE_UP.isButtonPressed())
+                {
+                    this.navigateMouse(mc.currentScreen, Navigate.UP);
+                }
+                else if(ButtonBindings.NAVIGATE_DOWN.isButtonPressed())
+                {
+                    this.navigateMouse(mc.currentScreen, Navigate.DOWN);
+                }
+                else if(ButtonBindings.NAVIGATE_LEFT.isButtonPressed())
+                {
+                    this.navigateMouse(mc.currentScreen, Navigate.LEFT);
+                }
+                else if(ButtonBindings.NAVIGATE_RIGHT.isButtonPressed())
+                {
+                    this.navigateMouse(mc.currentScreen, Navigate.RIGHT);
+                }
+                else if(button == ButtonBindings.PICKUP_ITEM.getButton())
                 {
                     invokeMouseClick(mc.currentScreen, 0);
+
+                    if(Config.CLIENT.options.quickCraft.get())
+                    {
+                        this.craftRecipeBookItem();
+                    }
                 }
-                else if(button == Buttons.X)
+                else if(button == ButtonBindings.SPLIT_STACK.getButton())
                 {
                     invokeMouseClick(mc.currentScreen, 1);
                 }
-                else if(button == Buttons.B && mc.player != null && mc.player.inventory.getItemStack().isEmpty())
+                else if(button == ButtonBindings.QUICK_MOVE.getButton() && mc.player != null)
                 {
-                    invokeMouseClick(mc.currentScreen, 0);
+                    if(mc.player.inventory.getItemStack().isEmpty())
+                    {
+                        invokeMouseClick(mc.currentScreen, 0);
+                    }
+                    else
+                    {
+                        invokeMouseReleased(mc.currentScreen, 1);
+                    }
                 }
             }
         }
@@ -614,11 +791,11 @@ public class ControllerInput
             }
             else
             {
-                if(button == Buttons.A)
+                if(button == ButtonBindings.PICKUP_ITEM.getButton())
                 {
                     invokeMouseReleased(mc.currentScreen, 0);
                 }
-                else if(button == Buttons.X)
+                else if(button == ButtonBindings.SPLIT_STACK.getButton())
                 {
                     invokeMouseReleased(mc.currentScreen, 1);
                 }
@@ -632,13 +809,7 @@ public class ControllerInput
     private void cycleThirdPersonView()
     {
         Minecraft mc = Minecraft.getInstance();
-
-        mc.gameSettings.thirdPersonView++;
-        if(mc.gameSettings.thirdPersonView > 2)
-        {
-            mc.gameSettings.thirdPersonView = 0;
-        }
-
+        mc.gameSettings.thirdPersonView = (mc.gameSettings.thirdPersonView + 1) % 3;
         if(mc.gameSettings.thirdPersonView == 0)
         {
             mc.gameRenderer.loadEntityShader(mc.getRenderViewEntity());
@@ -651,7 +822,7 @@ public class ControllerInput
 
     private void scrollCreativeTabs(CreativeScreen creative, int dir)
     {
-        lastUse = 100;
+        this.setControllerInUse();
 
         try
         {
@@ -678,25 +849,214 @@ public class ControllerInput
         }
     }
 
+    private void scrollRecipeTab(RecipeBookGui recipeBook, int dir)
+    {
+        RecipeBookGuiMixin recipeBookMixin = ((RecipeBookGuiMixin) recipeBook);
+        RecipeTabToggleWidget currentTab = recipeBookMixin.getCurrentTab();
+        List<RecipeTabToggleWidget> tabs = recipeBookMixin.getRecipeTabs();
+        int nextTabIndex = tabs.indexOf(currentTab) + dir;
+        if(nextTabIndex >= 0 && nextTabIndex < tabs.size())
+        {
+            RecipeTabToggleWidget newTab = tabs.get(nextTabIndex);
+            currentTab.setStateTriggered(false);
+            recipeBookMixin.setCurrentTab(newTab);
+            newTab.setStateTriggered(true);
+            recipeBookMixin.invokeUpdateCollections(true);
+            Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        }
+    }
+
+    private void scrollRecipePage(RecipeBookGui recipeBook, int dir)
+    {
+        RecipeBookPageAccessor page = (RecipeBookPageAccessor)((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
+        if(dir > 0 && page.getForwardButton().visible || dir < 0 && page.getBackButton().visible)
+        {
+            int currentPage = page.getCurrentPage();
+            page.setCurrentPage(currentPage + dir);
+            page.invokeUpdateButtonsForPage();
+            Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        }
+    }
+
+    private void navigateMouse(Screen screen, Navigate navigate)
+    {
+        Minecraft mc = Minecraft.getInstance();
+        int mouseX = (int) (this.targetMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth());
+        int mouseY = (int) (this.targetMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight());
+
+        List<NavigationPoint> points = this.gatherNavigationPoints(screen);
+
+        // Gather any extra navigation points from event
+        GatherNavigationPointsEvent event = new GatherNavigationPointsEvent();
+        MinecraftForge.EVENT_BUS.post(event);
+        points.addAll(event.getPoints());
+
+        // Get only the points that are in the target direction
+        List<NavigationPoint> targetPoints = points.stream().filter(point -> navigate.getPredicate().test(point, mouseX, mouseY)).collect(Collectors.toList());
+        if(targetPoints.isEmpty())
+            return;
+
+        Vec3d mousePos = new Vec3d(mouseX, mouseY, 0);
+        Optional<NavigationPoint> minimumPointOptional = targetPoints.stream().min(navigate.getMinComparator(mouseX, mouseY));
+        double minimumDelta = navigate.getKeyExtractor().apply(minimumPointOptional.get(), mousePos) + 10;
+        Optional<NavigationPoint> targetPointOptional = targetPoints.stream().filter(point -> navigate.getKeyExtractor().apply(point, mousePos) <= minimumDelta).min(Comparator.comparing(p -> p.distanceTo(mouseX, mouseY)));
+        if(targetPointOptional.isPresent())
+        {
+            this.performMouseDrag(this.targetMouseX, this.targetMouseY, 0, 0);
+            NavigationPoint targetPoint = targetPointOptional.get();
+            int screenX = (int) (targetPoint.getX() / ((double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth()));
+            int screenY = (int) (targetPoint.getY() / ((double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight()));
+            double lastTargetMouseX = this.targetMouseX;
+            double lastTargetMouseY = this.targetMouseY;
+            this.targetMouseX = this.prevTargetMouseX = screenX;
+            this.targetMouseY = this.prevTargetMouseY = screenY;
+            this.setMousePosition(screenX, screenY);
+            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 2.0F));
+            this.performMouseDrag(this.targetMouseX, this.targetMouseY, screenX - lastTargetMouseX, screenY - lastTargetMouseY);
+        }
+    }
+
+    private List<NavigationPoint> gatherNavigationPoints(Screen screen)
+    {
+        List<NavigationPoint> points = new ArrayList<>();
+
+        if(screen instanceof ContainerScreen)
+        {
+            ContainerScreen containerScreen = (ContainerScreen) screen;
+            int guiLeft = containerScreen.getGuiLeft();
+            int guiTop = containerScreen.getGuiTop();
+            for(Slot slot : containerScreen.getContainer().inventorySlots)
+            {
+                if(containerScreen.getSlotUnderMouse() == slot)
+                    continue;
+                int posX = guiLeft + slot.xPos + 8;
+                int posY = guiTop + slot.yPos + 8;
+                points.add(new SlotNavigationPoint(posX, posY, slot));
+            }
+        }
+
+        List<Widget> widgets = new ArrayList<>();
+        for(IGuiEventListener listener : screen.children())
+        {
+            if(listener instanceof Widget)
+            {
+                widgets.add((Widget) listener);
+            }
+        }
+
+        if(screen instanceof IRecipeShownListener)
+        {
+            RecipeBookGui recipeBook = ((IRecipeShownListener) screen).getRecipeGui();
+            if(recipeBook.isVisible())
+            {
+                widgets.add(((RecipeBookGuiMixin) recipeBook).getToggleRecipesBtn());
+                widgets.addAll(((RecipeBookGuiMixin) recipeBook).getRecipeTabs());
+                RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
+                widgets.addAll(((RecipeBookPageAccessor) recipeBookPage).getButtons());
+                widgets.add(((RecipeBookPageAccessor) recipeBookPage).getForwardButton());
+                widgets.add(((RecipeBookPageAccessor) recipeBookPage).getBackButton());
+            }
+        }
+
+        for(Widget widget : widgets)
+        {
+            if(widget == null || widget.isHovered() || !widget.visible)
+                continue;
+            int posX = widget.x + widget.getWidth() / 2;
+            int posY = widget.y + widget.getHeight() / 2;
+            points.add(new WidgetNavigationPoint(posX, posY, widget));
+        }
+
+        if(screen instanceof CreativeScreen)
+        {
+            int tabPage = CreativeScreenMixin.getTabPage();
+            int start = tabPage * 10;
+            int end = Math.min(ItemGroup.GROUPS.length, ((tabPage + 1) * 10 + 2));
+            for(int i = start; i < end; i++)
+            {
+                ItemGroup group = ItemGroup.GROUPS[i];
+                if(group != null)
+                {
+                    points.add(this.getCreativeTabPoint((CreativeScreen) screen, group));
+                }
+            }
+        }
+
+        if(Controllable.isJeiLoaded())
+        {
+            points.addAll(JustEnoughItems.getNavigationPoints());
+        }
+
+        return points;
+    }
+
+    /**
+     * Gets the navigation point of a creative tab.
+     */
+    private BasicNavigationPoint getCreativeTabPoint(ContainerScreen screen, ItemGroup group)
+    {
+        boolean topRow = group.isOnTopRow();
+        int column = group.getColumn();
+        int width = 28;
+        int height = 32;
+        int x = screen.getGuiLeft() + width * column;
+        int y = screen.getGuiTop();
+        x = group.isAlignedRight() ? screen.getGuiLeft() + screen.getXSize() - width * (6 - column) : (column > 0 ? x + column : x);
+        y = topRow ? y - width : y + (screen.getYSize() - 4);
+        return new BasicNavigationPoint(x + width / 2.0, y + height / 2.0);
+    }
+
+    private void craftRecipeBookItem()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.player == null)
+            return;
+
+        if(!(mc.currentScreen instanceof ContainerScreen) || !(mc.currentScreen instanceof IRecipeShownListener))
+            return;
+
+        IRecipeShownListener listener = (IRecipeShownListener) mc.currentScreen;
+        if(!listener.getRecipeGui().isVisible())
+            return;
+
+        ContainerScreen screen = (ContainerScreen) mc.currentScreen;
+        if(!(screen.getContainer() instanceof RecipeBookContainer))
+            return;
+
+        RecipeBookPage recipeBookPage = ((RecipeBookGuiMixin) listener.getRecipeGui()).getRecipeBookPage();
+        RecipeWidget recipe = ((RecipeBookPageAccessor) recipeBookPage).getButtons().stream().filter(Widget::isHovered).findFirst().orElse(null);
+        if(recipe != null)
+        {
+            RecipeBookContainer container = (RecipeBookContainer) screen.getContainer();
+            Slot slot = container.getSlot(container.getOutputSlot());
+            if(mc.player.inventory.getItemStack().isEmpty())
+            {
+                this.invokeMouseClick(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screen.getGuiLeft() + slot.xPos + 8, screen.getGuiTop() + slot.yPos + 8);
+            }
+            else
+            {
+                this.invokeMouseReleased(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screen.getGuiLeft() + slot.xPos + 8, screen.getGuiTop() + slot.yPos + 8);
+            }
+        }
+    }
+
     private void moveMouseToClosestSlot(boolean moving, Screen screen)
     {
-        nearSlot = false;
+        this.nearSlot = false;
 
         /* Makes the mouse attracted to slots. This helps with selecting items when using
          * a controller. */
         if(screen instanceof ContainerScreen)
         {
             /* Prevents cursor from moving until at least some input is detected */
-            if(!moved) return;
+            if(!this.moved) return;
 
             Minecraft mc = Minecraft.getInstance();
             ContainerScreen guiContainer = (ContainerScreen) screen;
-            int guiLeft = (guiContainer.width - guiContainer.getXSize()) / 2;
-            int guiTop = (guiContainer.height - guiContainer.getYSize()) / 2;
-            int mouseX = (int) (targetMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth());
-            int mouseY = (int) (targetMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight());
-
-            //Slot closestSlot = guiContainer.getSlotUnderMouse();
+            int guiLeft = guiContainer.getGuiLeft();
+            int guiTop = guiContainer.getGuiTop();
+            int mouseX = (int) (this.targetMouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth());
+            int mouseY = (int) (this.targetMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight());
 
             /* Finds the closest slot in the GUI within 14 pixels (inclusive) */
             Slot closestSlot = null;
@@ -716,7 +1076,7 @@ public class ControllerInput
 
             if(closestSlot != null && (closestSlot.getHasStack() || !mc.player.inventory.getItemStack().isEmpty()))
             {
-                nearSlot = true;
+                this.nearSlot = true;
                 int slotCenterXScaled = guiLeft + closestSlot.xPos + 8;
                 int slotCenterYScaled = guiTop + closestSlot.yPos + 8;
                 int slotCenterX = (int) (slotCenterXScaled / ((double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth()));
@@ -728,29 +1088,44 @@ public class ControllerInput
                 {
                     if(mouseX != slotCenterXScaled || mouseY != slotCenterYScaled)
                     {
-                        targetMouseX += deltaX * 0.75;
-                        targetMouseY += deltaY * 0.75;
+                        this.targetMouseX += deltaX * 0.75;
+                        this.targetMouseY += deltaY * 0.75;
                     }
                     else
                     {
-                        mouseSpeedX = 0.0F;
-                        mouseSpeedY = 0.0F;
+                        this.mouseSpeedX = 0.0F;
+                        this.mouseSpeedY = 0.0F;
                     }
                 }
 
-                mouseSpeedX *= 0.75F;
-                mouseSpeedY *= 0.75F;
+                this.mouseSpeedX *= 0.75F;
+                this.mouseSpeedY *= 0.75F;
             }
             else
             {
-                mouseSpeedX *= 0.1F;
-                mouseSpeedY *= 0.1F;
+                this.mouseSpeedX = 0.0F;
+                this.mouseSpeedY = 0.0F;
             }
         }
         else
         {
-            mouseSpeedX = 0.0F;
-            mouseSpeedY = 0.0F;
+            this.mouseSpeedX = 0.0F;
+            this.mouseSpeedY = 0.0F;
+        }
+    }
+
+    private void setMousePosition(double mouseX, double mouseY)
+    {
+        if(Config.CLIENT.options.virtualMouse.get())
+        {
+            this.virtualMouseX = mouseX;
+            this.virtualMouseY = mouseY;
+        }
+        else
+        {
+            Minecraft mc = Minecraft.getInstance();
+            GLFW.glfwSetCursorPos(mc.getMainWindow().getHandle(), mouseX, mouseY);
+            this.preventReset = true;
         }
     }
 
@@ -761,11 +1136,11 @@ public class ControllerInput
             int i = (creative.getContainer().itemList.size() + 9 - 1) / 9 - 5;
             int dir = 0;
 
-            if(controller.getSDL2Controller().getButton(SDL_CONTROLLER_BUTTON_DPAD_UP) || controller.getRThumbStickYValue() <= -0.8F)
+            if(controller.getRThumbStickYValue() <= -0.8F)
             {
                 dir = 1;
             }
-            else if(controller.getSDL2Controller().getButton(SDL_CONTROLLER_BUTTON_DPAD_DOWN) || controller.getRThumbStickYValue() >= 0.8F)
+            else if(controller.getRThumbStickYValue() >= 0.8F)
             {
                 dir = -1;
             }
@@ -785,6 +1160,40 @@ public class ControllerInput
         }
     }
 
+    private void handleListScrolling(AbstractList list, Controller controller)
+    {
+        double dir = 0;
+        if(Math.abs(controller.getRThumbStickYValue()) >= 0.2F)
+        {
+            this.setControllerInUse();
+            dir = controller.getRThumbStickYValue();
+        }
+        dir *= Minecraft.getInstance().getTickLength();
+        list.setScrollAmount(list.getScrollAmount() + dir * 10);
+    }
+
+    private double getMouseX()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        double mouseX = mc.mouseHelper.getMouseX();
+        if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && this.lastUse > 0)
+        {
+            mouseX = this.virtualMouseX;
+        }
+        return mouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
+    }
+
+    private double getMouseY()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        double mouseY = mc.mouseHelper.getMouseY();
+        if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && this.lastUse > 0)
+        {
+            mouseY = this.virtualMouseY;
+        }
+        return mouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
+    }
+
     /**
      * Invokes a mouse click in a GUI. This is modified version that is designed for controllers.
      * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
@@ -794,34 +1203,32 @@ public class ControllerInput
      */
     private void invokeMouseClick(Screen screen, int button)
     {
+        if(screen != null)
+        {
+            double mouseX = this.getMouseX();
+            double mouseY = this.getMouseY();
+            this.invokeMouseClick(screen, button, mouseX, mouseY);
+        }
+    }
+
+    private void invokeMouseClick(Screen screen, int button, double mouseX, double mouseY)
+    {
         Minecraft mc = Minecraft.getInstance();
         if(screen != null)
         {
-            double mouseX = mc.mouseHelper.getMouseX();
-            double mouseY = mc.mouseHelper.getMouseY();
-            if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && lastUse > 0)
-            {
-                mouseX = virtualMouseX;
-                mouseY = virtualMouseY;
-            }
-            mouseX = mouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
-            mouseY = mouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
-
             mc.mouseHelper.activeButton = button;
             mc.mouseHelper.eventTime = NativeUtil.getTime();
 
-            double finalMouseX = mouseX;
-            double finalMouseY = mouseY;
             Screen.wrapScreenError(() ->
             {
-                boolean cancelled = ForgeHooksClient.onGuiMouseClickedPre(screen, finalMouseX, finalMouseY, button);
+                boolean cancelled = ForgeHooksClient.onGuiMouseClickedPre(screen, mouseX, mouseY, button);
                 if(!cancelled)
                 {
-                    cancelled = screen.mouseClicked(finalMouseX, finalMouseY, button);
+                    cancelled = screen.mouseClicked(mouseX, mouseY, button);
                 }
                 if(!cancelled)
                 {
-                    ForgeHooksClient.onGuiMouseClickedPost(screen, finalMouseX, finalMouseY, button);
+                    ForgeHooksClient.onGuiMouseClickedPost(screen, mouseX, mouseY, button);
                 }
             }, "mouseClicked event handler", screen.getClass().getCanonicalName());
         }
@@ -836,35 +1243,85 @@ public class ControllerInput
      */
     private void invokeMouseReleased(Screen screen, int button)
     {
+        if(screen != null)
+        {
+            double mouseX = this.getMouseX();
+            double mouseY = this.getMouseY();
+            this.invokeMouseReleased(screen, button, mouseX, mouseY);
+        }
+    }
+
+    private void invokeMouseReleased(Screen screen, int button, double mouseX, double mouseY)
+    {
         Minecraft mc = Minecraft.getInstance();
         if(screen != null)
         {
-            double mouseX = mc.mouseHelper.getMouseX();
-            double mouseY = mc.mouseHelper.getMouseY();
-            if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && lastUse > 0)
-            {
-                mouseX = virtualMouseX;
-                mouseY = virtualMouseY;
-            }
-            mouseX = mouseX * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth();
-            mouseY = mouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
-
             mc.mouseHelper.activeButton = -1;
 
-            double finalMouseX = mouseX;
-            double finalMouseY = mouseY;
             Screen.wrapScreenError(() ->
             {
-                boolean cancelled = ForgeHooksClient.onGuiMouseReleasedPre(screen, finalMouseX, finalMouseY, button);
+                boolean cancelled = ForgeHooksClient.onGuiMouseReleasedPre(screen, mouseX, mouseY, button);
                 if(!cancelled)
                 {
-                    cancelled = screen.mouseReleased(finalMouseX, finalMouseY, button);
+                    cancelled = screen.mouseReleased(mouseX, mouseY, button);
                 }
                 if(!cancelled)
                 {
-                    ForgeHooksClient.onGuiMouseReleasedPost(screen, finalMouseX, finalMouseY, button);
+                    ForgeHooksClient.onGuiMouseReleasedPost(screen, mouseX, mouseY, button);
                 }
             }, "mouseReleased event handler", screen.getClass().getCanonicalName());
         }
+    }
+
+    private enum Navigate
+    {
+        UP((p, x, y) -> p.getY() < y, (p, v) -> Math.abs(p.getX() - v.x)),
+        DOWN((p, x, y) -> p.getY() > y + 1, (p, v) -> Math.abs(p.getX() - v.x)),
+        LEFT((p, x, y) -> p.getX() < x, (p, v) -> Math.abs(p.getY() - v.y)),
+        RIGHT((p, x, y) -> p.getX() > x + 1, (p, v) -> Math.abs(p.getY() - v.y));
+
+        private NavigatePredicate predicate;
+        private BiFunction<? super NavigationPoint, Vec3d, Double> keyExtractor;
+
+        Navigate(NavigatePredicate predicate, BiFunction<? super NavigationPoint, Vec3d, Double> keyExtractor)
+        {
+            this.predicate = predicate;
+            this.keyExtractor = keyExtractor;
+        }
+
+        public NavigatePredicate getPredicate()
+        {
+            return this.predicate;
+        }
+
+        public BiFunction<? super NavigationPoint, Vec3d, Double> getKeyExtractor()
+        {
+            return this.keyExtractor;
+        }
+
+        public Comparator<NavigationPoint> getMinComparator(int mouseX, int mouseY)
+        {
+            return Comparator.comparing(p -> this.keyExtractor.apply(p, new Vec3d(mouseX, mouseY, 0)));
+        }
+
+        public static void main(String[] args)
+        {
+            int slotX = 10;
+            int slotY = 20;
+            int mouseX = 50;
+            int mouseY = 20;
+            angle(new SlotNavigationPoint(slotX, slotY, null), mouseX, mouseY, 0);
+        }
+
+        private static boolean angle(NavigationPoint point, int mouseX, int mouseY, double offset)
+        {
+            double angle = Math.toDegrees(Math.atan2(point.getY() - mouseY, point.getX() - mouseX)) + offset;
+            return angle > -45 && angle < 45;
+        }
+    }
+
+    private interface NavigatePredicate
+    {
+        boolean test(NavigationPoint point, int mouseX, int mouseY);
     }
 }

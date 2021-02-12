@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import net.minecraft.client.gui.toasts.IToast;
@@ -32,10 +32,10 @@ public class ControllerToast implements IToast
         toastGui.getMinecraft().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
         toastGui.blit(8, 8, 20, 43, 20, 16);
 
-        String title = toastGui.getMinecraft().fontRenderer.trimStringToWidth(controllerName, 120);
+        String title = toastGui.getMinecraft().fontRenderer.trimStringToWidth(this.controllerName, 120); //TODO test
         toastGui.getMinecraft().fontRenderer.drawString(TextFormatting.DARK_GRAY + title, 35, 7, 0);
 
-        String message = connected ?
+        String message = this.connected ?
                 TextFormatting.DARK_GREEN.toString() + TextFormatting.BOLD.toString() + I18n.format("controllable.toast.connected") :
                 TextFormatting.RED.toString() + TextFormatting.BOLD.toString() + I18n.format("controllable.toast.disconnected");
         toastGui.getMinecraft().fontRenderer.drawString(TextFormatting.BOLD + message, 35, 18, 0);

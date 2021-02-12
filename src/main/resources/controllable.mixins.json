@@ -1,0 +1,30 @@
+{
+    "required": true,
+    "package": "com.mrcrayfish.controllable.mixin",
+    "plugin": "com.mrcrayfish.controllable.mixin.ControllableMixinPlugin",
+    "compatibilityLevel": "JAVA_8",
+    "minVersion": "0.8",
+    "refmap": "controllable.refmap.json",
+    "client": [
+        "client.ClientPlayerEntityMixin",
+        "client.ContainerScreenMixin",
+        "client.CreativeScreenMixin",
+        "client.ForgeIngameGuiMixin",
+        "client.GameRendererMixin",
+        "client.OptifineGameRendererMixin",
+        "client.IngameGuiMixin",
+        "client.MinecraftMixin",
+        "client.MouseHelperMixin",
+        "client.RecipeBookGuiMixin",
+        "client.RecipeBookPageAccessor",
+        "client.RecipeBookPageMixin",
+        "client.jei.MouseUtilMixin",
+        "client.jei.IngredientListOverlayMixin",
+        "client.jei.IngredientGridWithNavigationMixin",
+        "client.jei.IngredientGridMixin",
+        "client.jei.PageNavigationMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

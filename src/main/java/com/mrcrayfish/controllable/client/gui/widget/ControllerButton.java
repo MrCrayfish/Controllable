@@ -1,10 +1,11 @@
 package com.mrcrayfish.controllable.client.gui.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mrcrayfish.controllable.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
 
 /**
  * Author: MrCrayfish
@@ -21,17 +22,14 @@ public class ControllerButton extends Button
     @Override
     public void renderButton(int mouseX, int mouseY, float partialTicks)
     {
-        if (this.visible)
+        super.renderButton(mouseX, mouseY, partialTicks);
+        Minecraft.getInstance().getTextureManager().bindTexture(TEXTURE);
+        boolean mouseOver = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+        int textureV = 43;
+        if(mouseOver)
         {
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            Minecraft.getInstance().getTextureManager().bindTexture(TEXTURE);
-            boolean mouseOver = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-            int textureV = 43;
-            if (mouseOver)
-            {
-                textureV += this.height;
-            }
-            this.blit(this.x, this.y, 0, textureV, this.width, this.height);
+            textureV += this.height;
         }
+        this.blit(this.x, this.y, 0, textureV, this.width, this.height);
     }
 }
