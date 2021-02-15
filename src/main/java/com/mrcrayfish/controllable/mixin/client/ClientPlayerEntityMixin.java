@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixin
 {
-    @Inject(method = "func_225510_bt_", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "isGlowing", at = @At(value = "HEAD"), cancellable = true)
     private void isEntityGlowing(CallbackInfoReturnable<Boolean> cir)
     {
         Minecraft mc = Minecraft.getInstance();
