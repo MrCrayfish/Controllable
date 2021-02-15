@@ -288,7 +288,7 @@ public class RenderEvents
             {
                 if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
                 {
-                    InventoryScreen.func_228187_a_(20, 45, 20, 0, 0, mc.player);
+                    InventoryScreen.drawEntityOnScreen(20, 45, 20, 0, 0, mc.player);
                 }
             }
         }

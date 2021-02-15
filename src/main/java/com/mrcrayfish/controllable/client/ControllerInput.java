@@ -447,7 +447,7 @@ public class ControllerInput
         {
             if (!mc.player.isSpectator())
             {
-                mc.player.func_225609_n_(true);
+                mc.player.drop(true);
             }
             this.dropCounter = 0;
         }
@@ -455,7 +455,7 @@ public class ControllerInput
         {
             if (!mc.player.isSpectator())
             {
-                mc.player.func_225609_n_(false);
+                mc.player.drop(false);
             }
             this.dropCounter = 0;
         }
@@ -502,7 +502,7 @@ public class ControllerInput
             this.isFlying = false;
         }
 
-        event.getMovementInput().field_228350_h_ = this.sneaking;
+        event.getMovementInput().sneaking = this.sneaking;
 
         if(mc.currentScreen == null)
         {
@@ -518,7 +518,7 @@ public class ControllerInput
                     event.getMovementInput().backKeyDown = dir < 0;
                     event.getMovementInput().moveForward = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
-                    if(event.getMovementInput().field_228350_h_)
+                    if(event.getMovementInput().sneaking)
                     {
                         event.getMovementInput().moveForward *= 0.3D;
                     }
@@ -537,7 +537,7 @@ public class ControllerInput
                     event.getMovementInput().leftKeyDown = dir > 0;
                     event.getMovementInput().moveStrafe = dir * MathHelper.clamp((Math.abs(controller.getLThumbStickXValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
-                    if(event.getMovementInput().field_228350_h_)
+                    if(event.getMovementInput().sneaking)
                     {
                         event.getMovementInput().moveStrafe *= 0.3D;
                     }
