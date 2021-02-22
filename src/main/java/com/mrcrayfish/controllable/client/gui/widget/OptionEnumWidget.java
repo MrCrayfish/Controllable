@@ -1,18 +1,19 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.widget;
 
-import com.mrcrayfish.controllable.client.gui.option.OptionBoolean;
+import com.mrcrayfish.controllable.client.IEnumNext;
+import com.mrcrayfish.controllable.client.settings.ControllableOptionEnum;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.util.IStringSerializable;
 
 /**
  * Author: MrCrayfish
  */
-public class GuiOptionButton extends GuiButton
+public class OptionEnumWidget<T extends Enum<T> & IStringSerializable & IEnumNext<T>> extends GuiButton
 {
-    private OptionBoolean option;
+    private ControllableOptionEnum<T> option;
 
-    public GuiOptionButton(int buttonId, int x, int y, int width, OptionBoolean option)
+    public OptionEnumWidget(int buttonId, int x, int y, int width, ControllableOptionEnum<T> option)
     {
         super(buttonId, x, y, width, 20, option.getFormatter().apply(option.getGetter().get()));
         this.option = option;
@@ -23,7 +24,7 @@ public class GuiOptionButton extends GuiButton
     {
         if(super.mousePressed(mc, mouseX, mouseY))
         {
-            this.option.setValue(!this.option.getGetter().get());
+            this.option.setValue(this.option.getGetter().get().next());
             this.displayString = this.option.getFormatter().apply(this.option.getGetter().get());
             return true;
         }

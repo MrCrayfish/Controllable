@@ -1,8 +1,8 @@
-package com.mrcrayfish.controllable.client.gui.option;
+package com.mrcrayfish.controllable.client.settings;
 
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.IEnumNext;
-import com.mrcrayfish.controllable.client.gui.GuiOptionEnum;
+import com.mrcrayfish.controllable.client.gui.widget.OptionEnumWidget;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.IStringSerializable;
 
@@ -13,11 +13,11 @@ import java.util.function.Supplier;
 /**
  * Author: MrCrayfish
  */
-public class OptionEnum<T extends Enum<T> & IStringSerializable & IEnumNext<T>> extends Option<T>
+public class ControllableOptionEnum<T extends Enum<T> & IStringSerializable & IEnumNext<T>> extends ControllableOption<T>
 {
-    public OptionEnum(Supplier<T> getter, Consumer<T> setter, Function<T, String> formatter)
+    public ControllableOptionEnum(String titleKey, Supplier<T> getter, Consumer<T> setter, Function<T, String> formatter)
     {
-        super(getter, setter, formatter);
+        super(titleKey, getter, setter, formatter);
     }
 
     public void setValue(T value)
@@ -33,6 +33,6 @@ public class OptionEnum<T extends Enum<T> & IStringSerializable & IEnumNext<T>> 
     @Override
     public GuiButton createOption(int id, int x, int y, int width)
     {
-        return new GuiOptionEnum<>(id, x, y, width, this);
+        return new OptionEnumWidget<>(id, x, y, width, this);
     }
 }

@@ -100,8 +100,8 @@ public class Hooks
         if(Controllable.getController() != null && Controllable.getOptions().isVirtualMouse() && input.getLastUse() > 0)
         {
             Minecraft mc = Minecraft.getMinecraft();
-            mouseX = input.getVirtualMouseX() * screen.width / mc.displayWidth;
-            mouseY = input.getVirtualMouseY() * screen.height / mc.displayHeight;
+            mouseX = (int) (input.getVirtualMouseX() * screen.width / mc.displayWidth);
+            mouseY = (int) (input.getVirtualMouseY() * screen.height / mc.displayHeight);
         }
         if(!MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.DrawScreenEvent.Pre(screen, mouseX, mouseY, partialTicks)))
         {

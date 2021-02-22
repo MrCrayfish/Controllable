@@ -21,4 +21,6 @@ build
 eclipse
 run
 
-classes
+# Files from Forge MDK
+forge*changelog.txt
+classes/

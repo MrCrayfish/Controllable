@@ -1,6 +1,6 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.widget;
 
-import com.mrcrayfish.controllable.client.gui.option.OptionSlider;
+import com.mrcrayfish.controllable.client.settings.ControllableOptionSlider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
@@ -12,13 +12,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * Author: MrCrayfish
  */
 @SideOnly(Side.CLIENT)
-public class GuiOptionSlider extends GuiButton
+public class OptionSliderWidget extends GuiButton
 {
     private float sliderValue;
     public boolean dragging;
-    private OptionSlider option;
+    private ControllableOptionSlider option;
 
-    public GuiOptionSlider(int buttonId, int x, int y, int width, OptionSlider option)
+    public OptionSliderWidget(int buttonId, int x, int y, int width, ControllableOptionSlider option)
     {
         super(buttonId, x, y, width, 20, "");
         this.sliderValue = 1.0F;

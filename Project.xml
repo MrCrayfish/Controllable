@@ -1,0 +1,36 @@
+<code_scheme name="Project" version="173">
+  <controllableOption name="RIGHT_MARGIN" value="100" />
+  <JSON>
+    <controllableOption name="ARRAY_WRAPPING" value="5" />
+  </JSON>
+  <codeStyleSettings language="JAVA">
+    <controllableOption name="KEEP_LINE_BREAKS" value="false" />
+    <controllableOption name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+    <controllableOption name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+    <controllableOption name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
+    <controllableOption name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+    <controllableOption name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="1" />
+    <controllableOption name="BRACE_STYLE" value="2" />
+    <controllableOption name="CLASS_BRACE_STYLE" value="2" />
+    <controllableOption name="METHOD_BRACE_STYLE" value="2" />
+    <controllableOption name="ELSE_ON_NEW_LINE" value="true" />
+    <controllableOption name="CATCH_ON_NEW_LINE" value="true" />
+    <controllableOption name="FINALLY_ON_NEW_LINE" value="true" />
+    <controllableOption name="SPACE_BEFORE_IF_PARENTHESES" value="false" />
+    <controllableOption name="SPACE_BEFORE_WHILE_PARENTHESES" value="false" />
+    <controllableOption name="SPACE_BEFORE_FOR_PARENTHESES" value="false" />
+    <controllableOption name="SPACE_BEFORE_TRY_PARENTHESES" value="false" />
+    <controllableOption name="SPACE_BEFORE_CATCH_PARENTHESES" value="false" />
+    <controllableOption name="SPACE_BEFORE_SWITCH_PARENTHESES" value="false" />
+    <controllableOption name="SPACE_BEFORE_SYNCHRONIZED_PARENTHESES" value="false" />
+    <controllableOption name="IF_BRACE_FORCE" value="1" />
+    <controllableOption name="ENUM_CONSTANTS_WRAP" value="2" />
+  </codeStyleSettings>
+  <codeStyleSettings language="JSON">
+    <controllableOption name="SPACE_WITHIN_BRACKETS" value="true" />
+    <controllableOption name="WRAP_ON_TYPING" value="0" />
+    <indentOptions>
+      <controllableOption name="INDENT_SIZE" value="4" />
+    </indentOptions>
+  </codeStyleSettings>
+</code_scheme>

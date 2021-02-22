@@ -3,6 +3,9 @@ package com.mrcrayfish.controllable.asm;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import org.spongepowered.asm.launch.MixinBootstrap;
+import org.spongepowered.asm.mixin.MixinEnvironment;
+import org.spongepowered.asm.mixin.Mixins;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -13,17 +16,24 @@ import java.util.Map;
  * Author: MrCrayfish
  */
 @IFMLLoadingPlugin.TransformerExclusions({"com.mrcrayfish.controllable.asm"})
+@IFMLLoadingPlugin.SortingIndex(1001)
 @IFMLLoadingPlugin.MCVersion("1.12.2")
 @IFMLLoadingPlugin.Name("Controllable")
-@IFMLLoadingPlugin.SortingIndex(value = 1001)
 public class ControllablePlugin implements IFMLLoadingPlugin
 {
-    public static File LOCATION = null;
+    public static File location = null;
+
+    public ControllablePlugin()
+    {
+        MixinBootstrap.init();
+        MixinEnvironment.getDefaultEnvironment();
+        Mixins.addConfiguration("controllable.mixins.json");
+    }
 
     @Override
     public String[] getASMTransformerClass()
     {
-        return new String[] {"com.mrcrayfish.controllable.asm.ControllableTransformer"};
+        return new String[] {};
     }
 
     @Override
@@ -46,7 +56,10 @@ public class ControllablePlugin implements IFMLLoadingPlugin
         {
             try
             {
-                LOCATION = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+                location = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+                /* I believe ForgeGradle 3.0 changed the out directory, classes and resources are
+                 * separate now so this fixes resources not being loaded in a dev environment. */
+                location = new File(location.getParentFile(), "resources");
             }
             catch(URISyntaxException e)
             {
@@ -55,13 +68,13 @@ public class ControllablePlugin implements IFMLLoadingPlugin
         }
         else
         {
-            LOCATION = (File) data.get("coremodLocation");
+            location = (File) data.get("coremodLocation");
         }
     }
 
     @Override
     public String getAccessTransformerClass()
     {
-        return null;
+        return ControllableAccessTransformer.class.getName();
     }
 }

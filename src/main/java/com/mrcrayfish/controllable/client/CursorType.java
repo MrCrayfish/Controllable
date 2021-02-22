@@ -21,13 +21,7 @@ public enum CursorType implements IStringSerializable, IEnumNext<CursorType>
     @Override
     public String getName()
     {
-        return id;
-    }
-
-    @Override
-    public CursorType next()
-    {
-        return values()[(ordinal() + 1) % values().length];
+        return this.id;
     }
 
     public static CursorType byId(String id)
@@ -40,5 +34,11 @@ public enum CursorType implements IStringSerializable, IEnumNext<CursorType>
             }
         }
         return LIGHT;
+    }
+
+    @Override
+    public CursorType next()
+    {
+        return values()[(ordinal() + 1) % values().length];
     }
 }

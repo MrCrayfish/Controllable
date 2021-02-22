@@ -1,8 +1,6 @@
 package com.mrcrayfish.controllable.event;
 
 import com.mrcrayfish.controllable.client.Controller;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.MovementInput;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
@@ -20,7 +18,7 @@ public abstract class ControllerEvent extends Event
 
     public Controller getController()
     {
-        return controller;
+        return this.controller;
     }
 
     @Cancelable
@@ -45,7 +43,7 @@ public abstract class ControllerEvent extends Event
          */
         public int getButton()
         {
-            return originalButton;
+            return this.originalButton;
         }
 
         /**
@@ -56,7 +54,7 @@ public abstract class ControllerEvent extends Event
          */
         public int getModifiedButton()
         {
-            return button;
+            return this.button;
         }
 
         /**
@@ -78,7 +76,7 @@ public abstract class ControllerEvent extends Event
          */
         public boolean getState()
         {
-            return state;
+            return this.state;
         }
     }
 
@@ -121,7 +119,7 @@ public abstract class ControllerEvent extends Event
          */
         public float getYawSpeed()
         {
-            return yawSpeed;
+            return this.yawSpeed;
         }
 
         /**
@@ -142,7 +140,7 @@ public abstract class ControllerEvent extends Event
          */
         public float getPitchSpeed()
         {
-            return pitchSpeed;
+            return this.pitchSpeed;
         }
 
         /**

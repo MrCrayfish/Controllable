@@ -1,8 +1,12 @@
 package com.mrcrayfish.controllable.client;
 
+import com.google.common.primitives.Ints;
 import com.mrcrayfish.controllable.Controllable;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -14,6 +18,7 @@ public class ControllerProperties
     private static boolean loaded = false;
     private static String lastController = "";
     private static String selectedMapping = "";
+    private static int pollRate = 8;
 
     public static void load(File configFolder)
     {
@@ -29,9 +34,13 @@ public class ControllerProperties
                 }
                 if(file.exists())
                 {
-                    properties.load(new FileInputStream(file));
-                    lastController = properties.getProperty("CurrentController", "");
-                    selectedMapping = properties.getProperty("SelectedMapping", "");
+                    try(FileInputStream is = new FileInputStream(file))
+                    {
+                        properties.load(is);
+                        lastController = properties.getProperty("CurrentController", "");
+                        selectedMapping = properties.getProperty("SelectedMapping", "");
+                        pollRate = Ints.tryParse(properties.getProperty("PollRate", "8"));
+                    }
                 }
             }
             catch(IOException e)
@@ -78,5 +87,10 @@ public class ControllerProperties
     public static void setSelectedMapping(String selectedMapping)
     {
         ControllerProperties.selectedMapping = selectedMapping;
+    }
+
+    public static int getPollRate()
+    {
+        return pollRate;
     }
 }

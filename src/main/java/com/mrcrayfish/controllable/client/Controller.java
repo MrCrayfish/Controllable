@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.ButtonStates;
+import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.resources.I18n;
 import uk.co.electronstudio.sdl2gdx.SDL2Controller;
 
@@ -15,16 +16,24 @@ import static org.libsdl.SDL.*;
  */
 public class Controller
 {
+    private int jid;
     private String cachedName;
     private Mappings.Entry mapping;
     private SDL2Controller controller;
     private ButtonStates states;
 
-    public Controller(SDL2Controller controller)
+    public Controller(int jid)
     {
-        this.controller = controller;
+        this.jid = jid;
+        this.controller = Controllable.getManager().getSDL2ControllerById(jid);
+        if(this.controller == null) throw new IllegalArgumentException("Illegal controller jid: " + jid);
         this.states = new ButtonStates();
         this.getName(); //cache the name straight away
+    }
+
+    public int getJid()
+    {
+        return this.jid;
     }
 
     /**
@@ -74,7 +83,7 @@ public class Controller
      */
     public boolean isButtonPressed(int button)
     {
-        return states.getState(button);
+        return this.states.getState(button);
     }
 
     /**
@@ -84,7 +93,7 @@ public class Controller
      */
     public float getLTriggerValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+        return (controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERLEFT) + 1.0F) / 2.0F;
     }
 
     /**
@@ -94,7 +103,7 @@ public class Controller
      */
     public float getRTriggerValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+        return (this.controller.getAxis(SDL_CONTROLLER_AXIS_TRIGGERRIGHT) + 1.0F) / 2.0F;
     }
 
     /**
@@ -104,7 +113,8 @@ public class Controller
      */
     public float getLThumbStickXValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_LEFTX);
+        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_RIGHTX : SDL_CONTROLLER_AXIS_LEFTX;
+        return this.controller.getAxis(axis) * (this.isFlipLeftX() ? -1 : 1);
     }
 
     /**
@@ -114,7 +124,8 @@ public class Controller
      */
     public float getLThumbStickYValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_LEFTY);
+        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_RIGHTY : SDL_CONTROLLER_AXIS_LEFTY;
+        return this.controller.getAxis(axis) * (this.isFlipLeftY() ? -1 : 1);
     }
 
     /**
@@ -124,7 +135,8 @@ public class Controller
      */
     public float getRThumbStickXValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTX);
+        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_LEFTX : SDL_CONTROLLER_AXIS_RIGHTX;
+        return this.controller.getAxis(axis) * (this.isFlipRightX() ? -1 : 1);
     }
 
     /**
@@ -134,7 +146,8 @@ public class Controller
      */
     public float getRThumbStickYValue()
     {
-        return controller.getAxis(SDL_CONTROLLER_AXIS_RIGHTY);
+        int axis = this.isThumbsticksSwitched() ? SDL_CONTROLLER_AXIS_LEFTY : SDL_CONTROLLER_AXIS_RIGHTY;
+        return this.controller.getAxis(axis) * (this.isFlipRightY() ? -1 : 1);
     }
 
     /**
@@ -155,6 +168,31 @@ public class Controller
     @Nullable
     public Mappings.Entry getMapping()
     {
-        return mapping;
+        return this.mapping;
+    }
+
+    private boolean isThumbsticksSwitched()
+    {
+        return this.mapping != null && this.mapping.isThumbsticksSwitched();
+    }
+
+    public boolean isFlipLeftX()
+    {
+        return this.mapping != null && this.mapping.isFlipLeftX();
+    }
+
+    public boolean isFlipLeftY()
+    {
+        return this.mapping != null && this.mapping.isFlipLeftY();
+    }
+
+    public boolean isFlipRightX()
+    {
+        return this.mapping != null && this.mapping.isFlipRightX();
+    }
+
+    public boolean isFlipRightY()
+    {
+        return this.mapping != null && this.mapping.isFlipRightY();
     }
 }

@@ -3,11 +3,9 @@ package com.mrcrayfish.controllable.client.settings;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.ActionVisibility;
 import com.mrcrayfish.controllable.client.ControllerType;
 import com.mrcrayfish.controllable.client.CursorType;
-import com.mrcrayfish.controllable.client.gui.option.OptionBoolean;
-import com.mrcrayfish.controllable.client.gui.option.OptionEnum;
-import com.mrcrayfish.controllable.client.gui.option.OptionSlider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
@@ -27,7 +25,7 @@ public class ControllerOptions
 {
     private static final DecimalFormat FORMAT = new DecimalFormat("0.0#");
 
-    public static final OptionBoolean FORCE_FEEDBACK = new OptionBoolean(() -> {
+    public static final ControllableOptionBoolean FORCE_FEEDBACK = new ControllableOptionBoolean("controllable.options.forceFeedback", () -> {
         return Controllable.getOptions().forceFeedback;
     }, value -> {
         Controllable.getOptions().forceFeedback = value;
@@ -35,7 +33,7 @@ public class ControllerOptions
         return I18n.format("controllable.options.forceFeedback") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
     });
 
-    public static final OptionBoolean AUTO_SELECT = new OptionBoolean(() -> {
+    public static final ControllableOptionBoolean AUTO_SELECT = new ControllableOptionBoolean("controllable.options.autoSelect", () -> {
         return Controllable.getOptions().autoSelect;
     }, value -> {
         Controllable.getOptions().autoSelect = value;
@@ -43,7 +41,7 @@ public class ControllerOptions
         return I18n.format("controllable.options.autoSelect") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
     });
 
-    public static final OptionBoolean RENDER_MINI_PLAYER  = new OptionBoolean(() -> {
+    public static final ControllableOptionBoolean RENDER_MINI_PLAYER  = new ControllableOptionBoolean("controllable.options.renderMiniPlayer", () -> {
         return Controllable.getOptions().renderMiniPlayer;
     }, value -> {
         Controllable.getOptions().renderMiniPlayer = value;
@@ -51,7 +49,7 @@ public class ControllerOptions
         return I18n.format("controllable.options.renderMiniPlayer") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
     });
 
-    public static final OptionBoolean VIRTUAL_MOUSE  = new OptionBoolean(() -> {
+    public static final ControllableOptionBoolean VIRTUAL_MOUSE  = new ControllableOptionBoolean("controllable.options.virtualMouse", () -> {
         return Controllable.getOptions().virtualMouse;
     }, value -> {
         Controllable.getOptions().virtualMouse = value;
@@ -59,7 +57,7 @@ public class ControllerOptions
         return I18n.format("controllable.options.virtualMouse") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
     });
 
-    public static final OptionBoolean CONSOLE_HOTBAR = new OptionBoolean(() -> {
+    public static final ControllableOptionBoolean CONSOLE_HOTBAR = new ControllableOptionBoolean("controllable.options.consoleHotbar", () -> {
         return Controllable.getOptions().consoleHotbar;
     }, value -> {
         Controllable.getOptions().consoleHotbar = value;
@@ -67,7 +65,7 @@ public class ControllerOptions
         return I18n.format("controllable.options.consoleHotbar") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
     });
 
-    public static final OptionEnum<CursorType> CURSOR_TYPE = new OptionEnum<>(() -> {
+    public static final ControllableOptionEnum<CursorType> CURSOR_TYPE = new ControllableOptionEnum<>("controllable.options.cursorType", () -> {
         return Controllable.getOptions().cursorType;
     }, value -> {
         Controllable.getOptions().cursorType = value;
@@ -75,7 +73,7 @@ public class ControllerOptions
         return I18n.format("controllable.options.cursorType") + ": " + I18n.format("controllable.cursor." + value.getName());
     });
 
-    public static final OptionEnum<ControllerType> CONTROLLER_TYPE = new OptionEnum<>(() -> {
+    public static final ControllableOptionEnum<ControllerType> CONTROLLER_TYPE = new ControllableOptionEnum<>("controllable.options.controllerType", () -> {
         return Controllable.getOptions().controllerType;
     }, value -> {
         Controllable.getOptions().controllerType = value;
@@ -83,7 +81,7 @@ public class ControllerOptions
         return I18n.format("controllable.options.controllerType") + ": " + I18n.format("controllable.controller." + value.getName());
     });
 
-    public static final OptionBoolean INVERT_LOOK = new OptionBoolean(() -> {
+    public static final ControllableOptionBoolean INVERT_LOOK = new ControllableOptionBoolean("controllable.options.invertLook", () -> {
         return Controllable.getOptions().invertLook;
     }, value -> {
         Controllable.getOptions().invertLook = value;
@@ -91,7 +89,7 @@ public class ControllerOptions
         return I18n.format("controllable.options.invertLook") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
     });
 
-    public static final OptionSlider DEAD_ZONE = new OptionSlider(0.01F, 0.0F, 1.0F, () -> {
+    public static final ControllableOptionSlider DEAD_ZONE = new ControllableOptionSlider("controllable.options.deadZone", 0.01F, 0.0F, 1.0F, () -> {
        return Controllable.getOptions().deadZone;
     }, value -> {
         Controllable.getOptions().deadZone = MathHelper.clamp(value, 0.0, 1.0);
@@ -100,7 +98,7 @@ public class ControllerOptions
         return I18n.format("controllable.options.deadZone.format", FORMAT.format(deadZone));
     });
 
-    public static final OptionSlider ROTATION_SPEED = new OptionSlider(1.0F, 1.0F, 50.0F, () -> {
+    public static final ControllableOptionSlider ROTATION_SPEED = new ControllableOptionSlider("controllable.options.rotationSpeed", 1.0F, 1.0F, 50.0F, () -> {
         return Controllable.getOptions().rotationSpeed;
     }, value -> {
         Controllable.getOptions().rotationSpeed = MathHelper.clamp(value, 1.0, 50.0);
@@ -109,13 +107,29 @@ public class ControllerOptions
         return I18n.format("controllable.options.rotationSpeed.format", FORMAT.format(rotationSpeed));
     });
 
-    public static final OptionSlider MOUSE_SPEED = new OptionSlider(1.0F, 1.0F, 50.0F, () -> {
+    public static final ControllableOptionSlider MOUSE_SPEED = new ControllableOptionSlider("controllable.options.mouseSpeed", 1.0F, 1.0F, 50.0F, () -> {
         return Controllable.getOptions().mouseSpeed;
     }, value -> {
         Controllable.getOptions().mouseSpeed = MathHelper.clamp(value, 1.0, 50.0);
     }, value -> {
         double mouseSpeed = Controllable.getOptions().mouseSpeed;
         return I18n.format("controllable.options.mouseSpeed.format", FORMAT.format(mouseSpeed));
+    });
+
+    public static final ControllableOptionEnum<ActionVisibility> SHOW_ACTIONS = new ControllableOptionEnum<>("controllable.options.showActions", () -> {
+        return Controllable.getOptions().actionVisibility;
+    }, value -> {
+        Controllable.getOptions().actionVisibility = value;
+    }, value -> {
+        return I18n.format("controllable.options.showActions.format", I18n.format("controllable.actionVisibility." + value.getName()));
+    });
+
+    public static final ControllableOptionBoolean QUICK_CRAFT = new ControllableOptionBoolean("controllable.options.quickCraft", () -> {
+        return Controllable.getOptions().quickCraft;
+    }, value -> {
+        Controllable.getOptions().quickCraft = value;
+    }, value -> {
+        return I18n.format("controllable.options.quickCraft") + ": " + (value ? I18n.format("options.on") : I18n.format("options.off"));
     });
 
     public static final Splitter COLON_SPLITTER = Splitter.on(':');
@@ -133,6 +147,8 @@ public class ControllerOptions
     private double deadZone = 0.15;
     private double rotationSpeed = 25.0;
     private double mouseSpeed = 30.0;
+    private ActionVisibility actionVisibility = ActionVisibility.MINIMAL;
+    private boolean quickCraft = true;
 
     public ControllerOptions(Minecraft minecraft, File dataDir)
     {
@@ -298,4 +314,16 @@ public class ControllerOptions
     {
         return mouseSpeed;
     }
+
+    public ActionVisibility getActionVisibility()
+    {
+        return actionVisibility;
+    }
+
+    public boolean isQuickCraft()
+    {
+        return quickCraft;
+    }
+
+
 }

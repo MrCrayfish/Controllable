@@ -1,7 +1,7 @@
-package com.mrcrayfish.controllable.client.gui.option;
+package com.mrcrayfish.controllable.client.settings;
 
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.gui.GuiOptionSlider;
+import com.mrcrayfish.controllable.client.gui.widget.OptionSliderWidget;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.math.MathHelper;
 
@@ -12,15 +12,15 @@ import java.util.function.Supplier;
 /**
  * Author: MrCrayfish
  */
-public class OptionSlider extends Option<Double>
+public class ControllableOptionSlider extends ControllableOption<Double>
 {
     private float stepSize;
     private float minValue;
     private float maxValue;
 
-    public OptionSlider(float stepSize, float minValue, float maxValue, Supplier<Double> getter, Consumer<Double> setter, Function<Double, String> formatter)
+    public ControllableOptionSlider(String titleKey, float stepSize, float minValue, float maxValue, Supplier<Double> getter, Consumer<Double> setter, Function<Double, String> formatter)
     {
-        super(getter, setter, formatter);
+        super(titleKey, getter, setter, formatter);
         this.stepSize = stepSize;
         this.minValue = minValue;
         this.maxValue = maxValue;
@@ -63,6 +63,6 @@ public class OptionSlider extends Option<Double>
     @Override
     public GuiButton createOption(int id, int x, int y, int width)
     {
-        return new GuiOptionSlider(id, x, y, width, this);
+        return new OptionSliderWidget(id, x, y, width, this);
     }
 }

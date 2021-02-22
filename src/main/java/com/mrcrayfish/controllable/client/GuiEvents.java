@@ -2,8 +2,8 @@ package com.mrcrayfish.controllable.client;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.gui.GuiButtonController;
-import com.mrcrayfish.controllable.client.gui.GuiControllerSelection;
+import com.mrcrayfish.controllable.client.gui.ControllerSelectionScreen;
+import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.renderer.GlStateManager;
@@ -11,7 +11,6 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import uk.co.electronstudio.sdl2gdx.SDL2ControllerManager;
 
 import java.util.List;
 
@@ -40,9 +39,9 @@ public class GuiEvents
         EXCLUDED_TYPES = builder.build();
     }
 
-    private SDL2ControllerManager manager;
+    private ControllerManager manager;
 
-    public GuiEvents(SDL2ControllerManager  manager)
+    public GuiEvents(ControllerManager  manager)
     {
         this.manager = manager;
     }
@@ -56,7 +55,9 @@ public class GuiEvents
         if(event.getGui() instanceof GuiOptions)
         {
             int y = event.getGui().height / 6 + 72 - 6;
-            event.getButtonList().add(new GuiButtonController(6969, (event.getGui().width / 2) + 5 + 150 + 4, y));
+            event.getButtonList().add(new ControllerButton((event.getGui().width / 2) + 5 + 150 + 4, y, button -> {
+                Minecraft.getMinecraft().displayGuiScreen(new ControllerSelectionScreen(manager, event.getGui()));
+            }));
         }
     }
 
@@ -83,18 +84,6 @@ public class GuiEvents
                 return;
             }
             GlStateManager.translate(0, 20, 0);
-        }
-    }
-
-    @SubscribeEvent
-    public void onAction(GuiScreenEvent.ActionPerformedEvent event)
-    {
-        if(event.getGui() instanceof GuiOptions)
-        {
-            if(event.getButton().id == 6969)
-            {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiControllerSelection(manager, true));
-            }
         }
     }
 }
