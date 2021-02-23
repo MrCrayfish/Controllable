@@ -12,7 +12,10 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLFileResourcePack;
 import net.minecraftforge.fml.client.FMLFolderResourcePack;
-import net.minecraftforge.fml.common.*;
+import net.minecraftforge.fml.common.DummyModContainer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.LoadController;
+import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +24,8 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Optional;
 
 import static org.libsdl.SDL.*;
 
@@ -170,7 +175,30 @@ public class Controllable extends DummyModContainer implements IControllerListen
     @Override
     public void disconnected(int jid)
     {
+        Minecraft.getMinecraft().addScheduledTask(() ->
+        {
+            if(Controllable.controller != null)
+            {
+                if(Controllable.controller.getJid() == jid)
+                {
+                    Controller oldController = Controllable.controller;
 
+                    setController(null);
+
+                    if(Controllable.getOptions().isAutoSelect() && manager.getControllerCount() > 0)
+                    {
+                        Optional<Integer> optional = manager.getControllers().keySet().stream().min(Comparator.comparing(i -> i));
+                        optional.ifPresent(minJid -> setController(new Controller(minJid)));
+                    }
+
+                    Minecraft mc = Minecraft.getMinecraft();
+                    if(mc.player != null)
+                    {
+                        Minecraft.getMinecraft().getToastGui().add(new ControllerToast(false, oldController.getName()));
+                    }
+                }
+            }
+        });
     }
 
     public static void setController(@Nullable Controller controller)
