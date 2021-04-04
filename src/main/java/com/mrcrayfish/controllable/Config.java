@@ -14,6 +14,9 @@ public class Config
     static final ForgeConfigSpec clientSpec;
     public static final Config.Client CLIENT;
 
+    static final ForgeConfigSpec serverSpec;
+    public static final Config.Server SERVER;
+
     public static class Client
     {
         public final ForgeConfigSpec.LongValue controllerPollInterval;
@@ -69,11 +72,29 @@ public class Config
         }
     }
 
+    public static class Server
+    {
+        public final ForgeConfigSpec.BooleanValue restrictToController;
+
+        public Server(ForgeConfigSpec.Builder builder)
+        {
+            builder.comment("Server configuration settings").push("server");
+            {
+                this.restrictToController = builder.comment("Restricts players to use only a controller when playing on the server. Be warned that this is not guaranteed and players may still be able to use keyboard and mouse input.").define("restrictToController", false);
+            }
+            builder.pop();
+        }
+    }
+
     static
     {
-        final Pair<Client, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(Config.Client::new);
-        clientSpec = specPair.getRight();
-        CLIENT = specPair.getLeft();
+        final Pair<Client, ForgeConfigSpec> clientPair = new ForgeConfigSpec.Builder().configure(Config.Client::new);
+        clientSpec = clientPair.getRight();
+        CLIENT = clientPair.getLeft();
+
+        final Pair<Server, ForgeConfigSpec> serverPair = new ForgeConfigSpec.Builder().configure(Config.Server::new);
+        serverSpec = serverPair.getRight();
+        SERVER = serverPair.getLeft();
     }
 
     public static void save()

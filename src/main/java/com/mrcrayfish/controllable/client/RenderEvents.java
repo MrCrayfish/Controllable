@@ -11,6 +11,7 @@ import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.IngameGui;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
@@ -23,6 +24,8 @@ import net.minecraft.item.UseAction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -218,29 +221,30 @@ public class RenderEvents
         if(event.phase != TickEvent.Phase.END)
             return;
 
-        if(Controllable.getInput().getLastUse() <= 0)
-            return;
-
         Minecraft mc = Minecraft.getInstance();
         if(mc.gameSettings.hideGUI)
             return;
 
-        if(Controllable.getController() == null)
-            return;
-
-        RenderSystem.pushMatrix();
+        if(Controllable.getController() != null)
         {
-            if(!MinecraftForge.EVENT_BUS.post(new RenderAvailableActionsEvent()))
+            if(Controllable.getInput().getLastUse() <= 0)
             {
-                IngameGui guiIngame = mc.ingameGUI;
-                boolean isChatVisible = mc.currentScreen == null && guiIngame.getChatGUI().drawnChatLines.stream().anyMatch(chatLine -> guiIngame.getTicks() - chatLine.getUpdatedCounter() < 200);
+                return;
+            }
 
-                int leftIndex = 0;
-                int rightIndex = 0;
-                for(int button : this.actions.keySet())
+            RenderSystem.pushMatrix();
+            {
+                if(!MinecraftForge.EVENT_BUS.post(new RenderAvailableActionsEvent()))
                 {
-                    Action action = this.actions.get(button);
-                    Action.Side side = action.getSide();
+                    IngameGui guiIngame = mc.ingameGUI;
+                    boolean isChatVisible = mc.currentScreen == null && guiIngame.getChatGUI().drawnChatLines.stream().anyMatch(chatLine -> guiIngame.getTicks() - chatLine.getUpdatedCounter() < 200);
+
+                    int leftIndex = 0;
+                    int rightIndex = 0;
+                    for(int button : this.actions.keySet())
+                    {
+                        Action action = this.actions.get(button);
+                        Action.Side side = action.getSide();
 
 /*
                     int remappedButton = button;
@@ -252,47 +256,57 @@ public class RenderEvents
                     }
 */
 
-                    int texU = button * 13;
-                    int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
-                    int size = 13;
+                        int texU = button * 13;
+                        int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
+                        int size = 13;
 
-                    int x = side == Action.Side.LEFT ? 5 : mc.getMainWindow().getScaledWidth() - 5 - size;
-                    int y = mc.getMainWindow().getScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
+                        int x = side == Action.Side.LEFT ? 5 : mc.getMainWindow().getScaledWidth() - 5 - size;
+                        int y = mc.getMainWindow().getScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
 
-                    mc.getTextureManager().bindTexture(CONTROLLER_BUTTONS);
-                    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-                    RenderSystem.disableLighting();
+                        mc.getTextureManager().bindTexture(CONTROLLER_BUTTONS);
+                        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+                        RenderSystem.disableLighting();
 
-                    if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2)
-                        continue;
+                        if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2) continue;
 
-                    /* Draw buttons icon */
-                    MatrixStack matrixStack = new MatrixStack();
-                    Widget.blit(matrixStack, x, y, texU, texV, size, size, 256, 256);
+                        /* Draw buttons icon */
+                        MatrixStack matrixStack = new MatrixStack();
+                        Widget.blit(matrixStack, x, y, texU, texV, size, size, 256, 256);
 
-                    /* Draw description text */
-                    if(side == Action.Side.LEFT)
-                    {
-                        mc.fontRenderer.drawString(matrixStack, action.getDescription(), x + 18, y + 3, Color.WHITE.getRGB());
-                        leftIndex++;
-                    }
-                    else
-                    {
-                        int width = mc.fontRenderer.getStringWidth(action.getDescription());
-                        mc.fontRenderer.drawString(matrixStack, action.getDescription(), x - 5 - width, y + 3, Color.WHITE.getRGB());
-                        rightIndex++;
+                        /* Draw description text */
+                        if(side == Action.Side.LEFT)
+                        {
+                            mc.fontRenderer.drawString(matrixStack, action.getDescription(), x + 18, y + 3, Color.WHITE.getRGB());
+                            leftIndex++;
+                        }
+                        else
+                        {
+                            int width = mc.fontRenderer.getStringWidth(action.getDescription());
+                            mc.fontRenderer.drawString(matrixStack, action.getDescription(), x - 5 - width, y + 3, Color.WHITE.getRGB());
+                            rightIndex++;
+                        }
                     }
                 }
-            }
 
-            if(mc.player != null && mc.currentScreen == null && Config.CLIENT.options.renderMiniPlayer.get())
-            {
-                if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
+                if(mc.player != null && mc.currentScreen == null && Config.CLIENT.options.renderMiniPlayer.get())
                 {
-                    InventoryScreen.drawEntityOnScreen(20, 45, 20, 0, 0, mc.player);
+                    if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
+                    {
+                        InventoryScreen.drawEntityOnScreen(20, 45, 20, 0, 0, mc.player);
+                    }
                 }
             }
+            RenderSystem.popMatrix();
         }
-        RenderSystem.popMatrix();
+        else if(mc.currentScreen == null)
+        {
+            RenderSystem.disableDepthTest();
+            int width = mc.getMainWindow().getScaledWidth();
+            int height = mc.getMainWindow().getScaledHeight();
+            AbstractGui.fill(new MatrixStack(), 0, 0, width, height, -1072689136);
+            AbstractGui.drawCenteredString(new MatrixStack(), mc.fontRenderer, new TranslationTextComponent("controllable.gui.controller_only").mergeStyle(TextFormatting.BOLD).mergeStyle(TextFormatting.YELLOW), width / 2, height / 2 - 15, 0xFFFFFFFF);
+            AbstractGui.drawCenteredString(new MatrixStack(), mc.fontRenderer, new TranslationTextComponent("controllable.gui.plug_in_controller"), width / 2, height / 2, 0xFFFFFFFF);
+            RenderSystem.enableDepthTest();
+        }
     }
 }

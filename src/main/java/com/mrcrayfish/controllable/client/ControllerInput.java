@@ -35,10 +35,7 @@ import net.minecraft.inventory.container.RecipeBookContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.network.play.client.CPlayerDiggingPacket;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ScreenShotHelper;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
@@ -47,6 +44,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -448,7 +446,7 @@ public class ControllerInput
         {
             if (!mc.player.isSpectator())
             {
-                mc.player.drop(true); //TODO test
+                mc.player.drop(true);
             }
             this.dropCounter = 0;
         }
@@ -456,9 +454,35 @@ public class ControllerInput
         {
             if (!mc.player.isSpectator())
             {
-                mc.player.drop(false); //TODO test
+                mc.player.drop(false);
             }
             this.dropCounter = 0;
+        }
+    }
+
+    @SubscribeEvent
+    public void onOpenScreen(GuiOpenEvent event)
+    {
+        Minecraft mc = Minecraft.getInstance();
+        if(Config.SERVER.restrictToController.get() && mc.world != null && !this.isControllerInUse())
+        {
+            if(event.getGui() instanceof ContainerScreen)
+            {
+                event.setCanceled(true);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onMouseClicked(InputEvent.RawMouseEvent event)
+    {
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.world != null && (mc.currentScreen == null || mc.currentScreen instanceof ContainerScreen))
+        {
+            if(Config.SERVER.restrictToController.get())
+            {
+                event.setCanceled(true);
+            }
         }
     }
 
@@ -469,9 +493,24 @@ public class ControllerInput
         if(player == null)
             return;
 
+        if(Config.SERVER.restrictToController.get())
+        {
+            MovementInput input = event.getMovementInput();
+            input.moveStrafe = 0F;
+            input.moveForward = 0F;
+            input.forwardKeyDown = false;
+            input.backKeyDown = false;
+            input.leftKeyDown = false;
+            input.rightKeyDown = false;
+            input.jump = false;
+            input.sneaking = false;
+        }
+
         Controller controller = Controllable.getController();
         if(controller == null)
+        {
             return;
+        }
 
         Minecraft mc = Minecraft.getInstance();
 
