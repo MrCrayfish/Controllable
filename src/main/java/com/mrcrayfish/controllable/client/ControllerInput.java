@@ -377,7 +377,7 @@ public class ControllerInput
         if(mc.currentScreen == null && (this.targetYaw != 0F || this.targetPitch != 0F))
         {
             float elapsedTicks = Minecraft.getInstance().getTickLength();
-            player.rotateTowards((this.targetYaw / 0.15) * elapsedTicks, (this.targetPitch / 0.15) * (Config.CLIENT.options.invertLook.get() ? -1 : 1) * elapsedTicks);
+            //player.rotateTowards((this.targetYaw / 0.15) * elapsedTicks, (this.targetPitch / 0.15) * (Config.CLIENT.options.invertLook.get() ? -1 : 1) * elapsedTicks);
             if(player.getRidingEntity() != null)
             {
                 player.getRidingEntity().applyOrientationToEntity(player);
@@ -706,6 +706,10 @@ public class ControllerInput
                 else if(ButtonBindings.DEBUG_INFO.isButtonPressed())
                 {
                     mc.gameSettings.showDebugInfo = !mc.gameSettings.showDebugInfo;
+                }
+                else if(ButtonBindings.RADIAL_MENU.isButtonPressed())
+                {
+                    RadialMenuHandler.instance().toggleMenu();
                 }
                 else if(mc.player != null && !mc.player.isHandActive())
                 {

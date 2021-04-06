@@ -122,5 +122,6 @@
     "controllable.key.moveRight": "Navigate Right",
     "controllable.key.moveUp": "Navigate Up",
     "controllable.key.debugInfo": "Show Debug Info",
+    "controllable.key.radial_menu": "Open / Use Radial Menu",
     "controllable.tooltip.craft": "Click to Craft Item"
 }

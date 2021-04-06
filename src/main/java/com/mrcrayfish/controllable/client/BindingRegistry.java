@@ -49,6 +49,7 @@ public class BindingRegistry
         getInstance().register(ButtonBindings.CINEMATIC_CAMERA);
         getInstance().register(ButtonBindings.FULLSCREEN);
         getInstance().register(ButtonBindings.DEBUG_INFO);
+        getInstance().register(ButtonBindings.RADIAL_MENU);
     }
 
     private static BindingRegistry instance;
