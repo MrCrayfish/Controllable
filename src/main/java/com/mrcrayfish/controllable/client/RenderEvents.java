@@ -11,6 +11,7 @@ import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.IngameGui;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -26,7 +27,9 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.UseAction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -48,6 +51,7 @@ public class RenderEvents
     public static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Reference.MOD_ID, "textures/gui/buttons.png");
 
     private Map<Integer, Action> actions = new HashMap<>();
+    private int selectedRadialIndex = -1;
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event)
@@ -329,36 +333,58 @@ public class RenderEvents
         if(controller == null)
             return;
 
-        
+        double selectedAngle = MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(controller.getRThumbStickYValue(), controller.getRThumbStickXValue())) - 90) + 180;
+        boolean canSelect = Math.abs(controller.getRThumbStickYValue()) > 0.5F || Math.abs(controller.getRThumbStickXValue()) > 0.5F;
+        int segments = 8; // Segments will be based on bound actions
+        double segmentSize = 360.0 / segments;
+        float innerRadius = 60F;
+        float outerRadius = 100F;
+
+        int radialIndex = canSelect ? (int) (selectedAngle / segmentSize) : -1;
+        if(radialIndex != this.selectedRadialIndex)
+        {
+            this.setSelectedRadialIndex(radialIndex);
+        }
+
         MatrixStack matrixStack = new MatrixStack();
         Minecraft mc = Minecraft.getInstance();
         matrixStack.translate(mc.getMainWindow().getScaledWidth() / 2F, mc.getMainWindow().getScaledHeight() / 2F, 0);
+
         int color = 0x88000000;
         float alpha = (color >> 24 & 255) / 255F;
         float red = (color >> 16 & 255) / 255F;
         float green = (color >> 8 & 255) / 255F;
         float blue = (color & 255) / 255F;
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableDepthTest();
+
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         buffer.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-        int segments = 8; // Segments will be based on bound actions
-        float innerRadius = 50F;
-        float outerRadius = 80F;
         for(int i = 0; i <= segments; i++)
         {
-            double angle = (360.0 / 8) * i - 90;
+            double angle = segmentSize * i - 90;
+            boolean selected = this.selectedRadialIndex == i - 1;
+            float newAlpha = selected ? Math.min(1.0F, alpha + 0.3F) : alpha;
             float x = (float) Math.cos(Math.toRadians(angle));
             float y = (float) Math.sin(Math.toRadians(angle));
-            buffer.pos(matrixStack.getLast().getMatrix(), x * outerRadius, y * outerRadius, 0.0F).color(red, green, blue, alpha).endVertex();
-            buffer.pos(matrixStack.getLast().getMatrix(), x * innerRadius, y * innerRadius, 0.0F).color(red, green, blue, alpha).endVertex();
+            buffer.pos(matrixStack.getLast().getMatrix(), x * outerRadius, y * outerRadius, 0.0F).color(red, green, blue, newAlpha).endVertex();
+            buffer.pos(matrixStack.getLast().getMatrix(), x * innerRadius, y * innerRadius, 0.0F).color(red, green, blue, newAlpha).endVertex();
         }
         buffer.finishDrawing();
         WorldVertexBufferUploader.draw(buffer);
+
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
+    }
+
+    private void setSelectedRadialIndex(int index)
+    {
+        this.selectedRadialIndex = index;
+        Minecraft mc = Minecraft.getInstance();
+        mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 2.0F));
     }
 }
