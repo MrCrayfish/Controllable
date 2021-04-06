@@ -114,6 +114,7 @@ public class Controllable implements IControllerListener
         MinecraftForge.EVENT_BUS.register(new RenderEvents());
         MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
         MinecraftForge.EVENT_BUS.register(new ControllerEvents());
+        MinecraftForge.EVENT_BUS.register(RadialMenuHandler.instance());
 
         this.startControllerThread();
     }
