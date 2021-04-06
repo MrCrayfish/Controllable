@@ -95,76 +95,89 @@ public class RenderEvents
             }
             else if(mc.currentScreen == null)
             {
-                boolean blockHit = mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.BLOCK;
-                boolean canOpenBlock = false;
-                if(blockHit)
+                if(RadialMenuHandler.instance().isOpen())
                 {
-                    BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult) mc.objectMouseOver;
-                    canOpenBlock = mc.world.getBlockState(blockRayTraceResult.getPos()).getBlock() instanceof ContainerBlock;
-                }
-
-                if(!mc.player.isHandActive())
-                {
-                    if(blockHit)
+                    if(RadialMenuHandler.instance().getSelectedRadialIndex() != -1)
                     {
-                        actionMap.put(ButtonBindings.ATTACK, new Action(I18n.format("controllable.action.break"), Action.Side.RIGHT));
+                        actionMap.put(ButtonBindings.RADIAL_MENU, new Action(I18n.format("controllable.action.radial.perform_action"), Action.Side.RIGHT));
                     }
                     else
                     {
-                        actionMap.put(ButtonBindings.ATTACK, new Action(I18n.format("controllable.action.attack"), Action.Side.RIGHT));
+                        actionMap.put(ButtonBindings.RADIAL_MENU, new Action(I18n.format("controllable.action.radial.close_menu"), Action.Side.RIGHT));
                     }
                 }
-
-                ItemStack offHandStack = mc.player.getHeldItemOffhand();
-                if(offHandStack.getUseAction() != UseAction.NONE)
+                else
                 {
-                    switch(offHandStack.getUseAction())
-                    {
-                        case EAT:
-                            if(mc.player.getFoodStats().needFood())
-                            {
-                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
-                            }
-                            break;
-                        case DRINK:
-                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
-                            break;
-                        case BLOCK:
-                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
-                            break;
-                        case BOW:
-                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
-                            break;
-                    }
-                }
-
-                ItemStack currentItem = mc.player.inventory.getCurrentItem();
-                if(currentItem.getUseAction() != UseAction.NONE)
-                {
-                    switch(currentItem.getUseAction())
-                    {
-                        case EAT:
-                            if(mc.player.getFoodStats().needFood())
-                            {
-                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
-                            }
-                            break;
-                        case DRINK:
-                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
-                            break;
-                        case BLOCK:
-                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
-                            break;
-                        case BOW:
-                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
-                            break;
-                    }
-                }
-                else if(currentItem.getItem() instanceof BlockItem)
-                {
+                    boolean blockHit = mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.BLOCK;
+                    boolean canOpenBlock = false;
                     if(blockHit)
                     {
-                        //TODO figure out logic to determine if block can be placed.
+                        BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult) mc.objectMouseOver;
+                        canOpenBlock = mc.world.getBlockState(blockRayTraceResult.getPos()).getBlock() instanceof ContainerBlock;
+                    }
+
+                    if(!mc.player.isHandActive())
+                    {
+                        if(blockHit)
+                        {
+                            actionMap.put(ButtonBindings.ATTACK, new Action(I18n.format("controllable.action.break"), Action.Side.RIGHT));
+                        }
+                        else
+                        {
+                            actionMap.put(ButtonBindings.ATTACK, new Action(I18n.format("controllable.action.attack"), Action.Side.RIGHT));
+                        }
+                    }
+
+                    ItemStack offHandStack = mc.player.getHeldItemOffhand();
+                    if(offHandStack.getUseAction() != UseAction.NONE)
+                    {
+                        switch(offHandStack.getUseAction())
+                        {
+                            case EAT:
+                                if(mc.player.getFoodStats().needFood())
+                                {
+                                    actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
+                                }
+                                break;
+                            case DRINK:
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
+                                break;
+                            case BLOCK:
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
+                                break;
+                            case BOW:
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
+                                break;
+                        }
+                    }
+
+                    ItemStack currentItem = mc.player.inventory.getCurrentItem();
+                    if(currentItem.getUseAction() != UseAction.NONE)
+                    {
+                        switch(currentItem.getUseAction())
+                        {
+                            case EAT:
+                                if(mc.player.getFoodStats().needFood())
+                                {
+                                    actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
+                                }
+                                break;
+                            case DRINK:
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
+                                break;
+                            case BLOCK:
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
+                                break;
+                            case BOW:
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
+                                break;
+                        }
+                    }
+                    else if(currentItem.getItem() instanceof BlockItem)
+                    {
+                        if(blockHit)
+                        {
+                            //TODO figure out logic to determine if block can be placed.
                         /*BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult) mc.objectMouseOver;
                         BlockItem item = (BlockItem) currentItem.getItem();
                         ItemUseContext itemUseContext = new ItemUseContext(mc.player, Hand.MAIN_HAND, blockRayTraceResult);
@@ -178,43 +191,44 @@ public class RenderEvents
                                 actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
                             }
                         }*/
-                        actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
+                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
+                        }
                     }
-                }
-                else if(!currentItem.isEmpty() && !mc.player.isHandActive())
-                {
-                    actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.use_item"), Action.Side.RIGHT));
-                }
+                    else if(!currentItem.isEmpty() && !mc.player.isHandActive())
+                    {
+                        actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.use_item"), Action.Side.RIGHT));
+                    }
 
-                if(!mc.player.isSneaking() && blockHit && canOpenBlock && !mc.player.isHandActive())
-                {
-                    actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.interact"), Action.Side.RIGHT));
-                }
+                    if(!mc.player.isSneaking() && blockHit && canOpenBlock && !mc.player.isHandActive())
+                    {
+                        actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.interact"), Action.Side.RIGHT));
+                    }
 
-                if(verbose)
-                {
-                    actionMap.put(ButtonBindings.JUMP, new Action(I18n.format("controllable.action.jump"), Action.Side.LEFT));
-                }
+                    if(verbose)
+                    {
+                        actionMap.put(ButtonBindings.JUMP, new Action(I18n.format("controllable.action.jump"), Action.Side.LEFT));
+                    }
 
-                actionMap.put(ButtonBindings.INVENTORY, new Action(I18n.format("controllable.action.inventory"), Action.Side.LEFT));
+                    actionMap.put(ButtonBindings.INVENTORY, new Action(I18n.format("controllable.action.inventory"), Action.Side.LEFT));
 
-                if(verbose && (!mc.player.getHeldItemOffhand().isEmpty() || !mc.player.inventory.getCurrentItem().isEmpty()))
-                {
-                    actionMap.put(ButtonBindings.SWAP_HANDS, new Action(I18n.format("controllable.action.swap_hands"), Action.Side.LEFT));
-                }
+                    if(verbose && (!mc.player.getHeldItemOffhand().isEmpty() || !mc.player.inventory.getCurrentItem().isEmpty()))
+                    {
+                        actionMap.put(ButtonBindings.SWAP_HANDS, new Action(I18n.format("controllable.action.swap_hands"), Action.Side.LEFT));
+                    }
 
-                if(mc.player.isPassenger())
-                {
-                    actionMap.put(ButtonBindings.SNEAK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
-                }
-                else if(verbose)
-                {
-                    actionMap.put(ButtonBindings.SNEAK, new Action(I18n.format("controllable.action.sneak"), Action.Side.RIGHT));
-                }
+                    if(mc.player.isPassenger())
+                    {
+                        actionMap.put(ButtonBindings.SNEAK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
+                    }
+                    else if(verbose)
+                    {
+                        actionMap.put(ButtonBindings.SNEAK, new Action(I18n.format("controllable.action.sneak"), Action.Side.RIGHT));
+                    }
 
-                if(!mc.player.inventory.getCurrentItem().isEmpty())
-                {
-                    actionMap.put(ButtonBindings.DROP_ITEM, new Action(I18n.format("controllable.action.drop_item"), Action.Side.LEFT));
+                    if(!mc.player.inventory.getCurrentItem().isEmpty())
+                    {
+                        actionMap.put(ButtonBindings.DROP_ITEM, new Action(I18n.format("controllable.action.drop_item"), Action.Side.LEFT));
+                    }
                 }
             }
 

@@ -45,6 +45,16 @@ public class RadialMenuHandler
         mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, this.open ? 0.6F : 0.5F));
     }
 
+    public boolean isOpen()
+    {
+        return this.open;
+    }
+
+    public int getSelectedRadialIndex()
+    {
+        return this.selectedRadialIndex;
+    }
+
     @SubscribeEvent
     public void onRenderScreen(TickEvent.RenderTickEvent event)
     {
@@ -101,7 +111,7 @@ public class RadialMenuHandler
 
         double selectedAngle = MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(controller.getRThumbStickYValue(), controller.getRThumbStickXValue())) - 90) + 180;
         boolean canSelect = Math.abs(controller.getRThumbStickYValue()) > 0.5F || Math.abs(controller.getRThumbStickXValue()) > 0.5F;
-        int segments = 8; // Segments will be based on bound actions
+        int segments = 12; // Segments will be based on bound actions
         double segmentSize = 360.0 / segments;
         float innerRadius = 60F * animateProgress;
         float outerRadius = 100F * animateProgress;
