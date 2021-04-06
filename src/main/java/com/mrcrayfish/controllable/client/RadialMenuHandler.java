@@ -41,6 +41,8 @@ public class RadialMenuHandler
     public void toggleMenu()
     {
         this.open = !this.open;
+        Minecraft mc = Minecraft.getInstance();
+        mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, this.open ? 0.6F : 0.5F));
     }
 
     @SubscribeEvent
