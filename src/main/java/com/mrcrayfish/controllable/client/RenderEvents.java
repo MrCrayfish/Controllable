@@ -350,11 +350,16 @@ public class RenderEvents
         Minecraft mc = Minecraft.getInstance();
         matrixStack.translate(mc.getMainWindow().getScaledWidth() / 2F, mc.getMainWindow().getScaledHeight() / 2F, 0);
 
-        int color = 0x88000000;
-        float alpha = (color >> 24 & 255) / 255F;
-        float red = (color >> 16 & 255) / 255F;
-        float green = (color >> 8 & 255) / 255F;
-        float blue = (color & 255) / 255F;
+        int wheelColor = 0x88000000;
+        float wheelAlpha = (wheelColor >> 24 & 255) / 255F;
+        float wheelRed = (wheelColor >> 16 & 255) / 255F;
+        float wheelGreen = (wheelColor >> 8 & 255) / 255F;
+        float wheelBlue = (wheelColor & 255) / 255F;
+
+        int highlightColor = 0xFFFFFF;
+        float highlightRed = (highlightColor >> 16 & 255) / 255F;
+        float highlightGreen = (highlightColor >> 8 & 255) / 255F;
+        float highlightBlue = (highlightColor & 255) / 255F;
 
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
@@ -367,11 +372,43 @@ public class RenderEvents
         {
             double angle = segmentSize * i - 90;
             boolean selected = this.selectedRadialIndex == i - 1;
-            float newAlpha = selected ? Math.min(1.0F, alpha + 0.3F) : alpha;
+            //float newAlpha = selected ? Math.min(1.0F, wheelAlpha + 0.3F) : wheelAlpha;
             float x = (float) Math.cos(Math.toRadians(angle));
             float y = (float) Math.sin(Math.toRadians(angle));
-            buffer.pos(matrixStack.getLast().getMatrix(), x * outerRadius, y * outerRadius, 0.0F).color(red, green, blue, newAlpha).endVertex();
-            buffer.pos(matrixStack.getLast().getMatrix(), x * innerRadius, y * innerRadius, 0.0F).color(red, green, blue, newAlpha).endVertex();
+            if(!selected)
+            {
+                buffer.pos(matrixStack.getLast().getMatrix(), x * outerRadius, y * outerRadius, 0.0F).color(wheelRed, wheelGreen, wheelBlue, wheelAlpha).endVertex();
+                buffer.pos(matrixStack.getLast().getMatrix(), x * innerRadius, y * innerRadius, 0.0F).color(wheelRed, wheelGreen, wheelBlue, wheelAlpha).endVertex();
+            }
+            else
+            {
+                buffer.pos(matrixStack.getLast().getMatrix(), x * outerRadius, y * outerRadius, 0.0F).color(highlightRed, highlightGreen, highlightBlue, wheelAlpha).endVertex();
+                buffer.pos(matrixStack.getLast().getMatrix(), x * innerRadius, y * innerRadius, 0.0F).color(highlightRed, highlightGreen, highlightBlue, wheelAlpha).endVertex();
+            }
+        }
+        buffer.finishDrawing();
+        WorldVertexBufferUploader.draw(buffer);
+
+        RenderSystem.lineWidth(4F);
+        buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+        for(int i = 0; i <= segments; i++)
+        {
+            double angle = segmentSize * i - 90;
+            float x = (float) Math.cos(Math.toRadians(angle));
+            float y = (float) Math.sin(Math.toRadians(angle));
+            buffer.pos(matrixStack.getLast().getMatrix(), x * outerRadius, y * outerRadius, 0.0F).color(1.0F, 1.0F, 1.0F, 0.75F).endVertex();
+        }
+        buffer.finishDrawing();
+        WorldVertexBufferUploader.draw(buffer);
+
+        RenderSystem.lineWidth(4F);
+        buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+        for(int i = 0; i <= segments; i++)
+        {
+            double angle = segmentSize * i - 90;
+            float x = (float) Math.cos(Math.toRadians(angle));
+            float y = (float) Math.sin(Math.toRadians(angle));
+            buffer.pos(matrixStack.getLast().getMatrix(), x * innerRadius, y * innerRadius, 0.0F).color(1.0F, 1.0F, 1.0F, 0.75F).endVertex();
         }
         buffer.finishDrawing();
         WorldVertexBufferUploader.draw(buffer);
@@ -385,6 +422,6 @@ public class RenderEvents
     {
         this.selectedRadialIndex = index;
         Minecraft mc = Minecraft.getInstance();
-        mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 2.0F));
+        mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 1.5F));
     }
 }
