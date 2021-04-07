@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.event.GatherRadialMenuItemsEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.AbstractGui;
@@ -18,6 +19,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
@@ -89,11 +91,6 @@ public class RadialMenuHandler
         this.prevAnimateTicks = 0;
     }
 
-    private boolean isCompletelyVisible()
-    {
-        return this.visible && this.animateTicks == ANIMATE_DURATION && this.prevAnimateTicks == ANIMATE_DURATION;
-    }
-
     private void populateItems()
     {
         this.items.clear();
@@ -106,6 +103,9 @@ public class RadialMenuHandler
         this.items.add(new ButtonBindingItem(ButtonBindings.TOGGLE_PERSPECTIVE));
         this.items.add(new ButtonBindingItem(ButtonBindings.SNEAK));
         this.items.add(new ButtonBindingItem(ButtonBindings.PLAYER_LIST));
+        GatherRadialMenuItemsEvent event = new GatherRadialMenuItemsEvent();
+        MinecraftForge.EVENT_BUS.post(event);
+        this.items.addAll(event.getItems());
         while(this.items.size() < MIN_ITEMS - 1) this.items.add(new EmptyRadialItem());
         this.items.add(new RadialSettingsItem());
     }
