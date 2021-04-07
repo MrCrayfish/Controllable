@@ -1,19 +1,28 @@
 package com.mrcrayfish.controllable.client;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author: MrCrayfish
@@ -35,14 +44,27 @@ public class RadialMenuHandler
     private int animateTicks;
     private int prevAnimateTicks;
     private int selectedRadialIndex = -1;
+    private List<ButtonBinding> bindings = new ArrayList<>();
+    private ButtonBinding performBinding;
+    private ITextComponent label;
 
     private RadialMenuHandler() {}
 
     public void toggleMenu()
     {
         this.open = !this.open;
+        ButtonBinding binding = this.getSelectedItem();
+        if(!this.open && binding != null)
+        {
+            this.animateTicks = 0;
+            this.prevAnimateTicks = 0;
+            binding.setActiveAndPressed();
+            Controllable.getInput().handleButtonInput(Controllable.getController(), binding.getButton(), true, true);
+            this.selectedRadialIndex = -1;
+        }
         Minecraft mc = Minecraft.getInstance();
         mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, this.open ? 0.6F : 0.5F));
+        this.bindings = ImmutableList.of(ButtonBindings.FULLSCREEN, ButtonBindings.JUMP, ButtonBindings.INVENTORY, ButtonBindings.ATTACK);
     }
 
     public boolean isOpen()
@@ -192,6 +214,11 @@ public class RadialMenuHandler
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
+
+        if(this.label != null)
+        {
+            AbstractGui.drawCenteredString(matrixStack, mc.fontRenderer, this.label, 0, -20, 0xFFFFFF);
+        }
     }
 
     private void setSelectedRadialIndex(int index)
@@ -199,5 +226,22 @@ public class RadialMenuHandler
         this.selectedRadialIndex = index;
         Minecraft mc = Minecraft.getInstance();
         mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 1.5F));
+        this.label = null;
+        ButtonBinding binding = this.getSelectedItem();
+        if(binding != null)
+        {
+            this.label = new TranslationTextComponent(binding.getDescription());
+        }
     }
+
+    @Nullable
+    private ButtonBinding getSelectedItem()
+    {
+        if(this.selectedRadialIndex >= 0 && this.selectedRadialIndex < this.bindings.size())
+        {
+            return this.bindings.get(this.selectedRadialIndex);
+        }
+        return null;
+    }
+
 }

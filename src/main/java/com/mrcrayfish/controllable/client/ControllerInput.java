@@ -377,7 +377,10 @@ public class ControllerInput
         if(mc.currentScreen == null && (this.targetYaw != 0F || this.targetPitch != 0F))
         {
             float elapsedTicks = Minecraft.getInstance().getTickLength();
-            //player.rotateTowards((this.targetYaw / 0.15) * elapsedTicks, (this.targetPitch / 0.15) * (Config.CLIENT.options.invertLook.get() ? -1 : 1) * elapsedTicks);
+            if(!RadialMenuHandler.instance().isOpen())
+            {
+                player.rotateTowards((this.targetYaw / 0.15) * elapsedTicks, (this.targetPitch / 0.15) * (Config.CLIENT.options.invertLook.get() ? -1 : 1) * elapsedTicks);
+            }
             if(player.getRidingEntity() != null)
             {
                 player.getRidingEntity().applyOrientationToEntity(player);
@@ -596,16 +599,24 @@ public class ControllerInput
         }
     }
 
-    public void handleButtonInput(Controller controller, int button, boolean state)
+    public void handleButtonInput(Controller controller, int button, boolean state, boolean virtual)
     {
-        this.setControllerInUse();
-
-        ControllerEvent.ButtonInput eventInput = new ControllerEvent.ButtonInput(controller, button, state);
-        if(MinecraftForge.EVENT_BUS.post(eventInput))
+        if(controller == null)
             return;
 
-        button = eventInput.getModifiedButton();
-        ButtonBinding.setButtonState(button, state);
+        this.setControllerInUse();
+
+        /* We don't send event for buttons that are not bound.
+         * This can happen when using the radial menu. */
+        if(button != -1)
+        {
+            ControllerEvent.ButtonInput eventInput = new ControllerEvent.ButtonInput(controller, button, state);
+            if(MinecraftForge.EVENT_BUS.post(eventInput))
+                return;
+
+            button = eventInput.getModifiedButton();
+            ButtonBinding.setButtonState(button, state);
+        }
 
         ControllerEvent.Button event = new ControllerEvent.Button(controller);
         if(MinecraftForge.EVENT_BUS.post(event))
@@ -707,7 +718,7 @@ public class ControllerInput
                 {
                     mc.gameSettings.showDebugInfo = !mc.gameSettings.showDebugInfo;
                 }
-                else if(ButtonBindings.RADIAL_MENU.isButtonPressed())
+                else if(ButtonBindings.RADIAL_MENU.isButtonPressed() && !virtual)
                 {
                     RadialMenuHandler.instance().toggleMenu();
                 }

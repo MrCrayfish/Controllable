@@ -296,13 +296,13 @@ public class Controllable implements IControllerListener
                         return;
                     }
                 }
-                input.handleButtonInput(controller, index, true);
+                input.handleButtonInput(controller, index, true, false);
             }
         }
         else if(states.getState(index))
         {
             states.setState(index, false);
-            input.handleButtonInput(controller, index, false);
+            input.handleButtonInput(controller, index, false, false);
         }
     }
 

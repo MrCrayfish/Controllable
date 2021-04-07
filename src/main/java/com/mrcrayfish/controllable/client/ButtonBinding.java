@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 
@@ -18,6 +19,7 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     private boolean pressed;
     private int pressedTime;
     private boolean reserved;
+    private boolean active;
 
     public ButtonBinding(int button, String descriptionKey, String category, IKeyConflictContext context)
     {
@@ -83,9 +85,14 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     {
         for(ButtonBinding binding : BindingRegistry.getInstance().getRegisteredBindings())
         {
-            if(binding.isButtonDown())
+            if(binding.isButtonDown() || (binding.active && ButtonBindings.RADIAL_MENU.isButtonDown()))
             {
                 binding.pressedTime--;
+            }
+            if(binding.active && !ButtonBindings.RADIAL_MENU.isButtonDown())
+            {
+                Controllable.getInput().handleButtonInput(Controllable.getController(), binding.getButton(), false, true);
+                binding.active = false;
             }
         }
     }
@@ -166,5 +173,15 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     public boolean equals(Object obj)
     {
         return this == obj;
+    }
+
+    /**
+     * Sets the binding as active and will use the radial menu button to determine it's state
+     */
+    void setActiveAndPressed()
+    {
+        this.active = true;
+        this.pressed = true;
+        this.pressedTime = 0;
     }
 }
