@@ -1,6 +1,5 @@
 package com.mrcrayfish.controllable.client;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
@@ -11,11 +10,14 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
@@ -23,12 +25,16 @@ import org.lwjgl.opengl.GL11;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Author: MrCrayfish
  */
 public class RadialMenuHandler
 {
+    private static final int MIN_ITEMS = 6;
+    private static final int ANIMATE_DURATION = 5;
+
     private static RadialMenuHandler instance;
 
     public static RadialMenuHandler instance()
@@ -40,41 +46,99 @@ public class RadialMenuHandler
         return instance;
     }
 
-    private boolean open;
+    private boolean visible;
     private int animateTicks;
     private int prevAnimateTicks;
-    private int selectedRadialIndex = -1;
-    private List<ButtonBinding> bindings = new ArrayList<>();
-    private ButtonBinding performBinding;
+    private int selectedRadialIndex = 0;
+    private List<AbstractRadialItem> items = new ArrayList<>();
     private ITextComponent label;
 
     private RadialMenuHandler() {}
 
-    public void toggleMenu()
+    public void interact()
     {
-        this.open = !this.open;
-        ButtonBinding binding = this.getSelectedItem();
-        if(!this.open && binding != null)
+        if(this.visible)
         {
-            this.animateTicks = 0;
-            this.prevAnimateTicks = 0;
-            binding.setActiveAndPressed();
-            Controllable.getInput().handleButtonInput(Controllable.getController(), binding.getButton(), true, true);
-            this.selectedRadialIndex = -1;
+            this.getSelectedItem().ifPresent(item ->
+            {
+                if(!item.isEmpty())
+                {
+                    item.onUseItem(this);
+                }
+            });
         }
-        Minecraft mc = Minecraft.getInstance();
-        mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, this.open ? 0.6F : 0.5F));
-        this.bindings = ImmutableList.of(ButtonBindings.FULLSCREEN, ButtonBindings.JUMP, ButtonBindings.INVENTORY, ButtonBindings.ATTACK);
+        else
+        {
+            this.setVisibility(true);
+            this.populateItems();
+            this.selectedRadialIndex = 0;
+            this.label = this.items.get(this.selectedRadialIndex).getLabel();
+            Minecraft mc = Minecraft.getInstance();
+            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, this.visible ? 0.6F : 0.5F));
+        }
     }
 
-    public boolean isOpen()
+    public void setVisibility(boolean visible)
     {
-        return this.open;
+        this.visible = visible;
+    }
+
+    public void clearAnimation()
+    {
+        this.animateTicks = 0;
+        this.prevAnimateTicks = 0;
+    }
+
+    private boolean isCompletelyVisible()
+    {
+        return this.visible && this.animateTicks == ANIMATE_DURATION && this.prevAnimateTicks == ANIMATE_DURATION;
+    }
+
+    private void populateItems()
+    {
+        this.items.clear();
+        this.items.add(new CloseMenuItem());
+        this.items.add(new ButtonBindingItem(ButtonBindings.JUMP));
+        this.items.add(new ButtonBindingItem(ButtonBindings.SCREENSHOT));
+        this.items.add(new ButtonBindingItem(ButtonBindings.FULLSCREEN));
+        this.items.add(new ButtonBindingItem(ButtonBindings.INVENTORY));
+        this.items.add(new ButtonBindingItem(ButtonBindings.ATTACK));
+        this.items.add(new ButtonBindingItem(ButtonBindings.TOGGLE_PERSPECTIVE));
+        this.items.add(new ButtonBindingItem(ButtonBindings.SNEAK));
+        this.items.add(new ButtonBindingItem(ButtonBindings.PLAYER_LIST));
+        while(this.items.size() < MIN_ITEMS - 1) this.items.add(new EmptyRadialItem());
+        this.items.add(new RadialSettingsItem());
+    }
+
+    public boolean isVisible()
+    {
+        return this.visible;
     }
 
     public int getSelectedRadialIndex()
     {
         return this.selectedRadialIndex;
+    }
+
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event)
+    {
+        if(event.phase == TickEvent.Phase.START)
+        {
+            if(this.visible && !Controllable.getInput().isControllerInUse())
+            {
+                this.setVisibility(false);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onDrawCrossHair(RenderGameOverlayEvent.Pre event)
+    {
+        if(this.visible && event.getType() == RenderGameOverlayEvent.ElementType.CROSSHAIRS)
+        {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent
@@ -92,7 +156,7 @@ public class RadialMenuHandler
             if(Controllable.getInput().getLastUse() <= 0)
                 return;
 
-            if(this.open || this.animateTicks > 0 || this.prevAnimateTicks > 0)
+            if(this.visible || this.animateTicks > 0 || this.prevAnimateTicks > 0)
             {
                 this.renderRadialMenu(event.renderTickTime);
             }
@@ -107,9 +171,9 @@ public class RadialMenuHandler
 
         this.prevAnimateTicks = this.animateTicks;
 
-        if(this.open)
+        if(this.visible)
         {
-            if(this.animateTicks < 5)
+            if(this.animateTicks < ANIMATE_DURATION)
             {
                 this.animateTicks++;
             }
@@ -126,22 +190,21 @@ public class RadialMenuHandler
         if(controller == null)
             return;
 
-        float animateProgress = MathHelper.lerp(partialTicks,this.prevAnimateTicks, this.animateTicks) / 5F;
+        float animateProgress = MathHelper.lerp(partialTicks, this.prevAnimateTicks, this.animateTicks) / 5F;
         float c1 = 1.70158F;
         float c3 = c1 + 1;
         animateProgress = (float) (1 + c3 * Math.pow(animateProgress - 1, 3) + c1 * Math.pow(animateProgress - 1, 2));
 
         double selectedAngle = MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(controller.getRThumbStickYValue(), controller.getRThumbStickXValue())) - 90) + 180;
         boolean canSelect = Math.abs(controller.getRThumbStickYValue()) > 0.5F || Math.abs(controller.getRThumbStickXValue()) > 0.5F;
-        int segments = 12; // Segments will be based on bound actions
+        int segments = this.items.size();
         double segmentSize = 360.0 / segments;
         float innerRadius = 60F * animateProgress;
         float outerRadius = 100F * animateProgress;
 
-        int radialIndex = canSelect ? (int) (selectedAngle / segmentSize) : -1;
-        if(radialIndex != this.selectedRadialIndex)
+        if(canSelect)
         {
-            this.setSelectedRadialIndex(radialIndex);
+            this.setSelectedRadialIndex((int) (selectedAngle / segmentSize));
         }
 
         MatrixStack matrixStack = new MatrixStack();
@@ -170,7 +233,6 @@ public class RadialMenuHandler
         {
             double angle = segmentSize * i - 90;
             boolean selected = this.selectedRadialIndex == i - 1;
-            //float newAlpha = selected ? Math.min(1.0F, wheelAlpha + 0.3F) : wheelAlpha;
             float x = (float) Math.cos(Math.toRadians(angle));
             float y = (float) Math.sin(Math.toRadians(angle));
             if(!selected)
@@ -211,37 +273,164 @@ public class RadialMenuHandler
         buffer.finishDrawing();
         WorldVertexBufferUploader.draw(buffer);
 
+        for(int i = 0; i <= segments; i++)
+        {
+            double angle = segmentSize * i - 90;
+            float distance = innerRadius + (outerRadius - innerRadius) * 0.4F;
+            float x = (float) Math.cos(Math.toRadians(angle + segmentSize / 2)) * distance - 8;
+            float y = (float) Math.sin(Math.toRadians(angle + segmentSize / 2)) * distance - 8;
+            RenderSystem.pushMatrix();
+            RenderSystem.translatef(mc.getMainWindow().getScaledWidth() / 2F, mc.getMainWindow().getScaledHeight() / 2F, 0);
+            RenderSystem.translatef(x, y, 0);
+            RenderSystem.scalef(animateProgress, animateProgress, animateProgress);
+            Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(Items.APPLE), 0, 0);
+            RenderSystem.popMatrix();
+        }
+
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
 
-        if(this.label != null)
+        if(this.label != null && this.visible)
         {
-            AbstractGui.drawCenteredString(matrixStack, mc.fontRenderer, this.label, 0, -20, 0xFFFFFF);
+            matrixStack.push();
+            matrixStack.scale(animateProgress, animateProgress, animateProgress);
+            AbstractGui.drawCenteredString(matrixStack, mc.fontRenderer, this.label, 0, -5, 0xFFFFFF);
+            matrixStack.pop();
         }
     }
 
     private void setSelectedRadialIndex(int index)
     {
-        this.selectedRadialIndex = index;
-        Minecraft mc = Minecraft.getInstance();
-        mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 1.5F));
-        this.label = null;
-        ButtonBinding binding = this.getSelectedItem();
-        if(binding != null)
+        if(index != this.selectedRadialIndex)
         {
-            this.label = new TranslationTextComponent(binding.getDescription());
+            this.selectedRadialIndex = index;
+            Minecraft mc = Minecraft.getInstance();
+            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 1.5F));
+            this.getSelectedItem().ifPresent(item -> this.label = item.getLabel());
         }
     }
 
-    @Nullable
-    private ButtonBinding getSelectedItem()
+    private Optional<AbstractRadialItem> getSelectedItem()
     {
-        if(this.selectedRadialIndex >= 0 && this.selectedRadialIndex < this.bindings.size())
+        if(this.selectedRadialIndex >= 0 && this.selectedRadialIndex < this.items.size())
         {
-            return this.bindings.get(this.selectedRadialIndex);
+            return Optional.of(this.items.get(this.selectedRadialIndex));
         }
-        return null;
+        return Optional.empty();
     }
 
+    /**
+     * The base radial item
+     */
+    public abstract static class AbstractRadialItem
+    {
+        private ITextComponent label;
+
+        protected AbstractRadialItem(ITextComponent label)
+        {
+            this.label = label;
+        }
+
+        @Nullable
+        public ITextComponent getLabel()
+        {
+            return this.label;
+        }
+
+        public boolean isEmpty()
+        {
+            return false;
+        }
+
+        public abstract void onUseItem(RadialMenuHandler handler);
+
+        protected void playSound(SoundEvent event, float pitch)
+        {
+            Minecraft mc = Minecraft.getInstance();
+            mc.getSoundHandler().play(SimpleSound.master(event, pitch));
+        }
+    }
+
+    /**
+     * A simple radial item to close the radial menu
+     */
+    public static final class CloseMenuItem extends AbstractRadialItem
+    {
+        public CloseMenuItem()
+        {
+            super(new TranslationTextComponent("controllable.gui.radial.close"));
+        }
+
+        @Override
+        public void onUseItem(RadialMenuHandler handler)
+        {
+            handler.setVisibility(false);
+        }
+    }
+
+    /**
+     * An empty radial item to fill radial menu if there aren't enough items in the menu
+     */
+    public static final class EmptyRadialItem extends AbstractRadialItem
+    {
+        public EmptyRadialItem()
+        {
+            super(null);
+        }
+
+        @Override
+        public boolean isEmpty()
+        {
+            return true;
+        }
+
+        @Override
+        public void onUseItem(RadialMenuHandler handler)
+        {
+            handler.setVisibility(false);
+        }
+    }
+
+    /**
+     * A simple radial item to close the radial menu
+     */
+    public static final class RadialSettingsItem extends AbstractRadialItem
+    {
+        public RadialSettingsItem()
+        {
+            super(new TranslationTextComponent("controllable.gui.radial.settings"));
+        }
+
+        @Override
+        public void onUseItem(RadialMenuHandler handler)
+        {
+            handler.setVisibility(false);
+        }
+    }
+
+    /**
+     * A radial item that takes a button binding. Using this item will virtually enables the button
+     * binding and doesn't require the real assigned button to be pressed. This also works for
+     * bindings that don't have a button bound to them.
+     */
+    private static class ButtonBindingItem extends AbstractRadialItem
+    {
+        public ButtonBinding binding;
+
+        public ButtonBindingItem(ButtonBinding binding)
+        {
+            super(new TranslationTextComponent(binding.getDescription()));
+            this.binding = binding;
+        }
+
+        @Override
+        public void onUseItem(RadialMenuHandler radialMenu)
+        {
+            radialMenu.setVisibility(false);
+            radialMenu.clearAnimation();
+            this.binding.setActiveAndPressed();
+            Controllable.getInput().handleButtonInput(Controllable.getController(), this.binding.getButton(), true, true);
+        }
+    }
 }

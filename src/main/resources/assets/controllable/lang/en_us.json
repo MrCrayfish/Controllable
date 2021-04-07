@@ -47,6 +47,8 @@
     "controllable.gui.layout.warning": "Warning",
     "controllable.gui.layout.invalid_layout": "One or more buttons are not assigned. Resolve any buttons that have an exclamation icon. If you continue, some buttons may not work!",
     "controllable.gui.layout.thumbsticks": "Thumbstick Settings",
+    "controllable.gui.radial.close": "Close Menu",
+    "controllable.gui.radial.settings": "Settings",
     "controllable.options.forceFeedback": "Vibration",
     "controllable.options.forceFeedback.desc": "If enabled, some actions will cause the controller to vibrate",
     "controllable.options.autoSelect": "Auto Select",
