@@ -40,6 +40,7 @@
     "controllable.gui.close": "Close",
     "controllable.gui.layout": "Layout",
     "controllable.gui.resetBinds": "Reset Binds",
+    "controllable.gui.restoreDefaults": "Restore Defaults",
     "controllable.gui.add_binding": "Modify Bindings",
     "controllable.gui.controller_only": "This server has enabled controller only",
     "controllable.gui.plug_in_controller": "Please plug in a controller to continue...",

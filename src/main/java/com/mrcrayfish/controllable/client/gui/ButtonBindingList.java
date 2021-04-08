@@ -113,7 +113,7 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         }
     }
 
-    protected class BindingEntry extends Entry
+    public class BindingEntry extends Entry
     {
         private ButtonBinding binding;
         private TextComponent label;
@@ -157,6 +157,17 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
                     this.bindingButton.active = true;
                     this.deleteButton.active = false;
                 });
+                this.bindingButton.active = bindings.stream().noneMatch(entry -> entry.getBinding() == this.binding);
+                this.deleteButton.active = bindings.stream().anyMatch(entry -> entry.getBinding() == this.binding);
+            }
+        }
+
+        public void updateButtons()
+        {
+            if(ButtonBindingList.this.parent instanceof SelectButtonBindingScreen)
+            {
+                SelectButtonBindingScreen screen = (SelectButtonBindingScreen) ButtonBindingList.this.parent;
+                List<ButtonBindingData> bindings = screen.getRadialConfigureScreen().getBindings();
                 this.bindingButton.active = bindings.stream().noneMatch(entry -> entry.getBinding() == this.binding);
                 this.deleteButton.active = bindings.stream().anyMatch(entry -> entry.getBinding() == this.binding);
             }

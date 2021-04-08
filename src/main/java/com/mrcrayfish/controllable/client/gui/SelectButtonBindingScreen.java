@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
@@ -30,8 +31,13 @@ public class SelectButtonBindingScreen extends Screen
     {
         this.bindingList = new ButtonBindingList(this, this.minecraft, this.width + 10, this.height, 45, this.height - 44, 20);
         this.children.add(this.bindingList);
-
-        this.addButton(new Button(this.width / 2 - 75, this.height - 29, 150, 20, DialogTexts.GUI_DONE, (button) -> {
+        this.addButton(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslationTextComponent("controllable.gui.restoreDefaults"), (button) -> {
+            RadialMenuHandler.instance().resetDefaults();
+            this.parentScreen.getBindings().clear();
+            this.parentScreen.getBindings().addAll(RadialMenuHandler.instance().getBindings());
+            this.bindingList.getEventListeners().stream().filter(entry -> entry instanceof ButtonBindingList.BindingEntry).map(entry -> (ButtonBindingList.BindingEntry) entry).forEach(ButtonBindingList.BindingEntry::updateButtons);
+        }));
+        this.addButton(new Button(this.width / 2 + 5, this.height - 29, 150, 20, DialogTexts.GUI_DONE, (button) -> {
             this.minecraft.displayGuiScreen(this.parentScreen);
         }));
     }

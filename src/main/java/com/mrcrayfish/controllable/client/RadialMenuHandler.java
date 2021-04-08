@@ -104,12 +104,7 @@ public class RadialMenuHandler
         }
         else
         {
-            this.bindings.add(new ButtonBindingData(ButtonBindings.ADVANCEMENTS, TextFormatting.YELLOW));
-            this.bindings.add(new ButtonBindingData(ButtonBindings.DEBUG_INFO, TextFormatting.YELLOW));
-            this.bindings.add(new ButtonBindingData(ButtonBindings.SCREENSHOT, TextFormatting.YELLOW));
-            this.bindings.add(new ButtonBindingData(ButtonBindings.FULLSCREEN, TextFormatting.YELLOW));
-            this.bindings.add(new ButtonBindingData(ButtonBindings.CINEMATIC_CAMERA, TextFormatting.YELLOW));
-            this.bindings.add(new ButtonBindingData(ButtonBindings.HIGHLIGHT_PLAYERS, TextFormatting.YELLOW));
+            this.resetDefaults();
             this.save();
         }
 
@@ -136,6 +131,17 @@ public class RadialMenuHandler
         {
             e.printStackTrace();
         }
+    }
+
+    public void resetDefaults()
+    {
+        this.bindings.clear();
+        this.bindings.add(new ButtonBindingData(ButtonBindings.ADVANCEMENTS, TextFormatting.YELLOW));
+        this.bindings.add(new ButtonBindingData(ButtonBindings.DEBUG_INFO, TextFormatting.YELLOW));
+        this.bindings.add(new ButtonBindingData(ButtonBindings.SCREENSHOT, TextFormatting.YELLOW));
+        this.bindings.add(new ButtonBindingData(ButtonBindings.FULLSCREEN, TextFormatting.YELLOW));
+        this.bindings.add(new ButtonBindingData(ButtonBindings.CINEMATIC_CAMERA, TextFormatting.YELLOW));
+        this.bindings.add(new ButtonBindingData(ButtonBindings.HIGHLIGHT_PLAYERS, TextFormatting.YELLOW));
     }
 
     public void interact()

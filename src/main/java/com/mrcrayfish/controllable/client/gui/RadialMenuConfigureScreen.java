@@ -19,9 +19,6 @@ public class RadialMenuConfigureScreen extends Screen
 {
     private List<ButtonBindingData> bindings;
     private RadialItemList list;
-    private Button saveButton;
-    private Button addButton;
-    private Button cancelButton;
 
     public RadialMenuConfigureScreen(LinkedHashSet<ButtonBindingData> bindings)
     {
@@ -34,15 +31,12 @@ public class RadialMenuConfigureScreen extends Screen
     {
         this.list = new RadialItemList(this.minecraft, this.width, this.height, 45, this.height - 44, this.bindings);
         this.children.add(this.list);
-        this.saveButton = this.addButton(new Button(this.width / 2 - 155, this.height - 29, 100, 20, DialogTexts.GUI_DONE, buttons -> {
+        this.addButton(new Button(this.width / 2 + 5, this.height - 29, 150, 20, DialogTexts.GUI_DONE, buttons -> {
             RadialMenuHandler.instance().setBindings(new LinkedHashSet<>(this.bindings));
             Objects.requireNonNull(this.minecraft).displayGuiScreen(null);
         }));
-        this.addButton = this.addButton(new Button(this.width / 2 - 50, this.height - 29, 100, 20, new TranslationTextComponent("controllable.gui.add_binding"), buttons -> {
+        this.addButton(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslationTextComponent("controllable.gui.add_binding"), buttons -> {
             Objects.requireNonNull(this.minecraft).displayGuiScreen(new SelectButtonBindingScreen(this));
-        }));
-        this.cancelButton = this.addButton(new Button(this.width / 2 + 55, this.height - 29, 100, 20, DialogTexts.GUI_CANCEL, buttons -> {
-            Objects.requireNonNull(this.minecraft).displayGuiScreen(null);
         }));
     }
 
