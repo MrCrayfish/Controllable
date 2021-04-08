@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.mrcrayfish.controllable.Controllable;
 
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -78,6 +79,12 @@ public class BindingRegistry
     {
         List<ButtonBinding> list = this.idToButtonList.get(button);
         return list != null ? ImmutableList.copyOf(list) : ImmutableList.of();
+    }
+
+    @Nullable
+    public ButtonBinding getBindingByDescriptionKey(String key)
+    {
+        return this.registeredBindings.get(key);
     }
 
     public List<ButtonBinding> getBindings()

@@ -1,9 +1,14 @@
 package com.mrcrayfish.controllable.client;
 
+import com.google.common.base.Charsets;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
+import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
+import com.mrcrayfish.controllable.client.gui.RadialMenuConfigureScreen;
 import com.mrcrayfish.controllable.event.GatherRadialMenuItemsEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
@@ -25,9 +30,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.io.*;
+import java.util.*;
 
 /**
  * Author: MrCrayfish
@@ -48,9 +52,11 @@ public class RadialMenuHandler
         return instance;
     }
 
+    private boolean loaded;
     private boolean visible;
     private int animateTicks;
     private int prevAnimateTicks;
+    private Set<ButtonBindingData> bindings = new LinkedHashSet<>();
     private AbstractRadialItem settingsItem;
     private AbstractRadialItem closeItem;
     private List<AbstractRadialItem> allItems = new ArrayList<>();
@@ -59,6 +65,60 @@ public class RadialMenuHandler
     private AbstractRadialItem selected;
 
     private RadialMenuHandler() {}
+
+    private void load()
+    {
+        if(this.loaded)
+            return;
+
+        File file = new File(Controllable.getConfigFolder(), "controllable/radial_menu_items.json");
+        if(file.exists())
+        {
+            try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charsets.UTF_8)))
+            {
+                JsonArray bindings = new Gson().fromJson(reader, JsonArray.class);
+                bindings.forEach(element ->
+                {
+                    String key = element.getAsString();
+                    ButtonBinding binding = BindingRegistry.getInstance().getBindingByDescriptionKey(key);
+                    if(binding != null)
+                    {
+                        this.bindings.add(new ButtonBindingData(binding, TextFormatting.YELLOW));
+                    }
+                });
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            //TODO load defaults
+            this.save();
+        }
+
+        this.loaded = true;
+    }
+
+    private void save()
+    {
+        JsonArray array = new JsonArray();
+        this.bindings.forEach(binding -> {
+            array.add(binding.getBinding().getDescription());
+        });
+
+        String json = new Gson().toJson(array);
+        File file = new File(Controllable.getConfigFolder(), "controllable/radial_menu_items.json");
+        try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file))))
+        {
+            writer.write(json);
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
     public void interact()
     {
@@ -71,6 +131,7 @@ public class RadialMenuHandler
         }
         else
         {
+            this.load();
             this.setVisibility(true);
             this.populateAndConstruct();
             Minecraft mc = Minecraft.getInstance();
@@ -81,6 +142,18 @@ public class RadialMenuHandler
     public AbstractRadialItem getSelected()
     {
         return this.selected;
+    }
+
+    public LinkedHashSet<ButtonBindingData> getBindings()
+    {
+        return new LinkedHashSet<>(this.bindings);
+    }
+
+    public void setBindings(Set<ButtonBindingData> bindings)
+    {
+        this.bindings = bindings;
+        this.save();
+        this.populateAndConstruct();
     }
 
     public void setVisibility(boolean visible)
@@ -100,14 +173,7 @@ public class RadialMenuHandler
         this.leftItems.clear();
 
         List<AbstractRadialItem> items = new ArrayList<>();
-        items.add(new ButtonBindingItem(ButtonBindings.JUMP));
-        items.add(new ButtonBindingItem(ButtonBindings.SCREENSHOT));
-        items.add(new ButtonBindingItem(ButtonBindings.FULLSCREEN));
-        items.add(new ButtonBindingItem(ButtonBindings.INVENTORY));
-        items.add(new ButtonBindingItem(ButtonBindings.ATTACK));
-        items.add(new ButtonBindingItem(ButtonBindings.TOGGLE_PERSPECTIVE));
-        items.add(new ButtonBindingItem(ButtonBindings.SNEAK));
-        items.add(new ButtonBindingItem(ButtonBindings.PLAYER_LIST));
+        this.bindings.forEach(binding -> items.add(new ButtonBindingItem(binding)));
         GatherRadialMenuItemsEvent event = new GatherRadialMenuItemsEvent();
         MinecraftForge.EVENT_BUS.post(event);
         items.addAll(event.getItems());
@@ -243,9 +309,9 @@ public class RadialMenuHandler
             if(i == items.size() - 1) matrixStack.translate(0, 10, 0);
 
             boolean left = item.angle >= 180F;
-            float x = (float) Math.cos(Math.toRadians(item.angle - 90F)) * 80F;
-            float y = (float) Math.sin(Math.toRadians(item.angle - 90F)) * 80F;
-            matrixStack.translate(x, y, 0);
+            float x = (float) Math.cos(Math.toRadians(item.angle - 90F)) * 70F;
+            float y = (float) Math.sin(Math.toRadians(item.angle - 90F)) * 70F;
+            matrixStack.translate((int) x, (int) y, 0);
 
             item.draw(matrixStack, mc, left, this.selected == item, animation);
 
@@ -364,7 +430,7 @@ public class RadialMenuHandler
         {
             float color = selected ? 1.0F : 0.1F;
 
-            matrixStack.translate(0, 100, 0);
+            matrixStack.translate(0, 90, 0);
 
             RenderSystem.disableTexture();
             RenderSystem.enableBlend();
@@ -410,7 +476,7 @@ public class RadialMenuHandler
         @Override
         public void onUseItem(RadialMenuHandler handler)
         {
-            handler.setVisibility(false);
+            Minecraft.getInstance().displayGuiScreen(new RadialMenuConfigureScreen(handler.getBindings()));
         }
 
         @Override
@@ -418,7 +484,7 @@ public class RadialMenuHandler
         {
             float color = selected ? 1.0F : 0.1F;
 
-            matrixStack.translate(0, -100, 0);
+            matrixStack.translate(0, -90, 0);
 
             RenderSystem.disableTexture();
             RenderSystem.enableBlend();
@@ -458,12 +524,12 @@ public class RadialMenuHandler
      */
     private static class ButtonBindingItem extends AbstractRadialItem
     {
-        public ButtonBinding binding;
+        public ButtonBindingData entry;
 
-        public ButtonBindingItem(ButtonBinding binding)
+        public ButtonBindingItem(ButtonBindingData entry)
         {
-            super(new TranslationTextComponent(binding.getDescription()).mergeStyle(TextFormatting.YELLOW), new TranslationTextComponent(binding.getCategory()));
-            this.binding = binding;
+            super(new TranslationTextComponent(entry.getBinding().getDescription()).mergeStyle(entry.getColor()), new TranslationTextComponent(entry.getBinding().getCategory()));
+            this.entry = entry;
         }
 
         @Override
@@ -471,8 +537,8 @@ public class RadialMenuHandler
         {
             radialMenu.setVisibility(false);
             radialMenu.clearAnimation();
-            this.binding.setActiveAndPressed();
-            Controllable.getInput().handleButtonInput(Controllable.getController(), this.binding.getButton(), true, true);
+            this.entry.getBinding().setActiveAndPressed();
+            Controllable.getInput().handleButtonInput(Controllable.getController(), this.entry.getBinding().getButton(), true, true);
         }
 
         @Override

@@ -8,6 +8,8 @@ import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.list.AbstractOptionList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponent;
@@ -22,14 +24,18 @@ import java.util.*;
  */
 public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entry>
 {
-    private ButtonBindingScreen screen;
+    private Screen parent;
     private Map<String, List<ButtonBinding>> categories = new LinkedHashMap<>();
 
-    public ButtonBindingList(ButtonBindingScreen screen, Minecraft mc, int widthIn, int heightIn, int topIn, int bottomIn, int itemHeightIn)
+    public ButtonBindingList(Screen parent, Minecraft mc, int widthIn, int heightIn, int topIn, int bottomIn, int itemHeightIn)
     {
         super(mc, widthIn, heightIn, topIn, bottomIn, itemHeightIn);
-        this.screen = screen;
+        this.parent = parent;
+        this.updateList(false);
+    }
 
+    public void updateList(boolean showUnbound)
+    {
         // Initialize map with categories to have a predictable order (map is linked)
         this.categories.put("key.categories.movement", new ArrayList<>());
         this.categories.put("key.categories.gameplay", new ArrayList<>());
@@ -42,6 +48,8 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         // Add all button bindings to the appropriate category or create a new one
         BindingRegistry.getInstance().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
         {
+            // Only show unbound bindings for select binding screen for radial menu
+            if(showUnbound && binding.getButton() != -1) return;
             List<ButtonBinding> list = this.categories.computeIfAbsent(binding.getCategory(), category -> new ArrayList<>());
             list.add(binding);
         });
@@ -61,8 +69,13 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        if(this.screen.isWaitingForButtonInput())
-            return true;
+        if(this.parent instanceof ButtonBindingScreen)
+        {
+            if(((ButtonBindingScreen) this.parent).isWaitingForButtonInput())
+            {
+                return true;
+            }
+        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -104,22 +117,49 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
     {
         private ButtonBinding binding;
         private TextComponent label;
-        private ButtonBindingButton bindingButton;
-        private ImageButton deleteButton;
+        private Button bindingButton;
+        private Button deleteButton;
 
         protected BindingEntry(ButtonBinding binding)
         {
             this.binding = binding;
             this.label = new TranslationTextComponent(binding.getDescription());
-            this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> {
-                ButtonBindingList.this.screen.setSelectedBinding(this.binding);
-            });
-            this.deleteButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button -> {
-                binding.reset();
-                BindingRegistry registry = BindingRegistry.getInstance();
-                registry.resetBindingHash();
-                registry.save();
-            });
+            if(ButtonBindingList.this.parent instanceof ButtonBindingScreen)
+            {
+                this.bindingButton = new ButtonBindingButton(0, 0, binding, button ->
+                {
+                    if(ButtonBindingList.this.parent instanceof ButtonBindingScreen)
+                    {
+                        ((ButtonBindingScreen) ButtonBindingList.this.parent).setSelectedBinding(this.binding);
+                    }
+                });
+                this.deleteButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button ->
+                {
+                    binding.reset();
+                    BindingRegistry registry = BindingRegistry.getInstance();
+                    registry.resetBindingHash();
+                    registry.save();
+                });
+            }
+            else if(ButtonBindingList.this.parent instanceof SelectButtonBindingScreen)
+            {
+                SelectButtonBindingScreen screen = (SelectButtonBindingScreen) ButtonBindingList.this.parent;
+                List<ButtonBindingData> bindings = screen.getRadialConfigureScreen().getBindings();
+                this.bindingButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button ->
+                {
+                    bindings.add(new ButtonBindingData(this.binding, TextFormatting.YELLOW));
+                    this.bindingButton.active = false;
+                    this.deleteButton.active = true;
+                });
+                this.deleteButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 98, 15, 10, 10, button ->
+                {
+                    bindings.removeIf(entry -> entry.getBinding() == this.binding);
+                    this.bindingButton.active = true;
+                    this.deleteButton.active = false;
+                });
+                this.bindingButton.active = bindings.stream().noneMatch(entry -> entry.getBinding() == this.binding);
+                this.deleteButton.active = bindings.stream().anyMatch(entry -> entry.getBinding() == this.binding);
+            }
         }
 
         @Override
@@ -136,21 +176,27 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
             ButtonBindingList.this.minecraft.fontRenderer.func_243246_a(matrixStack, this.label, left - 15, y + 6, color);
             this.bindingButton.x = left + width - 45;
             this.bindingButton.y = y;
-            this.bindingButton.render(matrixStack, mouseX,mouseY, partialTicks);
+            this.bindingButton.render(matrixStack, mouseX, mouseY, partialTicks);
             this.deleteButton.x = left + width - 20;
             this.deleteButton.y = y;
-            this.deleteButton.active = !this.binding.isDefault();
+            if(ButtonBindingList.this.parent instanceof ButtonBindingScreen)
+            {
+                this.deleteButton.active = !this.binding.isDefault();
+            }
             this.deleteButton.render(matrixStack, mouseX, mouseY, partialTicks);
         }
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button)
         {
-            if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.bindingButton.isHovered())
+            if(ButtonBindingList.this.parent instanceof ButtonBindingScreen)
             {
-                this.binding.setButton(-1);
-                this.bindingButton.playDownSound(Minecraft.getInstance().getSoundHandler());
-                return true;
+                if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.bindingButton.isHovered())
+                {
+                    this.binding.setButton(-1);
+                    this.bindingButton.playDownSound(Minecraft.getInstance().getSoundHandler());
+                    return true;
+                }
             }
             return super.mouseClicked(mouseX, mouseY, button);
         }
