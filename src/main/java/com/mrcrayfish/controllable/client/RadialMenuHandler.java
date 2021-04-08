@@ -500,6 +500,8 @@ public class RadialMenuHandler
         @Override
         public void onUseItem(RadialMenuHandler handler)
         {
+            handler.setVisibility(false);
+            handler.clearAnimation();
             Minecraft.getInstance().displayGuiScreen(new RadialMenuConfigureScreen(handler.getBindings()));
         }
 
