@@ -32,7 +32,7 @@ public class RadialMenuConfigureScreen extends Screen
     @Override
     protected void init()
     {
-        this.list = new RadialItemList(this.minecraft, this.width, this.height, 40, this.height - 44, this.bindings);
+        this.list = new RadialItemList(this.minecraft, this.width, this.height, 45, this.height - 44, this.bindings);
         this.children.add(this.list);
         this.saveButton = this.addButton(new Button(this.width / 2 - 155, this.height - 29, 100, 20, DialogTexts.GUI_DONE, buttons -> {
             RadialMenuHandler.instance().setBindings(new LinkedHashSet<>(this.bindings));
