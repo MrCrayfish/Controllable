@@ -2,7 +2,9 @@ package com.mrcrayfish.controllable.client;
 
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
@@ -17,6 +19,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
@@ -79,11 +82,18 @@ public class RadialMenuHandler
                 JsonArray bindings = new Gson().fromJson(reader, JsonArray.class);
                 bindings.forEach(element ->
                 {
-                    String key = element.getAsString();
+                    JsonObject object = element.getAsJsonObject();
+                    String key = JSONUtils.getString(object, "key");
+                    String colorName = JSONUtils.getString(object, "color");
                     ButtonBinding binding = BindingRegistry.getInstance().getBindingByDescriptionKey(key);
                     if(binding != null)
                     {
-                        this.bindings.add(new ButtonBindingData(binding, TextFormatting.YELLOW));
+                        TextFormatting color = TextFormatting.getValueByName(colorName);
+                        if(color == null || color.getColor() == null)
+                        {
+                            color = TextFormatting.YELLOW;
+                        }
+                        this.bindings.add(new ButtonBindingData(binding, color));
                     }
                 });
             }
@@ -94,7 +104,12 @@ public class RadialMenuHandler
         }
         else
         {
-            //TODO load defaults
+            this.bindings.add(new ButtonBindingData(ButtonBindings.ADVANCEMENTS, TextFormatting.YELLOW));
+            this.bindings.add(new ButtonBindingData(ButtonBindings.DEBUG_INFO, TextFormatting.YELLOW));
+            this.bindings.add(new ButtonBindingData(ButtonBindings.SCREENSHOT, TextFormatting.YELLOW));
+            this.bindings.add(new ButtonBindingData(ButtonBindings.FULLSCREEN, TextFormatting.YELLOW));
+            this.bindings.add(new ButtonBindingData(ButtonBindings.CINEMATIC_CAMERA, TextFormatting.YELLOW));
+            this.bindings.add(new ButtonBindingData(ButtonBindings.HIGHLIGHT_PLAYERS, TextFormatting.YELLOW));
             this.save();
         }
 
@@ -104,11 +119,14 @@ public class RadialMenuHandler
     private void save()
     {
         JsonArray array = new JsonArray();
-        this.bindings.forEach(binding -> {
-            array.add(binding.getBinding().getDescription());
+        this.bindings.forEach(data -> {
+            JsonObject object = new JsonObject();
+            object.addProperty("key", data.getBinding().getDescription());
+            object.addProperty("color", data.getColor().name());
+            array.add(object);
         });
 
-        String json = new Gson().toJson(array);
+        String json = new GsonBuilder().setPrettyPrinting().create().toJson(array);
         File file = new File(Controllable.getConfigFolder(), "controllable/radial_menu_items.json");
         try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file))))
         {
@@ -414,6 +432,8 @@ public class RadialMenuHandler
      */
     public static final class CloseRadialMenuItem extends AbstractRadialItem
     {
+        private static final ITextComponent LABEL = new TranslationTextComponent("controllable.gui.close");
+
         public CloseRadialMenuItem()
         {
             super(new TranslationTextComponent("controllable.gui.radial.close"));
@@ -458,7 +478,7 @@ public class RadialMenuHandler
 
             if(selected)
             {
-                AbstractGui.drawCenteredString(matrixStack, mc.fontRenderer, "Close", 0, -30, 0xFFFFFF);
+                AbstractGui.drawCenteredString(matrixStack, mc.fontRenderer, LABEL, 0, -30, 0xFFFFFF);
             }
         }
     }
@@ -468,6 +488,8 @@ public class RadialMenuHandler
      */
     public static final class RadialSettingsItem extends AbstractRadialItem
     {
+        private static final ITextComponent LABEL = new TranslationTextComponent("controllable.gui.configure");
+
         public RadialSettingsItem()
         {
             super(new TranslationTextComponent("controllable.gui.radial.settings"));
@@ -512,7 +534,7 @@ public class RadialMenuHandler
 
             if(selected)
             {
-                AbstractGui.drawCenteredString(matrixStack, mc.fontRenderer, "Configure", 0, 21, 0xFFFFFF);
+                AbstractGui.drawCenteredString(matrixStack, mc.fontRenderer, LABEL, 0, 21, 0xFFFFFF);
             }
         }
     }

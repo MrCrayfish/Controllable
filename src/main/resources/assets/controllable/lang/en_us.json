@@ -36,6 +36,8 @@
     "controllable.gui.back": "Back",
     "controllable.gui.save": "Save",
     "controllable.gui.reset": "Reset",
+    "controllable.gui.configure": "Configure",
+    "controllable.gui.close": "Close",
     "controllable.gui.layout": "Layout",
     "controllable.gui.resetBinds": "Reset Binds",
     "controllable.gui.add_binding": "Modify Bindings",
