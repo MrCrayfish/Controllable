@@ -89,7 +89,7 @@ public class RenderEvents
             {
                 if(RadialMenuHandler.instance().isVisible())
                 {
-                    if(RadialMenuHandler.instance().getSelectedRadialIndex() != -1)
+                    if(RadialMenuHandler.instance().getSelected() != null)
                     {
                         actionMap.put(ButtonBindings.RADIAL_MENU, new Action(I18n.format("controllable.action.radial.perform_action"), Action.Side.RIGHT));
                     }
