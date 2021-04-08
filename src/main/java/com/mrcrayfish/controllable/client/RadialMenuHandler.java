@@ -153,7 +153,7 @@ public class RadialMenuHandler
             this.setVisibility(true);
             this.populateAndConstruct();
             Minecraft mc = Minecraft.getInstance();
-            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, this.visible ? 0.6F : 0.5F));
+            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.UI_LOOM_TAKE_RESULT, 1.5F));
         }
     }
 
@@ -443,6 +443,8 @@ public class RadialMenuHandler
         public void onUseItem(RadialMenuHandler handler)
         {
             handler.setVisibility(false);
+            Minecraft mc = Minecraft.getInstance();
+            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.UI_LOOM_TAKE_RESULT, 1.3F));
         }
 
         @Override
