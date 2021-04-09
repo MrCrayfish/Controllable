@@ -32,9 +32,8 @@ public class SelectButtonBindingScreen extends Screen
         this.bindingList = new ButtonBindingList(this, this.minecraft, this.width + 10, this.height, 45, this.height - 44, 20);
         this.children.add(this.bindingList);
         this.addButton(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslationTextComponent("controllable.gui.restoreDefaults"), (button) -> {
-            RadialMenuHandler.instance().resetDefaults();
             this.parentScreen.getBindings().clear();
-            this.parentScreen.getBindings().addAll(RadialMenuHandler.instance().getBindings());
+            this.parentScreen.getBindings().addAll(RadialMenuHandler.instance().getDefaults());
             this.bindingList.getEventListeners().stream().filter(entry -> entry instanceof ButtonBindingList.BindingEntry).map(entry -> (ButtonBindingList.BindingEntry) entry).forEach(ButtonBindingList.BindingEntry::updateButtons);
         }));
         this.addButton(new Button(this.width / 2 + 5, this.height - 29, 150, 20, DialogTexts.GUI_DONE, (button) -> {
