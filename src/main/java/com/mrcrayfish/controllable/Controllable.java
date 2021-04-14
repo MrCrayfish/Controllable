@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.client.gui.ButtonBindingScreen;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.resources.IResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -50,7 +51,6 @@ public class Controllable implements IControllerListener
     public Controllable()
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onLoadComplete);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.clientSpec);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.serverSpec);
         //Make sure the mod being absent on the other network side does not cause the client to display the server as incompatible
@@ -121,14 +121,6 @@ public class Controllable implements IControllerListener
         MinecraftForge.EVENT_BUS.register(RadialMenuHandler.instance());
 
         this.startControllerThread();
-    }
-
-    private void onLoadComplete(FMLLoadCompleteEvent event)
-    {
-        if(FMLLoader.getDist() != Dist.CLIENT)
-            return;
-
-        BindingRegistry.getInstance().load();
     }
 
     @Override

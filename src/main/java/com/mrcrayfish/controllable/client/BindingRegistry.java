@@ -5,6 +5,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.mrcrayfish.controllable.Controllable;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
@@ -12,6 +15,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Author: MrCrayfish
@@ -86,7 +91,7 @@ public class BindingRegistry
     @Nullable
     public ButtonBinding getBindingByDescriptionKey(String key)
     {
-        return this.registeredBindings.get(key);
+        return Stream.concat(this.registeredBindings.values().stream(), this.keyAdapters.values().stream()).filter(binding -> binding.getDescription().equals(key)).findFirst().orElse(null);
     }
 
     public List<ButtonBinding> getBindings()
@@ -99,6 +104,7 @@ public class BindingRegistry
         return this.keyAdapters;
     }
 
+    @Nullable
     public KeyAdapterBinding getKeyAdapterByDescriptionKey(String key)
     {
         return this.keyAdapters.get(key);
@@ -126,6 +132,7 @@ public class BindingRegistry
             {
                 this.idToButtonList.computeIfAbsent(binding.getButton(), i -> new ArrayList<>()).add(binding);
             }
+            this.save();
         }
     }
 
@@ -135,6 +142,7 @@ public class BindingRegistry
         {
             this.keyAdapters.remove(binding.getDescription());
             this.idToButtonList.remove(binding.getButton());
+            this.save();
         }
     }
 
@@ -148,12 +156,12 @@ public class BindingRegistry
 
     public void load()
     {
-        File file = new File(Controllable.getConfigFolder(), "controllable/bindings.properties");
-        try(BufferedReader reader = Files.newReader(file, Charsets.UTF_8))
+        // Load regular button bindings
+        try(BufferedReader reader = Files.newReader(new File(Controllable.getConfigFolder(), "controllable/bindings.properties"), Charsets.UTF_8))
         {
             Properties properties = new Properties();
             properties.load(reader);
-            this.bindings.stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
+            this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
             {
                 String name = properties.getProperty(binding.getDescription(), Buttons.getNameForButton(binding.getButton()));
                 if(name != null)
@@ -161,30 +169,75 @@ public class BindingRegistry
                     binding.setButton(Buttons.getButtonFromName(name));
                 }
             });
-            this.resetBindingHash();
         }
         catch(IOException e)
         {
             e.printStackTrace();
         }
+
+        // Load key adapters
+        try(BufferedReader reader = Files.newReader(new File(Controllable.getConfigFolder(), "controllable/key_adapters.properties"), Charsets.UTF_8))
+        {
+            Map<String, KeyBinding> bindings = Arrays.asList(Minecraft.getInstance().gameSettings.keyBindings).stream().collect(Collectors.toMap(KeyBinding::getKeyDescription, v -> v));
+            Properties properties = new Properties();
+            properties.load(reader);
+            properties.forEach((key, value) ->
+            {
+                KeyBinding binding = bindings.get(key.toString());
+                if(binding != null)
+                {
+                    int button = Buttons.getButtonFromName(StringUtils.defaultIfEmpty(value.toString(), ""));
+                    KeyAdapterBinding keyAdapter = new KeyAdapterBinding(button, binding);
+                    if(this.keyAdapters.putIfAbsent(keyAdapter.getDescription(), keyAdapter) == null)
+                    {
+                        this.bindings.add(keyAdapter);
+                        if(keyAdapter.getButton() != -1)
+                        {
+                            this.idToButtonList.computeIfAbsent(keyAdapter.getButton(), i -> new ArrayList<>()).add(keyAdapter);
+                        }
+                    }
+                }
+            });
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        this.resetBindingHash();
     }
 
     public void save()
     {
-        Properties properties = new Properties();
-        this.bindings.stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
+        try
         {
-            String name = Buttons.getNameForButton(binding.getButton());
-            if(name != null)
+            Properties properties = new Properties();
+            this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
             {
-                properties.put(binding.getDescription(), name);
-            }
-        });
+                String name = Buttons.getNameForButton(binding.getButton());
+                if(name != null)
+                {
+                    properties.put(binding.getDescription(), name);
+                }
+            });
+            File file = new File(Controllable.getConfigFolder(), "controllable/bindings.properties");
+            properties.store(new FileOutputStream(file), "Button Bindings");
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
 
         try
         {
-            File file = new File(Controllable.getConfigFolder(), "controllable/bindings.properties");
-            properties.store(new FileOutputStream(file), "Button Bindings");
+            Properties properties = new Properties();
+            this.keyAdapters.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
+            {
+                String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
+                properties.put(binding.getKeyBinding().getKeyDescription(), name);
+            });
+            File file = new File(Controllable.getConfigFolder(), "controllable/key_adapters.properties");
+            properties.store(new FileOutputStream(file), "Key Adapters");
         }
         catch(IOException e)
         {

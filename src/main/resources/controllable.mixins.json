@@ -6,6 +6,7 @@
     "minVersion": "0.8",
     "refmap": "controllable.refmap.json",
     "client": [
+        "client.ClientModLoaderMixin",
         "client.ContainerScreenMixin",
         "client.CreativeScreenMixin",
         "client.ForgeIngameGuiMixin",
