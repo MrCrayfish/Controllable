@@ -1,7 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Controllable;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 

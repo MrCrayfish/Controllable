@@ -3,13 +3,10 @@ package com.mrcrayfish.controllable.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A special binding that translates button presses to key presses. This binding does not need to be
