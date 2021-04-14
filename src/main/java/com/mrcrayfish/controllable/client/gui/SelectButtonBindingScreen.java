@@ -17,7 +17,7 @@ public class SelectButtonBindingScreen extends Screen
 
     public SelectButtonBindingScreen(RadialMenuConfigureScreen parentScreen)
     {
-        super(new TranslationTextComponent("controllable.gui.title.select_bindings"));
+        super(new TranslationTextComponent("controllable.gui.title.select_button_bindings"));
         this.parentScreen = parentScreen;
     }
 

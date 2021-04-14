@@ -193,10 +193,10 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         {
             int color = this.binding.isConflictingContext() ? TextFormatting.RED.getColor() : TextFormatting.GRAY.getColor();
             ButtonBindingList.this.minecraft.fontRenderer.func_243246_a(matrixStack, this.label, left - 15, y + 6, color);
-            this.bindingButton.x = left + width - 45;
+            this.bindingButton.x = left + width - 38;
             this.bindingButton.y = y;
             this.bindingButton.render(matrixStack, mouseX, mouseY, partialTicks);
-            this.deleteButton.x = left + width - 20;
+            this.deleteButton.x = left + width - 15;
             this.deleteButton.y = y;
             if(ButtonBindingList.this.parent instanceof ButtonBindingScreen)
             {

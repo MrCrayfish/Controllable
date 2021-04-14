@@ -4,11 +4,16 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
+import com.mrcrayfish.controllable.client.KeyAdapterBinding;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Author: MrCrayfish
@@ -42,7 +47,7 @@ public class ButtonBindingScreen extends Screen
         this.bindingList = new ButtonBindingList(this, this.minecraft, this.width + 10, this.height, 45, this.height - 44, 20);
         this.children.add(this.bindingList);
 
-        this.buttonReset = this.addButton(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslationTextComponent("controllable.gui.resetBinds"), (button) -> {
+        this.buttonReset = this.addButton(new Button(this.width / 2 - 155, this.height - 29, 100, 20, new TranslationTextComponent("controllable.gui.resetBinds"), (button) -> {
             BindingRegistry registry = BindingRegistry.getInstance();
             registry.getBindings().forEach(ButtonBinding::reset);
             registry.resetBindingHash();
@@ -50,8 +55,12 @@ public class ButtonBindingScreen extends Screen
         }));
         this.buttonReset.active = BindingRegistry.getInstance().getBindings().stream().noneMatch(ButtonBinding::isDefault);
 
-        this.addButton(new Button(this.width / 2 - 155 + 160, this.height - 29, 150, 20, DialogTexts.GUI_DONE, (button) -> {
-            this.minecraft.displayGuiScreen(this.parentScreen);
+        this.addButton(new Button(this.width / 2 - 50, this.height - 29, 100, 20, new TranslationTextComponent("controllable.gui.add_key_bind"), button -> {
+            Objects.requireNonNull(this.minecraft).displayGuiScreen(new SelectKeyBindingScreen(this));
+        }));
+
+        this.addButton(new Button(this.width / 2 + 55, this.height - 29, 100, 20, DialogTexts.GUI_DONE, (button) -> {
+            Objects.requireNonNull(this.minecraft).displayGuiScreen(this.parentScreen);
             BindingRegistry registry = BindingRegistry.getInstance();
             registry.resetBindingHash();
             registry.save();

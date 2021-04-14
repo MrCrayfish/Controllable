@@ -99,6 +99,11 @@ public class BindingRegistry
         return this.keyAdapters;
     }
 
+    public KeyAdapterBinding getKeyAdapterByDescriptionKey(String key)
+    {
+        return this.keyAdapters.get(key);
+    }
+
     public void register(ButtonBinding binding)
     {
         Preconditions.checkArgument(!(binding instanceof KeyAdapterBinding), "A key adapter binding can not be registered");

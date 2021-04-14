@@ -181,6 +181,15 @@ public class RadialMenuHandler
         this.populateAndConstruct();
     }
 
+    public void removeBinding(ButtonBinding binding)
+    {
+        if(this.bindings.removeIf(data -> data.getBinding() == binding))
+        {
+            this.save();
+            this.populateAndConstruct();
+        }
+    }
+
     public void setVisibility(boolean visible)
     {
         this.visible = visible;
