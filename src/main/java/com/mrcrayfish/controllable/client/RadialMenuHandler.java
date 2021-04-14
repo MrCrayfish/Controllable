@@ -303,7 +303,7 @@ public class RadialMenuHandler
         MatrixStack matrixStack = new MatrixStack();
         Minecraft mc = Minecraft.getInstance();
         matrixStack.translate(0, -10, 0);
-        matrixStack.translate(mc.getMainWindow().getScaledWidth() / 2F, mc.getMainWindow().getScaledHeight() / 2F, 0);
+        matrixStack.translate((int) (mc.getMainWindow().getScaledWidth() / 2F), (int) (mc.getMainWindow().getScaledHeight() / 2F), 0);
 
         float animation = MathHelper.lerp(partialTicks, this.prevAnimateTicks, this.animateTicks) / 5F;
         float c1 = 1.70158F;
@@ -582,7 +582,7 @@ public class RadialMenuHandler
             float color = selected ? 1.0F : 0.1F;
             float end = (left ? -150F : 150F) * animation;
 
-            matrixStack.translate((1.0F - animation) * (left ? -20F : 20F), 0, 0);
+            matrixStack.translate((1.0F - animation) * (left ? -20 : 20), 0, 0);
 
             RenderSystem.disableTexture();
             RenderSystem.enableBlend();
