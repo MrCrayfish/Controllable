@@ -73,7 +73,7 @@ public class RadialItemList extends ExtendedList<RadialItemList.ButtonBindingEnt
         public ButtonBindingEntry(ButtonBindingData data)
         {
             this.data = data;
-            this.label = new TranslationTextComponent(data.getBinding().getDescription()).mergeStyle(data.getColor());
+            this.label = new TranslationTextComponent(data.getBinding().getLabelKey()).mergeStyle(data.getColor());
             this.description = new TranslationTextComponent(data.getBinding().getCategory());
             this.colorButton = new ColorButton(0, 0, button -> {
                 data.setColor(this.colorButton.getColor());

@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.mrcrayfish.controllable.Controllable;
@@ -66,6 +67,7 @@ public class BindingRegistry
 
     private List<ButtonBinding> bindings = new ArrayList<>();
     private Map<String, ButtonBinding> registeredBindings = new HashMap<>();
+    private Map<String, KeyAdapterBinding> keyAdapters = new HashMap<>();
     private Map<Integer, List<ButtonBinding>> idToButtonList = new HashMap<>();
 
     private BindingRegistry() {}
@@ -92,12 +94,42 @@ public class BindingRegistry
         return ImmutableList.copyOf(this.bindings);
     }
 
+    public Map<String, KeyAdapterBinding> getKeyAdapters()
+    {
+        return this.keyAdapters;
+    }
+
     public void register(ButtonBinding binding)
     {
+        Preconditions.checkArgument(!(binding instanceof KeyAdapterBinding), "A key adapter binding can not be registered");
         if(this.registeredBindings.putIfAbsent(binding.getDescription(), binding) == null)
         {
             this.bindings.add(binding);
-            this.idToButtonList.computeIfAbsent(binding.getButton(), i -> new ArrayList<>()).add(binding);
+            if(binding.getButton() != -1)
+            {
+                this.idToButtonList.computeIfAbsent(binding.getButton(), i -> new ArrayList<>()).add(binding);
+            }
+        }
+    }
+
+    public void addKeyAdapter(KeyAdapterBinding binding)
+    {
+        if(this.keyAdapters.putIfAbsent(binding.getDescription(), binding) == null)
+        {
+            this.bindings.add(binding);
+            if(binding.getButton() != -1)
+            {
+                this.idToButtonList.computeIfAbsent(binding.getButton(), i -> new ArrayList<>()).add(binding);
+            }
+        }
+    }
+
+    public void removeKeyAdapter(KeyAdapterBinding binding)
+    {
+        if(this.bindings.remove(binding))
+        {
+            this.keyAdapters.remove(binding.getDescription());
+            this.idToButtonList.remove(binding.getButton());
         }
     }
 

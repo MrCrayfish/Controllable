@@ -42,6 +42,7 @@
     "controllable.gui.resetBinds": "Reset Binds",
     "controllable.gui.restoreDefaults": "Restore Defaults",
     "controllable.gui.add_binding": "Modify Bindings",
+    "controllable.gui.addKeyBinding": "Add Custom",
     "controllable.gui.controller_only": "This server has enabled controller only",
     "controllable.gui.plug_in_controller": "Please plug in a controller to continue...",
     "controllable.gui.layout.press_button": "Listening for button input. Press ESC to cancel",
@@ -134,5 +135,6 @@
     "controllable.key.moveUp": "Navigate Up",
     "controllable.key.debugInfo": "Show Debug Info",
     "controllable.key.radial_menu": "Open / Use Radial Menu",
-    "controllable.tooltip.craft": "Click to Craft Item"
+    "controllable.tooltip.craft": "Click to Craft Item",
+    "key.categories.controllable_custom": "Custom"
 }

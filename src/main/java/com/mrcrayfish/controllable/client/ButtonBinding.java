@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Controllable;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 
@@ -46,6 +47,11 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         this.button = button;
     }
 
+    public String getLabelKey()
+    {
+        return this.descriptionKey;
+    }
+
     public String getDescription()
     {
         return this.descriptionKey;
@@ -59,6 +65,11 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     public boolean isDefault()
     {
         return this.button == this.defaultButton;
+    }
+
+    protected void setPressed(boolean pressed)
+    {
+        this.pressed = pressed;
     }
 
     public boolean isButtonPressed()
@@ -81,6 +92,8 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         this.button = this.defaultButton;
     }
 
+    protected void onPressTick() {};
+
     public static void tick()
     {
         for(ButtonBinding binding : BindingRegistry.getInstance().getRegisteredBindings())
@@ -91,8 +104,9 @@ public class ButtonBinding implements Comparable<ButtonBinding>
             }
             if(binding.active && !ButtonBindings.RADIAL_MENU.isButtonDown())
             {
-                Controllable.getInput().handleButtonInput(Controllable.getController(), binding.getButton(), false, true);
+                Controllable.getInput().handleButtonInput(Controllable.getController(), -1, false, true);
                 binding.active = false;
+                binding.setPressed(false);
             }
         }
     }
@@ -102,7 +116,7 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         List<ButtonBinding> bindings = BindingRegistry.getInstance().getBindingListForButton(button);
         for(ButtonBinding binding : bindings)
         {
-            binding.pressed = state;
+            binding.setPressed(state);
             if(state)
             {
                 binding.pressedTime = 0;
@@ -181,7 +195,7 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     void setActiveAndPressed()
     {
         this.active = true;
-        this.pressed = true;
+        this.setPressed(true);
         this.pressedTime = 0;
     }
 }

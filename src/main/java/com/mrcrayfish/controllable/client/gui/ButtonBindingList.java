@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
+import com.mrcrayfish.controllable.client.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import net.minecraft.client.Minecraft;
@@ -44,6 +45,7 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         this.categories.put("key.categories.multiplayer", new ArrayList<>());
         this.categories.put("key.categories.ui", new ArrayList<>());
         this.categories.put("key.categories.misc", new ArrayList<>());
+        this.categories.put("key.categories.controllable_custom", new ArrayList<>());
 
         // Add all button bindings to the appropriate category or create a new one
         BindingRegistry.getInstance().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
@@ -119,11 +121,12 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         private TextComponent label;
         private Button bindingButton;
         private Button deleteButton;
+        private Button removeButton;
 
         protected BindingEntry(ButtonBinding binding)
         {
             this.binding = binding;
-            this.label = new TranslationTextComponent(binding.getDescription());
+            this.label = new TranslationTextComponent(binding.getLabelKey());
             if(ButtonBindingList.this.parent instanceof ButtonBindingScreen)
             {
                 this.bindingButton = new ButtonBindingButton(0, 0, binding, button ->
@@ -140,6 +143,11 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
                     registry.resetBindingHash();
                     registry.save();
                 });
+                this.removeButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 0, 0, 16, 16, button -> {
+                    if(binding instanceof KeyAdapterBinding) BindingRegistry.getInstance().removeKeyAdapter((KeyAdapterBinding) binding);
+                    ButtonBindingList.this.removeEntry(this);
+                });
+                this.removeButton.visible = binding instanceof KeyAdapterBinding;
             }
             else if(ButtonBindingList.this.parent instanceof SelectButtonBindingScreen)
             {

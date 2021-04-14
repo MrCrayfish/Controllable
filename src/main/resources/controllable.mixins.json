@@ -11,6 +11,7 @@
         "client.ForgeIngameGuiMixin",
         "client.GameRendererMixin",
         "client.OptifineGameRendererMixin",
+        "client.KeyBindingMixin",
         "client.IngameGuiMixin",
         "client.MinecraftMixin",
         "client.MouseHelperMixin",

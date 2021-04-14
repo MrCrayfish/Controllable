@@ -561,7 +561,7 @@ public class RadialMenuHandler
 
         public ButtonBindingItem(ButtonBindingData entry)
         {
-            super(new TranslationTextComponent(entry.getBinding().getDescription()).mergeStyle(entry.getColor()), new TranslationTextComponent(entry.getBinding().getCategory()));
+            super(new TranslationTextComponent(entry.getBinding().getLabelKey()).mergeStyle(entry.getColor()), new TranslationTextComponent(entry.getBinding().getCategory()));
             this.entry = entry;
         }
 
@@ -571,7 +571,7 @@ public class RadialMenuHandler
             radialMenu.setVisibility(false);
             radialMenu.clearAnimation();
             this.entry.getBinding().setActiveAndPressed();
-            Controllable.getInput().handleButtonInput(Controllable.getController(), this.entry.getBinding().getButton(), true, true);
+            Controllable.getInput().handleButtonInput(Controllable.getController(), -1, true, true);
         }
 
         @Override
