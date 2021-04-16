@@ -42,7 +42,7 @@ public final class ControllerEntry extends ExtendedList.AbstractListEntry<Contro
         {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation("textures/gui/container/beacon.png"));
-            Screen.blit(matrixStack, left + 2, top + 2, 91, 224, 14, 12, 256, 256); //TODO test
+            Screen.blit(matrixStack, left + 2, top + 2, 91, 224, 14, 12, 256, 256);
         }
     }
 

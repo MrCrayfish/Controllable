@@ -32,7 +32,7 @@ public class ControllerToast implements IToast
         toastGui.getMinecraft().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
         toastGui.blit(matrixStack, 8, 8, 20, 43, 20, 16);
 
-        String title = toastGui.getMinecraft().fontRenderer.func_238412_a_(this.controllerName, 120); //TODO test
+        String title = toastGui.getMinecraft().fontRenderer.func_238412_a_(this.controllerName, 120);
         toastGui.getMinecraft().fontRenderer.drawString(matrixStack, TextFormatting.DARK_GRAY + title, 35, 7, 0);
 
         String message = this.connected ?
