@@ -2,7 +2,6 @@ package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mrcrayfish.controllable.client.BindingRegistry;
-import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import net.minecraft.client.gui.DialogTexts;

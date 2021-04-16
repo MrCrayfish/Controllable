@@ -9,7 +9,6 @@ import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.list.AbstractOptionList;
 import net.minecraft.client.settings.KeyBinding;
