@@ -178,7 +178,7 @@ public class BindingRegistry
         // Load key adapters
         try(BufferedReader reader = Files.newReader(new File(Controllable.getConfigFolder(), "controllable/key_adapters.properties"), Charsets.UTF_8))
         {
-            Map<String, KeyBinding> bindings = Arrays.asList(Minecraft.getInstance().gameSettings.keyBindings).stream().collect(Collectors.toMap(KeyBinding::getKeyDescription, v -> v));
+            Map<String, KeyBinding> bindings = Arrays.stream(Minecraft.getInstance().gameSettings.keyBindings).collect(Collectors.toMap(KeyBinding::getKeyDescription, v -> v));
             Properties properties = new Properties();
             properties.load(reader);
             properties.forEach((key, value) ->
