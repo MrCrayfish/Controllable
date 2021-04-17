@@ -250,7 +250,7 @@ public class RenderEvents
             this.renderHints();
             this.renderMiniPlayer();
         }
-        else if(mc.currentScreen == null)
+        else if(mc.currentScreen == null && Config.SERVER.restrictToController.get())
         {
             RenderSystem.disableDepthTest();
             int width = mc.getMainWindow().getScaledWidth();
