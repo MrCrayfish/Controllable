@@ -8,8 +8,14 @@ import net.minecraft.util.IStringSerializable;
 public enum ControllerIcons implements IStringSerializable
 {
     DEFAULT("default"),
-    PLAYSTATION("playstation"),
-    XBOX("xbox");
+    PLAYSTATION_4("playstation_4"),
+    PLAYSTATION_3("playstation_3"),
+    XBOX_ONE("xbox_one"),
+    XBOX_360("xbox_360"),
+    SWITCH_JOYCONS("switch_joycons"),
+    SWITCH_CONTROLLER("switch_controller"),
+    GAMECUBE("gamecube"),
+    STEAM("steam");
 
     String name;
 
