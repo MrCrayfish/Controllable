@@ -7,6 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
@@ -380,7 +381,11 @@ public class RadialMenuHandler
 
         this.selected = closest.get();
         Minecraft mc = Minecraft.getInstance();
-        mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 1.5F));
+
+        if(Config.CLIENT.options.uiSounds.get())
+        {
+            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 1.5F));
+        }
     }
 
     private Optional<AbstractRadialItem> getSelectedItem()

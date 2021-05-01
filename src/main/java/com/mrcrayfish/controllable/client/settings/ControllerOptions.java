@@ -126,4 +126,11 @@ public class ControllerOptions
         Config.CLIENT.options.quickCraft.set(value);
         Config.save();
     });
+
+    public static final BooleanOption UI_SOUNDS = new ControllableBooleanOption("controllable.options.uiSounds", gameSettings -> {
+        return Config.CLIENT.options.uiSounds.get();
+    }, (gameSettings, value) -> {
+        Config.CLIENT.options.uiSounds.set(value);
+        Config.save();
+    });
 }

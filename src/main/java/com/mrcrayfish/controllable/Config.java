@@ -48,6 +48,7 @@ public class Config
             public final ForgeConfigSpec.DoubleValue mouseSpeed;
             public final ForgeConfigSpec.EnumValue<ActionVisibility> showActions;
             public final ForgeConfigSpec.BooleanValue quickCraft;
+            public final ForgeConfigSpec.BooleanValue uiSounds;
 
             public Options(ForgeConfigSpec.Builder builder)
             {
@@ -66,6 +67,7 @@ public class Config
                     this.mouseSpeed = builder.comment("The speed which the cursor or virtual mouse moves around the screen").defineInRange("mouseSpeed", 15.0, 0.0, 50.0);
                     this.showActions = builder.comment("If enabled, shows common actions when displaying available on the screen").defineEnum("showActions", ActionVisibility.MINIMAL);
                     this.quickCraft = builder.comment("If enabled, allows you to craft quickly when clicking an item in the recipe book").define("quickCraft", true);
+                    this.uiSounds = builder.comment("If enabled, plays a pop sound when you navigate in inventories, menus or scrolling the radial menu").translation("controllable.config.uiSounds").define("uiSounds", true);
                 }
                 builder.pop();
             }

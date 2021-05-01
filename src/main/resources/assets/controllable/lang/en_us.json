@@ -96,6 +96,8 @@
     "controllable.options.flipRightThumbstickY": "Flip Right Y-Axis",
     "controllable.options.quickCraft": "Quick Craft",
     "controllable.options.quickCraft.desc": "If enabled, allows you to craft quickly when clicking an item in the recipe book",
+    "controllable.options.uiSounds": "UI Sounds",
+    "controllable.options.uiSounds.desc": "If enabled, plays a pop sound when you navigate in inventories, menus or scrolling the radial menu",
     "controllable.controller.default": "Default",
     "controllable.controller.playstation_4": "Playstation 4",
     "controllable.controller.playstation_3": "Playstation 3",
@@ -145,5 +147,6 @@
     "controllable.key.debugInfo": "Show Debug Info",
     "controllable.key.radial_menu": "Open / Use Radial Menu",
     "controllable.tooltip.craft": "Click to Craft Item",
+    "controllable.config.uiSounds": "UI Sounds",
     "key.categories.controllable_custom": "Custom"
 }

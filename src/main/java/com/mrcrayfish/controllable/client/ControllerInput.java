@@ -963,7 +963,10 @@ public class ControllerInput
             this.targetMouseX = this.prevTargetMouseX = screenX;
             this.targetMouseY = this.prevTargetMouseY = screenY;
             this.setMousePosition(screenX, screenY);
-            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 2.0F));
+            if(Config.CLIENT.options.uiSounds.get())
+            {
+                mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 2.0F));
+            }
             this.performMouseDrag(this.targetMouseX, this.targetMouseY, screenX - lastTargetMouseX, screenY - lastTargetMouseY);
         }
     }
