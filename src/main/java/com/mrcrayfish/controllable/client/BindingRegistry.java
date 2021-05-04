@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
@@ -214,11 +215,8 @@ public class BindingRegistry
             Properties properties = new Properties();
             this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
             {
-                String name = Buttons.getNameForButton(binding.getButton());
-                if(name != null)
-                {
-                    properties.put(binding.getDescription(), name);
-                }
+                String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
+                properties.put(binding.getDescription(), name);
             });
             File file = new File(Controllable.getConfigFolder(), "controllable/bindings.properties");
             properties.store(new FileOutputStream(file), "Button Bindings");
