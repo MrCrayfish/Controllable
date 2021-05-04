@@ -72,7 +72,7 @@ public class RenderEvents
                         if(slot.getHasStack())
                         {
                             actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(I18n.format("controllable.action.pickup_stack"), Action.Side.LEFT));
-                            actionMap.put(ButtonBindings.SPLIT_STACK, new Action(I18n.format("controllable.action.pickup_item"), Action.Side.LEFT));
+                            actionMap.put(ButtonBindings.SPLIT_STACK, new Action(I18n.format("controllable.action.split_stack"), Action.Side.LEFT));
                             actionMap.put(ButtonBindings.QUICK_MOVE, new Action(I18n.format("controllable.action.quick_move"), Action.Side.LEFT));
                         }
                     }
@@ -81,6 +81,17 @@ public class RenderEvents
                 {
                     actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(I18n.format("controllable.action.place_stack"), Action.Side.LEFT));
                     actionMap.put(ButtonBindings.SPLIT_STACK, new Action(I18n.format("controllable.action.place_item"), Action.Side.LEFT));
+
+                    // You can still quick move items if holding one with cursor
+                    ContainerScreen container = (ContainerScreen) mc.currentScreen;
+                    if(container.getSlotUnderMouse() != null)
+                    {
+                        Slot slot = container.getSlotUnderMouse();
+                        if(slot.getHasStack())
+                        {
+                            actionMap.put(ButtonBindings.QUICK_MOVE, new Action(I18n.format("controllable.action.quick_move"), Action.Side.LEFT));
+                        }
+                    }
                 }
 
                 actionMap.put(ButtonBindings.INVENTORY, new Action(I18n.format("controllable.action.close_inventory"), Action.Side.RIGHT));

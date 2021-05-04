@@ -16,7 +16,7 @@
     "controllable.action.sneak": "Sneak",
     "controllable.action.drop_item": "Drop Item",
     "controllable.action.pickup_stack": "Pickup Stack",
-    "controllable.action.pickup_item": "Pickup Item",
+    "controllable.action.split_stack": "Split Stack",
     "controllable.action.quick_move": "Quick Move",
     "controllable.action.place_stack": "Place Stack",
     "controllable.action.place_item": "Place Item",
