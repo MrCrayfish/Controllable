@@ -77,6 +77,7 @@ public class ControllerInput
     private boolean nearSlot = false;
     private boolean moving = false;
     private boolean preventReset;
+    private boolean ignoreInput;
     private double virtualMouseX;
     private double virtualMouseY;
     private int prevTargetMouseX;
@@ -587,7 +588,12 @@ public class ControllerInput
                 }
             }
 
-            if(ButtonBindings.JUMP.isButtonDown())
+            if(this.ignoreInput && !ButtonBindings.JUMP.isButtonDown())
+            {
+                this.ignoreInput = false;
+            }
+
+            if(ButtonBindings.JUMP.isButtonDown() && !this.ignoreInput)
             {
                 event.getMovementInput().jump = true;
             }
@@ -815,6 +821,11 @@ public class ControllerInput
                 else if(button == ButtonBindings.PICKUP_ITEM.getButton())
                 {
                     invokeMouseClick(mc.currentScreen, 0);
+
+                    if(mc.currentScreen == null)
+                    {
+                        this.ignoreInput = true;
+                    }
 
                     if(Config.CLIENT.options.quickCraft.get())
                     {
