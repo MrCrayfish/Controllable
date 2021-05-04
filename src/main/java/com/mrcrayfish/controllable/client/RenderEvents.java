@@ -287,7 +287,11 @@ public class RenderEvents
             {
                 Action action = this.actions.get(button);
                 Action.Side side = action.getSide();
-
+                
+                if(mc.gameSettings.showSubtitles && mc.currentScreen == null)
+                {
+                    side = Action.Side.LEFT;
+                }
 /*
                 int remappedButton = button;
                 Controller controller = Controllable.getController();
