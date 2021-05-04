@@ -695,7 +695,7 @@ public class ControllerInput
                         mc.getConnection().sendPacket(new CPlayerDiggingPacket(CPlayerDiggingPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
                     }
                 }
-                else if(ButtonBindings.TOGGLE_PERSPECTIVE.isButtonPressed() && mc.mouseHelper.isMouseGrabbed())
+                else if(ButtonBindings.TOGGLE_PERSPECTIVE.isButtonPressed())
                 {
                     cycleThirdPersonView();
                 }
