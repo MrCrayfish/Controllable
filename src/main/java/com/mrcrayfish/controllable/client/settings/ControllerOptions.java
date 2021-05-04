@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.ActionVisibility;
 import com.mrcrayfish.controllable.client.ControllerIcons;
 import com.mrcrayfish.controllable.client.CursorType;
+import com.mrcrayfish.controllable.client.Thumbstick;
 import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.util.math.MathHelper;
@@ -132,5 +133,15 @@ public class ControllerOptions
     }, (gameSettings, value) -> {
         Config.CLIENT.options.uiSounds.set(value);
         Config.save();
+    });
+
+    public static final ControllableEnumOption<Thumbstick> RADIAL_THUMBSTICK = new ControllableEnumOption<>("controllable.options.radialThumbstick", Thumbstick.class, gameSettings -> {
+        return Config.CLIENT.options.radialThumbstick.get();
+    }, (gameSettings, value) -> {
+        Config.CLIENT.options.radialThumbstick.set(value);
+        Config.save();
+    }, (gameSettings, option) -> {
+        Thumbstick thumbstick = option.get(gameSettings);
+        return new TranslationTextComponent("controllable.options.radialThumbstick.format", new TranslationTextComponent(thumbstick.getKey()));
     });
 }

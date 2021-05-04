@@ -98,6 +98,9 @@
     "controllable.options.quickCraft.desc": "If enabled, allows you to craft quickly when clicking an item in the recipe book",
     "controllable.options.uiSounds": "UI Sounds",
     "controllable.options.uiSounds.desc": "If enabled, plays a pop sound when you navigate in inventories, menus or scrolling the radial menu",
+    "controllable.options.radialThumbstick": "Radial Thumbstick",
+    "controllable.options.radialThumbstick.format": "Radial Thumbstick: %s",
+    "controllable.options.radialThumbstick.desc": "The thumbstick to use when scrolling items in the radial menu",
     "controllable.controller.default": "Default",
     "controllable.controller.playstation_4": "Playstation 4",
     "controllable.controller.playstation_3": "Playstation 3",
@@ -113,6 +116,8 @@
     "controllable.actionVisibility.all": "All",
     "controllable.actionVisibility.minimal": "Minimal",
     "controllable.actionVisibility.none": "None",
+    "controllable.thumbstick.left": "Left",
+    "controllable.thumbstick.right": "Right",
     "controllable.toast.controller": "Controller",
     "controllable.toast.connected": "Connected",
     "controllable.toast.disconnected": "Disconnected",
@@ -148,5 +153,6 @@
     "controllable.key.radial_menu": "Open / Use Radial Menu",
     "controllable.tooltip.craft": "Click to Craft Item",
     "controllable.config.uiSounds": "UI Sounds",
+    "controllable.config.radialThumbstick": "Radial Thumbstick",
     "key.categories.controllable_custom": "Custom"
 }

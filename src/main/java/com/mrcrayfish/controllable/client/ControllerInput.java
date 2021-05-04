@@ -550,7 +550,7 @@ public class ControllerInput
 
         if(mc.currentScreen == null)
         {
-            if(!MinecraftForge.EVENT_BUS.post(new ControllerEvent.Move(controller)))
+            if((!RadialMenuHandler.instance().isVisible() || Config.CLIENT.options.radialThumbstick.get() != Thumbstick.LEFT) && !MinecraftForge.EVENT_BUS.post(new ControllerEvent.Move(controller)))
             {
                 float deadZone = Config.CLIENT.options.deadZone.get().floatValue();
 
