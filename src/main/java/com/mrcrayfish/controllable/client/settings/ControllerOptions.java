@@ -94,7 +94,7 @@ public class ControllerOptions
     public static final SliderPercentageOption ROTATION_SPEED = new ControllableSliderPercentageOption("controllable.options.rotationSpeed", 1.0, 50.0, 1.0F, gameSettings -> {
         return Config.CLIENT.options.rotationSpeed.get();
     }, (gameSettings, value) -> {
-        Config.CLIENT.options.rotationSpeed.set(MathHelper.clamp(value, 0.0, 50.0));
+        Config.CLIENT.options.rotationSpeed.set(MathHelper.clamp(value, 0.0, 100.0));
         Config.save();
     }, (gameSettings, option) -> {
         double rotationSpeed = Config.CLIENT.options.rotationSpeed.get();
