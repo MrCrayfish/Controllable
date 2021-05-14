@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable;
 
 import com.google.common.io.ByteStreams;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingScreen;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
@@ -83,16 +84,19 @@ public class Controllable implements IControllerListener
 
         ControllerProperties.load(configFolder);
 
-        try(InputStream is = Mappings.class.getResourceAsStream("/gamecontrollerdb.txt"))
+        RenderSystem.recordRenderCall(() ->
         {
-            byte[] bytes = ByteStreams.toByteArray(is);
-            ByteBuffer buffer = MemoryUtil.memASCIISafe(new String(bytes));
-            GLFW.glfwUpdateGamepadMappings(buffer);
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
+            try(InputStream is = Mappings.class.getResourceAsStream("/gamecontrollerdb.txt"))
+            {
+                byte[] bytes = ByteStreams.toByteArray(is);
+                ByteBuffer buffer = MemoryUtil.memASCIISafe(new String(bytes));
+                GLFW.glfwUpdateGamepadMappings(buffer);
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+        });
 
         /* Loads up the controller manager and adds a listener */
         Controllable.manager = new ControllerManager();
