@@ -51,6 +51,7 @@ public class Config
             public final ForgeConfigSpec.BooleanValue quickCraft;
             public final ForgeConfigSpec.BooleanValue uiSounds;
             public final ForgeConfigSpec.EnumValue<Thumbstick> radialThumbstick;
+            public final ForgeConfigSpec.BooleanValue alwaysShowHints;
 
             public Options(ForgeConfigSpec.Builder builder)
             {
@@ -71,6 +72,7 @@ public class Config
                     this.quickCraft = builder.comment("If enabled, allows you to craft quickly when clicking an item in the recipe book").define("quickCraft", true);
                     this.uiSounds = builder.comment("If enabled, plays a pop sound when you navigate in inventories, menus or scrolling the radial menu").translation("controllable.config.uiSounds").define("uiSounds", true);
                     this.radialThumbstick = builder.comment("The thumbstick to use when scrolling items in the radial menu").translation("controllable.config.radialThumbstick").defineEnum("radialThumbstick", Thumbstick.RIGHT);
+                    this.alwaysShowHints = builder.comment("If enabled, Button Hints will always be visible except when chat is open").define("alwaysShowHints", false);
                 }
                 builder.pop();
             }

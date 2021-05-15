@@ -101,6 +101,8 @@
     "controllable.options.radialThumbstick": "Radial Thumbstick",
     "controllable.options.radialThumbstick.format": "Radial Thumbstick: %s",
     "controllable.options.radialThumbstick.desc": "The thumbstick to use when scrolling items in the radial menu",
+    "controllable.options.alwaysShowHints": "Always Show Hints",
+    "controllable.options.alwaysShowHints.desc": "If enabled, Button Hints will always be visible except when chat is open",
     "controllable.controller.default": "Default",
     "controllable.controller.playstation_4": "Playstation 4",
     "controllable.controller.playstation_3": "Playstation 3",

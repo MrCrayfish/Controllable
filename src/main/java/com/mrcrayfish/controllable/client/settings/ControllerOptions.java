@@ -144,4 +144,11 @@ public class ControllerOptions
         Thumbstick thumbstick = option.get(gameSettings);
         return new TranslationTextComponent("controllable.options.radialThumbstick.format", new TranslationTextComponent(thumbstick.getKey()));
     });
+
+    public static final BooleanOption ALWAYS_SHOW_HINTS = new ControllableBooleanOption("controllable.options.alwaysShowHints", gameSettings -> {
+        return Config.CLIENT.options.alwaysShowHints.get();
+    }, (gameSettings, value) -> {
+        Config.CLIENT.options.alwaysShowHints.set(value);
+        Config.save();
+    });
 }
