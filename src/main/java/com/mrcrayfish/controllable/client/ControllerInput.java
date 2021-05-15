@@ -329,7 +329,7 @@ public class ControllerInput
             RenderSystem.pushMatrix();
             {
                 CursorType type = Config.CLIENT.options.cursorType.get();
-                Minecraft minecraft = event.getGui().getMinecraft();
+                Minecraft minecraft = Minecraft.getInstance();
                 if(minecraft.player == null || (minecraft.player.inventory.getItemStack().isEmpty() || type == CursorType.CONSOLE))
                 {
                     double mouseX = (this.prevTargetMouseX + (this.targetMouseX - this.prevTargetMouseX) * Minecraft.getInstance().getRenderPartialTicks());
