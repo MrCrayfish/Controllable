@@ -3,7 +3,7 @@ loaderVersion="[34,)"
 updateJSONURL="https://raw.githubusercontent.com/MrCrayfish/ModUpdates/master/controllable/update.json"
 issueTrackerURL="https://github.com/MrCrayfish/Controllable/issues"
 displayURL="https://mrcrayfish.com/mods?id=controllable"
-logoFile="controllable.png"
+logoFile="controllable_logo.png"
 authors="MrCrayfish"
 license="GNU General Public License 3.0"
 
@@ -12,8 +12,6 @@ modId="controllable"
 version="0.13.1"
 displayName="Controllable"
 description="Adds the ability to use a controller to play Minecraft"
-itemIcon="minecraft:piston"
-configBackground="minecraft:textures/block/cobblestone.png"
 
 [[dependencies.controllable]]
    modId="forge"
@@ -33,3 +31,19 @@ configBackground="minecraft:textures/block/cobblestone.png"
    versionRange="[7.6.0,)"
    ordering="NONE"
    side="CLIENT"
+[[dependencies.controllable]]
+   modId="configured"
+   mandatory=false
+   versionRange="[1.0.0,)"
+   ordering="NONE"
+   side="CLIENT"
+[[dependencies.controllable]]
+   modId="catalogue"
+   mandatory=false
+   versionRange="[1.2.0,)"
+   ordering="NONE"
+   side="CLIENT"
+
+[modproperties.controllable]
+   catalogueImageIcon="controllable_icon.png"
+   configuredBackground="minecraft:textures/block/cobblestone.png"
