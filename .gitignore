@@ -13,6 +13,9 @@ out
 *.iml
 .idea
 
+#VSCode
+*.code-workspace
+
 # gradle
 build
 .gradle
@@ -20,6 +23,7 @@ build
 # other
 eclipse
 run
+.vscode
 
 # Files from Forge MDK
 forge*changelog.txt
