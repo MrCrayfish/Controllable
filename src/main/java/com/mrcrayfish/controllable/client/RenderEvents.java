@@ -253,10 +253,10 @@ public class RenderEvents
 
         if(Controllable.getController() != null)
         {
-            if(Controllable.getInput().getLastUse() <= 0 && Config.CLIENT.options.alwaysShowHints.get()==false)
+            /*if(Controllable.getInput().getLastUse() <= 0 && Config.CLIENT.options.alwaysShowHints.get()==false)
             {
                 return;
-            }
+            }*/
 
             this.renderHints();
             this.renderMiniPlayer();

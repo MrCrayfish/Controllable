@@ -724,10 +724,10 @@ public class ControllerInput
                 {
                     mc.gameSettings.showDebugInfo = !mc.gameSettings.showDebugInfo;
                 }
-                else if(ButtonBindings.RADIAL_MENU.isButtonPressed() && !virtual)
+                /*else if(ButtonBindings.RADIAL_MENU.isButtonPressed() && !virtual)
                 {
                     RadialMenuHandler.instance().interact();
-                }
+                }*/
                 else if(mc.player != null && !mc.player.isHandActive())
                 {
                     if(ButtonBindings.ATTACK.isButtonPressed())
