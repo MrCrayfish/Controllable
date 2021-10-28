@@ -29,7 +29,7 @@ public class MouseUtilMixin
         if(isVirtualMouseActive(input))
         {
             Minecraft minecraft = Minecraft.getInstance();
-            double mouseX = input.getVirtualMouseX() * (double) minecraft.getMainWindow().getScaledWidth() / (double) minecraft.getMainWindow().getWidth();
+            double mouseX = input.getVirtualMouseX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getScreenWidth();
             cir.setReturnValue(mouseX);
         }
     }
@@ -41,7 +41,7 @@ public class MouseUtilMixin
         if(isVirtualMouseActive(input))
         {
             Minecraft minecraft = Minecraft.getInstance();
-            double mouseY = input.getVirtualMouseY() * (double) minecraft.getMainWindow().getScaledHeight() / (double) minecraft.getMainWindow().getHeight();
+            double mouseY = input.getVirtualMouseY() * (double) minecraft.getWindow().getGuiScaledHeight() / (double) minecraft.getWindow().getScreenHeight();
             cir.setReturnValue(mouseY);
         }
     }

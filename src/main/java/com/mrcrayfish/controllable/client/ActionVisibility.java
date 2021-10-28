@@ -1,31 +1,23 @@
 package com.mrcrayfish.controllable.client;
 
-import net.minecraft.util.IStringSerializable;
-
 /**
  * Author: MrCrayfish
  */
-public enum ActionVisibility implements IStringSerializable
+public enum ActionVisibility
 {
     ALL("all"),
     MINIMAL("minimal"),
     NONE("none");
 
-    String name;
+    private final String id;
 
-    ActionVisibility(String name)
+    ActionVisibility(String id)
     {
-        this.name = name;
+        this.id = id;
     }
 
-    public String getName()
+    public String getId()
     {
-        return this.name;
-    }
-
-    @Override
-    public String getString()
-    {
-        return this.name;
+        return this.id;
     }
 }

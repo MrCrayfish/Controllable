@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client.gui.navigation;
 
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.world.inventory.Slot;
 
 /**
  * Author: MrCrayfish

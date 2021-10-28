@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Controllable;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 
 import java.util.List;
@@ -137,7 +137,7 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     @Override
     public int compareTo(ButtonBinding o)
     {
-        return I18n.format(this.descriptionKey).compareTo(I18n.format(o.descriptionKey));
+        return I18n.get(this.descriptionKey).compareTo(I18n.get(o.descriptionKey));
     }
 
     public boolean isConflictingContext()

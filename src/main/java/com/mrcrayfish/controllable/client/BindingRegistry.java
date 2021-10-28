@@ -1,13 +1,12 @@
 package com.mrcrayfish.controllable.client;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.mrcrayfish.controllable.Controllable;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -179,16 +178,16 @@ public class BindingRegistry
         // Load key adapters
         try(BufferedReader reader = Files.newReader(new File(Controllable.getConfigFolder(), "controllable/key_adapters.properties"), Charsets.UTF_8))
         {
-            Map<String, KeyBinding> bindings = Arrays.stream(Minecraft.getInstance().gameSettings.keyBindings).collect(Collectors.toMap(KeyBinding::getKeyDescription, v -> v));
+            Map<String, KeyMapping> bindings = Arrays.stream(Minecraft.getInstance().options.keyMappings).collect(Collectors.toMap(KeyMapping::getName, v -> v));
             Properties properties = new Properties();
             properties.load(reader);
             properties.forEach((key, value) ->
             {
-                KeyBinding binding = bindings.get(key.toString());
-                if(binding != null)
+                KeyMapping mapping = bindings.get(key.toString());
+                if(mapping != null)
                 {
                     int button = Buttons.getButtonFromName(StringUtils.defaultIfEmpty(value.toString(), ""));
-                    KeyAdapterBinding keyAdapter = new KeyAdapterBinding(button, binding);
+                    KeyAdapterBinding keyAdapter = new KeyAdapterBinding(button, mapping);
                     if(this.keyAdapters.putIfAbsent(keyAdapter.getDescription(), keyAdapter) == null)
                     {
                         this.bindings.add(keyAdapter);
@@ -232,7 +231,7 @@ public class BindingRegistry
             this.keyAdapters.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
             {
                 String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
-                properties.put(binding.getKeyBinding().getKeyDescription(), name);
+                properties.put(binding.getKeyMapping().getCategory(), name);
             });
             File file = new File(Controllable.getConfigFolder(), "controllable/key_adapters.properties");
             properties.store(new FileOutputStream(file), "Key Adapters");

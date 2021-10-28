@@ -9,13 +9,13 @@ import com.mrcrayfish.controllable.mixin.client.jei.IngredientListOverlayMixin;
 import com.mrcrayfish.controllable.mixin.client.jei.PageNavigationMixin;
 import mezz.jei.Internal;
 import mezz.jei.gui.PageNavigation;
+import mezz.jei.gui.elements.GuiIconButton;
 import mezz.jei.gui.overlay.IngredientGrid;
 import mezz.jei.gui.overlay.IngredientGridWithNavigation;
 import mezz.jei.render.IngredientListBatchRenderer;
 import mezz.jei.render.IngredientListSlot;
 import mezz.jei.runtime.JeiRuntime;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.client.renderer.Rect2i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +39,15 @@ public class JustEnoughItems
             List<IngredientListSlot> slots = ingredientListBatchRenderer.getAllGuiIngredientSlots();
             for(IngredientListSlot slot : slots)
             {
-                Rectangle2d area = slot.getArea();
+                Rect2i area = slot.getArea();
                 points.add(new BasicNavigationPoint(area.getX() + area.getWidth() / 2.0, area.getY() + area.getHeight() / 2.0));
             }
 
             PageNavigation navigation = ((IngredientGridWithNavigationMixin) ingredientGridWithNavigation).getNavigation();
-            Widget backButton = ((PageNavigationMixin) navigation).getBackButton();
-            points.add(new WidgetNavigationPoint(backButton.x + backButton.getWidth() / 2.0, backButton.y + backButton.getHeightRealms() / 2.0, backButton));
-            Widget nextButton = ((PageNavigationMixin) navigation).getNextButton();
-            points.add(new WidgetNavigationPoint(nextButton.x + nextButton.getWidth() / 2.0, nextButton.y + nextButton.getHeightRealms() / 2.0, nextButton));
+            GuiIconButton backButton = ((PageNavigationMixin) navigation).getBackButton();
+            points.add(new WidgetNavigationPoint(backButton.x + backButton.getWidth() / 2.0, backButton.y + backButton.getHeight() / 2.0, backButton));
+            GuiIconButton nextButton = ((PageNavigationMixin) navigation).getNextButton();
+            points.add(new WidgetNavigationPoint(nextButton.x + nextButton.getWidth() / 2.0, nextButton.y + nextButton.getHeight() / 2.0, nextButton));
         }
         return points;
     }

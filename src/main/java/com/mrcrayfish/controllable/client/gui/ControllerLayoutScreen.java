@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.ButtonStates;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
@@ -9,18 +9,18 @@ import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class ControllerLayoutScreen extends Screen
 
     protected ControllerLayoutScreen(Screen parentScreen)
     {
-        super(new TranslationTextComponent("controllable.gui.title.layout"));
+        super(new TranslatableComponent("controllable.gui.title.layout"));
         this.parentScreen = parentScreen;
 
         Controller controller = Controllable.getController();
@@ -88,12 +88,12 @@ public class ControllerLayoutScreen extends Screen
         this.controllerButtons.add(new ControllerAxis(this, Buttons.LEFT_THUMB_STICK, 9, 12, 0, 0, 7, 7, 5));
         this.controllerButtons.add(new ControllerAxis(this, Buttons.RIGHT_THUMB_STICK, 22, 12, 0, 0, 7, 7, 5));
 
-        this.doneButton = this.addButton(new Button(this.width / 2 - 154, this.height - 32, 100, 20, new TranslationTextComponent("controllable.gui.save"), (button) -> {
+        this.doneButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 32, 100, 20, new TranslatableComponent("controllable.gui.save"), (button) -> {
             this.updateControllerMapping();
-            this.minecraft.displayGuiScreen(this.parentScreen);
+            this.minecraft.setScreen(this.parentScreen);
         }));
 
-        this.resetButton = this.addButton(new Button(this.width / 2 - 50, this.height - 32, 100, 20, new TranslationTextComponent("controllable.gui.reset"), (button) -> {
+        this.resetButton = this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 32, 100, 20, new TranslatableComponent("controllable.gui.reset"), (button) -> {
             this.entry.getReassignments().clear();
             this.entry.setSwitchThumbsticks(false);
             this.entry.setFlipLeftX(false);
@@ -102,16 +102,16 @@ public class ControllerLayoutScreen extends Screen
             this.entry.setFlipRightY(false);
         }));
 
-        this.addButton(new Button(this.width / 2 + 54, this.height - 32, 100, 20, new TranslationTextComponent("gui.cancel"), (button) -> {
-            this.minecraft.displayGuiScreen(this.parentScreen);
+        this.addRenderableWidget(new Button(this.width / 2 + 54, this.height - 32, 100, 20, new TranslatableComponent("gui.cancel"), (button) -> {
+            this.minecraft.setScreen(this.parentScreen);
         }));
 
         int width = 38 * 5;
         int x = this.width / 2 - width / 2;
         int y = this.height / 2 - 50 - 35;
 
-        this.thumbstickButton = this.addButton(new ImageButton(x + width / 2 - 10, y + 90, 20, TEXTURE, 92, 0, 16, 16, button -> {
-            this.minecraft.displayGuiScreen(new ThumbstickSettingsScreen(this));
+        this.thumbstickButton = this.addRenderableWidget(new ImageButton(x + width / 2 - 10, y + 90, 20, TEXTURE, 92, 0, 16, 16, button -> {
+            this.minecraft.setScreen(new ThumbstickSettingsScreen(this));
         }));
     }
 
@@ -126,31 +126,31 @@ public class ControllerLayoutScreen extends Screen
         changed |= this.entry.isFlipRightY();
         this.resetButton.active = changed;
         this.validLayout = this.entry.getReassignments().values().stream().noneMatch(b -> b == -1);
-        this.doneButton.setMessage(new TranslationTextComponent("controllable.gui.save").mergeStyle(this.validLayout ? TextFormatting.WHITE : TextFormatting.RED));
+        this.doneButton.setMessage(new TranslatableComponent("controllable.gui.save").withStyle(this.validLayout ? ChatFormatting.WHITE : ChatFormatting.RED));
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderDirtBackground(0);
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, TEXTURE);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
-        Minecraft.getInstance().getTextureManager().bindTexture(TEXTURE);
         int width = 38 * 5;
         int height = 24 * 5;
         int x = this.width / 2 - width / 2;
         int y = this.height / 2 - 50 - 35;
-        blit(matrixStack, x, y, width, height, 50, 0, 38, 24, 256, 256);
-        this.controllerButtons.forEach(controllerButton -> controllerButton.draw(matrixStack, x, y, mouseX, mouseY, this.configureButton == controllerButton.button));
-        drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
-        this.drawMultiLineCenteredString(matrixStack, this.font, new TranslationTextComponent("controllable.gui.layout.info").mergeStyle(TextFormatting.GRAY), x + width / 2, y + 135, width + 190, 0xFFFFFFFF);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        blit(poseStack, x, y, width, height, 50, 0, 38, 24, 256, 256);
+        this.controllerButtons.forEach(controllerButton -> controllerButton.draw(poseStack, x, y, mouseX, mouseY, this.configureButton == controllerButton.button));
+        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        this.drawMultiLineCenteredString(poseStack, this.font, new TranslatableComponent("controllable.gui.layout.info").withStyle(ChatFormatting.GRAY), x + width / 2, y + 135, width + 190, 0xFFFFFFFF);
+        super.render(poseStack, mouseX, mouseY, partialTicks);
 
         if(this.configureButton != -1)
         {
             RenderSystem.disableDepthTest();
-            this.fillGradient(matrixStack, 0, 0, this.width, this.height, -1072689136, -804253680);
-            drawCenteredString(matrixStack, this.font, new TranslationTextComponent("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
+            this.fillGradient(poseStack, 0, 0, this.width, this.height, -1072689136, -804253680);
+            drawCenteredString(poseStack, this.font, new TranslatableComponent("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
             return;
         }
@@ -158,11 +158,11 @@ public class ControllerLayoutScreen extends Screen
         ControllerButton button = this.controllerButtons.stream().filter(ControllerButton::isHovered).findFirst().orElse(null);
         if(button != null)
         {
-            List<ITextComponent> components = new ArrayList<>();
-            components.add(new TranslationTextComponent("controllable.gui.layout.button", new TranslationTextComponent(Buttons.NAMES[button.getButton()]).mergeStyle(TextFormatting.BLUE)));
+            List<Component> components = new ArrayList<>();
+            components.add(new TranslatableComponent("controllable.gui.layout.button", new TranslatableComponent(Buttons.NAMES[button.getButton()]).withStyle(ChatFormatting.BLUE)));
             if(button.isMissingMapping())
             {
-                components.add(new TranslationTextComponent("controllable.gui.layout.missing_mapping").mergeStyle(TextFormatting.RED));
+                components.add(new TranslatableComponent("controllable.gui.layout.missing_mapping").withStyle(ChatFormatting.RED));
             }
             else
             {
@@ -179,23 +179,23 @@ public class ControllerLayoutScreen extends Screen
                         }
                     }
                 }
-                components.add(new TranslationTextComponent("controllable.gui.layout.mapped_to", new StringTextComponent(String.valueOf(remappedButton)).mergeStyle(TextFormatting.BLUE)));
+                components.add(new TranslatableComponent("controllable.gui.layout.mapped_to", new TextComponent(String.valueOf(remappedButton)).withStyle(ChatFormatting.BLUE)));
             }
-            components.add(new TranslationTextComponent("controllable.gui.layout.remap").mergeStyle(TextFormatting.GRAY));
-            this.func_243308_b(matrixStack, components, mouseX, mouseY);
+            components.add(new TranslatableComponent("controllable.gui.layout.remap").withStyle(ChatFormatting.GRAY));
+            this.renderComponentTooltip(poseStack, components, mouseX, mouseY);
         }
 
         if(!this.validLayout && this.doneButton.isHovered())
         {
-            List<IReorderingProcessor> components = new ArrayList<>();
-            components.add(new TranslationTextComponent("controllable.gui.layout.warning").mergeStyle(TextFormatting.RED).func_241878_f());
-            components.addAll(this.font.trimStringToWidth(new TranslationTextComponent("controllable.gui.layout.invalid_layout").mergeStyle(TextFormatting.GRAY), 180));
-            this.renderTooltip(matrixStack, components, mouseX, mouseY - 50);
+            List<FormattedCharSequence> components = new ArrayList<>();
+            components.add(new TranslatableComponent("controllable.gui.layout.warning").withStyle(ChatFormatting.RED).getVisualOrderText());
+            components.addAll(this.font.split(new TranslatableComponent("controllable.gui.layout.invalid_layout").withStyle(ChatFormatting.GRAY), 180));
+            this.renderTooltip(poseStack, components, mouseX, mouseY - 50);
         }
 
         if(this.thumbstickButton.isHovered())
         {
-            this.renderTooltip(matrixStack, new TranslationTextComponent("controllable.gui.layout.thumbsticks"), mouseX, mouseY);
+            this.renderTooltip(poseStack, new TranslatableComponent("controllable.gui.layout.thumbsticks"), mouseX, mouseY);
         }
     }
 
@@ -305,13 +305,13 @@ public class ControllerLayoutScreen extends Screen
             if(!this.states.getState(index))
             {
                 this.states.setState(index, true);
-                Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WOODEN_BUTTON_CLICK_ON, 1.0F));
             }
         }
         else if(this.states.getState(index))
         {
             this.states.setState(index, false);
-            Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON, 0.9F));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WOODEN_BUTTON_CLICK_ON, 0.9F));
         }
     }
 
@@ -335,12 +335,12 @@ public class ControllerLayoutScreen extends Screen
         return this.entry;
     }
 
-    private void drawMultiLineCenteredString(MatrixStack matrixStack, FontRenderer font, ITextComponent component, int x, int y, int width, int color)
+    private void drawMultiLineCenteredString(PoseStack matrixStack, Font font, Component component, int x, int y, int width, int color)
     {
-        for(IReorderingProcessor s : font.trimStringToWidth(component, width))
+        for(FormattedCharSequence s : font.split(component, width))
         {
-            font.func_238407_a_(matrixStack, s, (float) (x - font.func_243245_a(s) / 2.0), y, color);
-            y += font.FONT_HEIGHT;
+            font.draw(matrixStack, s, (float) (x - font.width(s) / 2.0), y, color);
+            y += font.lineHeight;
         }
     }
 

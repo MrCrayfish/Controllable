@@ -1,11 +1,9 @@
 package com.mrcrayfish.controllable.client;
 
-import net.minecraft.util.IStringSerializable;
-
 /**
  * Author: MrCrayfish
  */
-public enum ControllerIcons implements IStringSerializable
+public enum ControllerIcons
 {
     DEFAULT("default"),
     PLAYSTATION_4("playstation_4"),
@@ -17,24 +15,23 @@ public enum ControllerIcons implements IStringSerializable
     GAMECUBE("gamecube"),
     STEAM("steam");
 
-    String name;
+    private final String id;
 
-    ControllerIcons(String name)
+    ControllerIcons(String id)
     {
-        this.name = name;
+        this.id = id;
     }
 
-    @Override
-    public String getString()
+    public String getId()
     {
-        return this.name;
+        return this.id;
     }
 
     public static ControllerIcons byName(String name)
     {
         for(ControllerIcons controllerIcons : values())
         {
-            if(controllerIcons.name.equals(name))
+            if(controllerIcons.id.equals(name))
             {
                 return controllerIcons;
             }

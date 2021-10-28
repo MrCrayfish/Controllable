@@ -1,21 +1,23 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.widget.list.AbstractOptionList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
@@ -23,7 +25,7 @@ import java.util.*;
 /**
  * Author: MrCrayfish
  */
-public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entry>
+public class ButtonBindingList extends ContainerObjectSelectionList<ButtonBindingList.Entry>
 {
     private Screen parent;
     private Map<String, List<ButtonBinding>> categories = new LinkedHashMap<>();
@@ -62,7 +64,7 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
             if(!list.isEmpty())
             {
                 Collections.sort(list);
-                this.addEntry(new CategoryEntry(new TranslationTextComponent(category)));
+                this.addEntry(new CategoryEntry(new TranslatableComponent(category)));
                 list.forEach(binding -> this.addEntry(new BindingEntry(binding)));
             }
         });
@@ -81,17 +83,42 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
-    abstract class Entry extends AbstractOptionList.Entry<Entry> {}
+    abstract class Entry extends ContainerObjectSelectionList.Entry<Entry> {}
 
     protected class CategoryEntry extends Entry
     {
-        private final ITextComponent label;
+        private final Component label;
         private final int labelWidth;
 
-        protected CategoryEntry(ITextComponent label)
+        protected CategoryEntry(Component label)
         {
             this.label = label;
-            this.labelWidth = ButtonBindingList.this.minecraft.fontRenderer.getStringPropertyWidth(this.label);
+            this.labelWidth = ButtonBindingList.this.minecraft.font.width(this.label);
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children()
+        {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<? extends NarratableEntry> narratables()
+        {
+            return ImmutableList.of(new NarratableEntry()
+            {
+                @Override
+                public NarratableEntry.NarrationPriority narrationPriority()
+                {
+                    return NarratableEntry.NarrationPriority.HOVERED;
+                }
+
+                @Override
+                public void updateNarration(NarrationElementOutput output)
+                {
+                    output.add(NarratedElementType.TITLE, CategoryEntry.this.label);
+                }
+            });
         }
 
         @Override
@@ -101,24 +128,18 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         }
 
         @Override
-        public List<? extends IGuiEventListener> getEventListeners()
+        public void render(PoseStack poseStack, int x, int y, int p_230432_4_, int p_230432_5_, int itemHeight, int p_230432_7_, int p_230432_8_, boolean selected, float partialTicks)
         {
-            return Collections.emptyList();
-        }
-
-        @Override
-        public void render(MatrixStack matrixStack, int x, int y, int p_230432_4_, int p_230432_5_, int itemHeight, int p_230432_7_, int p_230432_8_, boolean selected, float partialTicks)
-        {
-            float labelX = ButtonBindingList.this.minecraft.currentScreen.width / 2F - this.labelWidth / 2F;
+            float labelX = ButtonBindingList.this.minecraft.screen.width / 2F - this.labelWidth / 2F;
             float labelY = y + itemHeight - 9 - 1;
-            ButtonBindingList.this.minecraft.fontRenderer.func_243248_b(matrixStack, this.label, labelX, labelY, 0xFFFFFFFF);
+            ButtonBindingList.this.minecraft.font.draw(poseStack, this.label, labelX, labelY, 0xFFFFFFFF);
         }
     }
 
     public class BindingEntry extends Entry
     {
         private ButtonBinding binding;
-        private TextComponent label;
+        private Component label;
         private Button bindingButton;
         private Button deleteButton;
         private Button removeButton;
@@ -126,7 +147,7 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         protected BindingEntry(ButtonBinding binding)
         {
             this.binding = binding;
-            this.label = new TranslationTextComponent(binding.getLabelKey());
+            this.label = new TranslatableComponent(binding.getLabelKey());
             if(ButtonBindingList.this.parent instanceof ButtonBindingScreen)
             {
                 this.bindingButton = new ButtonBindingButton(0, 0, binding, button ->
@@ -155,7 +176,7 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
                 List<ButtonBindingData> bindings = screen.getRadialConfigureScreen().getBindings();
                 this.bindingButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button ->
                 {
-                    bindings.add(new ButtonBindingData(this.binding, TextFormatting.YELLOW));
+                    bindings.add(new ButtonBindingData(this.binding, ChatFormatting.YELLOW));
                     this.bindingButton.active = false;
                     this.deleteButton.active = true;
                 });
@@ -182,17 +203,17 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
         }
 
         @Override
-        public List<? extends IGuiEventListener> getEventListeners()
+        public List<? extends GuiEventListener> children()
         {
             return ImmutableList.of(this.bindingButton, this.deleteButton);
         }
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void render(MatrixStack matrixStack, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void render(PoseStack matrixStack, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
-            int color = this.binding.isConflictingContext() ? TextFormatting.RED.getColor() : TextFormatting.GRAY.getColor();
-            ButtonBindingList.this.minecraft.fontRenderer.func_243246_a(matrixStack, this.label, left - 15, y + 6, color);
+            int color = this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.GRAY.getColor();
+            ButtonBindingList.this.minecraft.font.draw(matrixStack, this.label, left - 15, y + 6, color);
             this.bindingButton.x = left + width - 38;
             this.bindingButton.y = y;
             this.bindingButton.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -213,11 +234,30 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
                 if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.bindingButton.isHovered())
                 {
                     this.binding.setButton(-1);
-                    this.bindingButton.playDownSound(Minecraft.getInstance().getSoundHandler());
+                    this.bindingButton.playDownSound(Minecraft.getInstance().getSoundManager());
                     return true;
                 }
             }
             return super.mouseClicked(mouseX, mouseY, button);
+        }
+
+        @Override
+        public List<? extends NarratableEntry> narratables()
+        {
+            return ImmutableList.of(new NarratableEntry()
+            {
+                @Override
+                public NarratableEntry.NarrationPriority narrationPriority()
+                {
+                    return NarratableEntry.NarrationPriority.HOVERED;
+                }
+
+                @Override
+                public void updateNarration(NarrationElementOutput output)
+                {
+                    output.add(NarratedElementType.TITLE, BindingEntry.this.label);
+                }
+            });
         }
     }
 }

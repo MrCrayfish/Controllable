@@ -1,8 +1,8 @@
 package com.mrcrayfish.controllable.mixin.client;
 
-import net.minecraft.client.gui.recipebook.RecipeBookPage;
-import net.minecraft.client.gui.recipebook.RecipeWidget;
-import net.minecraft.client.gui.widget.ToggleWidget;
+import net.minecraft.client.gui.components.StateSwitchingButton;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
+import net.minecraft.client.gui.screens.recipebook.RecipeButton;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
@@ -16,13 +16,13 @@ import java.util.List;
 public interface RecipeBookPageAccessor
 {
     @Accessor("buttons")
-    List<RecipeWidget> getButtons();
+    List<RecipeButton> getButtons();
 
     @Accessor("forwardButton")
-    ToggleWidget getForwardButton();
+    StateSwitchingButton getForwardButton();
 
     @Accessor("backButton")
-    ToggleWidget getBackButton();
+    StateSwitchingButton getBackButton();
 
     @Accessor("currentPage")
     int getCurrentPage();

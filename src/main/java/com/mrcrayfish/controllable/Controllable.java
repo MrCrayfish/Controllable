@@ -6,19 +6,18 @@ import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingScreen;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.network.FMLNetworkConstants;
-import org.apache.commons.lang3.tuple.Pair;
+import net.minecraftforge.fmllegacy.network.FMLNetworkConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -52,7 +51,7 @@ public class Controllable implements IControllerListener
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.clientSpec);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.serverSpec);
         //Make sure the mod being absent on the other network side does not cause the client to display the server as incompatible
-        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
     }
 
     @Nullable
@@ -78,8 +77,8 @@ public class Controllable implements IControllerListener
 
     private void onClientSetup(FMLClientSetupEvent event)
     {
-        Minecraft mc = event.getMinecraftSupplier().get();
-        configFolder = new File(mc.gameDir, "config");
+        Minecraft mc = Minecraft.getInstance();
+        configFolder = new File(mc.gameDirectory, "config");
         jeiLoaded = ModList.get().isLoaded("jei");
 
         ControllerProperties.load(configFolder);
@@ -128,7 +127,7 @@ public class Controllable implements IControllerListener
     @OnlyIn(Dist.CLIENT)
     public void connected(int jid)
     {
-        Minecraft.getInstance().enqueue(() ->
+        Minecraft.getInstance().doRunTask(() ->
         {
             if(Controllable.controller == null)
             {
@@ -140,7 +139,7 @@ public class Controllable implements IControllerListener
                 Minecraft mc = Minecraft.getInstance();
                 if(mc.player != null && Controllable.controller != null)
                 {
-                    Minecraft.getInstance().getToastGui().add(new ControllerToast(true, Controllable.controller.getName()));
+                    Minecraft.getInstance().getToasts().addToast(new ControllerToast(true, Controllable.controller.getName()));
                 }
             }
         });
@@ -150,7 +149,7 @@ public class Controllable implements IControllerListener
     @OnlyIn(Dist.CLIENT)
     public void disconnected(int jid)
     {
-        Minecraft.getInstance().enqueue(() ->
+        Minecraft.getInstance().doRunTask(() ->
         {
             if(Controllable.controller != null)
             {
@@ -169,7 +168,7 @@ public class Controllable implements IControllerListener
                     Minecraft mc = Minecraft.getInstance();
                     if(mc.player != null)
                     {
-                        Minecraft.getInstance().getToastGui().add(new ControllerToast(false, oldController.getName()));
+                        Minecraft.getInstance().getToasts().addToast(new ControllerToast(false, oldController.getName()));
                     }
                 }
             }
@@ -240,7 +239,7 @@ public class Controllable implements IControllerListener
         states.setState(Buttons.DPAD_DOWN, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
         states.setState(Buttons.DPAD_LEFT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
         states.setState(Buttons.DPAD_RIGHT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
-        Minecraft.getInstance().enqueue(() -> this.processButtons(states));
+        Minecraft.getInstance().submit(() -> this.processButtons(states));
     }
 
     private void processButtons(ButtonStates states)
@@ -256,7 +255,7 @@ public class Controllable implements IControllerListener
     {
         boolean state = newStates.getState(index);
 
-        Screen screen = Minecraft.getInstance().currentScreen;
+        Screen screen = Minecraft.getInstance().screen;
         if(screen instanceof ControllerLayoutScreen)
         {
             ((ControllerLayoutScreen) screen).processButton(index, newStates);

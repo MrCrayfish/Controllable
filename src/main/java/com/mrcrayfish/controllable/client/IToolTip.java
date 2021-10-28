@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
-import net.minecraft.util.IReorderingProcessor;
+import net.minecraft.util.FormattedCharSequence;
 
 import java.util.List;
 
@@ -9,6 +9,6 @@ import java.util.List;
  */
 public interface IToolTip
 {
-    List<IReorderingProcessor> getToolTip();
+    List<FormattedCharSequence> getToolTip();
 }
 

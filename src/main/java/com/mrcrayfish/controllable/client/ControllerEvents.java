@@ -3,8 +3,8 @@ package com.mrcrayfish.controllable.client;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.UseAction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.UseAnim;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -39,20 +39,20 @@ public class ControllerEvents
         if(controller != null)
         {
             float magnitudeFactor = 0.5F;
-            UseAction action = event.getItem().getUseAction();
+            UseAnim action = event.getItem().getUseAnimation();
             switch(action)
             {
                 case BLOCK:
                     magnitudeFactor = 0.25F;
                     break;
                 case SPEAR:
-                    magnitudeFactor = MathHelper.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 0.25F) / 0.25F;
+                    magnitudeFactor = Mth.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 0.25F) / 0.25F;
                     break;
                 case BOW:
-                    magnitudeFactor = MathHelper.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 1.0F) / 1.0F;
+                    magnitudeFactor = Mth.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 1.0F) / 1.0F;
                     break;
                 case CROSSBOW:
-                    magnitudeFactor = MathHelper.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 1.5F) / 1.5F;
+                    magnitudeFactor = Mth.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 1.5F) / 1.5F;
                     break;
             }
             //controller.getGamepadState().rumble(0.5F * magnitudeFactor, 0.5F * magnitudeFactor, 50); //50ms is one tick
@@ -74,7 +74,7 @@ public class ControllerEvents
         }
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.world != null && Config.CLIENT.options.forceFeedback.get())
+        if(mc.level != null && Config.CLIENT.options.forceFeedback.get())
         {
             if(this.prevHealth == -1)
             {

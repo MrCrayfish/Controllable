@@ -1,31 +1,28 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
-import com.mrcrayfish.controllable.event.AvailableActionsEvent;
 import com.mrcrayfish.controllable.event.GatherActionsEvent;
 import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
-import net.minecraft.block.ContainerBlock;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.IngameGui;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.screen.inventory.InventoryScreen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.UseAction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -49,7 +46,7 @@ public class RenderEvents
     public void onClientTick(TickEvent.ClientTickEvent event)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(event.phase == TickEvent.Phase.START && mc.player != null && !mc.gameSettings.hideGUI)
+        if(event.phase == TickEvent.Phase.START && mc.player != null && !mc.options.hideGui)
         {
             this.actions.clear();
 
@@ -61,118 +58,118 @@ public class RenderEvents
 
             boolean verbose = visibility == ActionVisibility.ALL;
 
-            if(mc.currentScreen instanceof ContainerScreen)
+            if(mc.screen instanceof ContainerScreen)
             {
-                if(mc.player.inventory.getItemStack().isEmpty())
+                if(mc.player.inventoryMenu.getCarried().isEmpty())
                 {
-                    ContainerScreen container = (ContainerScreen) mc.currentScreen;
+                    ContainerScreen container = (ContainerScreen) mc.screen;
                     if(container.getSlotUnderMouse() != null)
                     {
                         Slot slot = container.getSlotUnderMouse();
-                        if(slot.getHasStack())
+                        if(slot.hasItem())
                         {
-                            actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(I18n.format("controllable.action.pickup_stack"), Action.Side.LEFT));
-                            actionMap.put(ButtonBindings.SPLIT_STACK, new Action(I18n.format("controllable.action.split_stack"), Action.Side.LEFT));
-                            actionMap.put(ButtonBindings.QUICK_MOVE, new Action(I18n.format("controllable.action.quick_move"), Action.Side.LEFT));
+                            actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(ActionDescriptions.PICKUP_STACK, Action.Side.LEFT));
+                            actionMap.put(ButtonBindings.SPLIT_STACK, new Action(ActionDescriptions.SPLIT_STACK, Action.Side.LEFT));
+                            actionMap.put(ButtonBindings.QUICK_MOVE, new Action(ActionDescriptions.QUICK_MOVE, Action.Side.LEFT));
                         }
                     }
                 }
                 else
                 {
-                    actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(I18n.format("controllable.action.place_stack"), Action.Side.LEFT));
-                    actionMap.put(ButtonBindings.SPLIT_STACK, new Action(I18n.format("controllable.action.place_item"), Action.Side.LEFT));
+                    actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(ActionDescriptions.PLACE_STACK, Action.Side.LEFT));
+                    actionMap.put(ButtonBindings.SPLIT_STACK, new Action(ActionDescriptions.PLACE_ITEM, Action.Side.LEFT));
 
                     // You can still quick move items if holding one with cursor
-                    ContainerScreen container = (ContainerScreen) mc.currentScreen;
+                    ContainerScreen container = (ContainerScreen) mc.screen;
                     if(container.getSlotUnderMouse() != null)
                     {
                         Slot slot = container.getSlotUnderMouse();
-                        if(slot.getHasStack())
+                        if(slot.hasItem())
                         {
-                            actionMap.put(ButtonBindings.QUICK_MOVE, new Action(I18n.format("controllable.action.quick_move"), Action.Side.LEFT));
+                            actionMap.put(ButtonBindings.QUICK_MOVE, new Action(ActionDescriptions.QUICK_MOVE, Action.Side.LEFT));
                         }
                     }
                 }
 
-                actionMap.put(ButtonBindings.INVENTORY, new Action(I18n.format("controllable.action.close_inventory"), Action.Side.RIGHT));
+                actionMap.put(ButtonBindings.INVENTORY, new Action(ActionDescriptions.CLOSE_INVENTORY, Action.Side.RIGHT));
             }
-            else if(mc.currentScreen == null)
+            else if(mc.screen == null)
             {
                 if(RadialMenuHandler.instance().isVisible())
                 {
                     if(RadialMenuHandler.instance().getSelected() != null)
                     {
-                        actionMap.put(ButtonBindings.RADIAL_MENU, new Action(I18n.format("controllable.action.radial.perform_action"), Action.Side.RIGHT));
+                        actionMap.put(ButtonBindings.RADIAL_MENU, new Action(ActionDescriptions.PERFORM_ACTION, Action.Side.RIGHT));
                     }
                     else
                     {
-                        actionMap.put(ButtonBindings.RADIAL_MENU, new Action(I18n.format("controllable.action.radial.close_menu"), Action.Side.RIGHT));
+                        actionMap.put(ButtonBindings.RADIAL_MENU, new Action(ActionDescriptions.CLOSE_MENU, Action.Side.RIGHT));
                     }
                 }
                 else
                 {
-                    boolean blockHit = mc.objectMouseOver != null && mc.objectMouseOver.getType() == RayTraceResult.Type.BLOCK;
+                    boolean blockHit = mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.BLOCK;
                     boolean canOpenBlock = false;
                     if(blockHit)
                     {
-                        BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult) mc.objectMouseOver;
-                        canOpenBlock = mc.world.getBlockState(blockRayTraceResult.getPos()).getBlock() instanceof ContainerBlock;
+                        BlockHitResult blockHitResult = (BlockHitResult) mc.hitResult;
+                        canOpenBlock = mc.level.getBlockState(blockHitResult.getBlockPos()).getBlock() instanceof BaseEntityBlock;
                     }
 
-                    if(!mc.player.isHandActive())
+                    if(!mc.player.isUsingItem())
                     {
                         if(blockHit)
                         {
-                            actionMap.put(ButtonBindings.ATTACK, new Action(I18n.format("controllable.action.break"), Action.Side.RIGHT));
+                            actionMap.put(ButtonBindings.ATTACK, new Action(ActionDescriptions.BREAK, Action.Side.RIGHT));
                         }
                         else
                         {
-                            actionMap.put(ButtonBindings.ATTACK, new Action(I18n.format("controllable.action.attack"), Action.Side.RIGHT));
+                            actionMap.put(ButtonBindings.ATTACK, new Action(ActionDescriptions.ATTACK, Action.Side.RIGHT));
                         }
                     }
 
-                    ItemStack offHandStack = mc.player.getHeldItemOffhand();
-                    if(offHandStack.getUseAction() != UseAction.NONE)
+                    ItemStack offHandStack = mc.player.getOffhandItem();
+                    if(offHandStack.getUseAnimation() != UseAnim.NONE)
                     {
-                        switch(offHandStack.getUseAction())
+                        switch(offHandStack.getUseAnimation())
                         {
                             case EAT:
-                                if(mc.player.getFoodStats().needFood())
+                                if(mc.player.getFoodData().needsFood())
                                 {
-                                    actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
+                                    actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.EAT, Action.Side.RIGHT));
                                 }
                                 break;
                             case DRINK:
-                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.DRINK, Action.Side.RIGHT));
                                 break;
                             case BLOCK:
-                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.BLOCK, Action.Side.RIGHT));
                                 break;
                             case BOW:
-                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.PULL_BOW, Action.Side.RIGHT));
                                 break;
                         }
                     }
 
-                    ItemStack currentItem = mc.player.inventory.getCurrentItem();
-                    if(currentItem.getUseAction() != UseAction.NONE)
+                    ItemStack currentItem = mc.player.containerMenu.getCarried(); //TODO test
+                    if(currentItem.getUseAnimation() != UseAnim.NONE)
                     {
-                        switch(currentItem.getUseAction())
+                        switch(currentItem.getUseAnimation())
                         {
                             case EAT:
-                                if(mc.player.getFoodStats().needFood())
+                                if(mc.player.getFoodData().needsFood())
                                 {
-                                    actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.eat"), Action.Side.RIGHT));
+                                    actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.EAT, Action.Side.RIGHT));
                                 }
                                 break;
                             case DRINK:
-                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.drink"), Action.Side.RIGHT));
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.DRINK, Action.Side.RIGHT));
                                 break;
                             case BLOCK:
-                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.block"), Action.Side.RIGHT));
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.BLOCK, Action.Side.RIGHT));
                                 break;
                             case BOW:
-                                actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.pull_bow"), Action.Side.RIGHT));
+                                actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.PULL_BOW, Action.Side.RIGHT));
                                 break;
                         }
                     }
@@ -194,48 +191,47 @@ public class RenderEvents
                                 actions.put(Buttons.LEFT_TRIGGER, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
                             }
                         }*/
-                            actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.place_block"), Action.Side.RIGHT));
+                            actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.PLACE_BLOCK, Action.Side.RIGHT));
                         }
                     }
-                    else if(!currentItem.isEmpty() && !mc.player.isHandActive())
+                    else if(!currentItem.isEmpty() && !mc.player.isUsingItem())
                     {
-                        actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.use_item"), Action.Side.RIGHT));
+                        actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.USE_ITEM, Action.Side.RIGHT));
                     }
 
-                    if(!mc.player.isSneaking() && blockHit && canOpenBlock && !mc.player.isHandActive())
+                    if(!mc.player.isCrouching() && blockHit && canOpenBlock && !mc.player.isUsingItem())
                     {
-                        actionMap.put(ButtonBindings.USE_ITEM, new Action(I18n.format("controllable.action.interact"), Action.Side.RIGHT));
+                        actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.INTERACT, Action.Side.RIGHT));
                     }
 
                     if(verbose)
                     {
-                        actionMap.put(ButtonBindings.JUMP, new Action(I18n.format("controllable.action.jump"), Action.Side.LEFT));
+                        actionMap.put(ButtonBindings.JUMP, new Action(ActionDescriptions.JUMP, Action.Side.LEFT));
                     }
 
-                    actionMap.put(ButtonBindings.INVENTORY, new Action(I18n.format("controllable.action.inventory"), Action.Side.LEFT));
+                    actionMap.put(ButtonBindings.INVENTORY, new Action(ActionDescriptions.INVENTORY, Action.Side.LEFT));
 
-                    if(verbose && (!mc.player.getHeldItemOffhand().isEmpty() || !mc.player.inventory.getCurrentItem().isEmpty()))
+                    if(verbose && (!mc.player.getOffhandItem().isEmpty() || !mc.player.containerMenu.getCarried().isEmpty())) //TODO test
                     {
-                        actionMap.put(ButtonBindings.SWAP_HANDS, new Action(I18n.format("controllable.action.swap_hands"), Action.Side.LEFT));
+                        actionMap.put(ButtonBindings.SWAP_HANDS, new Action(ActionDescriptions.SWAP_HANDS, Action.Side.LEFT));
                     }
 
                     if(mc.player.isPassenger())
                     {
-                        actionMap.put(ButtonBindings.SNEAK, new Action(I18n.format("controllable.action.dismount"), Action.Side.RIGHT));
+                        actionMap.put(ButtonBindings.SNEAK, new Action(ActionDescriptions.DISMOUNT, Action.Side.RIGHT));
                     }
                     else if(verbose)
                     {
-                        actionMap.put(ButtonBindings.SNEAK, new Action(I18n.format("controllable.action.sneak"), Action.Side.RIGHT));
+                        actionMap.put(ButtonBindings.SNEAK, new Action(ActionDescriptions.SNEAK, Action.Side.RIGHT));
                     }
 
-                    if(!mc.player.inventory.getCurrentItem().isEmpty())
+                    if(!mc.player.inventoryMenu.getCarried().isEmpty()) //TODO test
                     {
-                        actionMap.put(ButtonBindings.DROP_ITEM, new Action(I18n.format("controllable.action.drop_item"), Action.Side.LEFT));
+                        actionMap.put(ButtonBindings.DROP_ITEM, new Action(ActionDescriptions.DROP_ITEM, Action.Side.LEFT));
                     }
                 }
             }
 
-            MinecraftForge.EVENT_BUS.post(new AvailableActionsEvent(this.actions));
             MinecraftForge.EVENT_BUS.post(new GatherActionsEvent(actionMap, visibility));
             actionMap.forEach((binding, action) -> this.actions.put(binding.getButton(), action));
         }
@@ -248,7 +244,7 @@ public class RenderEvents
             return;
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.gameSettings.hideGUI)
+        if(mc.options.hideGui)
             return;
 
         if(Controllable.getController() != null)
@@ -261,14 +257,14 @@ public class RenderEvents
             this.renderHints();
             this.renderMiniPlayer();
         }
-        else if(mc.currentScreen == null && Config.SERVER.restrictToController.get())
+        else if(mc.screen == null && Config.SERVER.restrictToController.get())
         {
             RenderSystem.disableDepthTest();
-            int width = mc.getMainWindow().getScaledWidth();
-            int height = mc.getMainWindow().getScaledHeight();
-            AbstractGui.fill(new MatrixStack(), 0, 0, width, height, -1072689136);
-            AbstractGui.drawCenteredString(new MatrixStack(), mc.fontRenderer, new TranslationTextComponent("controllable.gui.controller_only").mergeStyle(TextFormatting.BOLD).mergeStyle(TextFormatting.YELLOW), width / 2, height / 2 - 15, 0xFFFFFFFF);
-            AbstractGui.drawCenteredString(new MatrixStack(), mc.fontRenderer, new TranslationTextComponent("controllable.gui.plug_in_controller"), width / 2, height / 2, 0xFFFFFFFF);
+            int width = mc.getWindow().getScreenWidth();
+            int height = mc.getWindow().getScreenHeight(); //TODO test
+            Screen.fill(new PoseStack(), 0, 0, width, height, -1072689136);
+            Screen.drawCenteredString(new PoseStack(), mc.font, new TranslatableComponent("controllable.gui.controller_only").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.YELLOW), width / 2, height / 2 - 15, 0xFFFFFFFF);
+            Screen.drawCenteredString(new PoseStack(), mc.font, new TranslatableComponent("controllable.gui.plug_in_controller"), width / 2, height / 2, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
         }
     }
@@ -278,8 +274,8 @@ public class RenderEvents
         if(!MinecraftForge.EVENT_BUS.post(new RenderAvailableActionsEvent()))
         {
             Minecraft mc = Minecraft.getInstance();
-            IngameGui guiIngame = mc.ingameGUI;
-            boolean isChatVisible = mc.currentScreen == null && guiIngame.getChatGUI().drawnChatLines.stream().anyMatch(chatLine -> guiIngame.getTicks() - chatLine.getUpdatedCounter() < 200);
+            Gui guiIngame = mc.gui;
+            boolean isChatVisible = mc.screen == null && guiIngame.getChat().trimmedMessages.stream().anyMatch(chatLine -> guiIngame.getGuiTicks() - chatLine.getAddedTime() < 200);
 
             int leftIndex = 0;
             int rightIndex = 0;
@@ -288,7 +284,7 @@ public class RenderEvents
                 Action action = this.actions.get(button);
                 Action.Side side = action.getSide();
                 
-                if(mc.gameSettings.showSubtitles && mc.currentScreen == null)
+                if(mc.options.showSubtitles && mc.screen == null)
                 {
                     side = Action.Side.LEFT;
                 }
@@ -306,29 +302,30 @@ public class RenderEvents
                 int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
                 int size = 13;
 
-                int x = side == Action.Side.LEFT ? 5 : mc.getMainWindow().getScaledWidth() - 5 - size;
-                int y = mc.getMainWindow().getScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
+                int x = side == Action.Side.LEFT ? 5 : mc.getWindow().getScreenWidth() - 5 - size; //TODO test
+                int y = mc.getWindow().getScreenHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
 
-                mc.getTextureManager().bindTexture(CONTROLLER_BUTTONS);
-                RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-                RenderSystem.disableLighting();
 
-                if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2) continue;
+                RenderSystem.setShaderTexture(0, CONTROLLER_BUTTONS);
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+                if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2)
+                    continue;
 
                 /* Draw buttons icon */
-                MatrixStack matrixStack = new MatrixStack();
-                Widget.blit(matrixStack, x, y, texU, texV, size, size, 256, 256);
+                PoseStack poseStack = new PoseStack();
+                Screen.blit(poseStack, x, y, texU, texV, size, size, 256, 256);
 
                 /* Draw description text */
                 if(side == Action.Side.LEFT)
                 {
-                    mc.fontRenderer.drawString(matrixStack, action.getDescription(), x + 18, y + 3, Color.WHITE.getRGB());
+                    mc.font.draw(poseStack, action.getDescription(), x + 18, y + 3, Color.WHITE.getRGB());
                     leftIndex++;
                 }
                 else
                 {
-                    int width = mc.fontRenderer.getStringWidth(action.getDescription());
-                    mc.fontRenderer.drawString(matrixStack, action.getDescription(), x - 5 - width, y + 3, Color.WHITE.getRGB());
+                    int width = mc.font.width(action.getDescription());
+                    mc.font.draw(poseStack, action.getDescription(), x - 5 - width, y + 3, Color.WHITE.getRGB());
                     rightIndex++;
                 }
             }
@@ -338,11 +335,11 @@ public class RenderEvents
     private void renderMiniPlayer()
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.player != null && mc.currentScreen == null && Config.CLIENT.options.renderMiniPlayer.get())
+        if(mc.player != null && mc.screen == null && Config.CLIENT.options.renderMiniPlayer.get())
         {
             if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
             {
-                InventoryScreen.drawEntityOnScreen(20, 45, 20, 0, 0, mc.player);
+                InventoryScreen.renderEntityInInventory(20, 45, 20, 0, 0, mc.player);
             }
         }
     }

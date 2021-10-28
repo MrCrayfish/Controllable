@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client.gui.navigation;
 
-import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.components.Widget;
 
 /**
  * Author: MrCrayfish

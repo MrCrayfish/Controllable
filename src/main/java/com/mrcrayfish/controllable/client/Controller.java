@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.ButtonStates;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resources.language.I18n;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
 
@@ -77,7 +77,7 @@ public class Controller
             }
             return this.cachedName;
         }
-        return I18n.format("controllable.toast.controller");
+        return I18n.get("controllable.toast.controller");
     }
 
     /**

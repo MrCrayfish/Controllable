@@ -19,7 +19,7 @@ public class OptifineGameRendererMixin
     /**
      * Fixes the mouse position when virtual mouse is turned on for controllers.
      */
-    @ModifyArgs(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/optifine/reflect/Reflector;callVoid(Lnet/optifine/reflect/ReflectorMethod;[Ljava/lang/Object;)V", remap = false))
+    /*@ModifyArgs(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/optifine/reflect/Reflector;callVoid(Lnet/optifine/reflect/ReflectorMethod;[Ljava/lang/Object;)V", remap = false))
     private void drawScreen(Args args)
     {
         Object[] params = args.get(1);
@@ -32,5 +32,5 @@ public class OptifineGameRendererMixin
             params[2] = mouseX;
             params[3] = mouseY;
         }
-    }
+    }*/
 }

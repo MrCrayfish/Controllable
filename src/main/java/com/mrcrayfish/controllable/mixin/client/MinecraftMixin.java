@@ -4,11 +4,11 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
@@ -22,21 +22,20 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 public class MinecraftMixin
 {
     @Shadow
-    public ClientPlayerEntity player;
+    public LocalPlayer player;
 
-    @ModifyArgs(method = "processKeyBinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;sendClickBlockToController(Z)V"))
-    private void sendClickBlockToController(Args args)
+    @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;continueAttack(Z)V"), index = 0)
+    private boolean sendClickBlockToController(boolean original)
     {
-        boolean leftClick = args.get(0);
-        args.set(0, leftClick || isLeftClicking());
+        return original || isLeftClicking();
     }
 
-    @Redirect(method = "processKeyBinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/settings/KeyBinding;isKeyDown()Z"), slice = @Slice(
-            from = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/player/ClientPlayerEntity;isHandActive()Z"),
-            to = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerController;onStoppedUsingItem(Lnet/minecraft/entity/player/PlayerEntity;)V")))
-    private boolean onKeyDown(KeyBinding binding)
+    @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"), slice = @Slice(
+            from = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z"),
+            to = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;releaseUsingItem(Lnet/minecraft/world/entity/player/Player;)V")))
+    private boolean onKeyDown(KeyMapping mapping)
     {
-        return binding.isKeyDown() || isRightClicking();
+        return mapping.isDown() || isRightClicking();
     }
 
     /**
@@ -59,12 +58,12 @@ public class MinecraftMixin
         if(controller != null && ButtonBindings.ATTACK.isButtonDown())
         {
             boolean usingVirtualMouse = (Config.CLIENT.options.virtualMouse.get() && Controllable.getInput().getLastUse() > 0);
-            return mc.currentScreen == null && (mc.mouseHelper.isMouseGrabbed() || usingVirtualMouse);
+            return mc.screen == null && (mc.mouseHandler.isMouseGrabbed() || usingVirtualMouse);
         }
         return false;
     }
 
-    @Inject(method = "isEntityGlowing", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "shouldEntityAppearGlowing", at = @At(value = "HEAD"), cancellable = true)
     private void isEntityGlowing(Entity entity, CallbackInfoReturnable<Boolean> cir)
     {
         if(this.player != null && this.player.isSpectator() && ButtonBindings.HIGHLIGHT_PLAYERS.isButtonDown() && entity.getType() == EntityType.PLAYER)

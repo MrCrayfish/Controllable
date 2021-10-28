@@ -5,33 +5,29 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.RadialMenuConfigureScreen;
 import com.mrcrayfish.controllable.event.GatherRadialMenuItemsEvent;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldVertexBufferUploader;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.util.Mth;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -84,15 +80,15 @@ public class RadialMenuHandler
                 bindings.forEach(element ->
                 {
                     JsonObject object = element.getAsJsonObject();
-                    String key = JSONUtils.getString(object, "key");
-                    String colorName = JSONUtils.getString(object, "color");
+                    String key = GsonHelper.getAsString(object, "key");
+                    String colorName = GsonHelper.getAsString(object, "color");
                     ButtonBinding binding = BindingRegistry.getInstance().getBindingByDescriptionKey(key);
                     if(binding != null)
                     {
-                        TextFormatting color = TextFormatting.getValueByName(colorName);
+                        ChatFormatting color = ChatFormatting.getByName(colorName);
                         if(color == null || color.getColor() == null)
                         {
-                            color = TextFormatting.YELLOW;
+                            color = ChatFormatting.YELLOW;
                         }
                         this.bindings.add(new ButtonBindingData(binding, color));
                     }
@@ -137,12 +133,12 @@ public class RadialMenuHandler
     public List<ButtonBindingData> getDefaults()
     {
         List<ButtonBindingData> defaults = new ArrayList<>();
-        defaults.add(new ButtonBindingData(ButtonBindings.ADVANCEMENTS, TextFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.DEBUG_INFO, TextFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.SCREENSHOT, TextFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.FULLSCREEN, TextFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.CINEMATIC_CAMERA, TextFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.HIGHLIGHT_PLAYERS, TextFormatting.YELLOW));
+        defaults.add(new ButtonBindingData(ButtonBindings.ADVANCEMENTS, ChatFormatting.YELLOW));
+        defaults.add(new ButtonBindingData(ButtonBindings.DEBUG_INFO, ChatFormatting.YELLOW));
+        defaults.add(new ButtonBindingData(ButtonBindings.SCREENSHOT, ChatFormatting.YELLOW));
+        defaults.add(new ButtonBindingData(ButtonBindings.FULLSCREEN, ChatFormatting.YELLOW));
+        defaults.add(new ButtonBindingData(ButtonBindings.CINEMATIC_CAMERA, ChatFormatting.YELLOW));
+        defaults.add(new ButtonBindingData(ButtonBindings.HIGHLIGHT_PLAYERS, ChatFormatting.YELLOW));
         return defaults;
     }
 
@@ -161,7 +157,7 @@ public class RadialMenuHandler
             this.setVisibility(true);
             this.populateAndConstruct();
             Minecraft mc = Minecraft.getInstance();
-            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.UI_LOOM_TAKE_RESULT, 1.5F));
+            mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_LOOM_TAKE_RESULT, 1.5F));
         }
     }
 
@@ -270,7 +266,7 @@ public class RadialMenuHandler
             return;
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.gameSettings.hideGUI || mc.currentScreen != null)
+        if(mc.options.hideGui || mc.screen != null)
             return;
 
         if(Controllable.getController() != null)
@@ -310,36 +306,36 @@ public class RadialMenuHandler
     {
         this.updateSelected();
 
-        MatrixStack matrixStack = new MatrixStack();
+        PoseStack poseStack = new PoseStack();
         Minecraft mc = Minecraft.getInstance();
-        matrixStack.translate(0, -10, 0);
-        matrixStack.translate((int) (mc.getMainWindow().getScaledWidth() / 2F), (int) (mc.getMainWindow().getScaledHeight() / 2F), 0);
+        poseStack.translate(0, -10, 0);
+        poseStack.translate((int) (mc.getWindow().getGuiScaledWidth() / 2F), (int) (mc.getWindow().getGuiScaledHeight() / 2F), 0);
 
-        float animation = MathHelper.lerp(partialTicks, this.prevAnimateTicks, this.animateTicks) / 5F;
+        float animation = Mth.lerp(partialTicks, this.prevAnimateTicks, this.animateTicks) / 5F;
         float c1 = 1.70158F;
         float c3 = c1 + 1;
         animation = (float) (1 + c3 * Math.pow(animation - 1, 3) + c1 * Math.pow(animation - 1, 2));
         //matrixStack.scale(animation, animation, animation);
 
-        matrixStack.push();
-        this.settingsItem.draw(matrixStack, mc, false, this.selected == this.settingsItem, animation);
-        matrixStack.pop();
+        poseStack.pushPose();
+        this.settingsItem.draw(poseStack, mc, false, this.selected == this.settingsItem, animation);
+        poseStack.popPose();
 
-        matrixStack.push();
-        this.closeItem.draw(matrixStack, mc, false, this.selected == this.closeItem, animation);
-        matrixStack.pop();
+        poseStack.pushPose();
+        this.closeItem.draw(poseStack, mc, false, this.selected == this.closeItem, animation);
+        poseStack.popPose();
 
-        this.drawRadialItems(this.rightItems, matrixStack, mc, animation);
-        this.drawRadialItems(this.leftItems, matrixStack, mc, animation);
+        this.drawRadialItems(this.rightItems, poseStack, mc, animation);
+        this.drawRadialItems(this.leftItems, poseStack, mc, animation);
     }
 
-    private void drawRadialItems(List<AbstractRadialItem> items, MatrixStack matrixStack, Minecraft mc, float animation)
+    private void drawRadialItems(List<AbstractRadialItem> items, PoseStack matrixStack, Minecraft mc, float animation)
     {
         for(int i = 0; i < items.size(); i++)
         {
             AbstractRadialItem item = items.get(i);
 
-            matrixStack.push();
+            matrixStack.pushPose();
             if(i == 0) matrixStack.translate(0, -10, 0);
             if(i == items.size() - 1) matrixStack.translate(0, 10, 0);
 
@@ -350,7 +346,7 @@ public class RadialMenuHandler
 
             item.draw(matrixStack, mc, left, this.selected == item, animation);
 
-            matrixStack.pop();
+            matrixStack.popPose();
         }
     }
 
@@ -373,9 +369,9 @@ public class RadialMenuHandler
             return;
 
         // Finds the closest radial item based on the direction of the right controller thumbstick
-        float selectedAngle = (float) (MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(yValue, xValue)) - 90) + 180);
-        Optional<AbstractRadialItem> closest = this.allItems.stream().min((o1, o2) -> MathHelper.degreesDifferenceAbs(o1.angle, selectedAngle) > MathHelper.degreesDifferenceAbs(o2.angle, selectedAngle) ? 1 : 0);
-        if(!closest.isPresent())
+        float selectedAngle = (float) (Mth.wrapDegrees(Math.toDegrees(Math.atan2(yValue, xValue)) - 90) + 180);
+        Optional<AbstractRadialItem> closest = this.allItems.stream().min((o1, o2) -> Mth.degreesDifferenceAbs(o1.angle, selectedAngle) > Mth.degreesDifferenceAbs(o2.angle, selectedAngle) ? 1 : 0);
+        if(closest.isEmpty())
             return;
 
         // Don't update if the closest is the same as the currently selected item
@@ -387,7 +383,7 @@ public class RadialMenuHandler
 
         if(Config.CLIENT.options.uiSounds.get())
         {
-            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.ENTITY_ITEM_PICKUP, 1.5F));
+            mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, 1.5F));
         }
     }
 
@@ -401,28 +397,28 @@ public class RadialMenuHandler
      */
     public abstract static class AbstractRadialItem
     {
-        protected ITextComponent label;
-        protected ITextComponent description;
+        protected Component label;
+        protected Component description;
         private float angle;
 
-        protected AbstractRadialItem(ITextComponent label)
+        protected AbstractRadialItem(Component label)
         {
             this(label, null);
         }
 
-        protected AbstractRadialItem(ITextComponent label, ITextComponent description)
+        protected AbstractRadialItem(Component label, Component description)
         {
             this.label = label;
             this.description = description;
         }
 
-        public ITextComponent getLabel()
+        public Component getLabel()
         {
             return this.label;
         }
 
         @Nullable
-        public ITextComponent getDescription()
+        public Component getDescription()
         {
             return this.description;
         }
@@ -434,12 +430,12 @@ public class RadialMenuHandler
 
         public abstract void onUseItem(RadialMenuHandler handler);
 
-        protected abstract void draw(MatrixStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation);
+        protected abstract void draw(PoseStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation);
 
         protected void playSound(SoundEvent event, float pitch)
         {
             Minecraft mc = Minecraft.getInstance();
-            mc.getSoundHandler().play(SimpleSound.master(event, pitch));
+            mc.getSoundManager().play(SimpleSoundInstance.forUI(event, pitch));
         }
 
         /**
@@ -456,11 +452,11 @@ public class RadialMenuHandler
      */
     public static final class CloseRadialMenuItem extends AbstractRadialItem
     {
-        private static final ITextComponent LABEL = new TranslationTextComponent("controllable.gui.close");
+        private static final Component LABEL = new TranslatableComponent("controllable.gui.close");
 
         public CloseRadialMenuItem()
         {
-            super(new TranslationTextComponent("controllable.gui.radial.close"));
+            super(new TranslatableComponent("controllable.gui.radial.close"));
         }
 
         @Override
@@ -468,11 +464,11 @@ public class RadialMenuHandler
         {
             handler.setVisibility(false);
             Minecraft mc = Minecraft.getInstance();
-            mc.getSoundHandler().play(SimpleSound.master(SoundEvents.UI_LOOM_TAKE_RESULT, 1.3F));
+            mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_LOOM_TAKE_RESULT, 1.3F));
         }
 
         @Override
-        protected void draw(MatrixStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation)
+        protected void draw(PoseStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation)
         {
             float color = selected ? 1.0F : 0.1F;
 
@@ -480,31 +476,32 @@ public class RadialMenuHandler
 
             RenderSystem.disableTexture();
             RenderSystem.enableBlend();
-            RenderSystem.disableAlphaTest();
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
 
             // Draw background
-            BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-            buffer.pos(matrixStack.getLast().getMatrix(), -15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.pos(matrixStack.getLast().getMatrix(), -15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.pos(matrixStack.getLast().getMatrix(), 15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.pos(matrixStack.getLast().getMatrix(), 15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.finishDrawing();
-            WorldVertexBufferUploader.draw(buffer);
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            buffer.vertex(matrixStack.last().pose(), -15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            buffer.vertex(matrixStack.last().pose(), -15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            buffer.end();
+            BufferUploader.end(buffer);
 
             RenderSystem.disableBlend();
-            RenderSystem.enableAlphaTest();
             RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
-            mc.getTextureManager().bindTexture(TEXTURE);
-            AbstractGui.blit(matrixStack, -10, -10, 20, 20, 98, 15, 10, 10, 256, 256);
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShaderTexture(0, TEXTURE);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            Screen.blit(matrixStack, -10, -10, 20, 20, 98, 15, 10, 10, 256, 256);
 
             if(selected)
             {
-                AbstractGui.drawCenteredString(matrixStack, mc.fontRenderer, LABEL, 0, -30, 0xFFFFFF);
+                Screen.drawCenteredString(matrixStack, mc.font, LABEL, 0, -30, 0xFFFFFF);
             }
         }
     }
@@ -514,11 +511,11 @@ public class RadialMenuHandler
      */
     public static final class RadialSettingsItem extends AbstractRadialItem
     {
-        private static final ITextComponent LABEL = new TranslationTextComponent("controllable.gui.configure");
+        private static final Component LABEL = new TranslatableComponent("controllable.gui.configure");
 
         public RadialSettingsItem()
         {
-            super(new TranslationTextComponent("controllable.gui.radial.settings"));
+            super(new TranslatableComponent("controllable.gui.radial.settings"));
         }
 
         @Override
@@ -526,11 +523,11 @@ public class RadialMenuHandler
         {
             handler.setVisibility(false);
             handler.clearAnimation();
-            Minecraft.getInstance().displayGuiScreen(new RadialMenuConfigureScreen(handler.getBindings()));
+            Minecraft.getInstance().setScreen(new RadialMenuConfigureScreen(handler.getBindings()));
         }
 
         @Override
-        protected void draw(MatrixStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation)
+        protected void draw(PoseStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation)
         {
             float color = selected ? 1.0F : 0.1F;
 
@@ -538,31 +535,32 @@ public class RadialMenuHandler
 
             RenderSystem.disableTexture();
             RenderSystem.enableBlend();
-            RenderSystem.disableAlphaTest();
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
 
             // Draw background
-            BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-            buffer.pos(matrixStack.getLast().getMatrix(), -15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.pos(matrixStack.getLast().getMatrix(), -15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.pos(matrixStack.getLast().getMatrix(), 15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.pos(matrixStack.getLast().getMatrix(), 15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.finishDrawing();
-            WorldVertexBufferUploader.draw(buffer);
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            buffer.vertex(matrixStack.last().pose(), -15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            buffer.vertex(matrixStack.last().pose(), -15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            buffer.end();
+            BufferUploader.end(buffer);
 
             RenderSystem.disableBlend();
-            RenderSystem.enableAlphaTest();
             RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
-            mc.getTextureManager().bindTexture(TEXTURE);
-            AbstractGui.blit(matrixStack, -10, -10, 20, 20, 88, 15, 10, 10, 256, 256);
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShaderTexture(0, TEXTURE);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            Screen.blit(matrixStack, -10, -10, 20, 20, 88, 15, 10, 10, 256, 256);
 
             if(selected)
             {
-                AbstractGui.drawCenteredString(matrixStack, mc.fontRenderer, LABEL, 0, 21, 0xFFFFFF);
+                Screen.drawCenteredString(matrixStack, mc.font, LABEL, 0, 21, 0xFFFFFF);
             }
         }
     }
@@ -578,7 +576,7 @@ public class RadialMenuHandler
 
         public ButtonBindingItem(ButtonBindingData entry)
         {
-            super(new TranslationTextComponent(entry.getBinding().getLabelKey()).mergeStyle(entry.getColor()), new TranslationTextComponent(entry.getBinding().getCategory()));
+            super(new TranslatableComponent(entry.getBinding().getLabelKey()).withStyle(entry.getColor()), new TranslatableComponent(entry.getBinding().getCategory()));
             this.entry = entry;
         }
 
@@ -592,51 +590,48 @@ public class RadialMenuHandler
         }
 
         @Override
-        protected void draw(MatrixStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation)
+        protected void draw(PoseStack poseStack, Minecraft mc, boolean left, boolean selected, float animation)
         {
-            matrixStack.push();
+            poseStack.pushPose();
 
             float color = selected ? 1.0F : 0.1F;
             float end = (left ? -150F : 150F) * animation;
 
-            matrixStack.translate((1.0F - animation) * (left ? -20 : 20), 0, 0);
+            poseStack.translate((1.0F - animation) * (left ? -20 : 20), 0, 0);
 
             RenderSystem.disableTexture();
             RenderSystem.enableBlend();
-            RenderSystem.disableAlphaTest();
             RenderSystem.defaultBlendFunc();
-            RenderSystem.shadeModel(7425);
             RenderSystem.disableCull();
 
             // Draw background
-            BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-            buffer.pos(matrixStack.getLast().getMatrix(), 0, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.pos(matrixStack.getLast().getMatrix(), 0, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.pos(matrixStack.getLast().getMatrix(), end, 15, 0).color(color, color, color, 0.0F).endVertex();
-            buffer.pos(matrixStack.getLast().getMatrix(), end, -15, 0).color(color, color, color, 0.0F).endVertex();
-            buffer.finishDrawing();
-            WorldVertexBufferUploader.draw(buffer);
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            buffer.vertex(poseStack.last().pose(), 0, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            buffer.vertex(poseStack.last().pose(), 0, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            buffer.vertex(poseStack.last().pose(), end, 15, 0).color(color, color, color, 0.0F).endVertex();
+            buffer.vertex(poseStack.last().pose(), end, -15, 0).color(color, color, color, 0.0F).endVertex();
+            buffer.end();
+            BufferUploader.end(buffer);
 
-            RenderSystem.shadeModel(7424);
             RenderSystem.disableBlend();
-            RenderSystem.enableAlphaTest();
             RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
             if(this.label != null)
             {
-                int offset = !left ? 5 : -mc.fontRenderer.getStringPropertyWidth(this.label) - 5;
-                AbstractGui.drawString(matrixStack, mc.fontRenderer, this.label, offset, -10, 0xFFFFFF);
+                int offset = !left ? 5 : -mc.font.width(this.label) - 5;
+                Screen.drawString(poseStack, mc.font, this.label, offset, -10, 0xFFFFFF);
             }
 
             if(this.description != null)
             {
-                int offset = !left ? 5 : -mc.fontRenderer.getStringPropertyWidth(this.description) - 5;
-                AbstractGui.drawString(matrixStack, mc.fontRenderer, this.description, offset, 2, 0xFFFFFF);
+                int offset = !left ? 5 : -mc.font.width(this.description) - 5;
+                Screen.drawString(poseStack, mc.font, this.description, offset, 2, 0xFFFFFF);
             }
 
-            matrixStack.pop();
+            poseStack.popPose();
         }
     }
 }

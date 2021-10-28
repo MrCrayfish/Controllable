@@ -1,30 +1,22 @@
 package com.mrcrayfish.controllable.client;
 
-import net.minecraft.util.IStringSerializable;
-
 /**
  * Author: MrCrayfish
  */
-public enum Thumbstick implements IStringSerializable
+public enum Thumbstick
 {
-    LEFT("controllable.thumbstick.left"),
-    RIGHT("controllable.thumbstick.right");
+    LEFT("left"),
+    RIGHT("right");
 
-    String key;
+    private final String id;
 
     Thumbstick(String key)
     {
-        this.key = key;
+        this.id = key;
     }
 
-    public String getKey()
+    public String getId()
     {
-        return this.key;
-    }
-
-    @Override
-    public String getString()
-    {
-        return this.key;
+        return this.id;
     }
 }

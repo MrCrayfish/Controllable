@@ -1,16 +1,16 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Controller;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.GuiComponent;
 
 /**
  * Author: MrCrayfish
  */
-public class ControllerButton extends AbstractGui
+public class ControllerButton extends GuiComponent
 {
     protected ControllerLayoutScreen screen;
     protected int button;
@@ -33,10 +33,11 @@ public class ControllerButton extends AbstractGui
         this.scale = scale;
     }
 
-    public void draw(MatrixStack matrixStack, int x, int y, int mouseX, int mouseY, boolean selected)
+    public void draw(PoseStack poseStack, int x, int y, int mouseX, int mouseY, boolean selected)
     {
         RenderSystem.enableBlend();
-        Minecraft.getInstance().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
+        RenderSystem.setShaderTexture(0, ControllerLayoutScreen.TEXTURE);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int buttonU = this.u;
         int buttonV = this.v;
         int buttonX = x + this.x * this.scale;
@@ -53,14 +54,15 @@ public class ControllerButton extends AbstractGui
         {
             buttonV += this.height;
         }
-        blit(matrixStack, buttonX, buttonY, this.width * this.scale, this.height * this.scale, buttonU, buttonV, this.width, this.height, 256, 256);
+        blit(poseStack, buttonX, buttonY, this.width * this.scale, this.height * this.scale, buttonU, buttonV, this.width, this.height, 256, 256);
         RenderSystem.disableBlend();
 
         // Draws an exclamation if the button has no button assigned to it!
         if(this.isMissingMapping())
         {
-            Minecraft.getInstance().getTextureManager().bindTexture(ControllerLayoutScreen.TEXTURE);
-            blit(matrixStack, buttonX + (buttonWidth - 4) / 2, buttonY + (buttonHeight - 15) / 2, 4, 15, 88, 0, 4, 15, 256, 256);
+            RenderSystem.setShaderTexture(0, ControllerLayoutScreen.TEXTURE);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            blit(poseStack, buttonX + (buttonWidth - 4) / 2, buttonY + (buttonHeight - 15) / 2, 4, 15, 88, 0, 4, 15, 256, 256);
         }
     }
 

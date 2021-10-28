@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.mrcrayfish.controllable.client.ButtonBinding;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
 
 /**
  * Author: MrCrayfish
@@ -9,9 +9,9 @@ import net.minecraft.util.text.TextFormatting;
 public class ButtonBindingData
 {
     private ButtonBinding binding;
-    private TextFormatting color;
+    private ChatFormatting color;
 
-    public ButtonBindingData(ButtonBinding binding, TextFormatting color)
+    public ButtonBindingData(ButtonBinding binding, ChatFormatting color)
     {
         this.binding = binding;
         this.color = color;
@@ -22,12 +22,12 @@ public class ButtonBindingData
         return binding;
     }
 
-    public TextFormatting getColor()
+    public ChatFormatting getColor()
     {
         return color;
     }
 
-    public void setColor(TextFormatting color)
+    public void setColor(ChatFormatting color)
     {
         this.color = color;
     }

@@ -1,7 +1,6 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.Controller;
@@ -19,9 +18,9 @@ public class ControllerAxis extends ControllerButton
     }
 
     @Override
-    public void draw(MatrixStack matrixStack, int x, int y, int mouseX, int mouseY, boolean selected)
+    public void draw(PoseStack poseStack, int x, int y, int mouseX, int mouseY, boolean selected)
     {
-        RenderSystem.pushMatrix();
+        poseStack.pushPose();
         Controller controller = Controllable.getController();
         if(controller != null)
         {
@@ -33,23 +32,23 @@ public class ControllerAxis extends ControllerButton
                     float leftY = gamepad.axes(this.screen.getEntry().isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y : GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y);
                     leftX *= this.screen.getEntry().isFlipLeftX() ? -1 : 1;
                     leftY *= this.screen.getEntry().isFlipLeftY() ? -1 : 1;
-                    RenderSystem.translatef(leftX * 5, leftY * 5, 0);
+                    poseStack.translate(leftX * 5, leftY * 5, 0);
                     break;
                 case Buttons.RIGHT_THUMB_STICK:
                     float rightX = gamepad.axes(this.screen.getEntry().isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_LEFT_X : GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X);
                     float rightY = gamepad.axes(this.screen.getEntry().isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y : GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y);
                     rightX *= this.screen.getEntry().isFlipRightX() ? -1 : 1;
                     rightY *= this.screen.getEntry().isFlipRightY() ? -1 : 1;
-                    RenderSystem.translatef(rightX * 5, rightY * 5, 0);
+                    poseStack.translate(rightX * 5, rightY * 5, 0);
                     break;
             }
 
             if(!this.screen.isButtonPressed(this.button))
             {
-                RenderSystem.translated(0, -5, 0);
+                poseStack.translate(0, -5, 0);
             }
         }
-        super.draw(matrixStack, x, y, mouseX, mouseY, selected);
-        RenderSystem.popMatrix();
+        super.draw(poseStack, x, y, mouseX, mouseY, selected);
+        poseStack.popPose();
     }
 }

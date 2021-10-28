@@ -1,11 +1,11 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
-import net.minecraft.client.gui.DialogTexts;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -22,7 +22,7 @@ public class RadialMenuConfigureScreen extends Screen
 
     public RadialMenuConfigureScreen(LinkedHashSet<ButtonBindingData> bindings)
     {
-        super(new TranslationTextComponent("controllable.gui.title.radial_menu_configure"));
+        super(new TranslatableComponent("controllable.gui.title.radial_menu_configure"));
         this.bindings = new ArrayList<>(bindings);
     }
 
@@ -30,26 +30,26 @@ public class RadialMenuConfigureScreen extends Screen
     protected void init()
     {
         this.list = new RadialItemList(this.minecraft, this.width, this.height, 45, this.height - 44, this.bindings);
-        this.children.add(this.list);
-        this.addButton(new Button(this.width / 2 - 155, this.height - 29, 100, 20, DialogTexts.GUI_DONE, buttons -> {
+        this.addWidget(this.list);
+        this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 29, 100, 20, CommonComponents.GUI_DONE, buttons -> {
             RadialMenuHandler.instance().setBindings(new LinkedHashSet<>(this.bindings));
-            Objects.requireNonNull(this.minecraft).displayGuiScreen(null);
+            Objects.requireNonNull(this.minecraft).setScreen(null);
         }));
-        this.addButton(new Button(this.width / 2 - 50, this.height - 29, 100, 20, new TranslationTextComponent("controllable.gui.add_binding"), buttons -> {
-            Objects.requireNonNull(this.minecraft).displayGuiScreen(new SelectButtonBindingScreen(this));
+        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 29, 100, 20, new TranslatableComponent("controllable.gui.add_binding"), buttons -> {
+            Objects.requireNonNull(this.minecraft).setScreen(new SelectButtonBindingScreen(this));
         }));
-        this.addButton(new Button(this.width / 2 + 55, this.height - 29, 100, 20, DialogTexts.GUI_CANCEL, buttons -> {
-            Objects.requireNonNull(this.minecraft).displayGuiScreen(null);
+        this.addRenderableWidget(new Button(this.width / 2 + 55, this.height - 29, 100, 20, CommonComponents.GUI_CANCEL, buttons -> {
+            Objects.requireNonNull(this.minecraft).setScreen(null);
         }));
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(matrixStack);
-        this.list.render(matrixStack, mouseX, mouseY, partialTicks);
-        drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.renderBackground(poseStack);
+        this.list.render(poseStack, mouseX, mouseY, partialTicks);
+        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        super.render(poseStack, mouseX, mouseY, partialTicks);
     }
 
     public List<ButtonBindingData> getBindings()

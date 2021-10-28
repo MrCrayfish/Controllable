@@ -4,7 +4,8 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.ControllerManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.list.ExtendedList;
+import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -15,7 +16,7 @@ import java.util.Map;
  * Author: MrCrayfish
  */
 @OnlyIn(Dist.CLIENT)
-public class ControllerList extends ExtendedList<ControllerEntry>
+public class ControllerList extends AbstractSelectionList<ControllerEntry>
 {
     private ControllerManager manager;
 
@@ -45,7 +46,7 @@ public class ControllerList extends ExtendedList<ControllerEntry>
             return;
         }
 
-        List<ControllerEntry> entries = this.getEventListeners();
+        List<ControllerEntry> entries = this.children();
         for(ControllerEntry entry : entries)
         {
             if(entry.getJid() == controller.getJid())
@@ -54,5 +55,11 @@ public class ControllerList extends ExtendedList<ControllerEntry>
                 break;
             }
         }
+    }
+
+    @Override
+    public void updateNarration(NarrationElementOutput output)
+    {
+
     }
 }

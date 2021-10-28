@@ -1,13 +1,13 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
-import net.minecraft.client.gui.DialogTexts;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
@@ -24,7 +24,7 @@ public class ButtonBindingScreen extends Screen
 
     protected ButtonBindingScreen(Screen parentScreen)
     {
-        super(new TranslationTextComponent("controllable.gui.title.button_binding"));
+        super(new TranslatableComponent("controllable.gui.title.button_binding"));
         this.parentScreen = parentScreen;
     }
 
@@ -42,9 +42,9 @@ public class ButtonBindingScreen extends Screen
     protected void init()
     {
         this.bindingList = new ButtonBindingList(this, this.minecraft, this.width + 10, this.height, 45, this.height - 44, 20);
-        this.children.add(this.bindingList);
+        this.addWidget(this.bindingList);
 
-        this.buttonReset = this.addButton(new Button(this.width / 2 - 155, this.height - 29, 100, 20, new TranslationTextComponent("controllable.gui.resetBinds"), (button) -> {
+        this.buttonReset = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 29, 100, 20, new TranslatableComponent("controllable.gui.resetBinds"), (button) -> {
             BindingRegistry registry = BindingRegistry.getInstance();
             registry.getBindings().forEach(ButtonBinding::reset);
             registry.resetBindingHash();
@@ -52,12 +52,12 @@ public class ButtonBindingScreen extends Screen
         }));
         this.buttonReset.active = BindingRegistry.getInstance().getBindings().stream().noneMatch(ButtonBinding::isDefault);
 
-        this.addButton(new Button(this.width / 2 - 50, this.height - 29, 100, 20, new TranslationTextComponent("controllable.gui.add_key_bind"), button -> {
-            Objects.requireNonNull(this.minecraft).displayGuiScreen(new SelectKeyBindingScreen(this));
+        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 29, 100, 20, new TranslatableComponent("controllable.gui.add_key_bind"), button -> {
+            Objects.requireNonNull(this.minecraft).setScreen(new SelectKeyBindingScreen(this));
         }));
 
-        this.addButton(new Button(this.width / 2 + 55, this.height - 29, 100, 20, DialogTexts.GUI_DONE, (button) -> {
-            Objects.requireNonNull(this.minecraft).displayGuiScreen(this.parentScreen);
+        this.addRenderableWidget(new Button(this.width / 2 + 55, this.height - 29, 100, 20, CommonComponents.GUI_DONE, (button) -> {
+            Objects.requireNonNull(this.minecraft).setScreen(this.parentScreen);
             BindingRegistry registry = BindingRegistry.getInstance();
             registry.resetBindingHash();
             registry.save();
@@ -71,18 +71,18 @@ public class ButtonBindingScreen extends Screen
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(matrixStack);
-        this.bindingList.render(matrixStack, this.selectedBinding == null ? mouseX : -1, this.selectedBinding == null ? mouseY : -1, partialTicks);
-        drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
-        super.render(matrixStack, this.selectedBinding == null ? mouseX : -1, this.selectedBinding == null ? mouseY : -1, partialTicks);
+        this.renderBackground(poseStack);
+        this.bindingList.render(poseStack, this.selectedBinding == null ? mouseX : -1, this.selectedBinding == null ? mouseY : -1, partialTicks);
+        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        super.render(poseStack, this.selectedBinding == null ? mouseX : -1, this.selectedBinding == null ? mouseY : -1, partialTicks);
 
         if(this.selectedBinding != null)
         {
             RenderSystem.disableDepthTest();
-            this.fillGradient(matrixStack, 0, 0, this.width, this.height, -1072689136, -804253680);
-            drawCenteredString(matrixStack, this.font, new TranslationTextComponent("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
+            this.fillGradient(poseStack, 0, 0, this.width, this.height, -1072689136, -804253680);
+            drawCenteredString(poseStack, this.font, new TranslatableComponent("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
         }
     }

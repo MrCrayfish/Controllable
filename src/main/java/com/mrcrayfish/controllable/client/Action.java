@@ -1,25 +1,27 @@
 package com.mrcrayfish.controllable.client;
 
+import net.minecraft.network.chat.Component;
+
 /**
  * Author: MrCrayfish
  */
 public class Action
 {
-    private String description;
+    private Component description;
     private Side side;
 
-    public Action(String description, Side side)
+    public Action(Component description, Side side)
     {
         this.description = description;
         this.side = side;
     }
 
-    public String getDescription()
+    public Component getDescription()
     {
         return this.description;
     }
 
-    public void setDescription(String description)
+    public void setDescription(Component description)
     {
         this.description = description;
     }

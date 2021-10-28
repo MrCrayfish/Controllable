@@ -1,25 +1,22 @@
 package com.mrcrayfish.controllable.client;
 
-import net.minecraft.util.IStringSerializable;
-
 /**
  * Author: MrCrayfish
  */
-public enum CursorType implements IStringSerializable
+public enum CursorType
 {
     LIGHT("light"),
     DARK("dark"),
     CONSOLE("console");
 
-    String id;
+    private final String id;
 
     CursorType(String id)
     {
         this.id = id;
     }
 
-    @Override
-    public String getString()
+    public String getId()
     {
         return this.id;
     }

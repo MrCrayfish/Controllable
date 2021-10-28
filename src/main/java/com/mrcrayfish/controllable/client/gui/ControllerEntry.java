@@ -1,13 +1,13 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Controller;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.list.ExtendedList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -15,7 +15,7 @@ import java.awt.*;
 /**
  * Author: MrCrayfish
  */
-public final class ControllerEntry extends ExtendedList.AbstractListEntry<ControllerEntry>
+public final class ControllerEntry extends AbstractSelectionList.Entry<ControllerEntry>
 {
     private ControllerList controllerList;
     private int jid;
@@ -32,17 +32,17 @@ public final class ControllerEntry extends ExtendedList.AbstractListEntry<Contro
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
+    public void render(PoseStack poseStack, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
     {
         String controllerName = GLFW.glfwGetGamepadName(this.jid);
         if(controllerName == null)
             return;
-        Minecraft.getInstance().fontRenderer.drawStringWithShadow(matrixStack, controllerName, left + 20, top + 4, Color.WHITE.getRGB());
+        Minecraft.getInstance().font.drawShadow(poseStack, controllerName, left + 20, top + 4, Color.WHITE.getRGB());
         if(this.controllerList.getSelected() == this)
         {
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation("textures/gui/container/beacon.png"));
-            Screen.blit(matrixStack, left + 2, top + 2, 91, 224, 14, 12, 256, 256);
+            RenderSystem.setShaderTexture(0, new ResourceLocation("textures/gui/container/beacon.png"));
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            Screen.blit(poseStack, left + 2, top + 2, 91, 224, 14, 12, 256, 256);
         }
     }
 

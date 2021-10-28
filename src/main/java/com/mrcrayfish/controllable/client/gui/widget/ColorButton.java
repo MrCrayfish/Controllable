@@ -1,10 +1,10 @@
 package com.mrcrayfish.controllable.client.gui.widget;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.TextComponent;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -12,33 +12,33 @@ import org.apache.commons.lang3.ArrayUtils;
  */
 public class ColorButton extends Button
 {
-    private static final TextFormatting[] COLORS = {
-        TextFormatting.BLACK,
-        TextFormatting.DARK_BLUE,
-        TextFormatting.DARK_GREEN,
-        TextFormatting.DARK_AQUA,
-        TextFormatting.DARK_RED,
-        TextFormatting.DARK_PURPLE,
-        TextFormatting.GOLD,
-        TextFormatting.GRAY,
-        TextFormatting.DARK_GRAY,
-        TextFormatting.BLUE,
-        TextFormatting.GREEN,
-        TextFormatting.AQUA,
-        TextFormatting.RED,
-        TextFormatting.LIGHT_PURPLE,
-        TextFormatting.YELLOW,
-        TextFormatting.WHITE
+    private static final ChatFormatting[] COLORS = {
+        ChatFormatting.BLACK,
+        ChatFormatting.DARK_BLUE,
+        ChatFormatting.DARK_GREEN,
+        ChatFormatting.DARK_AQUA,
+        ChatFormatting.DARK_RED,
+        ChatFormatting.DARK_PURPLE,
+        ChatFormatting.GOLD,
+        ChatFormatting.GRAY,
+        ChatFormatting.DARK_GRAY,
+        ChatFormatting.BLUE,
+        ChatFormatting.GREEN,
+        ChatFormatting.AQUA,
+        ChatFormatting.RED,
+        ChatFormatting.LIGHT_PURPLE,
+        ChatFormatting.YELLOW,
+        ChatFormatting.WHITE
     };
 
     private int index = 14;
 
-    public ColorButton(int x, int y, IPressable onPress)
+    public ColorButton(int x, int y, OnPress onPress)
     {
-        super(x, y, 20, 20, StringTextComponent.EMPTY, onPress);
+        super(x, y, 20, 20, TextComponent.EMPTY, onPress);
     }
 
-    public void setColor(TextFormatting color)
+    public void setColor(ChatFormatting color)
     {
         int index = ArrayUtils.indexOf(COLORS, color);
         if(index != -1)
@@ -47,7 +47,7 @@ public class ColorButton extends Button
         }
     }
 
-    public TextFormatting getColor()
+    public ChatFormatting getColor()
     {
         return COLORS[this.index];
     }
@@ -60,13 +60,13 @@ public class ColorButton extends Button
     }
 
     @Override
-    public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
     {
-        super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
+        super.renderButton(poseStack, mouseX, mouseY, partialTicks);
         RenderSystem.disableTexture();
         RenderSystem.disableDepthTest();
-        fill(matrixStack, this.x + 4, this.y + 4, this.x + 16, this.y + 16, 0xFF000000);
-        fill(matrixStack, this.x + 5, this.y + 5, this.x + 15, this.y + 15, COLORS[this.index].getColor() + 0xFF000000);
+        fill(poseStack, this.x + 4, this.y + 4, this.x + 16, this.y + 16, 0xFF000000);
+        fill(poseStack, this.x + 5, this.y + 5, this.x + 15, this.y + 15, COLORS[this.index].getColor() + 0xFF000000);
         RenderSystem.enableDepthTest();
         RenderSystem.enableTexture();
     }
