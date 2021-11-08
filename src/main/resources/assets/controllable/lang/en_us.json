@@ -113,6 +113,8 @@
     "controllable.cursor.light": "Light",
     "controllable.cursor.dark": "Dark",
     "controllable.cursor.console": "Console",
+    "controllable.cursor.legacy_light": "Light (Legacy)",
+    "controllable.cursor.legacy_dark": "Dark (Legacy)",
     "controllable.actionVisibility.all": "All",
     "controllable.actionVisibility.minimal": "Minimal",
     "controllable.actionVisibility.none": "None",

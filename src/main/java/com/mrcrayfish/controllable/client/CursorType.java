@@ -7,7 +7,9 @@ public enum CursorType
 {
     LIGHT("light"),
     DARK("dark"),
-    CONSOLE("console");
+    CONSOLE("console"),
+    LEGACY_LIGHT("legacy_light"),
+    LEGACY_DARK("legacy_dark");
 
     private final String id;
 
