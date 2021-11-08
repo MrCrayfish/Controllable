@@ -10,10 +10,7 @@ import net.minecraft.client.Minecraft;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -170,6 +167,10 @@ public class BindingRegistry
                 }
             });
         }
+        catch(FileNotFoundException e)
+        {
+            Controllable.LOGGER.info("Skipped loading bindings.properties since it doesn't exist");
+        }
         catch(IOException e)
         {
             e.printStackTrace();
@@ -198,6 +199,10 @@ public class BindingRegistry
                     }
                 }
             });
+        }
+        catch(FileNotFoundException e)
+        {
+            Controllable.LOGGER.info("Skipped loading key_adapters.properties since it doesn't exist");
         }
         catch(IOException e)
         {
