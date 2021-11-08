@@ -335,7 +335,7 @@ public class ControllerInput
             poseStack.pushPose();
             CursorType type = Config.CLIENT.options.cursorType.get();
             Minecraft minecraft = Minecraft.getInstance();
-            if(minecraft.player == null || (minecraft.player.getInventory().getSelected().isEmpty() || type == CursorType.CONSOLE))
+            if(minecraft.player == null || (minecraft.player.inventoryMenu.getCarried().isEmpty() || type == CursorType.CONSOLE))
             {
                 double mouseX = (this.prevMouseX + (this.mouseX - this.prevMouseX) * Minecraft.getInstance().getFrameTime());
                 double mouseY = (this.prevMouseY + (this.mouseY - this.prevMouseY) * Minecraft.getInstance().getFrameTime());
