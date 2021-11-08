@@ -9,7 +9,9 @@ public enum CursorType implements IStringSerializable
 {
     LIGHT("light"),
     DARK("dark"),
-    CONSOLE("console");
+    CONSOLE("console"),
+    LEGACY_LIGHT("legacy_light"),
+    LEGACY_DARK("legacy_dark");
 
     String id;
 

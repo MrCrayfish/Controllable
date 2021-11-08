@@ -11,10 +11,7 @@ import net.minecraft.client.settings.KeyBinding;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -171,6 +168,10 @@ public class BindingRegistry
                 }
             });
         }
+        catch(FileNotFoundException e)
+        {
+            Controllable.LOGGER.info("Skipped loading bindings.properties since it doesn't exist");
+        }
         catch(IOException e)
         {
             e.printStackTrace();
@@ -179,7 +180,7 @@ public class BindingRegistry
         // Load key adapters
         try(BufferedReader reader = Files.newReader(new File(Controllable.getConfigFolder(), "controllable/key_adapters.properties"), Charsets.UTF_8))
         {
-            Map<String, KeyBinding> bindings = Arrays.stream(Minecraft.getInstance().gameSettings.keyBindings).collect(Collectors.toMap(KeyBinding::getKeyDescription, v -> v));
+            Map<String, KeyBinding> bindings = Arrays.stream(Minecraft.getInstance().gameSettings.keyBindings).collect(Collectors.toMap(KeyBinding::getKeyDescription, v -> v, (t1, t2) -> t2));
             Properties properties = new Properties();
             properties.load(reader);
             properties.forEach((key, value) ->
@@ -199,6 +200,10 @@ public class BindingRegistry
                     }
                 }
             });
+        }
+        catch(FileNotFoundException e)
+        {
+            Controllable.LOGGER.info("Skipped loading key_adapters.properties since it doesn't exist");
         }
         catch(IOException e)
         {
