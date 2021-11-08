@@ -54,7 +54,7 @@ public class RadialItemList extends ExtendedList<RadialItemList.ButtonBindingEnt
     }
 
     @Override
-    protected int getRowLeft()
+    public int getRowLeft()
     {
         if(true) return super.getRowLeft();
         return this.x0 + this.width / 2 - this.getRowWidth() / 2;
