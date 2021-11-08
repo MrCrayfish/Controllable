@@ -302,9 +302,8 @@ public class RenderEvents
                 int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
                 int size = 13;
 
-                int x = side == Action.Side.LEFT ? 5 : mc.getWindow().getScreenWidth() - 5 - size; //TODO test
-                int y = mc.getWindow().getScreenHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
-
+                int x = side == Action.Side.LEFT ? 5 : mc.getWindow().getGuiScaledWidth() - 5 - size; //TODO test
+                int y = mc.getWindow().getGuiScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
 
                 RenderSystem.setShaderTexture(0, CONTROLLER_BUTTONS);
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
