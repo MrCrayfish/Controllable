@@ -1114,22 +1114,22 @@ public class ControllerInput
 
         /* Makes the mouse attracted to slots. This helps with selecting items when using
          * a controller. */
-        if(screen instanceof ContainerScreen)
+        if(screen instanceof AbstractContainerScreen<?> containerScreen)
         {
             /* Prevents cursor from moving until at least some input is detected */
-            if(!this.moved) return;
+            if(!this.moved)
+                return;
 
             Minecraft mc = Minecraft.getInstance();
-            ContainerScreen guiContainer = (ContainerScreen) screen;
-            int guiLeft = guiContainer.getGuiLeft();
-            int guiTop = guiContainer.getGuiTop();
+            int guiLeft = containerScreen.getGuiLeft();
+            int guiTop = containerScreen.getGuiTop();
             int mouseX = (int) (this.mouseX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth());
             int mouseY = (int) (this.mouseY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight());
 
             /* Finds the closest slot in the GUI within 14 pixels (inclusive) */
             Slot closestSlot = null;
             double closestDistance = -1.0;
-            for(Slot slot : guiContainer.getMenu().slots)
+            for(Slot slot : containerScreen.getMenu().slots)
             {
                 int posX = guiLeft + slot.x + 8;
                 int posY = guiTop + slot.y + 8;
