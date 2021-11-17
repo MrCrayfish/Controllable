@@ -1,10 +1,7 @@
 package com.mrcrayfish.controllable.client.settings;
 
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.client.ActionVisibility;
-import com.mrcrayfish.controllable.client.ControllerIcons;
-import com.mrcrayfish.controllable.client.CursorType;
-import com.mrcrayfish.controllable.client.Thumbstick;
+import com.mrcrayfish.controllable.client.*;
 import net.minecraft.client.CycleOption;
 import net.minecraft.client.Options;
 import net.minecraft.client.ProgressOption;
@@ -140,6 +137,15 @@ public class ControllerOptions
         return Config.CLIENT.options.radialThumbstick.get();
     }, (options, option, thumbstick) -> {
         Config.CLIENT.options.radialThumbstick.set(thumbstick);
+        Config.save();
+    });
+
+    public static final CycleOption<SneakMode> SNEAK_MODE = CycleOption.create("controllable.options.sneakMode", SneakMode.values(), sneakMode -> {
+        return new TranslatableComponent("controllable.sneakMode." + sneakMode.getId());
+    }, options -> {
+        return Config.CLIENT.options.sneakMode.get();
+    }, (options, option, sneakMode) -> {
+        Config.CLIENT.options.sneakMode.set(sneakMode);
         Config.save();
     });
 

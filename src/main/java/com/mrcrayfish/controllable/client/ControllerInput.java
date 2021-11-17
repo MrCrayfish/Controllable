@@ -40,6 +40,7 @@ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.inventory.RecipeBookMenu;
@@ -54,6 +55,7 @@ import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.lwjgl.glfw.GLFW;
@@ -493,7 +495,7 @@ public class ControllerInput
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onInputUpdate(InputUpdateEvent event)
     {
         Player player = Minecraft.getInstance().player;
@@ -527,6 +529,11 @@ public class ControllerInput
             this.keyboardSneaking = false;
         }
 
+        if(Config.CLIENT.options.sneakMode.get() == SneakMode.HOLD)
+        {
+            this.sneaking = ButtonBindings.SNEAK.isButtonDown();
+        }
+
         if(mc.options.keyShift.isDown())
         {
             this.sneaking = true;
@@ -545,7 +552,6 @@ public class ControllerInput
         }
         else if(this.isFlying)
         {
-            this.sneaking = false;
             this.isFlying = false;
         }
 
@@ -672,9 +678,12 @@ public class ControllerInput
                 }
                 else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
-                    if(mc.player != null && !mc.player.getAbilities().flying && !mc.player.isPassenger())
+                    if(mc.player != null && !mc.player.getAbilities().flying && !this.isFlying && !mc.player.isPassenger())
                     {
-                        this.sneaking = !this.sneaking;
+                        if(Config.CLIENT.options.sneakMode.get() == SneakMode.TOGGLE)
+                        {
+                            this.sneaking = !this.sneaking;
+                        }
                     }
                 }
                 else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())

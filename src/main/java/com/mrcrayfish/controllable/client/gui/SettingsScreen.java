@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
  */
 public class SettingsScreen extends Screen
 {
-    private static final Option[] OPTIONS = new Option[]{ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.CONSOLE_HOTBAR, ControllerOptions.CONTROLLER_ICONS, ControllerOptions.CURSOR_TYPE, ControllerOptions.INVERT_LOOK, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED, ControllerOptions.SHOW_ACTIONS, ControllerOptions.QUICK_CRAFT, ControllerOptions.UI_SOUNDS, ControllerOptions.RADIAL_THUMBSTICK};
+    private static final Option[] OPTIONS = new Option[]{ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.CONSOLE_HOTBAR, ControllerOptions.CONTROLLER_ICONS, ControllerOptions.CURSOR_TYPE, ControllerOptions.INVERT_LOOK, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED, ControllerOptions.SHOW_ACTIONS, ControllerOptions.QUICK_CRAFT, ControllerOptions.UI_SOUNDS, ControllerOptions.RADIAL_THUMBSTICK, ControllerOptions.SNEAK_MODE};
     private final Screen parentScreen;
     private IToolTip hoveredTooltip;
     private int hoveredCounter;
@@ -35,11 +35,11 @@ public class SettingsScreen extends Screen
         {
             Option option = OPTIONS[i];
             int x = this.width / 2 - 155 + i % 2 * 160;
-            int y = this.height / 6 + 24 * (i >> 1);
+            int y = this.height / 6 + 24 * (i >> 1) - 12;
             this.addRenderableWidget(option.createButton(this.minecraft.options, x, y, 150));
         }
 
-        this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 6 + 24 * (OPTIONS.length + 1) / 2, 200, 20, CommonComponents.GUI_BACK, (button) -> {
+        this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 6 + 24 * (OPTIONS.length + 1) / 2 - 12, 200, 20, CommonComponents.GUI_BACK, (button) -> {
             this.minecraft.setScreen(this.parentScreen);
         }));
     }
@@ -70,7 +70,7 @@ public class SettingsScreen extends Screen
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(poseStack);
-        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 10, 0xFFFFFF);
         super.render(poseStack, mouseX, mouseY, partialTicks);
 
         this.hoveredTooltip = this.getHoveredToolTip(mouseX, mouseY);
