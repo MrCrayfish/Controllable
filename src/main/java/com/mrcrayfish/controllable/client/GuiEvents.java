@@ -2,11 +2,9 @@ package com.mrcrayfish.controllable.client;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.gui.ControllerSelectionScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
-import com.mrcrayfish.controllable.mixin.client.ForgeIngameGuiMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraftforge.client.event.GuiScreenEvent;
