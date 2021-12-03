@@ -2,8 +2,8 @@ package com.mrcrayfish.controllable.mixin.client;
 
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.loading.ClientModLoader;
 import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.fmlclient.ClientModLoader;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

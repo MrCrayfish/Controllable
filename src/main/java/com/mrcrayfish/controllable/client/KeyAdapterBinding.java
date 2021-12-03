@@ -79,15 +79,15 @@ public final class KeyAdapterBinding extends ButtonBinding
             {
                 if(action == GLFW.GLFW_RELEASE)
                 {
-                    cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onGuiKeyReleasedPre(screen, key, -1, modifiers);
+                    cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onScreenKeyReleasedPre(screen, key, -1, modifiers);
                     if(!cancelled[0]) cancelled[0] = screen.keyReleased(key, -1, modifiers);
-                    if(!cancelled[0]) cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onGuiKeyReleasedPost(screen, key, -1, modifiers);
+                    if(!cancelled[0]) cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onScreenKeyReleasedPost(screen, key, -1, modifiers);
                 }
                 else if(action == GLFW.GLFW_PRESS)
                 {
-                    cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onGuiKeyPressedPre(screen, key, -1, modifiers);
+                    cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onScreenKeyPressedPre(screen, key, -1, modifiers);
                     if(!cancelled[0])  cancelled[0] = screen.keyPressed(key, -1, modifiers);
-                    if(!cancelled[0]) cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onGuiKeyPressedPost(screen, key, -1, modifiers);
+                    if(!cancelled[0]) cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onScreenKeyPressedPost(screen, key, -1, modifiers);
                 }
 
             }, "keyPressed event handler", screen.getClass().getCanonicalName());

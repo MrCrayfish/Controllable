@@ -1,18 +1,18 @@
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://maven.parchmentmc.org' }
+       // maven { url = 'https://maven.parchmentmc.org' }
         maven { url = 'https://repo.spongepowered.org/maven' }
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-        classpath 'org.parchmentmc:librarian:1.+'
+        //classpath 'org.parchmentmc:librarian:1.+'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
+//apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
@@ -20,14 +20,14 @@ version = "0.15.0-1.17.1"
 group = "com.mrcrayfish" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "controllable"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 mixin {
     add sourceSets.main, "controllable.refmap.json"
 }
 
 minecraft {
-    mappings channel: 'parchment', version: '2021.10.24-1.17.1'
+    mappings channel: 'official', version: '1.18'
     
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -89,11 +89,11 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.0.97'
-    implementation fg.deobf("mezz.jei:jei-1.17.1:8.1.0.26")
-    implementation fg.deobf('curse.maven:configured-457570:3434072')
-    implementation fg.deobf('curse.maven:catalogue-459701:3399552')
-    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
+    minecraft 'net.minecraftforge:forge:1.18-38.0.10'
+    //implementation fg.deobf("mezz.jei:jei-1.17.1:8.1.0.26")
+    implementation fg.deobf('curse.maven:configured-457570:3543119')
+    implementation fg.deobf('curse.maven:catalogue-459701:3543625')
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 jar {

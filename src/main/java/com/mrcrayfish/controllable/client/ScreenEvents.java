@@ -7,8 +7,8 @@ import com.mrcrayfish.controllable.client.gui.ControllerSelectionScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.OptionsScreen;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-public class GuiEvents
+public class ScreenEvents
 {
     private static final List<IIngameOverlay> INCLUDED_OVERLAYS;
 
@@ -43,21 +43,21 @@ public class GuiEvents
 
     private ControllerManager manager;
 
-    public GuiEvents(ControllerManager manager)
+    public ScreenEvents(ControllerManager manager)
     {
         this.manager = manager;
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    public void onOpenGui(GuiScreenEvent.InitGuiEvent.Post event)
+    public void onOpenGui(ScreenEvent.InitScreenEvent.Post event)
     {
         /* Resets the controller button states */
         ButtonBinding.resetButtonStates();
 
-        if(event.getGui() instanceof OptionsScreen)
+        if(event.getScreen() instanceof OptionsScreen)
         {
-            int y = event.getGui().height / 6 + 72 - 6;
-            event.addWidget(new ControllerButton((event.getGui().width / 2) + 5 + 150 + 4, y, button -> Minecraft.getInstance().setScreen(new ControllerSelectionScreen(manager, event.getGui()))));
+            int y = event.getScreen().height / 6 + 72 - 6;
+            event.addListener(new ControllerButton((event.getScreen().width / 2) + 5 + 150 + 4, y, button -> Minecraft.getInstance().setScreen(new ControllerSelectionScreen(manager, event.getScreen()))));
         }
     }
 

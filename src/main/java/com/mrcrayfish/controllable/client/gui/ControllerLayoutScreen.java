@@ -185,7 +185,7 @@ public class ControllerLayoutScreen extends Screen
             this.renderComponentTooltip(poseStack, components, mouseX, mouseY);
         }
 
-        if(!this.validLayout && this.doneButton.isHovered())
+        if(!this.validLayout && this.doneButton.isHoveredOrFocused())
         {
             List<FormattedCharSequence> components = new ArrayList<>();
             components.add(new TranslatableComponent("controllable.gui.layout.warning").withStyle(ChatFormatting.RED).getVisualOrderText());
@@ -193,7 +193,7 @@ public class ControllerLayoutScreen extends Screen
             this.renderTooltip(poseStack, components, mouseX, mouseY - 50);
         }
 
-        if(this.thumbstickButton.isHovered())
+        if(this.thumbstickButton.isHoveredOrFocused())
         {
             this.renderTooltip(poseStack, new TranslatableComponent("controllable.gui.layout.thumbsticks"), mouseX, mouseY);
         }

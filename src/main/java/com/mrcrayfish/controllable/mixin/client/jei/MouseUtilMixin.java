@@ -3,12 +3,7 @@ package com.mrcrayfish.controllable.mixin.client.jei;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerInput;
-import mezz.jei.input.MouseUtil;
 import net.minecraft.client.Minecraft;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
@@ -18,11 +13,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  *
  * Author: MrCrayfish
  */
-@Pseudo
-@Mixin(MouseUtil.class)
+//@Pseudo
+//@Mixin(MouseUtil.class)
 public class MouseUtilMixin
 {
-    @Inject(method = "getX", at = @At(value = "TAIL"), remap = false, cancellable = true)
+    //@Inject(method = "getX", at = @At(value = "TAIL"), remap = false, cancellable = true)
     private static void getX(CallbackInfoReturnable<Double> cir)
     {
         ControllerInput input = Controllable.getInput();
@@ -34,7 +29,7 @@ public class MouseUtilMixin
         }
     }
 
-    @Inject(method = "getY", at = @At(value = "TAIL"), remap = false, cancellable = true)
+    //@Inject(method = "getY", at = @At(value = "TAIL"), remap = false, cancellable = true)
     private static void getY(CallbackInfoReturnable<Double> cir)
     {
         ControllerInput input = Controllable.getInput();

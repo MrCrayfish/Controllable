@@ -40,7 +40,6 @@ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.inventory.RecipeBookMenu;
@@ -49,10 +48,10 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.InputUpdateEvent;
+import net.minecraftforge.client.event.MovementInputUpdateEvent;
+import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -260,7 +259,7 @@ public class ControllerInput
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    public void onScreenInit(GuiOpenEvent event)
+    public void onScreenInit(ScreenOpenEvent event)
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.screen == null)
@@ -275,7 +274,7 @@ public class ControllerInput
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    public void onRenderScreen(GuiScreenEvent.DrawScreenEvent.Pre event)
+    public void onRenderScreen(ScreenEvent.DrawScreenEvent.Pre event)
     {
         /* Makes the cursor movement appear smooth between ticks. This will only run if the target
          * mouse position is different to the previous tick's position. This allows for the mouse
@@ -312,7 +311,7 @@ public class ControllerInput
                         {
                             double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
                             double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
-                            if(net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPre(screen, finalMouseX, finalMouseY, mc.mouseHandler.activeButton, finalDragX, finalDragY))
+                            if(net.minecraftforge.client.ForgeHooksClient.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, mc.mouseHandler.activeButton, finalDragX, finalDragY))
                             {
                                 return;
                             }
@@ -320,7 +319,7 @@ public class ControllerInput
                             {
                                 return;
                             }
-                            net.minecraftforge.client.ForgeHooksClient.onGuiMouseDragPost(screen, finalMouseX, finalMouseY, mc.mouseHandler.activeButton, finalDragX, finalDragY);
+                            net.minecraftforge.client.ForgeHooksClient.onScreenMouseDragPost(screen, finalMouseX, finalMouseY, mc.mouseHandler.activeButton, finalDragX, finalDragY);
                         }, "mouseDragged event handler", ((GuiEventListener) screen).getClass().getCanonicalName());
                     }
                 }
@@ -329,11 +328,11 @@ public class ControllerInput
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    public void onRenderScreen(GuiScreenEvent.DrawScreenEvent.Post event)
+    public void onRenderScreen(ScreenEvent.DrawScreenEvent.Post event)
     {
         if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && lastUse > 0)
         {
-            PoseStack poseStack = event.getMatrixStack();
+            PoseStack poseStack = event.getPoseStack();
             poseStack.pushPose();
             CursorType type = Config.CLIENT.options.cursorType.get();
             Minecraft minecraft = Minecraft.getInstance();
@@ -470,12 +469,12 @@ public class ControllerInput
     }
 
     @SubscribeEvent
-    public void onOpenScreen(GuiOpenEvent event)
+    public void onOpenScreen(ScreenOpenEvent event)
     {
         Minecraft mc = Minecraft.getInstance();
         if(Config.SERVER.restrictToController.get() && mc.level != null && !this.isControllerInUse())
         {
-            if(event.getGui() instanceof ContainerScreen)
+            if(event.getScreen() instanceof ContainerScreen)
             {
                 event.setCanceled(true);
             }
@@ -496,7 +495,7 @@ public class ControllerInput
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onInputUpdate(InputUpdateEvent event)
+    public void onInputUpdate(MovementInputUpdateEvent event)
     {
         Player player = Minecraft.getInstance().player;
         if(player == null)
@@ -504,7 +503,7 @@ public class ControllerInput
 
         if(Config.SERVER.restrictToController.get())
         {
-            Input input = event.getMovementInput();
+            Input input = event.getInput();
             input.leftImpulse = 0F;
             input.forwardImpulse = 0F;
             input.up = false;
@@ -555,7 +554,7 @@ public class ControllerInput
             this.isFlying = false;
         }
 
-        event.getMovementInput().shiftKeyDown = this.sneaking;
+        event.getInput().shiftKeyDown = this.sneaking;
 
         if(mc.screen == null)
         {
@@ -567,13 +566,13 @@ public class ControllerInput
                 {
                     this.setControllerInUse();
                     int dir = controller.getLThumbStickYValue() > 0.0F ? -1 : 1;
-                    event.getMovementInput().up = dir > 0;
-                    event.getMovementInput().down = dir < 0;
-                    event.getMovementInput().forwardImpulse = dir * Mth.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
+                    event.getInput().up = dir > 0;
+                    event.getInput().down = dir < 0;
+                    event.getInput().forwardImpulse = dir * Mth.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
-                    if(event.getMovementInput().shiftKeyDown)
+                    if(event.getInput().shiftKeyDown)
                     {
-                        event.getMovementInput().forwardImpulse *= 0.3D;
+                        event.getInput().forwardImpulse *= 0.3D;
                     }
                 }
 
@@ -586,13 +585,13 @@ public class ControllerInput
                 {
                     this.setControllerInUse();
                     int dir = controller.getLThumbStickXValue() > 0.0F ? -1 : 1;
-                    event.getMovementInput().right = dir < 0;
-                    event.getMovementInput().left = dir > 0;
-                    event.getMovementInput().leftImpulse = dir * Mth.clamp((Math.abs(controller.getLThumbStickXValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
+                    event.getInput().right = dir < 0;
+                    event.getInput().left = dir > 0;
+                    event.getInput().leftImpulse = dir * Mth.clamp((Math.abs(controller.getLThumbStickXValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
 
-                    if(event.getMovementInput().shiftKeyDown)
+                    if(event.getInput().shiftKeyDown)
                     {
-                        event.getMovementInput().leftImpulse *= 0.3D;
+                        event.getInput().leftImpulse *= 0.3D;
                     }
                 }
             }
@@ -604,7 +603,7 @@ public class ControllerInput
 
             if(ButtonBindings.JUMP.isButtonDown() && !this.ignoreInput)
             {
-                event.getMovementInput().jumping = true;
+                event.getInput().jumping = true;
             }
         }
 
@@ -1037,7 +1036,7 @@ public class ControllerInput
 
         for(AbstractWidget widget : widgets)
         {
-            if(widget == null || widget.isHovered() || !widget.visible)
+            if(widget == null || widget.isHoveredOrFocused() || !widget.visible)
                 continue;
             int posX = widget.x + widget.getWidth() / 2;
             int posY = widget.y + widget.getHeight() / 2;
@@ -1101,7 +1100,7 @@ public class ControllerInput
             return;
 
         RecipeBookPage recipeBookPage = ((RecipeBookComponentMixin) listener.getRecipeBookComponent()).getRecipeBookPage();
-        RecipeButton recipeButton = ((RecipeBookPageAccessor) recipeBookPage).getButtons().stream().filter(RecipeButton::isHovered).findFirst().orElse(null);
+        RecipeButton recipeButton = ((RecipeBookPageAccessor) recipeBookPage).getButtons().stream().filter(RecipeButton::isHoveredOrFocused).findFirst().orElse(null);
         if(recipeButton != null)
         {
             RecipeBookMenu<?> menu = (RecipeBookMenu<?>) screen.getMenu();
@@ -1298,14 +1297,11 @@ public class ControllerInput
 
             Screen.wrapScreenError(() ->
             {
-                boolean cancelled = ForgeHooksClient.onGuiMouseClickedPre(screen, mouseX, mouseY, button);
+                boolean cancelled = ForgeHooksClient.onScreenMouseClickedPre(screen, mouseX, mouseY, button);
                 if(!cancelled)
                 {
                     cancelled = screen.mouseClicked(mouseX, mouseY, button);
-                }
-                if(!cancelled)
-                {
-                    ForgeHooksClient.onGuiMouseClickedPost(screen, mouseX, mouseY, button);
+                    ForgeHooksClient.onScreenMouseClickedPost(screen, mouseX, mouseY, button, cancelled);
                 }
             }, "mouseClicked event handler", screen.getClass().getCanonicalName());
         }
@@ -1337,14 +1333,11 @@ public class ControllerInput
 
             Screen.wrapScreenError(() ->
             {
-                boolean cancelled = ForgeHooksClient.onGuiMouseReleasedPre(screen, mouseX, mouseY, button);
+                boolean cancelled = ForgeHooksClient.onScreenMouseReleasedPre(screen, mouseX, mouseY, button);
                 if(!cancelled)
                 {
                     cancelled = screen.mouseReleased(mouseX, mouseY, button);
-                }
-                if(!cancelled)
-                {
-                    ForgeHooksClient.onGuiMouseReleasedPost(screen, mouseX, mouseY, button);
+                    ForgeHooksClient.onScreenMouseReleasedPost(screen, mouseX, mouseY, button, cancelled);
                 }
             }, "mouseReleased event handler", screen.getClass().getCanonicalName());
         }

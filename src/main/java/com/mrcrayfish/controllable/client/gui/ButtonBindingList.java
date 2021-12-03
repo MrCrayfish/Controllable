@@ -231,7 +231,7 @@ public class ButtonBindingList extends ContainerObjectSelectionList<ButtonBindin
         {
             if(ButtonBindingList.this.parent instanceof ButtonBindingScreen)
             {
-                if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.bindingButton.isHovered())
+                if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.bindingButton.isHoveredOrFocused())
                 {
                     this.binding.setButton(-1);
                     this.bindingButton.playDownSound(Minecraft.getInstance().getSoundManager());
