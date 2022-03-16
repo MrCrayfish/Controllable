@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.mixin.client.jei;
 
-import mezz.jei.gui.PageNavigation;
 import mezz.jei.gui.elements.GuiIconButton;
+import mezz.jei.gui.elements.GuiIconToggleButton;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -10,12 +10,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * Author: MrCrayfish
  */
 @Pseudo
-@Mixin(PageNavigation.class)
-public interface PageNavigationMixin
+@Mixin(GuiIconToggleButton.class)
+public interface GuiIconToggleButtonMixin
 {
-    @Accessor(value = "nextButton", remap = false)
-    GuiIconButton getNextButton();
-
-    @Accessor(value = "backButton", remap = false)
-    GuiIconButton getBackButton();
+    @Accessor(value = "button", remap = false)
+    GuiIconButton getButton();
 }
