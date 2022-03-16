@@ -1148,7 +1148,7 @@ public class ControllerInput
                 }
             }
 
-            if(closestSlot != null && (closestSlot.hasItem() || !mc.player.inventoryMenu.getCarried().isEmpty()))
+            if(closestSlot != null && (closestSlot.hasItem() || !containerScreen.getMenu().getCarried().isEmpty()))
             {
                 this.nearSlot = true;
                 int slotCenterXScaled = guiLeft + closestSlot.x + 8;
