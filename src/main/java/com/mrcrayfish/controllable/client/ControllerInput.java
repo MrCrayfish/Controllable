@@ -1088,14 +1088,12 @@ public class ControllerInput
         if(mc.player == null)
             return;
 
-        if(!(mc.screen instanceof ContainerScreen) || !(mc.screen instanceof RecipeUpdateListener))
+        if(!(mc.screen instanceof AbstractContainerScreen<?> screen) || !(mc.screen instanceof RecipeUpdateListener listener))
             return;
 
-        RecipeUpdateListener listener = (RecipeUpdateListener) mc.screen;
         if(!listener.getRecipeBookComponent().isVisible())
             return;
 
-        AbstractContainerScreen<?> screen = (ContainerScreen) mc.screen;
         if(!(screen.getMenu() instanceof RecipeBookMenu<?>))
             return;
 
@@ -1105,7 +1103,7 @@ public class ControllerInput
         {
             RecipeBookMenu<?> menu = (RecipeBookMenu<?>) screen.getMenu();
             Slot slot = menu.getSlot(menu.getResultSlotIndex());
-            if(mc.player.inventoryMenu.getCarried().isEmpty())
+            if(menu.getCarried().isEmpty())
             {
                 this.invokeMouseClick(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screen.getGuiLeft() + slot.x + 8, screen.getGuiTop() + slot.y + 8);
             }
