@@ -62,7 +62,7 @@ public class ButtonBindingList extends AbstractOptionList<ButtonBindingList.Entr
             if(!list.isEmpty())
             {
                 Collections.sort(list);
-                this.addEntry(new CategoryEntry(new TranslationTextComponent(category)));
+                this.addEntry(new CategoryEntry(new TranslationTextComponent(category).mergeStyle(TextFormatting.YELLOW)));
                 list.forEach(binding -> this.addEntry(new BindingEntry(binding)));
             }
         });
