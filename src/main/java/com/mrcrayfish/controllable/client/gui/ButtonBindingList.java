@@ -130,8 +130,8 @@ public class ButtonBindingList extends ContainerObjectSelectionList<ButtonBindin
         @Override
         public void render(PoseStack poseStack, int x, int y, int p_230432_4_, int p_230432_5_, int itemHeight, int p_230432_7_, int p_230432_8_, boolean selected, float partialTicks)
         {
-            float labelX = ButtonBindingList.this.minecraft.screen.width / 2F - this.labelWidth / 2F;
-            float labelY = y + itemHeight - 9 - 1;
+            int labelX = (int) (ButtonBindingList.this.minecraft.screen.width / 2F - this.labelWidth / 2F);
+            int labelY = y + itemHeight - 9 - 1;
             ButtonBindingList.this.minecraft.font.draw(poseStack, this.label, labelX, labelY, 0xFFFFFFFF);
         }
     }
