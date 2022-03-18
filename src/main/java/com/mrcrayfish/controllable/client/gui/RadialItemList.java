@@ -6,10 +6,13 @@ import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.widget.ColorButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
@@ -19,7 +22,7 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-public class RadialItemList extends ContainerObjectSelectionList<RadialItemList.ButtonBindingEntry>
+public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonBindingEntry>
 {
     private List<ButtonBindingData> bindings;
     private ButtonBinding selectedBinding;
@@ -65,6 +68,9 @@ public class RadialItemList extends ContainerObjectSelectionList<RadialItemList.
         if(true) return super.getRowLeft();
         return this.x0 + this.width / 2 - this.getRowWidth() / 2;
     }
+
+    @Override
+    public void updateNarration(NarrationElementOutput output) {}
 
     class ButtonBindingEntry extends ContainerObjectSelectionList.Entry<ButtonBindingEntry>
     {
