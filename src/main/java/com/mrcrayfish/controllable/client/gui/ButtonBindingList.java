@@ -64,7 +64,7 @@ public class ButtonBindingList extends ContainerObjectSelectionList<ButtonBindin
             if(!list.isEmpty())
             {
                 Collections.sort(list);
-                this.addEntry(new CategoryEntry(new TranslatableComponent(category)));
+                this.addEntry(new CategoryEntry(new TranslatableComponent(category).withStyle(ChatFormatting.YELLOW)));
                 list.forEach(binding -> this.addEntry(new BindingEntry(binding)));
             }
         });
