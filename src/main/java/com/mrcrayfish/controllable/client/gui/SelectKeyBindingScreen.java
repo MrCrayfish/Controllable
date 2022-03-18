@@ -34,7 +34,7 @@ public class SelectKeyBindingScreen extends Screen
     @Override
     protected void init()
     {
-        this.bindingList = new KeyBindingList(this, this.minecraft, this.width + 10, this.height, 45, this.height - 44, 20);
+        this.bindingList = new KeyBindingList(this, this.minecraft, this.width + 10, this.height, 45, this.height - 44, 22);
         this.addWidget(this.bindingList);
         this.resetButton = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslatableComponent("controllable.gui.reset"), (button) -> {
             List<KeyAdapterBinding> copy = new ArrayList<>(BindingRegistry.getInstance().getKeyAdapters().values());

@@ -91,7 +91,7 @@ public class KeyBindingList extends AbstractSelectionList<KeyBindingList.Entry>
             if(!list.isEmpty())
             {
                 Collections.sort(list);
-                this.addEntry(new CategoryEntry(new TranslatableComponent(category)));
+                this.addEntry(new CategoryEntry(new TranslatableComponent(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
                 list.forEach(binding -> this.addEntry(new KeyBindingEntry(binding)));
             }
         });
@@ -131,8 +131,8 @@ public class KeyBindingList extends AbstractSelectionList<KeyBindingList.Entry>
         @Override
         public void render(PoseStack poseStack, int x, int y, int p_230432_4_, int p_230432_5_, int itemHeight, int p_230432_7_, int p_230432_8_, boolean selected, float partialTicks)
         {
-            float labelX = KeyBindingList.this.minecraft.screen.width / 2F - this.labelWidth / 2F;
-            float labelY = y + itemHeight - 9 - 1;
+            int labelX = (int) (KeyBindingList.this.minecraft.screen.width / 2F - this.labelWidth / 2F);
+            int labelY = y + itemHeight - 9 - 2;
             KeyBindingList.this.minecraft.font.draw(poseStack, this.label, labelX, labelY, 0xFFFFFFFF);
         }
 
@@ -208,8 +208,8 @@ public class KeyBindingList extends AbstractSelectionList<KeyBindingList.Entry>
         @SuppressWarnings("ConstantConditions")
         public void render(PoseStack matrixStack, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
-            KeyBindingList.this.minecraft.font.draw(matrixStack, this.label, left - 15, y + 6, ChatFormatting.GRAY.getColor());
-            this.addBinding.x = left + width - 38;
+            KeyBindingList.this.minecraft.font.draw(matrixStack, this.label, left - 15, y + 6, 0xFFFFFF);
+            this.addBinding.x = left + width - 37;
             this.addBinding.y = y;
             this.addBinding.render(matrixStack, mouseX, mouseY, partialTicks);
             this.removeBinding.x = left + width - 15;

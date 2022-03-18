@@ -31,7 +31,7 @@ public class ControllerSelectionScreen extends Screen
     @Override
     protected void init()
     {
-        this.listControllers = new ControllerList(this.manager, this.minecraft, this.width, this.height, 45, this.height - 44, 20);
+        this.listControllers = new ControllerList(this.manager, this.minecraft, this.width, this.height, 45, this.height - 44, 22);
         this.addWidget(this.listControllers);
         this.btnSettings = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 32, 72, 20, new TranslatableComponent("controllable.gui.settings"), this::handleSettings));
         this.btnRemap = this.addRenderableWidget(new Button(this.width / 2 - 76, this.height - 32, 72, 20, new TranslatableComponent("controllable.gui.binding"), this::handleConfigure));
