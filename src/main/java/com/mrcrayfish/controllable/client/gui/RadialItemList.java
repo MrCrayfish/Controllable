@@ -153,7 +153,20 @@ public class RadialItemList extends ContainerObjectSelectionList<RadialItemList.
         @Override
         public List<? extends NarratableEntry> narratables()
         {
-            return null;
+            return ImmutableList.of(new NarratableEntry()
+            {
+                @Override
+                public NarratableEntry.NarrationPriority narrationPriority()
+                {
+                    return NarratableEntry.NarrationPriority.HOVERED;
+                }
+
+                @Override
+                public void updateNarration(NarrationElementOutput output)
+                {
+                    output.add(NarratedElementType.TITLE, ButtonBindingEntry.this.label);
+                }
+            });
         }
     }
 }
