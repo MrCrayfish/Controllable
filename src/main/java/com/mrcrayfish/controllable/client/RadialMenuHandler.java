@@ -134,11 +134,11 @@ public class RadialMenuHandler
     {
         List<ButtonBindingData> defaults = new ArrayList<>();
         defaults.add(new ButtonBindingData(ButtonBindings.ADVANCEMENTS, ChatFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.DEBUG_INFO, ChatFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.SCREENSHOT, ChatFormatting.YELLOW));
+        defaults.add(new ButtonBindingData(ButtonBindings.DEBUG_INFO, ChatFormatting.AQUA));
+        defaults.add(new ButtonBindingData(ButtonBindings.SCREENSHOT, ChatFormatting.GOLD));
         defaults.add(new ButtonBindingData(ButtonBindings.FULLSCREEN, ChatFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.CINEMATIC_CAMERA, ChatFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.HIGHLIGHT_PLAYERS, ChatFormatting.YELLOW));
+        defaults.add(new ButtonBindingData(ButtonBindings.CINEMATIC_CAMERA, ChatFormatting.GREEN));
+        defaults.add(new ButtonBindingData(ButtonBindings.HIGHLIGHT_PLAYERS, ChatFormatting.GREEN));
         return defaults;
     }
 
