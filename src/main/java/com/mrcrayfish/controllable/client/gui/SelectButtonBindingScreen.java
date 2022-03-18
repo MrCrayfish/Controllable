@@ -29,7 +29,7 @@ public class SelectButtonBindingScreen extends Screen
     @Override
     protected void init()
     {
-        this.bindingList = new ButtonBindingList(this, this.minecraft, this.width + 10, this.height, 45, this.height - 44, 20);
+        this.bindingList = new ButtonBindingList(this, this.minecraft, this.width + 10, this.height, 45, this.height - 44, 22);
         this.children.add(this.bindingList);
         this.addButton(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslationTextComponent("controllable.gui.restoreDefaults"), (button) -> {
             this.parentScreen.getBindings().clear();

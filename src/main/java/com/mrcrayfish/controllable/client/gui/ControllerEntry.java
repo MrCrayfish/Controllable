@@ -37,12 +37,12 @@ public final class ControllerEntry extends ExtendedList.AbstractListEntry<Contro
         String controllerName = GLFW.glfwGetGamepadName(this.jid);
         if(controllerName == null)
             return;
-        Minecraft.getInstance().fontRenderer.drawStringWithShadow(matrixStack, controllerName, left + 20, top + 4, Color.WHITE.getRGB());
+        Minecraft.getInstance().fontRenderer.drawStringWithShadow(matrixStack, controllerName, left + 22, top + 5, 0xFFFFFFFF);
         if(this.controllerList.getSelected() == this)
         {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation("textures/gui/container/beacon.png"));
-            Screen.blit(matrixStack, left + 2, top + 2, 91, 224, 14, 12, 256, 256);
+            Screen.blit(matrixStack, left + 3, top + 3, 91, 224, 14, 12, 256, 256);
         }
     }
 
