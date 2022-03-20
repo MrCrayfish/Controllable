@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.gui;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.BindingRegistry;
+import com.mrcrayfish.controllable.client.ISearchable;
 import com.mrcrayfish.controllable.client.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
@@ -11,13 +12,12 @@ import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 /**
  * Author: MrCrayfish
  */
-public class KeyBindingList extends AbstractSelectionList<KeyBindingList.Entry>
+public abstract class KeyBindingListMenuScreen extends ListMenuScreen
 {
     private static final List<KeyMapping> DEFAULT_BINDINGS = Util.make(() -> {
         Options options = Minecraft.getInstance().options;
@@ -60,17 +60,20 @@ public class KeyBindingList extends AbstractSelectionList<KeyBindingList.Entry>
         return ImmutableList.copyOf(bindings);
     });
 
-    private SelectKeyBindingScreen parent;
     private Map<String, List<KeyMapping>> categories = new LinkedHashMap<>();
 
-    public KeyBindingList(SelectKeyBindingScreen parent, Minecraft mc, int widthIn, int heightIn, int topIn, int bottomIn, int itemHeightIn)
+    protected KeyBindingListMenuScreen(Screen parent, Component title, int itemHeight)
     {
-        super(mc, widthIn, heightIn, topIn, bottomIn, itemHeightIn);
-        this.parent = parent;
-        this.updateList(false);
+        super(parent, title, itemHeight);
     }
 
-    public void updateList(boolean showUnbound)
+    @Override
+    protected void constructEntries(List<Item> entries)
+    {
+        this.updateList(entries, false);
+    }
+
+    public void updateList(List<Item> entries, boolean showUnbound)
     {
         // Initialize map with categories to have a predictable order (map is linked)
         this.categories.put("key.categories.movement", new ArrayList<>());
@@ -91,89 +94,31 @@ public class KeyBindingList extends AbstractSelectionList<KeyBindingList.Entry>
             if(!list.isEmpty())
             {
                 Collections.sort(list);
-                this.addEntry(new CategoryEntry(new TranslatableComponent(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
-                list.forEach(binding -> this.addEntry(new KeyBindingEntry(binding)));
+                entries.add(new TitleItem(new TranslatableComponent(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+                list.forEach(binding -> entries.add(new KeyBindingItem(binding)));
             }
         });
     }
 
-    @Override
-    public void updateNarration(NarrationElementOutput pNarrationElementOutput)
+    protected void onChange() {}
+
+    public class KeyBindingItem extends Item implements ISearchable
     {
-
-    }
-
-    abstract class Entry extends ContainerObjectSelectionList.Entry<Entry> {}
-
-    protected class CategoryEntry extends Entry
-    {
-        private final Component label;
-        private final int labelWidth;
-
-        protected CategoryEntry(Component label)
-        {
-            this.label = label;
-            this.labelWidth = KeyBindingList.this.minecraft.font.width(this.label);
-        }
-
-        @Override
-        public boolean changeFocus(boolean focus)
-        {
-            return false;
-        }
-
-        @Override
-        public List<? extends GuiEventListener> children()
-        {
-            return Collections.emptyList();
-        }
-
-        @Override
-        public void render(PoseStack poseStack, int x, int y, int p_230432_4_, int p_230432_5_, int itemHeight, int p_230432_7_, int p_230432_8_, boolean selected, float partialTicks)
-        {
-            int labelX = (int) (KeyBindingList.this.minecraft.screen.width / 2F - this.labelWidth / 2F);
-            int labelY = y + itemHeight - 9 - 2;
-            KeyBindingList.this.minecraft.font.draw(poseStack, this.label, labelX, labelY, 0xFFFFFFFF);
-        }
-
-        @Override
-        public List<? extends NarratableEntry> narratables()
-        {
-            return ImmutableList.of(new NarratableEntry()
-            {
-                @Override
-                public NarratableEntry.NarrationPriority narrationPriority()
-                {
-                    return NarratableEntry.NarrationPriority.HOVERED;
-                }
-
-                @Override
-                public void updateNarration(NarrationElementOutput output)
-                {
-                    output.add(NarratedElementType.TITLE, CategoryEntry.this.label);
-                }
-            });
-        }
-    }
-
-    public class KeyBindingEntry extends Entry
-    {
-        private KeyMapping mapping;
-        private Component label;
+        private final KeyMapping mapping;
         private Button addBinding;
         private Button removeBinding;
 
-        protected KeyBindingEntry(KeyMapping mapping)
+        protected KeyBindingItem(KeyMapping mapping)
         {
+            super(new TranslatableComponent(mapping.getName()));
             this.mapping = mapping;
-            this.label = new TranslatableComponent(mapping.getName());
             Collection<KeyAdapterBinding> bindings = BindingRegistry.getInstance().getKeyAdapters().values();
             this.addBinding = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button ->
             {
                 BindingRegistry.getInstance().addKeyAdapter(new KeyAdapterBinding(-1, this.mapping));
                 this.addBinding.active = false;
                 this.removeBinding.active = true;
-                KeyBindingList.this.parent.updateButtons();
+                KeyBindingListMenuScreen.this.onChange();
             });
             this.removeBinding = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 98, 15, 10, 10, button ->
             {
@@ -185,10 +130,16 @@ public class KeyBindingList extends AbstractSelectionList<KeyBindingList.Entry>
                 }
                 this.addBinding.active = true;
                 this.removeBinding.active = false;
-                KeyBindingList.this.parent.updateButtons();
+                KeyBindingListMenuScreen.this.onChange();
             });
             this.addBinding.active = bindings.stream().noneMatch(entry -> entry.getKeyMapping() == this.mapping);
             this.removeBinding.active = bindings.stream().anyMatch(entry -> entry.getKeyMapping() == this.mapping);
+        }
+
+        @Override
+        public String getLabel()
+        {
+            return this.label.plainCopy().getString();
         }
 
         public void updateButtons()
@@ -208,7 +159,7 @@ public class KeyBindingList extends AbstractSelectionList<KeyBindingList.Entry>
         @SuppressWarnings("ConstantConditions")
         public void render(PoseStack matrixStack, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
-            KeyBindingList.this.minecraft.font.draw(matrixStack, this.label, left - 15, y + 6, 0xFFFFFF);
+            KeyBindingListMenuScreen.this.minecraft.font.draw(matrixStack, this.label, left - 15, y + 6, 0xFFFFFF);
             this.addBinding.x = left + width - 37;
             this.addBinding.y = y;
             this.addBinding.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -231,7 +182,7 @@ public class KeyBindingList extends AbstractSelectionList<KeyBindingList.Entry>
                 @Override
                 public void updateNarration(NarrationElementOutput output)
                 {
-                    output.add(NarratedElementType.TITLE, KeyBindingEntry.this.label);
+                    output.add(NarratedElementType.TITLE, KeyBindingItem.this.label);
                 }
             });
         }
