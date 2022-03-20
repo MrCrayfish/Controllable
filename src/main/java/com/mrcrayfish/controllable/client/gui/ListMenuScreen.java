@@ -20,6 +20,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,12 +36,18 @@ public abstract class ListMenuScreen extends Screen
     protected List<FormattedCharSequence> activeTooltip;
     protected FocusedEditBox activeTextField;
     protected FocusedEditBox searchTextField;
+    protected Component subTitle;
 
     protected ListMenuScreen(Screen parent, Component title, int itemHeight)
     {
         super(title);
         this.parent = parent;
         this.itemHeight = itemHeight;
+    }
+
+    public void setSubTitle(Component subTitle)
+    {
+        this.subTitle = subTitle;
     }
 
     @Override
@@ -50,12 +57,12 @@ public abstract class ListMenuScreen extends Screen
         List<Item> entries = new ArrayList<>();
         this.constructEntries(entries);
         this.entries = ImmutableList.copyOf(entries); //Should this still be immutable?
-        this.list = new EntryList(this.entries);
+        this.list = new EntryList(this.entries, this.subTitle != null);
         this.list.setRenderBackground(!isPlayingGame());
         this.addWidget(this.list);
 
         // Adds a search text field to the top of the screen
-        this.searchTextField = new FocusedEditBox(this.font, this.width / 2 - 110, 22, 220, 20, new TextComponent("Search"));
+        this.searchTextField = new FocusedEditBox(this.font, this.width / 2 - 110, this.subTitle != null ? 36 : 22, 220, 20, new TextComponent("Search"));
         this.searchTextField.setResponder(s ->
         {
             this.updateSearchTextFieldSuggestion(s);
@@ -108,6 +115,12 @@ public abstract class ListMenuScreen extends Screen
         // Draw title
         drawCenteredString(poseStack, this.font, this.title, this.width / 2, 7, 0xFFFFFF);
 
+        // Draw sub title
+        if(this.subTitle != null)
+        {
+            drawCenteredString(poseStack, this.font, this.subTitle, this.width / 2, 21, 0xFFFFFF);
+        }
+
         super.render(poseStack, mouseX, mouseY, partialTicks);
 
         // Gives a chance for child classes to set the active tooltip
@@ -150,9 +163,9 @@ public abstract class ListMenuScreen extends Screen
 
     protected class EntryList extends ContainerObjectSelectionList<Item>
     {
-        public EntryList(List<Item> entries)
+        public EntryList(List<Item> entries, boolean extended)
         {
-            super(ListMenuScreen.this.minecraft, ListMenuScreen.this.width, ListMenuScreen.this.height, 50, ListMenuScreen.this.height - 44, ListMenuScreen.this.itemHeight);
+            super(ListMenuScreen.this.minecraft, ListMenuScreen.this.width, ListMenuScreen.this.height, extended ? 64 : 50, ListMenuScreen.this.height - 44, ListMenuScreen.this.itemHeight);
             entries.forEach(this::addEntry);
         }
 

@@ -25,7 +25,7 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
     public SelectKeyBindingScreen(Screen parent)
     {
         super(parent, new TranslatableComponent("controllable.gui.title.select_key_bindings"), 22);
-        //this.note = new TranslatableComponent("controllable.gui.note").withStyle(ChatFormatting.RED).append(new TranslatableComponent("controllable.gui.key_bind_note").withStyle(ChatFormatting.GRAY));
+        this.setSubTitle(new TranslatableComponent("controllable.gui.note").withStyle(ChatFormatting.RED).append(new TranslatableComponent("controllable.gui.key_bind_note").withStyle(ChatFormatting.GRAY)));
     }
 
     @Override
