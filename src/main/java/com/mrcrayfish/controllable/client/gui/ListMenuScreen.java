@@ -2,7 +2,6 @@ package com.mrcrayfish.controllable.client.gui;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.ISearchable;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.client.Minecraft;
@@ -14,20 +13,12 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.list.AbstractOptionList;
 import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.*;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -42,12 +33,18 @@ public abstract class ListMenuScreen extends Screen
     protected List<IReorderingProcessor> activeTooltip;
     protected FocusedTextFieldWidget activeTextField;
     protected FocusedTextFieldWidget searchTextField;
+    protected ITextComponent subTitle;
 
     protected ListMenuScreen(Screen parent, ITextComponent title, int itemHeight)
     {
         super(title);
         this.parent = parent;
         this.itemHeight = itemHeight;
+    }
+
+    public void setSubTitle(ITextComponent subTitle)
+    {
+        this.subTitle = subTitle;
     }
 
     @Override
@@ -57,12 +54,12 @@ public abstract class ListMenuScreen extends Screen
         List<Item> entries = new ArrayList<>();
         this.constructEntries(entries);
         this.entries = ImmutableList.copyOf(entries); //Should this still be immutable?
-        this.list = new EntryList(this.entries);
+        this.list = new EntryList(this.entries, this.subTitle != null);
         this.list.func_244605_b(!isPlayingGame());
         this.children.add(this.list);
 
         // Adds a search text field to the top of the screen
-        this.searchTextField = new FocusedTextFieldWidget(this.font, this.width / 2 - 110, 22, 220, 20, new StringTextComponent("Search"));
+        this.searchTextField = new FocusedTextFieldWidget(this.font, this.width / 2 - 110, this.subTitle != null ? 36 : 22, 220, 20, new StringTextComponent("Search"));
         this.searchTextField.setResponder(s ->
         {
             ScreenUtil.updateSearchTextFieldSuggestion(this.searchTextField, s, this.entries);
@@ -107,6 +104,12 @@ public abstract class ListMenuScreen extends Screen
         // Draw title
         drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 7, 0xFFFFFF);
 
+        // Draw sub title
+        if(this.subTitle != null)
+        {
+            drawCenteredString(matrixStack, this.font, this.subTitle, this.width / 2, 21, 0xFFFFFF);
+        }
+
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         // Draws the active tooltip otherwise tries to draw button tooltips
@@ -146,9 +149,9 @@ public abstract class ListMenuScreen extends Screen
 
     protected class EntryList extends AbstractOptionList<Item>
     {
-        public EntryList(List<Item> entries)
+        public EntryList(List<Item> entries, boolean extended)
         {
-            super(ListMenuScreen.this.minecraft, ListMenuScreen.this.width, ListMenuScreen.this.height, 50, ListMenuScreen.this.height - 44, ListMenuScreen.this.itemHeight);
+            super(ListMenuScreen.this.minecraft, ListMenuScreen.this.width, ListMenuScreen.this.height, extended ? 64 : 50, ListMenuScreen.this.height - 44, ListMenuScreen.this.itemHeight);
             entries.forEach(this::addEntry);
         }
 
