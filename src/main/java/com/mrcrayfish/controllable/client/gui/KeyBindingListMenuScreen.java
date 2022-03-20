@@ -157,11 +157,11 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
         @SuppressWarnings("ConstantConditions")
         public void render(MatrixStack matrixStack, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
-            KeyBindingListMenuScreen.this.minecraft.fontRenderer.func_243246_a(matrixStack, this.label, left - 15, y + 6, 0xFFFFFF);
-            this.addBinding.x = left + width - 37;
+            KeyBindingListMenuScreen.this.minecraft.fontRenderer.func_243246_a(matrixStack, this.label, left, y + 6, 0xFFFFFF);
+            this.addBinding.x = left + width - 42;
             this.addBinding.y = y;
             this.addBinding.render(matrixStack, mouseX, mouseY, partialTicks);
-            this.removeBinding.x = left + width - 15;
+            this.removeBinding.x = left + width - 20;
             this.removeBinding.y = y;
             this.removeBinding.render(matrixStack, mouseX, mouseY, partialTicks);
         }
