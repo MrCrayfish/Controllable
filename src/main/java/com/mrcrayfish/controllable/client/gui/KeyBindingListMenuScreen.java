@@ -62,6 +62,13 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
     protected KeyBindingListMenuScreen(Screen parent, TextComponent title, int itemHeight)
     {
         super(parent, title, itemHeight);
+        this.categories.put("key.categories.movement", new ArrayList<>());
+        this.categories.put("key.categories.gameplay", new ArrayList<>());
+        this.categories.put("key.categories.inventory", new ArrayList<>());
+        this.categories.put("key.categories.creative", new ArrayList<>());
+        this.categories.put("key.categories.multiplayer", new ArrayList<>());
+        this.categories.put("key.categories.ui", new ArrayList<>());
+        this.categories.put("key.categories.misc", new ArrayList<>());
     }
 
     @Override
@@ -72,14 +79,8 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
 
     public void updateList(List<Item> entries, boolean showUnbound)
     {
-        // Initialize map with categories to have a predictable order (map is linked)
-        this.categories.put("key.categories.movement", new ArrayList<>());
-        this.categories.put("key.categories.gameplay", new ArrayList<>());
-        this.categories.put("key.categories.inventory", new ArrayList<>());
-        this.categories.put("key.categories.creative", new ArrayList<>());
-        this.categories.put("key.categories.multiplayer", new ArrayList<>());
-        this.categories.put("key.categories.ui", new ArrayList<>());
-        this.categories.put("key.categories.misc", new ArrayList<>());
+        // Clear the list of bindings for each category
+        this.categories.forEach((category, list) -> list.clear());
 
         Stream.of(this.minecraft.gameSettings.keyBindings).filter(binding -> !DEFAULT_BINDINGS.contains(binding)).forEach(binding -> {
             this.categories.computeIfAbsent(binding.getKeyCategory(), category -> new ArrayList<>()).add(binding);

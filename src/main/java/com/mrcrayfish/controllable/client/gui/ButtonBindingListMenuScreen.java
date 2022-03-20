@@ -19,6 +19,14 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
     protected ButtonBindingListMenuScreen(Screen parent, ITextComponent title, int itemHeight)
     {
         super(parent, title, itemHeight);
+        this.categories.put("key.categories.movement", new ArrayList<>());
+        this.categories.put("key.categories.gameplay", new ArrayList<>());
+        this.categories.put("key.categories.inventory", new ArrayList<>());
+        this.categories.put("key.categories.creative", new ArrayList<>());
+        this.categories.put("key.categories.multiplayer", new ArrayList<>());
+        this.categories.put("key.categories.ui", new ArrayList<>());
+        this.categories.put("key.categories.misc", new ArrayList<>());
+        this.categories.put("key.categories.controllable_custom", new ArrayList<>());
     }
 
     @Override
@@ -29,15 +37,8 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
 
     public void updateList(List<Item> entries, boolean showUnbound)
     {
-        // Initialize map with categories to have a predictable order (map is linked)
-        this.categories.put("key.categories.movement", new ArrayList<>());
-        this.categories.put("key.categories.gameplay", new ArrayList<>());
-        this.categories.put("key.categories.inventory", new ArrayList<>());
-        this.categories.put("key.categories.creative", new ArrayList<>());
-        this.categories.put("key.categories.multiplayer", new ArrayList<>());
-        this.categories.put("key.categories.ui", new ArrayList<>());
-        this.categories.put("key.categories.misc", new ArrayList<>());
-        this.categories.put("key.categories.controllable_custom", new ArrayList<>());
+        // Clear the list of bindings for each category
+        this.categories.forEach((category, list) -> list.clear());
 
         // Add all button bindings to the appropriate category or create a new one
         BindingRegistry.getInstance().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
