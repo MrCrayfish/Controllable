@@ -33,13 +33,18 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
     {
         super.init();
         this.resetButton = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 32, 150, 20, new TranslatableComponent("controllable.gui.reset"), (button) -> {
-            List<KeyAdapterBinding> copy = new ArrayList<>(BindingRegistry.getInstance().getKeyAdapters().values());
-            copy.forEach(binding -> {
-                BindingRegistry.getInstance().removeKeyAdapter(binding);
-                RadialMenuHandler.instance().removeBinding(binding);
-            });
-            this.list.children().stream().filter(entry -> entry instanceof KeyBindingItem).map(entry -> (KeyBindingItem) entry).forEach(KeyBindingItem::updateButtons);
-            this.updateButtons();
+            this.minecraft.setScreen(new ConfirmationScreen(this, new TranslatableComponent("controllable.gui.reset_keybinds"), result -> {
+                if(result) {
+                    List<KeyAdapterBinding> copy = new ArrayList<>(BindingRegistry.getInstance().getKeyAdapters().values());
+                    copy.forEach(binding -> {
+                        BindingRegistry.getInstance().removeKeyAdapter(binding);
+                        RadialMenuHandler.instance().removeBinding(binding);
+                    });
+                    this.list.children().stream().filter(entry -> entry instanceof KeyBindingItem).map(entry -> (KeyBindingItem) entry).forEach(KeyBindingItem::updateButtons);
+                    this.updateButtons();
+                }
+                return true;
+            }));
         }));
         this.addRenderableWidget(new Button(this.width / 2 + 5, this.height - 32, 150, 20, CommonComponents.GUI_DONE, (button) -> {
             this.minecraft.setScreen(this.parent);

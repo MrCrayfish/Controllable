@@ -52,10 +52,15 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         super.init();
 
         this.buttonReset = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 32, 100, 20, new TranslatableComponent("controllable.gui.resetBinds"), (button) -> {
-            BindingRegistry registry = BindingRegistry.getInstance();
-            registry.getBindings().forEach(ButtonBinding::reset);
-            registry.resetBindingHash();
-            registry.save();
+            this.minecraft.setScreen(new ConfirmationScreen(this, new TranslatableComponent("controllable.gui.restore_default_buttons"), result -> {
+                if(result) {
+                    BindingRegistry registry = BindingRegistry.getInstance();
+                    registry.getBindings().forEach(ButtonBinding::reset);
+                    registry.resetBindingHash();
+                    registry.save();
+                }
+                return true;
+            }));
         }));
         this.buttonReset.active = BindingRegistry.getInstance().getBindings().stream().noneMatch(ButtonBinding::isDefault);
 
