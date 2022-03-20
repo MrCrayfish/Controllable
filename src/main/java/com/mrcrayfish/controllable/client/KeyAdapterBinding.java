@@ -22,9 +22,9 @@ public final class KeyAdapterBinding extends ButtonBinding
 
     public KeyAdapterBinding(int button, KeyMapping keyMapping)
     {
-        super(button, keyMapping.getCategory() + ".custom", "key.categories.controllable_custom", keyMapping.getKeyConflictContext());
+        super(button, keyMapping.getName() + ".custom", "key.categories.controllable_custom", keyMapping.getKeyConflictContext());
         this.keyMapping = keyMapping;
-        this.labelKey = keyMapping.getCategory();
+        this.labelKey = keyMapping.getName();
     }
 
     @Override

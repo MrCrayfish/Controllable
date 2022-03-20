@@ -236,7 +236,7 @@ public class BindingRegistry
             this.keyAdapters.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
             {
                 String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
-                properties.put(binding.getKeyMapping().getCategory(), name);
+                properties.put(binding.getKeyMapping().getName(), name);
             });
             File file = new File(Controllable.getConfigFolder(), "controllable/key_adapters.properties");
             properties.store(new FileOutputStream(file), "Key Adapters");
