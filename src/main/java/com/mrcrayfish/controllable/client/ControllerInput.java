@@ -204,11 +204,11 @@ public class ControllerInput
                 double mouseSpeed = Config.CLIENT.options.mouseSpeed.get() * mc.getWindow().getGuiScale();
 
                 // When hovering over slots, slows down the mouse speed to make it easier
-                if(mc.screen instanceof ContainerScreen screen)
+                if(mc.screen instanceof AbstractContainerScreen<?> screen)
                 {
                     if(screen.getSlotUnderMouse() != null)
                     {
-                        mouseSpeed *= 0.5;
+                        mouseSpeed *= Config.CLIENT.options.hoverModifier.get();
                     }
                 }
 
@@ -228,10 +228,11 @@ public class ControllerInput
                         eventListeners.add(((RecipeBookPageAccessor) recipeBookPage).getBackButton());
                     }
                 }
+
                 GuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
                 if(hoveredListener != null && !(hoveredListener instanceof AbstractSelectionList<?>))
                 {
-                    mouseSpeed *= 0.6; //TODO config?
+                    mouseSpeed *= Config.CLIENT.options.hoverModifier.get();
                 }
 
                 this.mouseX += mouseSpeed * this.mouseSpeedX;

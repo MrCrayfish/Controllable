@@ -158,6 +158,16 @@ public class ControllerOptions
         Config.save();
     });
 
+    public static final ProgressOption HOVER_MODIFIER = new ControllableProgressOption("controllable.options.hoverModifier", 0.05, 1.0, 0.05F, options -> {
+        return Config.CLIENT.options.hoverModifier.get();
+    }, (options, value) -> {
+        Config.CLIENT.options.hoverModifier.set(Mth.clamp(value, 0.05, 1.0));
+        Config.save();
+    }, (options, option) -> {
+        double mouseSpeed = Config.CLIENT.options.hoverModifier.get();
+        return new TranslatableComponent("controllable.options.hoverModifier.format", FORMAT.format(mouseSpeed));
+    });
+
     public static CycleOption<Boolean> createOnOff(String key, Function<Options, Boolean> getter, CycleOption.OptionSetter<Boolean> setter)
     {
         return CycleOption.createOnOff(key, new TranslatableComponent(key + ".desc"), getter, setter);
