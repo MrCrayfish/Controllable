@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 public class SettingsScreen extends ListMenuScreen
 {
-    private static final AbstractOption[] OPTIONS = new AbstractOption[]{ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.CONSOLE_HOTBAR, ControllerOptions.CONTROLLER_ICONS, ControllerOptions.CURSOR_TYPE, ControllerOptions.INVERT_LOOK, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED, ControllerOptions.SHOW_ACTIONS, ControllerOptions.QUICK_CRAFT, ControllerOptions.UI_SOUNDS, ControllerOptions.RADIAL_THUMBSTICK, ControllerOptions.SNEAK_MODE, ControllerOptions.CURSOR_THUMBSTICK};
+    private static final AbstractOption[] OPTIONS = new AbstractOption[]{ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.CONSOLE_HOTBAR, ControllerOptions.CONTROLLER_ICONS, ControllerOptions.CURSOR_TYPE, ControllerOptions.INVERT_LOOK, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED, ControllerOptions.SHOW_ACTIONS, ControllerOptions.QUICK_CRAFT, ControllerOptions.UI_SOUNDS, ControllerOptions.RADIAL_THUMBSTICK, ControllerOptions.SNEAK_MODE, ControllerOptions.CURSOR_THUMBSTICK, ControllerOptions.HOVER_MODIFIER};
     private IToolTip hoveredTooltip;
     private int hoveredCounter;
 

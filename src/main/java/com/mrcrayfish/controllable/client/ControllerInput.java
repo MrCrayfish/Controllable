@@ -204,7 +204,7 @@ public class ControllerInput
                     ContainerScreen screen = (ContainerScreen) mc.currentScreen;
                     if(screen.getSlotUnderMouse() != null)
                     {
-                        mouseSpeed *= 0.5;
+                        mouseSpeed *= Config.CLIENT.options.hoverModifier.get();
                     }
                 }
 
@@ -227,7 +227,7 @@ public class ControllerInput
                 IGuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
                 if(hoveredListener != null && !(hoveredListener instanceof AbstractList))
                 {
-                    mouseSpeed *= 0.6; //TODO config?
+                    mouseSpeed *= Config.CLIENT.options.hoverModifier.get();
                 }
 
                 this.targetMouseX += mouseSpeed * this.mouseSpeedX;

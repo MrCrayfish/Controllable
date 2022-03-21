@@ -161,4 +161,14 @@ public class ControllerOptions
         Thumbstick cursorThumbstick = option.get(gameSettings);
         return new TranslationTextComponent("controllable.options.cursorThumbstick.format", new TranslationTextComponent("controllable.cursorThumbstick." + cursorThumbstick.getString()));
     });
+
+    public static final SliderPercentageOption HOVER_MODIFIER = new ControllableSliderPercentageOption("controllable.options.hoverModifier", 0.05, 1.0, 0.05F, gameSettings -> {
+        return Config.CLIENT.options.hoverModifier.get();
+    }, (gameSettings, value) -> {
+        Config.CLIENT.options.hoverModifier.set(MathHelper.clamp(value, 0.05, 1.0));
+        Config.save();
+    }, (gameSettings, option) -> {
+        double mouseSpeed = Config.CLIENT.options.hoverModifier.get();
+        return new TranslationTextComponent("controllable.options.hoverModifier.format", FORMAT.format(mouseSpeed));
+    });
 }
