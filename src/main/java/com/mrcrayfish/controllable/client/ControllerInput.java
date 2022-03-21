@@ -166,7 +166,9 @@ public class ControllerInput
 
             /* Only need to run code if left thumb stick has input */
             boolean lastMoving = this.moving;
-            this.moving = Math.abs(controller.getLThumbStickXValue()) >= deadZone || Math.abs(controller.getLThumbStickYValue()) >= deadZone;
+            float xAxis = Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickXValue() : controller.getRThumbStickXValue();
+            float yAxis = Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickYValue() : controller.getRThumbStickYValue();
+            this.moving = Math.abs(xAxis) >= deadZone || Math.abs(yAxis) >= deadZone;
             if(this.moving)
             {
                 /* Updates the target mouse position when the initial thumb stick movement is
@@ -185,12 +187,8 @@ public class ControllerInput
                     this.prevMouseY = this.mouseY = (int) mouseY;
                 }
 
-                float xAxis = controller.getLThumbStickXValue();
                 this.mouseSpeedX = Math.abs(xAxis) >= deadZone ? Math.signum(xAxis) * (Math.abs(xAxis) - deadZone) / (1.0F - deadZone) : 0.0F;
-
-                float yAxis = controller.getLThumbStickYValue();
                 this.mouseSpeedY = Math.abs(yAxis) >= deadZone ? Math.signum(yAxis) * (Math.abs(yAxis) - deadZone) / (1.0F - deadZone) : 0.0F;
-
                 this.setControllerInUse();
             }
 
@@ -233,7 +231,7 @@ public class ControllerInput
                 GuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
                 if(hoveredListener != null && !(hoveredListener instanceof AbstractSelectionList<?>))
                 {
-                    mouseSpeed *= 0.6;
+                    mouseSpeed *= 0.6; //TODO config?
                 }
 
                 this.mouseX += mouseSpeed * this.mouseSpeedX;

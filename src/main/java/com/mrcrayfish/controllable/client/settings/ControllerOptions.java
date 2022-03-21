@@ -149,6 +149,15 @@ public class ControllerOptions
         Config.save();
     });
 
+    public static final CycleOption<Thumbstick> CURSOR_THUMBSTICK = CycleOption.create("controllable.options.cursorThumbstick", Thumbstick.values(), thumbstick -> {
+        return new TranslatableComponent("controllable.thumbstick." + thumbstick.getId());
+    }, options -> {
+        return Config.CLIENT.options.cursorThumbstick.get();
+    }, (options, option, thumbstick) -> {
+        Config.CLIENT.options.cursorThumbstick.set(thumbstick);
+        Config.save();
+    });
+
     public static CycleOption<Boolean> createOnOff(String key, Function<Options, Boolean> getter, CycleOption.OptionSetter<Boolean> setter)
     {
         return CycleOption.createOnOff(key, new TranslatableComponent(key + ".desc"), getter, setter);
