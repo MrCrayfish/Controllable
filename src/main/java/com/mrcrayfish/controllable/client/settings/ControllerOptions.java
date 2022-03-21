@@ -3,12 +3,16 @@ package com.mrcrayfish.controllable.client.settings;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.*;
 import net.minecraft.client.CycleOption;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.ProgressOption;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -53,7 +57,7 @@ public class ControllerOptions
         Config.save();
     });
 
-    public static final CycleOption<CursorType> CURSOR_TYPE = CycleOption.create("controllable.options.cursorType", CursorType.values(), cursorType -> {
+    public static final CycleOption<CursorType> CURSOR_TYPE = create("controllable.options.cursorType", CursorType.values(), cursorType -> {
         return new TranslatableComponent("controllable.cursor." + cursorType.getId());
     }, options -> {
         return Config.CLIENT.options.cursorType.get();
@@ -62,7 +66,7 @@ public class ControllerOptions
         Config.save();
     });
 
-    public static final CycleOption<ControllerIcons> CONTROLLER_ICONS = CycleOption.create("controllable.options.controllerIcons", ControllerIcons.values(), controllerIcon -> {
+    public static final CycleOption<ControllerIcons> CONTROLLER_ICONS = create("controllable.options.controllerIcons", ControllerIcons.values(), controllerIcon -> {
         return new TranslatableComponent("controllable.controller." + controllerIcon.getId());
     }, options -> {
         return Config.CLIENT.options.controllerIcons.get();
@@ -108,7 +112,7 @@ public class ControllerOptions
         return new TranslatableComponent("controllable.options.mouseSpeed.format", FORMAT.format(mouseSpeed));
     });
 
-    public static final CycleOption<ActionVisibility> SHOW_ACTIONS = CycleOption.create("controllable.options.showActions", ActionVisibility.values(), actionVisibility -> {
+    public static final CycleOption<ActionVisibility> SHOW_ACTIONS = create("controllable.options.showActions", ActionVisibility.values(), actionVisibility -> {
         return new TranslatableComponent("controllable.actionVisibility." + actionVisibility.getId());
     }, options -> {
         return Config.CLIENT.options.showActions.get();
@@ -131,7 +135,7 @@ public class ControllerOptions
         Config.save();
     });
 
-    public static final CycleOption<Thumbstick> RADIAL_THUMBSTICK = CycleOption.create("controllable.options.radialThumbstick", Thumbstick.values(), thumbstick -> {
+    public static final CycleOption<Thumbstick> RADIAL_THUMBSTICK = create("controllable.options.radialThumbstick", Thumbstick.values(), thumbstick -> {
         return new TranslatableComponent("controllable.thumbstick." + thumbstick.getId());
     }, options -> {
         return Config.CLIENT.options.radialThumbstick.get();
@@ -140,7 +144,7 @@ public class ControllerOptions
         Config.save();
     });
 
-    public static final CycleOption<SneakMode> SNEAK_MODE = CycleOption.create("controllable.options.sneakMode", SneakMode.values(), sneakMode -> {
+    public static final CycleOption<SneakMode> SNEAK_MODE = create("controllable.options.sneakMode", SneakMode.values(), sneakMode -> {
         return new TranslatableComponent("controllable.sneakMode." + sneakMode.getId());
     }, options -> {
         return Config.CLIENT.options.sneakMode.get();
@@ -149,7 +153,7 @@ public class ControllerOptions
         Config.save();
     });
 
-    public static final CycleOption<Thumbstick> CURSOR_THUMBSTICK = CycleOption.create("controllable.options.cursorThumbstick", Thumbstick.values(), thumbstick -> {
+    public static final CycleOption<Thumbstick> CURSOR_THUMBSTICK = create("controllable.options.cursorThumbstick", Thumbstick.values(), thumbstick -> {
         return new TranslatableComponent("controllable.thumbstick." + thumbstick.getId());
     }, options -> {
         return Config.CLIENT.options.cursorThumbstick.get();
@@ -171,5 +175,11 @@ public class ControllerOptions
     public static CycleOption<Boolean> createOnOff(String key, Function<Options, Boolean> getter, CycleOption.OptionSetter<Boolean> setter)
     {
         return CycleOption.createOnOff(key, new TranslatableComponent(key + ".desc"), getter, setter);
+    }
+
+    public static <T> CycleOption<T> create(String key, T[] values, Function<T, Component> display, Function<Options, T> getter, CycleOption.OptionSetter<T> setter)
+    {
+        List<FormattedCharSequence> tooltip = Minecraft.getInstance().font.split(new TranslatableComponent(key + ".desc"), 200);
+        return CycleOption.create(key, values, display, getter, setter).setTooltip(minecraft -> t -> tooltip);
     }
 }

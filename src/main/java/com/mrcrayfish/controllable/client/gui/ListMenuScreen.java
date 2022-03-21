@@ -19,8 +19,8 @@ import net.minecraft.network.chat.*;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -226,6 +226,13 @@ public abstract class ListMenuScreen extends Screen
         public boolean removeEntry(Item item)
         {
             return super.removeEntry(item);
+        }
+
+        @Nullable
+        @Override
+        public Item getHovered()
+        {
+            return super.getHovered();
         }
 
         @Override

@@ -9,12 +9,14 @@ import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.Option;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.TooltipAccessor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.FormattedCharSequence;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -37,7 +39,7 @@ public class SettingsScreen extends ListMenuScreen
             ControllerOptions.SNEAK_MODE, ControllerOptions.CURSOR_THUMBSTICK,
             ControllerOptions.HOVER_MODIFIER
     };
-    private IToolTip hoveredTooltip;
+    private List<FormattedCharSequence> hoveredTooltip;
     private int hoveredCounter;
 
     protected SettingsScreen(Screen parent)
@@ -102,25 +104,24 @@ public class SettingsScreen extends ListMenuScreen
     {
         super.render(poseStack, mouseX, mouseY, partialTicks);
         this.hoveredTooltip = this.getHoveredToolTip(mouseX, mouseY);
-        if(this.hoveredTooltip != null && this.hoveredCounter >= 20)
+        if(this.hoveredTooltip != null && this.hoveredCounter >= 10)
         {
-            this.renderTooltip(poseStack, this.hoveredTooltip.getToolTip(), mouseX, mouseY);
+            this.renderTooltip(poseStack, this.hoveredTooltip, mouseX, mouseY);
         }
     }
 
     @Nullable
-    private IToolTip getHoveredToolTip(int mouseX, int mouseY) //TODO fix
+    private List<FormattedCharSequence> getHoveredToolTip(int mouseX, int mouseY)
     {
-        for(int i = 0; i < OPTIONS.length; i++)
+        if(this.list.getHovered() instanceof OptionRowItem item)
         {
-            Option option = OPTIONS[i];
-            if(!(option instanceof IToolTip))
-                continue;
-            int x = this.width / 2 - 155 + i % 2 * 160;
-            int y = this.height / 6 + 24 * (i >> 1);
-            if(mouseX >= x && mouseY >= y && mouseX < x + 150 && mouseY < y + 20)
+            List<? extends GuiEventListener> listeners = item.children();
+            for(GuiEventListener listener : listeners)
             {
-                return (IToolTip) option;
+                if(listener.isMouseOver(mouseX, mouseY) && listener instanceof TooltipAccessor accessor)
+                {
+                    return accessor.getTooltip();
+                }
             }
         }
         return null;
