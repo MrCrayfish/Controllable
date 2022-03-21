@@ -19,7 +19,6 @@ import java.util.List;
  */
 public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
 {
-    //private final Component note; //TODO reimplement note into list menu
     private Button resetButton;
 
     public SelectKeyBindingScreen(Screen parent)
@@ -61,12 +60,5 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
     protected void updateButtons()
     {
         this.resetButton.active = BindingRegistry.getInstance().getKeyAdapters().size() > 0;
-    }
-
-    @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
-    {
-        //drawCenteredString(poseStack, this.font, this.note, this.width / 2, 26, 0xFFFFFF);
-        super.render(poseStack, mouseX, mouseY, partialTicks);
     }
 }
