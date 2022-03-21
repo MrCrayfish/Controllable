@@ -1,6 +1,5 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
@@ -8,7 +7,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.ArrayList;

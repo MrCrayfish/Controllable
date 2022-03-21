@@ -7,8 +7,6 @@ import com.mrcrayfish.controllable.client.gui.ButtonBindingScreen;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModList;
@@ -124,7 +122,6 @@ public class Controllable implements IControllerListener
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void connected(int jid)
     {
         Minecraft.getInstance().doRunTask(() ->
@@ -146,7 +143,6 @@ public class Controllable implements IControllerListener
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void disconnected(int jid)
     {
         Minecraft.getInstance().doRunTask(() ->

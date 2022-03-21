@@ -17,8 +17,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.*;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -330,7 +328,6 @@ public abstract class ListMenuScreen extends Screen
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     protected class FocusedEditBox extends EditBox
     {
         public FocusedEditBox(Font font, int x, int y, int width, int height, Component label)

@@ -10,8 +10,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
-
 /**
  * Author: MrCrayfish
  */

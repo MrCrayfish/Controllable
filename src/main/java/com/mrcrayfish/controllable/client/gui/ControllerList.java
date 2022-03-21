@@ -6,8 +6,6 @@ import com.mrcrayfish.controllable.client.ControllerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +13,6 @@ import java.util.Map;
 /**
  * Author: MrCrayfish
  */
-@OnlyIn(Dist.CLIENT)
 public class ControllerList extends AbstractSelectionList<ControllerEntry>
 {
     private ControllerManager manager;

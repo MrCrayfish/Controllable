@@ -3,8 +3,6 @@ package com.mrcrayfish.controllable.client.gui;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.IToolTip;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.Option;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -13,7 +11,6 @@ import net.minecraft.client.gui.components.TooltipAccessor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
@@ -21,7 +18,6 @@ import net.minecraft.util.FormattedCharSequence;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * Author: MrCrayfish

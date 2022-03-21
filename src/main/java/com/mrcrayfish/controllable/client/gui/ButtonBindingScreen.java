@@ -21,7 +21,8 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TranslatableComponent;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Author: MrCrayfish
