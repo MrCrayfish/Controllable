@@ -1235,10 +1235,11 @@ public class ControllerInput
     private void handleListScrolling(AbstractSelectionList<?> list, Controller controller)
     {
         double dir = 0;
-        if(Math.abs(controller.getRThumbStickYValue()) >= 0.2F)
+        float yValue = Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
+        if(Math.abs(yValue) >= 0.2F)
         {
             this.setControllerInUse();
-            dir = controller.getRThumbStickYValue();
+            dir = yValue;
         }
         dir *= Minecraft.getInstance().getDeltaFrameTime();
         list.setScrollAmount(list.getScrollAmount() + dir * 10);
