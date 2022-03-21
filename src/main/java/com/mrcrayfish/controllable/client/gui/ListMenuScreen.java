@@ -34,6 +34,8 @@ public abstract class ListMenuScreen extends Screen
     protected FocusedTextFieldWidget activeTextField;
     protected FocusedTextFieldWidget searchTextField;
     protected ITextComponent subTitle;
+    protected boolean searchBarVisible = true;
+    protected int rowWidth = 240;
 
     protected ListMenuScreen(Screen parent, ITextComponent title, int itemHeight)
     {
@@ -47,6 +49,16 @@ public abstract class ListMenuScreen extends Screen
         this.subTitle = subTitle;
     }
 
+    public void setSearchBarVisible(boolean visible)
+    {
+        this.searchBarVisible = visible;
+    }
+
+    public void setRowWidth(int rowWidth)
+    {
+        this.rowWidth = rowWidth;
+    }
+
     @Override
     protected void init()
     {
@@ -54,12 +66,12 @@ public abstract class ListMenuScreen extends Screen
         List<Item> entries = new ArrayList<>();
         this.constructEntries(entries);
         this.entries = ImmutableList.copyOf(entries); //Should this still be immutable?
-        this.list = new EntryList(this.entries, this.subTitle != null);
+        this.list = new EntryList(this.entries, this.calculateTop());
         this.list.func_244605_b(!isPlayingGame());
         this.children.add(this.list);
 
         // Adds a search text field to the top of the screen
-        this.searchTextField = new FocusedTextFieldWidget(this.font, this.width / 2 - 110, this.subTitle != null ? 36 : 22, 220, 20, new StringTextComponent("Search"));
+        this.searchTextField = new FocusedTextFieldWidget(this.font, this.width / 2 - 110, this.calculateSearchBarY(), 220, 20, new StringTextComponent("Search"));
         this.searchTextField.setResponder(s ->
         {
             ScreenUtil.updateSearchTextFieldSuggestion(this.searchTextField, s, this.entries);
@@ -72,7 +84,27 @@ public abstract class ListMenuScreen extends Screen
             }
         });
         this.children.add(this.searchTextField);
+        this.searchTextField.visible = this.searchBarVisible;
         ScreenUtil.updateSearchTextFieldSuggestion(this.searchTextField, "", this.entries);
+    }
+
+    private int calculateTop()
+    {
+        int top = 30;
+        if(this.searchBarVisible)
+        {
+            top += 20;
+        }
+        if(this.subTitle != null)
+        {
+            top += 14;
+        }
+        return top;
+    }
+
+    private int calculateSearchBarY()
+    {
+        return this.subTitle != null ? 36 : 22;
     }
 
     protected abstract void constructEntries(List<Item> entries);
@@ -102,7 +134,8 @@ public abstract class ListMenuScreen extends Screen
         this.searchTextField.render(matrixStack, mouseX, mouseY, partialTicks);
 
         // Draw title
-        drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 7, 0xFFFFFF);
+        int titleY = 7 + (!this.searchBarVisible && this.subTitle == null ? 5 : 0);
+        drawCenteredString(matrixStack, this.font, this.title, this.width / 2, titleY, 0xFFFFFF);
 
         // Draw sub title
         if(this.subTitle != null)
@@ -149,22 +182,22 @@ public abstract class ListMenuScreen extends Screen
 
     protected class EntryList extends AbstractOptionList<Item>
     {
-        public EntryList(List<Item> entries, boolean extended)
+        public EntryList(List<Item> entries, int top)
         {
-            super(ListMenuScreen.this.minecraft, ListMenuScreen.this.width, ListMenuScreen.this.height, extended ? 64 : 50, ListMenuScreen.this.height - 44, ListMenuScreen.this.itemHeight);
+            super(ListMenuScreen.this.minecraft, ListMenuScreen.this.width, ListMenuScreen.this.height, top, ListMenuScreen.this.height - 44, ListMenuScreen.this.itemHeight);
             entries.forEach(this::addEntry);
         }
 
         @Override
         protected int getScrollbarPosition()
         {
-            return this.width / 2 + 134;
+            return this.width / 2 + ListMenuScreen.this.rowWidth / 2 + 10;
         }
 
         @Override
         public int getRowWidth()
         {
-            return 240;
+            return ListMenuScreen.this.rowWidth;
         }
 
         // Overridden simply to make it public
