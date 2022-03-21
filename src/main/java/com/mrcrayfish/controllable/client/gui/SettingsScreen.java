@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client.gui;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.ButtonBinding;
@@ -8,6 +9,7 @@ import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.Option;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -119,11 +121,12 @@ public class SettingsScreen extends ListMenuScreen
         private final AbstractWidget optionOne;
         private final AbstractWidget optionTwo;
 
-        public OptionRowItem(@Nullable Option o1, @Nullable Option o2)
+        public OptionRowItem(Option o1, @Nullable Option o2)
         {
             super(TextComponent.EMPTY);
-            this.optionOne = Optional.ofNullable(o1).map(o -> o.createButton(SettingsScreen.this.minecraft.options, 0, 0, 150)).orElse(null);
+            this.optionOne = o1.createButton(SettingsScreen.this.minecraft.options, 0, 0, 150);
             this.optionTwo = Optional.ofNullable(o2).map(o -> o.createButton(SettingsScreen.this.minecraft.options, 0, 0, 150)).orElse(null);
+
         }
 
         @Override
@@ -132,9 +135,18 @@ public class SettingsScreen extends ListMenuScreen
             this.optionOne.x = left;
             this.optionOne.y = top;
             this.optionOne.render(matrixStack, mouseX, mouseY, partialTicks);
-            this.optionTwo.x = left + width - 150;
-            this.optionTwo.y = top;
-            this.optionTwo.render(matrixStack, mouseX, mouseY, partialTicks);
+            if(this.optionTwo != null)
+            {
+                this.optionTwo.x = left + width - 150;
+                this.optionTwo.y = top;
+                this.optionTwo.render(matrixStack, mouseX, mouseY, partialTicks);
+            }
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children()
+        {
+            return this.optionTwo != null ? ImmutableList.of(this.optionOne, this.optionTwo) : ImmutableList.of(this.optionOne);
         }
     }
 }
