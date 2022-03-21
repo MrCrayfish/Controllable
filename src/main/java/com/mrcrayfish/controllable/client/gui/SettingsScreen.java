@@ -2,46 +2,65 @@ package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.IToolTip;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.Option;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Author: MrCrayfish
  */
-public class SettingsScreen extends Screen
+public class SettingsScreen extends ListMenuScreen
 {
     private static final Option[] OPTIONS = new Option[]{ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.CONSOLE_HOTBAR, ControllerOptions.CONTROLLER_ICONS, ControllerOptions.CURSOR_TYPE, ControllerOptions.INVERT_LOOK, ControllerOptions.DEAD_ZONE, ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED, ControllerOptions.SHOW_ACTIONS, ControllerOptions.QUICK_CRAFT, ControllerOptions.UI_SOUNDS, ControllerOptions.RADIAL_THUMBSTICK, ControllerOptions.SNEAK_MODE, ControllerOptions.CURSOR_THUMBSTICK};
-    private final Screen parentScreen;
     private IToolTip hoveredTooltip;
     private int hoveredCounter;
 
-    protected SettingsScreen(Screen parentScreen)
+    protected SettingsScreen(Screen parent)
     {
-        super(new TranslatableComponent("controllable.gui.title.settings"));
-        this.parentScreen = parentScreen;
+        super(parent, new TranslatableComponent("controllable.gui.title.settings"), 24);
+        this.setSearchBarVisible(false);
+        this.setRowWidth(310);
     }
 
     @Override
     protected void init()
     {
-        for(int i = 0; i < OPTIONS.length; i++)
-        {
-            Option option = OPTIONS[i];
-            int x = this.width / 2 - 155 + i % 2 * 160;
-            int y = this.height / 6 + 24 * (i >> 1) - 12;
-            this.addRenderableWidget(option.createButton(this.minecraft.options, x, y, 150));
-        }
-
-        this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 6 + 24 * (OPTIONS.length + 1) / 2 - 12, 200, 20, CommonComponents.GUI_BACK, (button) -> {
-            this.minecraft.setScreen(this.parentScreen);
+        super.init();
+        this.addRenderableWidget(new Button(this.width / 2 - 100, this.height - 32, 200, 20, CommonComponents.GUI_BACK, (button) -> {
+            this.minecraft.setScreen(this.parent);
         }));
+    }
+
+    @Override
+    protected void constructEntries(List<Item> entries)
+    {
+        for(int i = 0; i < OPTIONS.length; i += 2)
+        {
+            entries.add(new OptionRowItem(this.getOption(i), this.getOption(i + 1)));
+        }
+    }
+
+    @Nullable
+    private Option getOption(int index)
+    {
+        if(index >= 0 && index < OPTIONS.length)
+        {
+            return OPTIONS[index];
+        }
+        return null;
     }
 
     @Override
@@ -69,10 +88,7 @@ public class SettingsScreen extends Screen
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(poseStack);
-        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 10, 0xFFFFFF);
         super.render(poseStack, mouseX, mouseY, partialTicks);
-
         this.hoveredTooltip = this.getHoveredToolTip(mouseX, mouseY);
         if(this.hoveredTooltip != null && this.hoveredCounter >= 20)
         {
@@ -81,7 +97,7 @@ public class SettingsScreen extends Screen
     }
 
     @Nullable
-    private IToolTip getHoveredToolTip(int mouseX, int mouseY)
+    private IToolTip getHoveredToolTip(int mouseX, int mouseY) //TODO fix
     {
         for(int i = 0; i < OPTIONS.length; i++)
         {
@@ -96,5 +112,29 @@ public class SettingsScreen extends Screen
             }
         }
         return null;
+    }
+
+    public class OptionRowItem extends Item
+    {
+        private final AbstractWidget optionOne;
+        private final AbstractWidget optionTwo;
+
+        public OptionRowItem(@Nullable Option o1, @Nullable Option o2)
+        {
+            super(TextComponent.EMPTY);
+            this.optionOne = Optional.ofNullable(o1).map(o -> o.createButton(SettingsScreen.this.minecraft.options, 0, 0, 150)).orElse(null);
+            this.optionTwo = Optional.ofNullable(o2).map(o -> o.createButton(SettingsScreen.this.minecraft.options, 0, 0, 150)).orElse(null);
+        }
+
+        @Override
+        public void render(PoseStack matrixStack, int index, int top, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean hovered, float partialTicks)
+        {
+            this.optionOne.x = left;
+            this.optionOne.y = top;
+            this.optionOne.render(matrixStack, mouseX, mouseY, partialTicks);
+            this.optionTwo.x = left + width - 150;
+            this.optionTwo.y = top;
+            this.optionTwo.render(matrixStack, mouseX, mouseY, partialTicks);
+        }
     }
 }
