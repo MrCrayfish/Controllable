@@ -1,11 +1,13 @@
 package com.mrcrayfish.controllable.client.gui;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.IToolTip;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.AbstractOption;
 import net.minecraft.client.gui.DialogTexts;
+import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
@@ -119,8 +121,9 @@ public class SettingsScreen extends ListMenuScreen
         public OptionRowItem(@Nullable AbstractOption o1, @Nullable AbstractOption o2)
         {
             super(StringTextComponent.EMPTY);
-            this.optionOne = Optional.ofNullable(o1).map(o -> o.createWidget(SettingsScreen.this.minecraft.gameSettings, 0, 0, 150)).orElse(null);
+            this.optionOne = o1.createWidget(SettingsScreen.this.minecraft.gameSettings, 0, 0, 150);
             this.optionTwo = Optional.ofNullable(o2).map(o -> o.createWidget(SettingsScreen.this.minecraft.gameSettings, 0, 0, 150)).orElse(null);
+
         }
 
         @Override
@@ -129,9 +132,18 @@ public class SettingsScreen extends ListMenuScreen
             this.optionOne.x = left;
             this.optionOne.y = top;
             this.optionOne.render(matrixStack, mouseX, mouseY, partialTicks);
-            this.optionTwo.x = left + width - 150;
-            this.optionTwo.y = top;
-            this.optionTwo.render(matrixStack, mouseX, mouseY, partialTicks);
+            if(this.optionTwo != null)
+            {
+                this.optionTwo.x = left + width - 150;
+                this.optionTwo.y = top;
+                this.optionTwo.render(matrixStack, mouseX, mouseY, partialTicks);
+            }
+        }
+
+        @Override
+        public List<? extends IGuiEventListener> getEventListeners()
+        {
+            return this.optionTwo != null ? ImmutableList.of(this.optionOne, this.optionTwo) : ImmutableList.of(this.optionOne);
         }
     }
 }
