@@ -1,13 +1,11 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import net.minecraft.client.gui.DialogTexts;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -19,7 +17,6 @@ import java.util.List;
  */
 public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
 {
-    //private final ITextComponent note; //TODO reimplement note into list menu
     private Button resetButton;
 
     public SelectKeyBindingScreen(Screen parent)

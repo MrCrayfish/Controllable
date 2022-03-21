@@ -151,4 +151,14 @@ public class ControllerOptions
         SneakMode sneakMode = option.get(gameSettings);
         return new TranslationTextComponent("controllable.options.sneakMode.format", new TranslationTextComponent("controllable.sneakMode." + sneakMode.getString()));
     });
+
+    public static final ControllableEnumOption<Thumbstick> CURSOR_THUMBSTICK = new ControllableEnumOption<>("controllable.options.cursorThumbstick", Thumbstick.class, gameSettings -> {
+        return Config.CLIENT.options.cursorThumbstick.get();
+    }, (gameSettings, value) -> {
+        Config.CLIENT.options.cursorThumbstick.set(value);
+        Config.save();
+    }, (gameSettings, option) -> {
+        Thumbstick cursorThumbstick = option.get(gameSettings);
+        return new TranslationTextComponent("controllable.options.cursorThumbstick.format", new TranslationTextComponent("controllable.cursorThumbstick." + cursorThumbstick.getString()));
+    });
 }

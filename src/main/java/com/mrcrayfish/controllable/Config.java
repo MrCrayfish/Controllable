@@ -49,6 +49,7 @@ public class Config
             public final ForgeConfigSpec.BooleanValue uiSounds;
             public final ForgeConfigSpec.EnumValue<Thumbstick> radialThumbstick;
             public final ForgeConfigSpec.EnumValue<SneakMode> sneakMode;
+            public final ForgeConfigSpec.EnumValue<Thumbstick> cursorThumbstick;
 
             public Options(ForgeConfigSpec.Builder builder)
             {
@@ -70,6 +71,7 @@ public class Config
                     this.uiSounds = builder.comment("If enabled, plays a pop sound when you navigate in inventories, menus or scrolling the radial menu").translation("controllable.config.uiSounds").define("uiSounds", true);
                     this.radialThumbstick = builder.comment("The thumbstick to use when scrolling items in the radial menu").translation("controllable.config.radialThumbstick").defineEnum("radialThumbstick", Thumbstick.RIGHT);
                     this.sneakMode = builder.comment("The behaviour to use for sneaking. Toggle means to press once to sneak then press again to stand again. Hold means you must hold the sneak button and releasing will make the player stand again.").translation("controllable.config.sneakMode").defineEnum("sneakMode", SneakMode.TOGGLE);
+                    this.cursorThumbstick = builder.comment("The thumbstick that controls moving the cursor").translation("controllable.config.cursorThumbstick").defineEnum("cursorThumbstick", Thumbstick.LEFT);
                 }
                 builder.pop();
             }
