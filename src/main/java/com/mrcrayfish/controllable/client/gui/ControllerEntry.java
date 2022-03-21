@@ -10,8 +10,6 @@ import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
-
 /**
  * Author: MrCrayfish
  */

@@ -1,7 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
