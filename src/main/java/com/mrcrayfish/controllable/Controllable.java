@@ -1,13 +1,13 @@
 package com.mrcrayfish.controllable;
 
 import com.google.common.io.ByteStreams;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingScreen;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -122,6 +122,7 @@ public class Controllable implements IControllerListener
             MinecraftForge.EVENT_BUS.register(new ScreenEvents(Controllable.manager));
             MinecraftForge.EVENT_BUS.register(new ControllerEvents());
             MinecraftForge.EVENT_BUS.register(RadialMenuHandler.instance());
+            MinecraftForge.EVENT_BUS.addListener(this::controllerTick);
         });
     }
 
@@ -188,70 +189,58 @@ public class Controllable implements IControllerListener
         }
     }
 
-    private void startControllerThread()
+    private void controllerTick(TickEvent.ClientTickEvent event)
     {
-        Runnable r = () ->
+        if(event.phase != TickEvent.Phase.START)
+            return;
+
+        if(manager != null)
         {
-            final long pollInterval = Config.CLIENT.controllerPollInterval.get();
-            while(Minecraft.getInstance().isRunning())
-            {
-                manager.update();
-                if(controller != null)
-                {
-                    controller.updateGamepadState();
-                    this.gatherAndQueueControllerInput();
-                }
-                try
-                {
-                    Thread.sleep(pollInterval);
-                }
-                catch(InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread controllerPollThread = new Thread(r, "Controller Input");
-        controllerPollThread.setDaemon(true);
-        controllerPollThread.start();
+            manager.update();
+        }
+        if(controller != null)
+        {
+            controller.updateGamepadState();
+            gatherAndQueueControllerInput();
+        }
     }
     
-    private void gatherAndQueueControllerInput()
+    private static void gatherAndQueueControllerInput()
     {
         Controller currentController = controller;
         if(currentController == null)
             return;
         ButtonStates states = new ButtonStates();
-        states.setState(Buttons.A, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_A));
-        states.setState(Buttons.B, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_B));
-        states.setState(Buttons.X, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_X));
-        states.setState(Buttons.Y, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_Y));
-        states.setState(Buttons.SELECT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_BACK));
-        states.setState(Buttons.HOME, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_GUIDE));
-        states.setState(Buttons.START, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_START));
-        states.setState(Buttons.LEFT_THUMB_STICK, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB));
-        states.setState(Buttons.RIGHT_THUMB_STICK, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB));
-        states.setState(Buttons.LEFT_BUMPER, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER));
-        states.setState(Buttons.RIGHT_BUMPER, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER));
+        states.setState(Buttons.A, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_A));
+        states.setState(Buttons.B, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_B));
+        states.setState(Buttons.X, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_X));
+        states.setState(Buttons.Y, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_Y));
+        states.setState(Buttons.SELECT, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_BACK));
+        states.setState(Buttons.HOME, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_GUIDE));
+        states.setState(Buttons.START, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_START));
+        states.setState(Buttons.LEFT_THUMB_STICK, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB));
+        states.setState(Buttons.RIGHT_THUMB_STICK, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB));
+        states.setState(Buttons.LEFT_BUMPER, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER));
+        states.setState(Buttons.RIGHT_BUMPER, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER));
         states.setState(Buttons.LEFT_TRIGGER, currentController.getLTriggerValue() >= 0.5F);
         states.setState(Buttons.RIGHT_TRIGGER, currentController.getRTriggerValue() >= 0.5F);
-        states.setState(Buttons.DPAD_UP, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP));
-        states.setState(Buttons.DPAD_DOWN, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
-        states.setState(Buttons.DPAD_LEFT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
-        states.setState(Buttons.DPAD_RIGHT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
-        Minecraft.getInstance().submit(() -> this.processButtons(states));
+        states.setState(Buttons.DPAD_UP, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP));
+        states.setState(Buttons.DPAD_DOWN, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
+        states.setState(Buttons.DPAD_LEFT, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
+        states.setState(Buttons.DPAD_RIGHT, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+        processButtonStates(states);
     }
 
-    private void processButtons(ButtonStates states)
+    private static void processButtonStates(ButtonStates states)
     {
         ButtonBinding.tick();
         for(int i = 0; i < Buttons.BUTTONS.length; i++)
         {
-            this.processButton(Buttons.BUTTONS[i], states);
+            processButton(Buttons.BUTTONS[i], states);
         }
     }
 
-    private void processButton(int index, ButtonStates newStates)
+    private static void processButton(int index, ButtonStates newStates)
     {
         boolean state = newStates.getState(index);
 
@@ -314,7 +303,7 @@ public class Controllable implements IControllerListener
         return controller != null && controller.getButtonsStates().getState(button);
     }
 
-    private boolean getButtonState(int buttonCode)
+    private static boolean getButtonState(int buttonCode)
     {
         return controller != null && controller.getGamepadState().buttons(buttonCode) == GLFW.GLFW_PRESS;
     }
