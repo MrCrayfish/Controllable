@@ -12,6 +12,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
+import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
 import com.mrcrayfish.controllable.integration.JustEnoughItems;
@@ -23,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -1022,9 +1024,32 @@ public class ControllerInput
         List<AbstractWidget> widgets = new ArrayList<>();
         for(GuiEventListener listener : screen.children())
         {
-            if(listener instanceof AbstractWidget)
+            if(listener instanceof AbstractWidget widget && widget.active && widget.visible)
             {
                 widgets.add((AbstractWidget) listener);
+            }
+            else if(listener instanceof AbstractSelectionList<?> list)
+            {
+                int count = list.children().size();
+                for(int i = 0; i < count; i++)
+                {
+                    int rowTop = ReflectUtil.getAbstractListRowTop(list, i);
+                    int rowBottom = ReflectUtil.getAbstractListRowBottom(list, i);
+                    if(rowTop >= list.getTop() && rowBottom <= list.getBottom()) // Is visible
+                    {
+                        AbstractSelectionList.Entry<?> entry = list.children().get(i);
+                        if(entry instanceof ContainerEventHandler handler)
+                        {
+                            for(GuiEventListener child : handler.children())
+                            {
+                                if(child instanceof AbstractWidget widget && widget.active && widget.visible)
+                                {
+                                    widgets.add((AbstractWidget) child);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -1044,7 +1069,7 @@ public class ControllerInput
 
         for(AbstractWidget widget : widgets)
         {
-            if(widget == null || widget.isHoveredOrFocused() || !widget.visible)
+            if(widget == null || widget.isHoveredOrFocused() || !widget.visible || !widget.active)
                 continue;
             int posX = widget.x + widget.getWidth() / 2;
             int posY = widget.y + widget.getHeight() / 2;
