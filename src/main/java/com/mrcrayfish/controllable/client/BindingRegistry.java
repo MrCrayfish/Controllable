@@ -54,6 +54,9 @@ public class BindingRegistry
         getInstance().register(ButtonBindings.FULLSCREEN);
         getInstance().register(ButtonBindings.DEBUG_INFO);
         getInstance().register(ButtonBindings.RADIAL_MENU);
+        Stream.of(ButtonBindings.HOTBAR_SLOTS).forEach(binding -> {
+            getInstance().register(binding);
+        });
     }
 
     private static BindingRegistry instance;

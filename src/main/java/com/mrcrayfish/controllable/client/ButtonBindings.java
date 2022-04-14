@@ -40,4 +40,14 @@ public class ButtonBindings
     public static final ButtonBinding FULLSCREEN = new ButtonBinding(-1, "key.fullscreen", "key.categories.misc", KeyConflictContext.UNIVERSAL);
     public static final ButtonBinding DEBUG_INFO = new ButtonBinding(-1, "controllable.key.debugInfo", "key.categories.misc", KeyConflictContext.IN_GAME);
     public static final ButtonBinding RADIAL_MENU = new ButtonBinding(Buttons.DPAD_RIGHT, "controllable.key.radial_menu", "key.categories.gameplay", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding HOTBAR_SLOT_1 = new ButtonBinding(-1, "controllable.key.hotbar_slot_1", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding HOTBAR_SLOT_2 = new ButtonBinding(-1, "controllable.key.hotbar_slot_2", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding HOTBAR_SLOT_3 = new ButtonBinding(-1, "controllable.key.hotbar_slot_3", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding HOTBAR_SLOT_4 = new ButtonBinding(-1, "controllable.key.hotbar_slot_4", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding HOTBAR_SLOT_5 = new ButtonBinding(-1, "controllable.key.hotbar_slot_5", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding HOTBAR_SLOT_6 = new ButtonBinding(-1, "controllable.key.hotbar_slot_6", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding HOTBAR_SLOT_7 = new ButtonBinding(-1, "controllable.key.hotbar_slot_7", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding HOTBAR_SLOT_8 = new ButtonBinding(-1, "controllable.key.hotbar_slot_8", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding HOTBAR_SLOT_9 = new ButtonBinding(-1, "controllable.key.hotbar_slot_9", "key.categories.misc", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding[] HOTBAR_SLOTS = {HOTBAR_SLOT_1, HOTBAR_SLOT_2, HOTBAR_SLOT_3, HOTBAR_SLOT_4, HOTBAR_SLOT_5, HOTBAR_SLOT_6, HOTBAR_SLOT_7, HOTBAR_SLOT_8, HOTBAR_SLOT_9};
 }
