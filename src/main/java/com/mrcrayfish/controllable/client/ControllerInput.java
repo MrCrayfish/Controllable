@@ -734,19 +734,31 @@ public class ControllerInput
                 {
                     RadialMenuHandler.instance().interact();
                 }
-                else if(mc.player != null && !mc.player.isHandActive())
+                else if(mc.player != null)
                 {
-                    if(ButtonBindings.ATTACK.isButtonPressed())
+                    for(int i = 0; i < 9; i++)
                     {
-                        mc.clickMouse();
+                        if(ButtonBindings.HOTBAR_SLOTS[i].isButtonPressed())
+                        {
+                            mc.player.inventory.currentItem = i;
+                            return;
+                        }
                     }
-                    else if(ButtonBindings.USE_ITEM.isButtonPressed())
+
+                    if(!mc.player.isHandActive())
                     {
-                        mc.rightClickMouse();
-                    }
-                    else if(ButtonBindings.PICK_BLOCK.isButtonPressed())
-                    {
-                        mc.middleClickMouse();
+                        if(ButtonBindings.ATTACK.isButtonPressed())
+                        {
+                            mc.clickMouse();
+                        }
+                        else if(ButtonBindings.USE_ITEM.isButtonPressed())
+                        {
+                            mc.rightClickMouse();
+                        }
+                        else if(ButtonBindings.PICK_BLOCK.isButtonPressed())
+                        {
+                            mc.middleClickMouse();
+                        }
                     }
                 }
             }
