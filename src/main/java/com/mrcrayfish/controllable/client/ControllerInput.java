@@ -226,6 +226,30 @@ public class ControllerInput
                     }
                 }
                 IGuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+                if(hoveredListener instanceof AbstractList<?>)
+                {
+                    AbstractList<?> list = (AbstractList<?>) hoveredListener;
+                    int count = list.getEventListeners().size();
+                    for(int i = 0; i < count; i++)
+                    {
+                        int rowTop = ReflectUtil.getAbstractListRowTop(list, i);
+                        int rowBottom = ReflectUtil.getAbstractListRowBottom(list, i);
+                        if(rowTop < list.getTop() && rowBottom > list.getBottom()) // Is visible
+                            continue;
+
+                        AbstractList.AbstractListEntry<?> entry = list.getEventListeners().get(i);
+                        if(!(entry instanceof INestedGuiEventHandler))
+                            continue;
+
+                        INestedGuiEventHandler handler = (INestedGuiEventHandler) entry;
+                        IGuiEventListener hovered = handler.getEventListeners().stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+                        if(hovered == null)
+                            continue;
+
+                        hoveredListener = hovered;
+                        break;
+                    }
+                }
                 if(hoveredListener != null && !(hoveredListener instanceof AbstractList))
                 {
                     mouseSpeed *= Config.CLIENT.options.hoverModifier.get();
