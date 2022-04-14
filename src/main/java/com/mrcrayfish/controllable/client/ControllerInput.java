@@ -229,6 +229,28 @@ public class ControllerInput
                 }
 
                 GuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+                if(hoveredListener instanceof AbstractSelectionList<?> list)
+                {
+                    int count = list.children().size();
+                    for(int i = 0; i < count; i++)
+                    {
+                        int rowTop = ReflectUtil.getAbstractListRowTop(list, i);
+                        int rowBottom = ReflectUtil.getAbstractListRowBottom(list, i);
+                        if(rowTop < list.getTop() && rowBottom > list.getBottom()) // Is visible
+                            continue;
+
+                        AbstractSelectionList.Entry<?> entry = list.children().get(i);
+                        if(!(entry instanceof ContainerEventHandler handler))
+                            continue;
+
+                        GuiEventListener hovered = handler.children().stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+                        if(hovered == null)
+                            continue;
+
+                        hoveredListener = hovered;
+                        break;
+                    }
+                }
                 if(hoveredListener != null && !(hoveredListener instanceof AbstractSelectionList<?>))
                 {
                     mouseSpeed *= Config.CLIENT.options.hoverModifier.get();
