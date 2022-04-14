@@ -78,50 +78,55 @@ public class Controllable implements IControllerListener
 
     private void onClientSetup(FMLClientSetupEvent event)
     {
-        Minecraft mc = event.getMinecraftSupplier().get();
-        configFolder = new File(mc.gameDir, "config");
-        jeiLoaded = ModList.get().isLoaded("jei");
-
-        ControllerProperties.load(configFolder);
-
-        RenderSystem.recordRenderCall(() ->
+        event.enqueueWork(() ->
         {
+            Minecraft mc = event.getMinecraftSupplier().get();
+            configFolder = new File(mc.gameDir, "config");
+            jeiLoaded = ModList.get().isLoaded("jei");
+
+            ControllerProperties.load(configFolder);
+
             try(InputStream is = Mappings.class.getResourceAsStream("/gamecontrollerdb.txt"))
             {
-                byte[] bytes = ByteStreams.toByteArray(is);
-                ByteBuffer buffer = MemoryUtil.memASCIISafe(new String(bytes));
-                GLFW.glfwUpdateGamepadMappings(buffer);
+                if(is != null)
+                {
+                    byte[] bytes = ByteStreams.toByteArray(is);
+                    ByteBuffer buffer = MemoryUtil.memASCIISafe(new String(bytes));
+                    if(buffer != null && GLFW.glfwUpdateGamepadMappings(buffer))
+                    {
+                        LOGGER.info("Successfully updated gamepad mappings");
+                    }
+                }
             }
             catch(IOException e)
             {
                 e.printStackTrace();
             }
-        });
 
-        /* Loads up the controller manager and adds a listener */
-        Controllable.manager = new ControllerManager();
-        Controllable.manager.addControllerListener(this);
+            /* Loads up the controller manager and adds a listener */
+            Controllable.manager = new ControllerManager();
+            Controllable.manager.addControllerListener(this);
 
-        /* Attempts to load the first controller connected if auto select is enabled */
-        if(Config.CLIENT.options.autoSelect.get())
-        {
-            if(GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_1) && GLFW.glfwJoystickIsGamepad(GLFW.GLFW_JOYSTICK_1))
+            /* Attempts to load the first controller connected if auto select is enabled */
+            if(Config.CLIENT.options.autoSelect.get())
             {
-                setController(new Controller(GLFW.GLFW_JOYSTICK_1));
+                if(GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_1) && GLFW.glfwJoystickIsGamepad(GLFW.GLFW_JOYSTICK_1))
+                {
+                    setController(new Controller(GLFW.GLFW_JOYSTICK_1));
+                }
             }
-        }
 
-        Mappings.load(configFolder);
+            Mappings.load(configFolder);
 
-        /* Registers events */
-        MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(input = new ControllerInput());
-        MinecraftForge.EVENT_BUS.register(new RenderEvents());
-        MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
-        MinecraftForge.EVENT_BUS.register(new ControllerEvents());
-        MinecraftForge.EVENT_BUS.register(RadialMenuHandler.instance());
+            /* Registers events */
+            MinecraftForge.EVENT_BUS.register(this);
+            MinecraftForge.EVENT_BUS.register(input = new ControllerInput());
+            MinecraftForge.EVENT_BUS.register(new RenderEvents());
+            MinecraftForge.EVENT_BUS.register(new GuiEvents(Controllable.manager));
+            MinecraftForge.EVENT_BUS.register(new ControllerEvents());
+            MinecraftForge.EVENT_BUS.register(RadialMenuHandler.instance());
 
-        this.startControllerThread();
+        });
     }
 
     @Override
