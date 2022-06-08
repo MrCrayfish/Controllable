@@ -231,6 +231,7 @@ public class ControllerInput
                 GuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
                 if(hoveredListener instanceof AbstractSelectionList<?> list)
                 {
+                    hoveredListener = null;
                     int count = list.children().size();
                     for(int i = 0; i < count; i++)
                     {
@@ -251,7 +252,7 @@ public class ControllerInput
                         break;
                     }
                 }
-                if(hoveredListener != null && !(hoveredListener instanceof AbstractSelectionList<?>))
+                if(hoveredListener != null)
                 {
                     mouseSpeed *= Config.CLIENT.options.hoverModifier.get();
                 }
