@@ -9,7 +9,7 @@ import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.RenderEvents;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.CommonComponents;
 
 /**
  * Author: MrCrayfish
@@ -20,7 +20,7 @@ public class ButtonBindingButton extends Button
 
     public ButtonBindingButton(int x, int y, ButtonBinding binding, OnPress onPress)
     {
-        super(x, y, 20, 20, TextComponent.EMPTY, onPress);
+        super(x, y, 20, 20, CommonComponents.EMPTY, onPress);
         this.binding = binding;
     }
 

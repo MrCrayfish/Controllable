@@ -1,18 +1,18 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
-import net.minecraft.client.Option;
+import com.mrcrayfish.controllable.client.settings.ControllerSetting;
+import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.TooltipAccessor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
 import javax.annotation.Nullable;
@@ -24,7 +24,7 @@ import java.util.Optional;
  */
 public class SettingsScreen extends ListMenuScreen
 {
-    private static final Option[] OPTIONS = new Option[]{
+    private static final ControllerSetting<?>[] OPTIONS = new ControllerSetting[]{
             ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER,
             ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.CONSOLE_HOTBAR,
             ControllerOptions.CONTROLLER_ICONS, ControllerOptions.CURSOR_TYPE,
@@ -40,7 +40,7 @@ public class SettingsScreen extends ListMenuScreen
 
     protected SettingsScreen(Screen parent)
     {
-        super(parent, new TranslatableComponent("controllable.gui.title.settings"), 24);
+        super(parent, Component.translatable("controllable.gui.title.settings"), 24);
         this.setSearchBarVisible(false);
         this.setRowWidth(310);
     }
@@ -59,12 +59,12 @@ public class SettingsScreen extends ListMenuScreen
     {
         for(int i = 0; i < OPTIONS.length; i += 2)
         {
-            entries.add(new OptionRowItem(this.getOption(i), this.getOption(i + 1)));
+            entries.add(new WidgetRow(this.getOption(i), this.getOption(i + 1)));
         }
     }
 
     @Nullable
-    private Option getOption(int index)
+    private ControllerSetting<?> getOption(int index)
     {
         if(index >= 0 && index < OPTIONS.length)
         {
@@ -109,7 +109,7 @@ public class SettingsScreen extends ListMenuScreen
     @Nullable
     private List<FormattedCharSequence> getHoveredToolTip(int mouseX, int mouseY)
     {
-        if(this.list.getHovered() instanceof OptionRowItem item)
+        if(this.list.getHovered() instanceof WidgetRow item)
         {
             List<? extends GuiEventListener> listeners = item.children();
             for(GuiEventListener listener : listeners)
@@ -123,17 +123,28 @@ public class SettingsScreen extends ListMenuScreen
         return null;
     }
 
-    public class OptionRowItem extends Item
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button)
+    {
+        boolean wasDragging = this.isDragging();
+        this.setDragging(false);
+        if(wasDragging && this.getFocused() != null)
+        {
+            return this.getFocused().mouseReleased(mouseX, mouseY, button);
+        }
+        return false;
+    }
+
+    public class WidgetRow extends Item
     {
         private final AbstractWidget optionOne;
         private final AbstractWidget optionTwo;
 
-        public OptionRowItem(Option o1, @Nullable Option o2)
+        public WidgetRow(ControllerSetting<?> leftWidget, @Nullable ControllerSetting<?> rightWidget)
         {
-            super(TextComponent.EMPTY);
-            this.optionOne = o1.createButton(SettingsScreen.this.minecraft.options, 0, 0, 150);
-            this.optionTwo = Optional.ofNullable(o2).map(o -> o.createButton(SettingsScreen.this.minecraft.options, 0, 0, 150)).orElse(null);
-
+            super(CommonComponents.EMPTY);
+            this.optionOne = leftWidget.createWidget(0, 0, 150, 20).get();
+            this.optionTwo = Optional.ofNullable(rightWidget).map(o -> o.createWidget(0, 0, 150, 20).get()).orElse(null);
         }
 
         @Override
@@ -154,6 +165,18 @@ public class SettingsScreen extends ListMenuScreen
         public List<? extends GuiEventListener> children()
         {
             return this.optionTwo != null ? ImmutableList.of(this.optionOne, this.optionTwo) : ImmutableList.of(this.optionOne);
+        }
+
+        @Override
+        public boolean mouseReleased(double mouseX, double mouseY, int button)
+        {
+            boolean wasDragging = this.isDragging();
+            this.setDragging(false);
+            if(wasDragging && this.getFocused() != null)
+            {
+                return this.getFocused().mouseReleased(mouseX, mouseY, button);
+            }
+            return false;
         }
     }
 }

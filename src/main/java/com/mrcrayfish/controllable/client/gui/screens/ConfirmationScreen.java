@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;

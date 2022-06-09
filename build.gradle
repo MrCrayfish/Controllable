@@ -1,20 +1,16 @@
 buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-       // maven { url = 'https://maven.parchmentmc.org' }
-        maven { url = 'https://repo.spongepowered.org/maven' }
-        mavenCentral()
-    }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-        //classpath 'org.parchmentmc:librarian:1.+'
     }
 }
-apply plugin: 'net.minecraftforge.gradle'
-//apply plugin: 'org.parchmentmc.librarian.forgegradle'
+
+plugins {
+    id 'eclipse'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '5.+'
+}
+
 apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'maven-publish'
 
 version = "0.16.1-1.18.2"
 group = "com.mrcrayfish"
@@ -27,15 +23,16 @@ mixin {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.18.2'
+    mappings channel: 'official', version: '1.19'
     
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         client {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'controllable'
             arg "-mixin.config=controllable.mixins.json"
             mods {
                 controllable {
@@ -46,9 +43,22 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'controllable'
             arg "-mixin.config=controllable.mixins.json"
+            mods {
+                controllable {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        gameTestServer {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'controllable'
             mods {
                 controllable {
                     source sourceSets.main
@@ -58,9 +68,9 @@ minecraft {
 
         data {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
-            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'controllable', '--all', '--output', file('src/generated/resources/')
             mods {
                 controllable {
                     source sourceSets.main
@@ -89,10 +99,10 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.2-40.0.15'
-    implementation fg.deobf('mezz.jei:jei-1.18.2:9.5.2.133')
-    implementation fg.deobf('curse.maven:configured-457570:3543119')
-    implementation fg.deobf('curse.maven:catalogue-459701:3543625')
+    minecraft 'net.minecraftforge:forge:1.19-41.0.1'
+    //implementation fg.deobf('mezz.jei:jei-1.18.2:9.5.2.133')
+    //implementation fg.deobf('curse.maven:configured-457570:3543119')
+    //implementation fg.deobf('curse.maven:catalogue-459701:3543625')
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
@@ -125,4 +135,8 @@ publishing {
             url "file:///X:/localmaven/mcmods"
         }
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }

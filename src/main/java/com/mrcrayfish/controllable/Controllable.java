@@ -2,8 +2,8 @@ package com.mrcrayfish.controllable;
 
 import com.google.common.io.ByteStreams;
 import com.mrcrayfish.controllable.client.*;
-import com.mrcrayfish.controllable.client.gui.ButtonBindingScreen;
-import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.gui.screens.ButtonBindingScreen;
+import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.common.MinecraftForge;

@@ -1,11 +1,10 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.*;
 
@@ -55,7 +54,7 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
             if(!list.isEmpty())
             {
                 Collections.sort(list);
-                entries.add(new TitleItem(new TranslatableComponent(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+                entries.add(new TitleItem(Component.translatable(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
                 list.forEach(binding -> entries.add(this.createItemFromBinding(binding)));
             }
         });

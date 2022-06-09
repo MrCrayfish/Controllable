@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.KeyAdapterBinding;
@@ -7,7 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +21,16 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
 
     public SelectKeyBindingScreen(Screen parent)
     {
-        super(parent, new TranslatableComponent("controllable.gui.title.select_key_bindings"), 22);
-        this.setSubTitle(new TranslatableComponent("controllable.gui.note").withStyle(ChatFormatting.RED).append(new TranslatableComponent("controllable.gui.key_bind_note").withStyle(ChatFormatting.GRAY)));
+        super(parent, Component.translatable("controllable.gui.title.select_key_bindings"), 22);
+        this.setSubTitle(Component.translatable("controllable.gui.note").withStyle(ChatFormatting.RED).append(Component.translatable("controllable.gui.key_bind_note").withStyle(ChatFormatting.GRAY)));
     }
 
     @Override
     protected void init()
     {
         super.init();
-        this.resetButton = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 32, 150, 20, new TranslatableComponent("controllable.gui.reset"), (button) -> {
-            this.minecraft.setScreen(new ConfirmationScreen(this, new TranslatableComponent("controllable.gui.reset_keybinds"), result -> {
+        this.resetButton = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 32, 150, 20, Component.translatable("controllable.gui.reset"), (button) -> {
+            this.minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_keybinds"), result -> {
                 if(result) {
                     List<KeyAdapterBinding> copy = new ArrayList<>(BindingRegistry.getInstance().getKeyAdapters().values());
                     copy.forEach(binding -> {

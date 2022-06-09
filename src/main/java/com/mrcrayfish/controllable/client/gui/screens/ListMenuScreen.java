@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -15,7 +15,9 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,7 +74,7 @@ public abstract class ListMenuScreen extends Screen
         this.addWidget(this.list);
 
         // Adds a search text field to the top of the screen
-        this.searchTextField = new FocusedEditBox(this.font, this.width / 2 - 110, this.calculateSearchBarY(), 220, 20, new TextComponent("Search"));
+        this.searchTextField = new FocusedEditBox(this.font, this.width / 2 - 110, this.calculateSearchBarY(), 220, 20, Component.literal("Search"));
         this.searchTextField.setResponder(s ->
         {
             this.updateSearchTextFieldSuggestion(s);
@@ -125,7 +127,7 @@ public abstract class ListMenuScreen extends Screen
     {
         if(ScreenUtil.isMouseWithin(10, 13, 23, 23, mouseX, mouseY))
         {
-            this.setActiveTooltip(this.minecraft.font.split(new TranslatableComponent("configured.gui.info"), 200));
+            this.setActiveTooltip(this.minecraft.font.split(Component.translatable("configured.gui.info"), 200));
         }
     }
 
@@ -261,6 +263,18 @@ public abstract class ListMenuScreen extends Screen
                 });
             });
         }
+
+        @Override
+        public boolean mouseReleased(double mouseX, double mouseY, int button)
+        {
+            boolean wasDragging = this.isDragging();
+            this.setDragging(false);
+            if(wasDragging && this.getFocused() != null)
+            {
+                return this.getFocused().mouseReleased(mouseX, mouseY, button);
+            }
+            return false;
+        }
     }
 
     protected abstract class Item extends ContainerObjectSelectionList.Entry<Item>
@@ -275,7 +289,7 @@ public abstract class ListMenuScreen extends Screen
 
         public Item(String label)
         {
-            this.label = new TextComponent(label);
+            this.label = Component.literal(label);
         }
 
         public void setTooltip(Component text, int maxWidth)
@@ -318,7 +332,7 @@ public abstract class ListMenuScreen extends Screen
 
         public TitleItem(String title)
         {
-            super(new TextComponent(title).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.YELLOW));
+            super(Component.literal(title).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.YELLOW));
         }
 
         @Override
@@ -372,7 +386,7 @@ public abstract class ListMenuScreen extends Screen
         }
         else
         {
-            this.searchTextField.setSuggestion(new TranslatableComponent("controllable.gui.search").getString());
+            this.searchTextField.setSuggestion(Component.translatable("controllable.gui.search").getString());
         }
     }
 }

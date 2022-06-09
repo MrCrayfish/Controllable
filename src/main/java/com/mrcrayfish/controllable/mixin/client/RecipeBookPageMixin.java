@@ -5,7 +5,6 @@ import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -23,7 +22,7 @@ public class RecipeBookPageMixin
     {
         if(Controllable.getInput().isControllerInUse() && Config.CLIENT.options.quickCraft.get())
         {
-            components.add(new TranslatableComponent("controllable.tooltip.craft").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLUE));
+            components.add(Component.translatable("controllable.tooltip.craft").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLUE));
         }
         return components;
     }

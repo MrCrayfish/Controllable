@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Controller;
+import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import net.minecraft.client.gui.GuiComponent;
 
 /**

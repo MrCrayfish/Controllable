@@ -1,12 +1,11 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.OptionsList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 /**
  * Author: MrCrayfish
@@ -18,7 +17,7 @@ public class ThumbstickSettingsScreen extends Screen
 
     protected ThumbstickSettingsScreen(ControllerLayoutScreen layoutScreen)
     {
-        super(new TranslatableComponent("controllable.gui.title.thumbstick_settings"));
+        super(Component.translatable("controllable.gui.title.thumbstick_settings"));
         this.layoutScreen = layoutScreen;
     }
 
@@ -27,7 +26,7 @@ public class ThumbstickSettingsScreen extends Screen
     {
         this.optionsRowList = new OptionsList(this.minecraft, this.width, this.height, 32, this.height - 32, 25);
 
-        this.optionsRowList.addBig(ControllerOptions.createOnOff("controllable.options.switchThumbsticks", gameSettings -> {
+        /*this.optionsRowList.addBig(ControllerOptions.createOnOff("controllable.options.switchThumbsticks", gameSettings -> {
             return this.layoutScreen.getEntry().isThumbsticksSwitched();
         }, (options, option, value) -> {
             this.layoutScreen.getEntry().setSwitchThumbsticks(value);
@@ -51,7 +50,7 @@ public class ThumbstickSettingsScreen extends Screen
             return this.layoutScreen.getEntry().isFlipRightY();
         }, (options, option, value) -> {
             this.layoutScreen.getEntry().setFlipRightY(value);
-        }));
+        }));*/
 
         this.addWidget(this.optionsRowList);
 

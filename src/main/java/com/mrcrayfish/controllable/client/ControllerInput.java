@@ -7,7 +7,7 @@ import com.mojang.math.Vector3d;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
-import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
@@ -663,7 +663,7 @@ public class ControllerInput
             if(ButtonBindings.FULLSCREEN.isButtonPressed())
             {
                 mc.getWindow().toggleFullScreen();
-                mc.options.fullscreen = mc.getWindow().isFullscreen();
+                mc.options.fullscreen().set(mc.getWindow().isFullscreen());
                 mc.options.save();
             }
             else if(ButtonBindings.SCREENSHOT.isButtonPressed())

@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Reference;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -17,7 +17,7 @@ public class ControllerButton extends Button
 
     public ControllerButton(int x, int y, OnPress onPress)
     {
-        super(x, y, 20, 20, TextComponent.EMPTY, onPress);
+        super(x, y, 20, 20, CommonComponents.EMPTY, onPress);
     }
 
     @Override

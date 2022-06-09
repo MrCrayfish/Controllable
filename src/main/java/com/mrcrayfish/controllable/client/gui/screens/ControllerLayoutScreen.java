@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -8,6 +8,8 @@ import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
+import com.mrcrayfish.controllable.client.gui.ControllerAxis;
+import com.mrcrayfish.controllable.client.gui.ControllerButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -16,8 +18,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
@@ -48,7 +48,7 @@ public class ControllerLayoutScreen extends Screen
 
     protected ControllerLayoutScreen(Screen parentScreen)
     {
-        super(new TranslatableComponent("controllable.gui.title.layout"));
+        super(Component.translatable("controllable.gui.title.layout"));
         this.parentScreen = parentScreen;
 
         Controller controller = Controllable.getController();
@@ -88,12 +88,12 @@ public class ControllerLayoutScreen extends Screen
         this.controllerButtons.add(new ControllerAxis(this, Buttons.LEFT_THUMB_STICK, 9, 12, 0, 0, 7, 7, 5));
         this.controllerButtons.add(new ControllerAxis(this, Buttons.RIGHT_THUMB_STICK, 22, 12, 0, 0, 7, 7, 5));
 
-        this.doneButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 32, 100, 20, new TranslatableComponent("controllable.gui.save"), (button) -> {
+        this.doneButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 32, 100, 20, Component.translatable("controllable.gui.save"), (button) -> {
             this.updateControllerMapping();
             this.minecraft.setScreen(this.parentScreen);
         }));
 
-        this.resetButton = this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 32, 100, 20, new TranslatableComponent("controllable.gui.reset"), (button) -> {
+        this.resetButton = this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 32, 100, 20, Component.translatable("controllable.gui.reset"), (button) -> {
             this.entry.getReassignments().clear();
             this.entry.setSwitchThumbsticks(false);
             this.entry.setFlipLeftX(false);
@@ -102,7 +102,7 @@ public class ControllerLayoutScreen extends Screen
             this.entry.setFlipRightY(false);
         }));
 
-        this.addRenderableWidget(new Button(this.width / 2 + 54, this.height - 32, 100, 20, new TranslatableComponent("gui.cancel"), (button) -> {
+        this.addRenderableWidget(new Button(this.width / 2 + 54, this.height - 32, 100, 20, Component.translatable("gui.cancel"), (button) -> {
             this.minecraft.setScreen(this.parentScreen);
         }));
 
@@ -126,7 +126,7 @@ public class ControllerLayoutScreen extends Screen
         changed |= this.entry.isFlipRightY();
         this.resetButton.active = changed;
         this.validLayout = this.entry.getReassignments().values().stream().noneMatch(b -> b == -1);
-        this.doneButton.setMessage(new TranslatableComponent("controllable.gui.save").withStyle(this.validLayout ? ChatFormatting.WHITE : ChatFormatting.RED));
+        this.doneButton.setMessage(Component.translatable("controllable.gui.save").withStyle(this.validLayout ? ChatFormatting.WHITE : ChatFormatting.RED));
     }
 
     @Override
@@ -141,16 +141,16 @@ public class ControllerLayoutScreen extends Screen
         int x = this.width / 2 - width / 2;
         int y = this.height / 2 - 50 - 35;
         blit(poseStack, x, y, width, height, 50, 0, 38, 24, 256, 256);
-        this.controllerButtons.forEach(controllerButton -> controllerButton.draw(poseStack, x, y, mouseX, mouseY, this.configureButton == controllerButton.button));
+        this.controllerButtons.forEach(controllerButton -> controllerButton.draw(poseStack, x, y, mouseX, mouseY, this.configureButton == controllerButton.getButton()));
         drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
-        this.drawMultiLineCenteredString(poseStack, this.font, new TranslatableComponent("controllable.gui.layout.info").withStyle(ChatFormatting.GRAY), x + width / 2, y + 135, width + 190, 0xFFFFFFFF);
+        this.drawMultiLineCenteredString(poseStack, this.font, Component.translatable("controllable.gui.layout.info").withStyle(ChatFormatting.GRAY), x + width / 2, y + 135, width + 190, 0xFFFFFFFF);
         super.render(poseStack, mouseX, mouseY, partialTicks);
 
         if(this.configureButton != -1)
         {
             RenderSystem.disableDepthTest();
             this.fillGradient(poseStack, 0, 0, this.width, this.height, -1072689136, -804253680);
-            drawCenteredString(poseStack, this.font, new TranslatableComponent("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
+            drawCenteredString(poseStack, this.font, Component.translatable("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
             return;
         }
@@ -159,10 +159,10 @@ public class ControllerLayoutScreen extends Screen
         if(button != null)
         {
             List<Component> components = new ArrayList<>();
-            components.add(new TranslatableComponent("controllable.gui.layout.button", new TranslatableComponent(Buttons.NAMES[button.getButton()]).withStyle(ChatFormatting.BLUE)));
+            components.add(Component.translatable("controllable.gui.layout.button", Component.translatable(Buttons.NAMES[button.getButton()]).withStyle(ChatFormatting.BLUE)));
             if(button.isMissingMapping())
             {
-                components.add(new TranslatableComponent("controllable.gui.layout.missing_mapping").withStyle(ChatFormatting.RED));
+                components.add(Component.translatable("controllable.gui.layout.missing_mapping").withStyle(ChatFormatting.RED));
             }
             else
             {
@@ -179,23 +179,23 @@ public class ControllerLayoutScreen extends Screen
                         }
                     }
                 }
-                components.add(new TranslatableComponent("controllable.gui.layout.mapped_to", new TextComponent(String.valueOf(remappedButton)).withStyle(ChatFormatting.BLUE)));
+                components.add(Component.translatable("controllable.gui.layout.mapped_to", Component.literal(String.valueOf(remappedButton)).withStyle(ChatFormatting.BLUE)));
             }
-            components.add(new TranslatableComponent("controllable.gui.layout.remap").withStyle(ChatFormatting.GRAY));
+            components.add(Component.translatable("controllable.gui.layout.remap").withStyle(ChatFormatting.GRAY));
             this.renderComponentTooltip(poseStack, components, mouseX, mouseY);
         }
 
         if(!this.validLayout && this.doneButton.isHoveredOrFocused())
         {
             List<FormattedCharSequence> components = new ArrayList<>();
-            components.add(new TranslatableComponent("controllable.gui.layout.warning").withStyle(ChatFormatting.RED).getVisualOrderText());
-            components.addAll(this.font.split(new TranslatableComponent("controllable.gui.layout.invalid_layout").withStyle(ChatFormatting.GRAY), 180));
+            components.add(Component.translatable("controllable.gui.layout.warning").withStyle(ChatFormatting.RED).getVisualOrderText());
+            components.addAll(this.font.split(Component.translatable("controllable.gui.layout.invalid_layout").withStyle(ChatFormatting.GRAY), 180));
             this.renderTooltip(poseStack, components, mouseX, mouseY - 50);
         }
 
         if(this.thumbstickButton.isHoveredOrFocused())
         {
-            this.renderTooltip(poseStack, new TranslatableComponent("controllable.gui.layout.thumbsticks"), mouseX, mouseY);
+            this.renderTooltip(poseStack, Component.translatable("controllable.gui.layout.thumbsticks"), mouseX, mouseY);
         }
     }
 

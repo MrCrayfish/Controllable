@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -18,7 +18,7 @@ public class ImageButton extends Button
 
     public ImageButton(int x, int y, int width, ResourceLocation texture, int imageU, int imageV, int imageWidth, int imageHeight, OnPress onPress)
     {
-        super(x, y, width, 20, TextComponent.EMPTY, onPress);
+        super(x, y, width, 20, CommonComponents.EMPTY, onPress);
         this.texture = texture;
         this.imageU = imageU;
         this.imageV = imageV;

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.CommonComponents;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -35,7 +35,7 @@ public class ColorButton extends Button
 
     public ColorButton(int x, int y, OnPress onPress)
     {
-        super(x, y, 20, 20, TextComponent.EMPTY, onPress);
+        super(x, y, 20, 20, CommonComponents.EMPTY, onPress);
     }
 
     public void setColor(ChatFormatting color)

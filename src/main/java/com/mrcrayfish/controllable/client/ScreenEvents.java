@@ -3,7 +3,7 @@ package com.mrcrayfish.controllable.client;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.client.gui.ControllerSelectionScreen;
+import com.mrcrayfish.controllable.client.gui.screens.ControllerSelectionScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.OptionsScreen;
@@ -66,7 +66,7 @@ public class ScreenEvents
     {
         if(Config.CLIENT.options.consoleHotbar.get() && INCLUDED_OVERLAYS.contains(event.getOverlay()))
         {
-            event.getMatrixStack().translate(0, -20, 0);
+            event.getPoseStack().translate(0, -20, 0);
             if(event.getOverlay() == ForgeIngameGui.HOTBAR_ELEMENT)
             {
                 RenderSystem.getModelViewStack().translate(0, -20, 0);
@@ -79,7 +79,7 @@ public class ScreenEvents
     {
         if(Config.CLIENT.options.consoleHotbar.get() && INCLUDED_OVERLAYS.contains(event.getOverlay()))
         {
-            event.getMatrixStack().translate(0, 20, 0);
+            event.getPoseStack().translate(0, 20, 0);
             if(event.getOverlay() == ForgeIngameGui.HOTBAR_ELEMENT)
             {
                 RenderSystem.getModelViewStack().translate(0, 20, 0);

@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -19,7 +19,6 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -96,7 +95,7 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
             if(!list.isEmpty())
             {
                 Collections.sort(list);
-                entries.add(new TitleItem(new TranslatableComponent(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+                entries.add(new TitleItem(Component.translatable(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
                 list.forEach(binding -> entries.add(new KeyBindingItem(binding)));
             }
         });
@@ -112,7 +111,7 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
 
         protected KeyBindingItem(KeyMapping mapping)
         {
-            super(new TranslatableComponent(mapping.getName()));
+            super(Component.translatable(mapping.getName()));
             this.mapping = mapping;
             Collection<KeyAdapterBinding> bindings = BindingRegistry.getInstance().getKeyAdapters().values();
             this.addBinding = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button ->

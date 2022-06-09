@@ -14,7 +14,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
@@ -27,7 +27,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -263,8 +262,8 @@ public class RenderEvents
             int width = mc.getWindow().getScreenWidth();
             int height = mc.getWindow().getScreenHeight(); //TODO test
             Screen.fill(new PoseStack(), 0, 0, width, height, -1072689136);
-            Screen.drawCenteredString(new PoseStack(), mc.font, new TranslatableComponent("controllable.gui.controller_only").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.YELLOW), width / 2, height / 2 - 15, 0xFFFFFFFF);
-            Screen.drawCenteredString(new PoseStack(), mc.font, new TranslatableComponent("controllable.gui.plug_in_controller"), width / 2, height / 2, 0xFFFFFFFF);
+            Screen.drawCenteredString(new PoseStack(), mc.font, Component.translatable("controllable.gui.controller_only").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.YELLOW), width / 2, height / 2 - 15, 0xFFFFFFFF);
+            Screen.drawCenteredString(new PoseStack(), mc.font, Component.translatable("controllable.gui.plug_in_controller"), width / 2, height / 2, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
         }
     }
@@ -284,7 +283,7 @@ public class RenderEvents
                 Action action = this.actions.get(button);
                 Action.Side side = action.getSide();
                 
-                if(mc.options.showSubtitles && mc.screen == null)
+                if(mc.options.showSubtitles().get() && mc.screen == null)
                 {
                     side = Action.Side.LEFT;
                 }
@@ -318,13 +317,13 @@ public class RenderEvents
                 /* Draw description text */
                 if(side == Action.Side.LEFT)
                 {
-                    mc.font.draw(poseStack, action.getDescription(), x + 18, y + 3, Color.WHITE.getRGB());
+                    mc.font.draw(poseStack, action.getDescription(), x + 18, y + 3, 0xFFFFFFFF);
                     leftIndex++;
                 }
                 else
                 {
                     int width = mc.font.width(action.getDescription());
-                    mc.font.draw(poseStack, action.getDescription(), x - 5 - width, y + 3, Color.WHITE.getRGB());
+                    mc.font.draw(poseStack, action.getDescription(), x - 5 - width, y + 3, 0xFFFFFFFF);
                     rightIndex++;
                 }
             }

@@ -1,41 +1,32 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.client.settings.SettingEnum;
+
 /**
  * Author: MrCrayfish
  */
-public enum ControllerIcons
+public enum ControllerIcons implements SettingEnum
 {
-    DEFAULT("default"),
-    PLAYSTATION_4("playstation_4"),
-    PLAYSTATION_3("playstation_3"),
-    XBOX_ONE("xbox_one"),
-    XBOX_360("xbox_360"),
-    SWITCH_JOYCONS("switch_joycons"),
-    SWITCH_CONTROLLER("switch_controller"),
-    GAMECUBE("gamecube"),
-    STEAM("steam");
+    DEFAULT("controllable.controller.default"),
+    PLAYSTATION_4("controllable.controller.playstation_4"),
+    PLAYSTATION_3("controllable.controller.playstation_3"),
+    XBOX_ONE("controllable.controller.xbox_one"),
+    XBOX_360("controllable.controller.xbox_360"),
+    SWITCH_JOYCONS("controllable.controller.switch_joycons"),
+    SWITCH_CONTROLLER("controllable.controller.switch_controller"),
+    GAMECUBE("controllable.controller.gamecube"),
+    STEAM("controllable.controller.steam");
 
-    private final String id;
+    private final String key;
 
-    ControllerIcons(String id)
+    ControllerIcons(String key)
     {
-        this.id = id;
+        this.key = key;
     }
 
-    public String getId()
+    @Override
+    public String getKey()
     {
-        return this.id;
-    }
-
-    public static ControllerIcons byName(String name)
-    {
-        for(ControllerIcons controllerIcons : values())
-        {
-            if(controllerIcons.id.equals(name))
-            {
-                return controllerIcons;
-            }
-        }
-        return DEFAULT;
+        return this.key;
     }
 }

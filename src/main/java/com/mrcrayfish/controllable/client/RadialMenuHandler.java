@@ -11,7 +11,7 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
-import com.mrcrayfish.controllable.client.gui.RadialMenuConfigureScreen;
+import com.mrcrayfish.controllable.client.gui.screens.RadialMenuConfigureScreen;
 import com.mrcrayfish.controllable.event.GatherRadialMenuItemsEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -19,7 +19,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -452,11 +451,11 @@ public class RadialMenuHandler
      */
     public static final class CloseRadialMenuItem extends AbstractRadialItem
     {
-        private static final Component LABEL = new TranslatableComponent("controllable.gui.close");
+        private static final Component LABEL = Component.translatable("controllable.gui.close");
 
         public CloseRadialMenuItem()
         {
-            super(new TranslatableComponent("controllable.gui.radial.close"));
+            super(Component.translatable("controllable.gui.radial.close"));
         }
 
         @Override
@@ -487,8 +486,7 @@ public class RadialMenuHandler
             buffer.vertex(matrixStack.last().pose(), -15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
             buffer.vertex(matrixStack.last().pose(), 15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
             buffer.vertex(matrixStack.last().pose(), 15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.end();
-            BufferUploader.end(buffer);
+            BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
             RenderSystem.enableTexture();
@@ -511,11 +509,11 @@ public class RadialMenuHandler
      */
     public static final class RadialSettingsItem extends AbstractRadialItem
     {
-        private static final Component LABEL = new TranslatableComponent("controllable.gui.configure");
+        private static final Component LABEL = Component.translatable("controllable.gui.configure");
 
         public RadialSettingsItem()
         {
-            super(new TranslatableComponent("controllable.gui.radial.settings"));
+            super(Component.translatable("controllable.gui.radial.settings"));
         }
 
         @Override
@@ -546,8 +544,7 @@ public class RadialMenuHandler
             buffer.vertex(matrixStack.last().pose(), -15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
             buffer.vertex(matrixStack.last().pose(), 15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
             buffer.vertex(matrixStack.last().pose(), 15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.end();
-            BufferUploader.end(buffer);
+            BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
             RenderSystem.enableTexture();
@@ -576,7 +573,7 @@ public class RadialMenuHandler
 
         public ButtonBindingItem(ButtonBindingData entry)
         {
-            super(new TranslatableComponent(entry.getBinding().getLabelKey()).withStyle(entry.getColor()), new TranslatableComponent(entry.getBinding().getCategory()));
+            super(Component.translatable(entry.getBinding().getLabelKey()).withStyle(entry.getColor()), Component.translatable(entry.getBinding().getCategory()));
             this.entry = entry;
         }
 
@@ -612,8 +609,7 @@ public class RadialMenuHandler
             buffer.vertex(poseStack.last().pose(), 0, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
             buffer.vertex(poseStack.last().pose(), end, 15, 0).color(color, color, color, 0.0F).endVertex();
             buffer.vertex(poseStack.last().pose(), end, -15, 0).color(color, color, color, 0.0F).endVertex();
-            buffer.end();
-            BufferUploader.end(buffer);
+            BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
             RenderSystem.enableTexture();

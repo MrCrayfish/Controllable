@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.gui;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.ButtonBinding;
+import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ColorButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import net.minecraft.client.Minecraft;
@@ -14,7 +15,6 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 
 import java.util.List;
@@ -84,8 +84,8 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
         public ButtonBindingEntry(ButtonBindingData data)
         {
             this.data = data;
-            this.label = new TranslatableComponent(data.getBinding().getLabelKey()).withStyle(data.getColor());
-            this.description = new TranslatableComponent(data.getBinding().getCategory());
+            this.label = Component.translatable(data.getBinding().getLabelKey()).withStyle(data.getColor());
+            this.description = Component.translatable(data.getBinding().getCategory());
             this.colorButton = new ColorButton(0, 0, button -> {
                 data.setColor(this.colorButton.getColor());
                 this.label = this.label.copy().withStyle(this.colorButton.getColor());

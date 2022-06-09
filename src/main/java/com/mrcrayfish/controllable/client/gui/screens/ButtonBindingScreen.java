@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -18,7 +18,7 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
 
     protected ButtonBindingScreen(Screen parentScreen)
     {
-        super(parentScreen, new TranslatableComponent("controllable.gui.title.button_binding"), 22);
+        super(parentScreen, Component.translatable("controllable.gui.title.button_binding"), 22);
     }
 
     void setSelectedBinding(ButtonBinding selectedBinding)
@@ -52,8 +52,8 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
     {
         super.init();
 
-        this.buttonReset = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 32, 100, 20, new TranslatableComponent("controllable.gui.resetBinds"), (button) -> {
-            this.minecraft.setScreen(new ConfirmationScreen(this, new TranslatableComponent("controllable.gui.restore_default_buttons"), result -> {
+        this.buttonReset = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 32, 100, 20, Component.translatable("controllable.gui.resetBinds"), (button) -> {
+            this.minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.restore_default_buttons"), result -> {
                 if(result) {
                     BindingRegistry registry = BindingRegistry.getInstance();
                     registry.getBindings().forEach(ButtonBinding::reset);
@@ -65,7 +65,7 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         }));
         this.buttonReset.active = BindingRegistry.getInstance().getBindings().stream().noneMatch(ButtonBinding::isDefault);
 
-        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 32, 100, 20, new TranslatableComponent("controllable.gui.add_key_bind"), button -> {
+        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 32, 100, 20, Component.translatable("controllable.gui.add_key_bind"), button -> {
             Objects.requireNonNull(this.minecraft).setScreen(new SelectKeyBindingScreen(this));
         }));
 
@@ -98,7 +98,7 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         {
             RenderSystem.disableDepthTest();
             this.fillGradient(poseStack, 0, 0, this.width, this.height, -1072689136, -804253680);
-            drawCenteredString(poseStack, this.font, new TranslatableComponent("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
+            drawCenteredString(poseStack, this.font, Component.translatable("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
         }
     }
@@ -156,7 +156,7 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
 
         protected ButtonBindingItem(ButtonBinding binding)
         {
-            super(new TranslatableComponent(binding.getLabelKey()));
+            super(Component.translatable(binding.getLabelKey()));
             this.binding = binding;
             this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> ButtonBindingScreen.this.setSelectedBinding(this.binding));
             this.deleteButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button ->

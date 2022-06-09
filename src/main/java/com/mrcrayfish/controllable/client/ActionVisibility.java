@@ -1,23 +1,26 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.client.settings.SettingEnum;
+
 /**
  * Author: MrCrayfish
  */
-public enum ActionVisibility
+public enum ActionVisibility implements SettingEnum
 {
-    ALL("all"),
-    MINIMAL("minimal"),
-    NONE("none");
+    ALL("controllable.actionVisibility.all"),
+    MINIMAL("controllable.actionVisibility.minimal"),
+    NONE("controllable.actionVisibility.none");
 
-    private final String id;
+    private final String key;
 
-    ActionVisibility(String id)
+    ActionVisibility(String key)
     {
-        this.id = id;
+        this.key = key;
     }
 
-    public String getId()
+    @Override
+    public String getKey()
     {
-        return this.id;
+        return this.key;
     }
 }

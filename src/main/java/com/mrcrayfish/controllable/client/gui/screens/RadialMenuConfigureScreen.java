@@ -1,11 +1,13 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
+import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
+import com.mrcrayfish.controllable.client.gui.RadialItemList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -22,7 +24,7 @@ public class RadialMenuConfigureScreen extends Screen
 
     public RadialMenuConfigureScreen(LinkedHashSet<ButtonBindingData> bindings)
     {
-        super(new TranslatableComponent("controllable.gui.title.radial_menu_configure"));
+        super(Component.translatable("controllable.gui.title.radial_menu_configure"));
         this.bindings = new ArrayList<>(bindings);
     }
 
@@ -35,7 +37,7 @@ public class RadialMenuConfigureScreen extends Screen
             RadialMenuHandler.instance().setBindings(new LinkedHashSet<>(this.bindings));
             Objects.requireNonNull(this.minecraft).setScreen(null);
         }));
-        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 29, 100, 20, new TranslatableComponent("controllable.gui.add_binding"), buttons -> {
+        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 29, 100, 20, Component.translatable("controllable.gui.add_binding"), buttons -> {
             Objects.requireNonNull(this.minecraft).setScreen(new SelectButtonBindingScreen(this));
         }));
         this.addRenderableWidget(new Button(this.width / 2 + 55, this.height - 29, 100, 20, CommonComponents.GUI_CANCEL, buttons -> {

@@ -1,16 +1,17 @@
-package com.mrcrayfish.controllable.client.gui;
+package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.ISearchable;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
+import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
 {
     public SelectButtonBindingScreen(RadialMenuConfigureScreen parentScreen)
     {
-        super(parentScreen, new TranslatableComponent("controllable.gui.title.select_button_bindings"), 22);
+        super(parentScreen, Component.translatable("controllable.gui.title.select_button_bindings"), 22);
     }
 
     public RadialMenuConfigureScreen getRadialConfigureScreen()
@@ -33,8 +34,8 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
     protected void init()
     {
         super.init();
-        this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslatableComponent("controllable.gui.restoreDefaults"), (button) -> {
-            this.minecraft.setScreen(new ConfirmationScreen(this, new TranslatableComponent("controllable.gui.reset_selected_bindings"), result -> {
+        this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 29, 150, 20, Component.translatable("controllable.gui.restoreDefaults"), (button) -> {
+            this.minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     ((RadialMenuConfigureScreen) this.parent).getBindings().clear();
                     ((RadialMenuConfigureScreen) this.parent).getBindings().addAll(RadialMenuHandler.instance().getDefaults());
@@ -62,7 +63,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
 
         protected ButtonBindingItem(ButtonBinding binding)
         {
-            super(new TranslatableComponent(binding.getLabelKey()));
+            super(Component.translatable(binding.getLabelKey()));
             this.binding = binding;
 
             List<ButtonBindingData> bindings = getRadialConfigureScreen().getBindings();

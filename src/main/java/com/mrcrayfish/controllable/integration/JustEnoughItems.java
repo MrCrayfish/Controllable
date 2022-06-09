@@ -1,18 +1,6 @@
 package com.mrcrayfish.controllable.integration;
 
-import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
-import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
-import com.mrcrayfish.controllable.mixin.client.jei.*;
-import mezz.jei.Internal;
-import mezz.jei.gui.PageNavigation;
-import mezz.jei.gui.elements.GuiIconButton;
-import mezz.jei.gui.elements.GuiIconToggleButton;
-import mezz.jei.gui.overlay.IngredientGrid;
-import mezz.jei.gui.overlay.IngredientGridWithNavigation;
-import mezz.jei.render.IngredientListRenderer;
-import mezz.jei.runtime.JeiRuntime;
-import mezz.jei.util.ImmutableRect2i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +13,7 @@ public class JustEnoughItems
     public static List<NavigationPoint> getNavigationPoints()
     {
         List<NavigationPoint> points = new ArrayList<>();
-        JeiRuntime runtime = Internal.getRuntime();
+        /*JeiRuntime runtime = Internal.getRuntime();
         if(runtime != null && runtime.getIngredientListOverlay().isListDisplayed())
         {
             // JEI just needs getters and I wouldn't have to do this mess
@@ -49,7 +37,7 @@ public class JustEnoughItems
             GuiIconToggleButton configToggleButton = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).getConfigButton();
             GuiIconButton configButton = ((GuiIconToggleButtonMixin) configToggleButton).getButton();
             points.add(new WidgetNavigationPoint(configButton.x + configButton.getWidth() / 2.0, configButton.y + configButton.getHeight() / 2.0, nextButton));
-        }
+        }*/
         return points;
     }
 }
