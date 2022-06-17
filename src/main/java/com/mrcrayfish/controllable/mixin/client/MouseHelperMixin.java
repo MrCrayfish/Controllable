@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.mixin.client;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerInput;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,7 +29,8 @@ public class MouseHelperMixin
     @Inject(method = "turnPlayer", at = @At(value = "HEAD"), cancellable = true)
     private void beforeUpdatePlayerLook(CallbackInfo ci)
     {
-        if(Config.SERVER.restrictToController.get())
+        Minecraft minecraft = Minecraft.getInstance();
+        if(minecraft.player != null && Config.SERVER.restrictToController.get())
         {
             ci.cancel();
         }

@@ -12,7 +12,7 @@ plugins {
 
 apply plugin: 'org.spongepowered.mixin'
 
-version = "0.16.1-1.18.2"
+version = "0.16.1-1.19"
 group = "com.mrcrayfish"
 archivesBaseName = "controllable"
 
@@ -101,8 +101,8 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.19-41.0.1'
     //implementation fg.deobf('mezz.jei:jei-1.18.2:9.5.2.133')
-    //implementation fg.deobf('curse.maven:configured-457570:3543119')
-    //implementation fg.deobf('curse.maven:catalogue-459701:3543625')
+    implementation fg.deobf('curse.maven:configured-457570:3822820')
+    implementation fg.deobf('curse.maven:catalogue-459701:3822882')
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
