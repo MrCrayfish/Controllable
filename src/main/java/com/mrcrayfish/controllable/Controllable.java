@@ -33,7 +33,7 @@ import java.util.Optional;
  * Author: MrCrayfish
  */
 @Mod(Reference.MOD_ID)
-public class Controllable implements IControllerListener
+public class Controllable
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
@@ -102,7 +102,58 @@ public class Controllable implements IControllerListener
 
             /* Loads up the controller manager and adds a listener */
             Controllable.manager = new ControllerManager();
-            Controllable.manager.addControllerListener(this);
+            Controllable.manager.addControllerListener(new IControllerListener()
+            {
+                @Override
+                public void connected(int jid)
+                {
+                    Minecraft.getInstance().doRunTask(() ->
+                    {
+                        if(Controllable.controller == null)
+                        {
+                            if(Config.CLIENT.options.autoSelect.get())
+                            {
+                                setController(new Controller(jid));
+                            }
+
+                            Minecraft mc = Minecraft.getInstance();
+                            if(mc.player != null && Controllable.controller != null)
+                            {
+                                Minecraft.getInstance().getToasts().addToast(new ControllerToast(true, Controllable.controller.getName()));
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void disconnected(int jid)
+                {
+                    Minecraft.getInstance().doRunTask(() ->
+                    {
+                        if(Controllable.controller != null)
+                        {
+                            if(Controllable.controller.getJid() == jid)
+                            {
+                                Controller oldController = Controllable.controller;
+
+                                setController(null);
+
+                                if(Config.CLIENT.options.autoSelect.get() && manager.getControllerCount() > 0)
+                                {
+                                    Optional<Integer> optional = manager.getControllers().keySet().stream().min(Comparator.comparing(i -> i));
+                                    optional.ifPresent(minJid -> setController(new Controller(minJid)));
+                                }
+
+                                Minecraft mc = Minecraft.getInstance();
+                                if(mc.player != null)
+                                {
+                                    Minecraft.getInstance().getToasts().addToast(new ControllerToast(false, oldController.getName()));
+                                }
+                            }
+                        }
+                    });
+                }
+            });
 
             /* Attempts to load the first controller connected if auto select is enabled */
             if(Config.CLIENT.options.autoSelect.get())
@@ -123,56 +174,6 @@ public class Controllable implements IControllerListener
             MinecraftForge.EVENT_BUS.register(new ControllerEvents());
             MinecraftForge.EVENT_BUS.register(RadialMenuHandler.instance());
             MinecraftForge.EVENT_BUS.addListener(this::controllerTick);
-        });
-    }
-
-    @Override
-    public void connected(int jid)
-    {
-        Minecraft.getInstance().doRunTask(() ->
-        {
-            if(Controllable.controller == null)
-            {
-                if(Config.CLIENT.options.autoSelect.get())
-                {
-                    setController(new Controller(jid));
-                }
-
-                Minecraft mc = Minecraft.getInstance();
-                if(mc.player != null && Controllable.controller != null)
-                {
-                    Minecraft.getInstance().getToasts().addToast(new ControllerToast(true, Controllable.controller.getName()));
-                }
-            }
-        });
-    }
-
-    @Override
-    public void disconnected(int jid)
-    {
-        Minecraft.getInstance().doRunTask(() ->
-        {
-            if(Controllable.controller != null)
-            {
-                if(Controllable.controller.getJid() == jid)
-                {
-                    Controller oldController = Controllable.controller;
-
-                    setController(null);
-
-                    if(Config.CLIENT.options.autoSelect.get() && manager.getControllerCount() > 0)
-                    {
-                        Optional<Integer> optional = manager.getControllers().keySet().stream().min(Comparator.comparing(i -> i));
-                        optional.ifPresent(minJid -> setController(new Controller(minJid)));
-                    }
-
-                    Minecraft mc = Minecraft.getInstance();
-                    if(mc.player != null)
-                    {
-                        Minecraft.getInstance().getToasts().addToast(new ControllerToast(false, oldController.getName()));
-                    }
-                }
-            }
         });
     }
 
