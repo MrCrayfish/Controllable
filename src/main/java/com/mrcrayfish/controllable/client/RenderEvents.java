@@ -12,6 +12,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
@@ -57,14 +58,13 @@ public class RenderEvents
 
             boolean verbose = visibility == ActionVisibility.ALL;
 
-            if(mc.screen instanceof ContainerScreen)
+            if(mc.screen instanceof AbstractContainerScreen<?> containerScreen)
             {
                 if(mc.player.inventoryMenu.getCarried().isEmpty())
                 {
-                    ContainerScreen container = (ContainerScreen) mc.screen;
-                    if(container.getSlotUnderMouse() != null)
+                    if(containerScreen.getSlotUnderMouse() != null)
                     {
-                        Slot slot = container.getSlotUnderMouse();
+                        Slot slot = containerScreen.getSlotUnderMouse();
                         if(slot.hasItem())
                         {
                             actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(ActionDescriptions.PICKUP_STACK, Action.Side.LEFT));
@@ -79,10 +79,9 @@ public class RenderEvents
                     actionMap.put(ButtonBindings.SPLIT_STACK, new Action(ActionDescriptions.PLACE_ITEM, Action.Side.LEFT));
 
                     // You can still quick move items if holding one with cursor
-                    ContainerScreen container = (ContainerScreen) mc.screen;
-                    if(container.getSlotUnderMouse() != null)
+                    if(containerScreen.getSlotUnderMouse() != null)
                     {
-                        Slot slot = container.getSlotUnderMouse();
+                        Slot slot = containerScreen.getSlotUnderMouse();
                         if(slot.hasItem())
                         {
                             actionMap.put(ButtonBindings.QUICK_MOVE, new Action(ActionDescriptions.QUICK_MOVE, Action.Side.LEFT));
