@@ -16,7 +16,7 @@ description="Adds the ability to use a controller to play Minecraft"
 [[dependencies.controllable]]
    modId="forge"
    mandatory=true
-   versionRange="[41,)"
+   versionRange="[41.0.94,)"
    ordering="NONE"
    side="CLIENT"
 [[dependencies.controllable]]

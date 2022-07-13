@@ -7,37 +7,38 @@ import com.mrcrayfish.controllable.client.gui.screens.ControllerSelectionScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.OptionsScreen;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.IIngameOverlay;
+import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraftforge.client.gui.overlay.NamedGuiOverlay;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Author: MrCrayfish
  */
 public class ScreenEvents
 {
-    private static final List<IIngameOverlay> INCLUDED_OVERLAYS;
+    private static final List<IGuiOverlay> INCLUDED_OVERLAYS;
 
     static
     {
-        ImmutableList.Builder<IIngameOverlay> builder = ImmutableList.builder();
-        builder.add(ForgeIngameGui.HOTBAR_ELEMENT);
-        builder.add(ForgeIngameGui.PLAYER_HEALTH_ELEMENT);
-        builder.add(ForgeIngameGui.MOUNT_HEALTH_ELEMENT);
-        builder.add(ForgeIngameGui.ARMOR_LEVEL_ELEMENT);
-        builder.add(ForgeIngameGui.EXPERIENCE_BAR_ELEMENT);
-        builder.add(ForgeIngameGui.FOOD_LEVEL_ELEMENT);
-        builder.add(ForgeIngameGui.AIR_LEVEL_ELEMENT);
-        builder.add(ForgeIngameGui.CHAT_PANEL_ELEMENT);
-        builder.add(ForgeIngameGui.HUD_TEXT_ELEMENT);
-        builder.add(ForgeIngameGui.ITEM_NAME_ELEMENT);
-        builder.add(ForgeIngameGui.JUMP_BAR_ELEMENT);
-        builder.add(ForgeIngameGui.RECORD_OVERLAY_ELEMENT);
+        ImmutableList.Builder<IGuiOverlay> builder = ImmutableList.builder();
+        builder.add(VanillaGuiOverlay.HOTBAR.type().overlay());
+        builder.add(VanillaGuiOverlay.PLAYER_HEALTH.type().overlay());
+        builder.add(VanillaGuiOverlay.MOUNT_HEALTH.type().overlay());
+        builder.add(VanillaGuiOverlay.ARMOR_LEVEL.type().overlay());
+        builder.add(VanillaGuiOverlay.EXPERIENCE_BAR.type().overlay());
+        builder.add(VanillaGuiOverlay.FOOD_LEVEL.type().overlay());
+        builder.add(VanillaGuiOverlay.AIR_LEVEL.type().overlay());
+        builder.add(VanillaGuiOverlay.CHAT_PANEL.type().overlay());
+        builder.add(VanillaGuiOverlay.RECORD_OVERLAY.type().overlay());
+        builder.add(VanillaGuiOverlay.ITEM_NAME.type().overlay());
+        builder.add(VanillaGuiOverlay.JUMP_BAR.type().overlay());
         INCLUDED_OVERLAYS = builder.build();
     }
 
@@ -49,7 +50,7 @@ public class ScreenEvents
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    public void onOpenGui(ScreenEvent.InitScreenEvent.Post event)
+    public void onOpenGui(ScreenEvent.Init.Post event)
     {
         /* Resets the controller button states */
         ButtonBinding.resetButtonStates();
@@ -62,12 +63,12 @@ public class ScreenEvents
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onRenderOverlay(RenderGameOverlayEvent.PreLayer event)
+    public void onRenderOverlay(RenderGuiOverlayEvent.Pre event)
     {
-        if(Config.CLIENT.options.consoleHotbar.get() && INCLUDED_OVERLAYS.contains(event.getOverlay()))
+        if(Config.CLIENT.options.consoleHotbar.get() && INCLUDED_OVERLAYS.contains(event.getOverlay().overlay()))
         {
             event.getPoseStack().translate(0, -20, 0);
-            if(event.getOverlay() == ForgeIngameGui.HOTBAR_ELEMENT)
+            if(event.getOverlay() == VanillaGuiOverlay.HOTBAR.type())
             {
                 RenderSystem.getModelViewStack().translate(0, -20, 0);
             }
@@ -75,12 +76,12 @@ public class ScreenEvents
     }
 
     @SubscribeEvent
-    public void onRenderOverlay(RenderGameOverlayEvent.PostLayer event)
+    public void onRenderOverlay(RenderGuiOverlayEvent.Post event)
     {
-        if(Config.CLIENT.options.consoleHotbar.get() && INCLUDED_OVERLAYS.contains(event.getOverlay()))
+        if(Config.CLIENT.options.consoleHotbar.get() && INCLUDED_OVERLAYS.contains(event.getOverlay().overlay()))
         {
             event.getPoseStack().translate(0, 20, 0);
-            if(event.getOverlay() == ForgeIngameGui.HOTBAR_ELEMENT)
+            if(event.getOverlay() == VanillaGuiOverlay.HOTBAR.type())
             {
                 RenderSystem.getModelViewStack().translate(0, 20, 0);
                 RenderSystem.applyModelViewMatrix();

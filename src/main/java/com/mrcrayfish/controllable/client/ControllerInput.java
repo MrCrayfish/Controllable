@@ -7,11 +7,11 @@ import com.mojang.math.Vector3d;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
-import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
+import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
@@ -51,7 +51,6 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -280,7 +279,7 @@ public class ControllerInput
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    public void onScreenInit(ScreenOpenEvent event)
+    public void onScreenInit(ScreenEvent.Opening event)
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.screen == null)
@@ -295,7 +294,7 @@ public class ControllerInput
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    public void onRenderScreen(ScreenEvent.DrawScreenEvent.Pre event)
+    public void onRenderScreen(ScreenEvent.Render.Pre event)
     {
         /* Makes the cursor movement appear smooth between ticks. This will only run if the target
          * mouse position is different to the previous tick's position. This allows for the mouse
@@ -349,7 +348,7 @@ public class ControllerInput
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    public void onRenderScreen(ScreenEvent.DrawScreenEvent.Post event)
+    public void onRenderScreen(ScreenEvent.Render.Post event)
     {
         if(Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && lastUse > 0)
         {
@@ -490,10 +489,10 @@ public class ControllerInput
     }
 
     @SubscribeEvent
-    public void onOpenScreen(ScreenOpenEvent event)
+    public void onOpenScreen(ScreenEvent.Opening event)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(Config.SERVER.restrictToController.get() && mc.level != null && !this.isControllerInUse())
+        if(mc.level != null && Config.SERVER.restrictToController.get() && !this.isControllerInUse())
         {
             if(event.getScreen() instanceof ContainerScreen)
             {
@@ -503,7 +502,7 @@ public class ControllerInput
     }
 
     @SubscribeEvent
-    public void onMouseClicked(InputEvent.RawMouseEvent event)
+    public void onMouseClicked(InputEvent.MouseButton.Pre event)
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.level != null && (mc.screen == null || mc.screen instanceof ContainerScreen))

@@ -96,6 +96,6 @@ public final class KeyAdapterBinding extends ButtonBinding
                 return;
             }
         }
-        net.minecraftforge.client.ForgeHooksClient.fireKeyInput(this.keyMapping.getKey().getValue(), 0, action, 0);
+        net.minecraftforge.client.ForgeHooksClient.onKeyInput(this.keyMapping.getKey().getValue(), 0, action, 0);
     }
 }
