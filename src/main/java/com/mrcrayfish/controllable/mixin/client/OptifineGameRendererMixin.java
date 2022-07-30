@@ -19,6 +19,7 @@ public class OptifineGameRendererMixin
      * Fixes the mouse position when virtual mouse is turned on for controllers.
      */
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/optifine/reflect/Reflector;callVoid(Lnet/optifine/reflect/ReflectorMethod;[Ljava/lang/Object;)V", remap = false), index = 1)
+    @SuppressWarnings({"MixinAnnotationTarget", "InvalidInjectorMethodSignature", "UnresolvedMixinReference"})
     private Object[] drawScreen(Object[] args)
     {
         ControllerInput input = Controllable.getInput();
