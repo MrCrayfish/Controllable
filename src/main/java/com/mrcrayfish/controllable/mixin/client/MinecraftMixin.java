@@ -70,4 +70,13 @@ public class MinecraftMixin
             cir.setReturnValue(true);
         }
     }
+
+    @Inject(method = "isWindowActive", at = @At(value = "HEAD"), cancellable = true)
+    private void isWindowActiveHead(CallbackInfoReturnable<Boolean> cir)
+    {
+        if(Controllable.getController() != null)
+        {
+            cir.setReturnValue(true);
+        }
+    }
 }
