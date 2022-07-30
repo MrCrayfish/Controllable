@@ -131,6 +131,11 @@ public class ControllerInput
         this.preventReset = false;
     }
 
+    public boolean isMovingCursor()
+    {
+        return this.moving;
+    }
+
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event)
     {
