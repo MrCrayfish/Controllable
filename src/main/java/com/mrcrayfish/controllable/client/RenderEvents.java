@@ -273,7 +273,7 @@ public class RenderEvents
         {
             Minecraft mc = Minecraft.getInstance();
             Gui guiIngame = mc.gui;
-            boolean isChatVisible = mc.screen == null && guiIngame.getChat().trimmedMessages.stream().anyMatch(chatLine -> guiIngame.getGuiTicks() - chatLine.getAddedTime() < 200);
+            boolean isChatVisible = mc.screen == null && guiIngame.getChat().trimmedMessages.stream().anyMatch(chatLine -> guiIngame.getGuiTicks() - chatLine.addedTime() < 200);
 
             int leftIndex = 0;
             int rightIndex = 0;

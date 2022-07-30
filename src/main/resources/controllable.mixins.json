@@ -17,7 +17,13 @@
         "client.OptifineGameRendererMixin",
         "client.RecipeBookComponentMixin",
         "client.RecipeBookPageAccessor",
-        "client.RecipeBookPageMixin"
+        "client.RecipeBookPageMixin",
+        "client.jei.GuiIconToggleButtonMixin",
+        "client.jei.IngredientGridMixin",
+        "client.jei.IngredientGridWithNavigationMixin",
+        "client.jei.IngredientListOverlayMixin",
+        "client.jei.MouseUtilMixin",
+        "client.jei.PageNavigationMixin"
     ],
     "injectors": {
         "defaultRequire": 1
