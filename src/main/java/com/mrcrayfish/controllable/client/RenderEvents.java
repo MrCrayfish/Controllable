@@ -253,13 +253,11 @@ public class RenderEvents
 
         if(Controllable.getController() != null)
         {
-            if(Controllable.getInput().getLastUse() <= 0)
+            if(Controllable.getInput().getLastUse() > 0)
             {
-                return;
+                this.renderHints();
+                this.renderMiniPlayer();
             }
-
-            this.renderHints();
-            this.renderMiniPlayer();
         }
         else if(mc.currentScreen == null && Config.SERVER.restrictToController.get())
         {

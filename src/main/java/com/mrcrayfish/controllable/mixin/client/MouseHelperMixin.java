@@ -15,16 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MouseHelper.class)
 public class MouseHelperMixin
 {
-    @Inject(method = "cursorPosCallback", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHelper;updatePlayerLook()V"))
-    private void beforeUpdateLook(long handle, double x, double y, CallbackInfo ci)
-    {
-        ControllerInput input = Controllable.getInput();
-        if(input != null)
-        {
-            input.resetLastUse();
-        }
-    }
-
     @Inject(method = "updatePlayerLook", at = @At(value = "HEAD"), cancellable = true)
     private void beforeUpdatePlayerLook(CallbackInfo ci)
     {
