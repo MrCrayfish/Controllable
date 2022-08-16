@@ -73,8 +73,8 @@ public class MinecraftMixin
         }
     }
 
-    @Inject(method = "isWindowActive", at = @At(value = "HEAD"), cancellable = true)
-    private void isWindowActiveHead(CallbackInfoReturnable<Boolean> cir)
+    @Inject(method = "isGameFocused", at = @At(value = "HEAD"), cancellable = true)
+    private void isGameFocusedHead(CallbackInfoReturnable<Boolean> cir)
     {
         if(Controllable.getController() != null)
         {
