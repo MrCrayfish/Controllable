@@ -27,6 +27,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.screen.inventory.MerchantScreen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.client.settings.PointOfView;
@@ -92,6 +93,7 @@ public class ControllerInput
     private boolean moved;
     private float targetPitch;
     private float targetYaw;
+    private long lastMerchantScroll;
 
     private int dropCounter = -1;
 
@@ -390,10 +392,15 @@ public class ControllerInput
         double mouseY = this.virtualMouseY * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight();
         if(mc.currentScreen != null && this.lastUse > 0)
         {
-            IGuiEventListener hoveredListener = mc.currentScreen.getEventListeners().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
-            if(hoveredListener instanceof AbstractList)
+            if(mc.currentScreen instanceof MerchantScreen)
             {
-                this.handleListScrolling((AbstractList) hoveredListener, controller);
+                this.handleMerchantScrolling((MerchantScreen) mc.currentScreen, controller);
+                return;
+            }
+            IGuiEventListener hoveredListener = mc.currentScreen.getEventListeners().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+            if(hoveredListener instanceof AbstractList<?>)
+            {
+                this.handleListScrolling((AbstractList<?>) hoveredListener, controller);
             }
         }
 
@@ -1319,6 +1326,28 @@ public class ControllerInput
         }
         dir *= Minecraft.getInstance().getTickLength();
         list.setScrollAmount(list.getScrollAmount() + dir * 10);
+    }
+
+    private void handleMerchantScrolling(MerchantScreen screen, Controller controller)
+    {
+        double dir = 0;
+        float yValue = Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
+        if(Math.abs(yValue) >= 0.5F)
+        {
+            this.setControllerInUse();
+            dir = -yValue;
+        }
+        else
+        {
+            // Do this to allow thumbstick to be tap up or down
+            this.lastMerchantScroll = 0;
+        }
+        long scrollTime = Util.milliTime();
+        if(dir != 0 && scrollTime - this.lastMerchantScroll >= 150)
+        {
+            screen.mouseScrolled(this.getMouseX(), this.getMouseY(), Math.signum(dir));
+            this.lastMerchantScroll = scrollTime;
+        }
     }
 
     private double getMouseX()
