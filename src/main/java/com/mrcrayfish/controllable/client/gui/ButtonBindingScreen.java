@@ -1,31 +1,37 @@
 package com.mrcrayfish.controllable.client.gui;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
+import com.mrcrayfish.controllable.client.ISearchable;
+import com.mrcrayfish.controllable.client.KeyAdapterBinding;
+import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
+import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.DialogTexts;
+import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
  * Author: MrCrayfish
  */
-public class ButtonBindingScreen extends Screen
+public class ButtonBindingScreen extends ButtonBindingListMenuScreen
 {
-    private Screen parentScreen;
     private Button buttonReset;
-    private ButtonBindingList bindingList;
     private ButtonBinding selectedBinding = null;
 
     protected ButtonBindingScreen(Screen parentScreen)
     {
-        super(new TranslationTextComponent("controllable.gui.title.button_binding"));
-        this.parentScreen = parentScreen;
+        super(parentScreen, new TranslationTextComponent("controllable.gui.title.button_binding"), 22);
     }
 
     void setSelectedBinding(ButtonBinding selectedBinding)
@@ -41,10 +47,8 @@ public class ButtonBindingScreen extends Screen
     @Override
     protected void init()
     {
-        this.bindingList = new ButtonBindingList(this, this.minecraft, this.width + 10, this.height, 45, this.height - 44, 22);
-        this.children.add(this.bindingList);
-
-        this.buttonReset = this.addButton(new Button(this.width / 2 - 155, this.height - 29, 100, 20, new TranslationTextComponent("controllable.gui.resetBinds"), (button) -> {
+        super.init();
+        this.buttonReset = this.addButton(new Button(this.width / 2 - 155, this.height - 32, 100, 20, new TranslationTextComponent("controllable.gui.resetBinds"), (button) -> {
             BindingRegistry registry = BindingRegistry.getInstance();
             registry.getBindings().forEach(ButtonBinding::reset);
             registry.resetBindingHash();
@@ -52,16 +56,22 @@ public class ButtonBindingScreen extends Screen
         }));
         this.buttonReset.active = BindingRegistry.getInstance().getBindings().stream().noneMatch(ButtonBinding::isDefault);
 
-        this.addButton(new Button(this.width / 2 - 50, this.height - 29, 100, 20, new TranslationTextComponent("controllable.gui.add_key_bind"), button -> {
+        this.addButton(new Button(this.width / 2 - 50, this.height - 32, 100, 20, new TranslationTextComponent("controllable.gui.add_key_bind"), button -> {
             Objects.requireNonNull(this.minecraft).displayGuiScreen(new SelectKeyBindingScreen(this));
         }));
 
-        this.addButton(new Button(this.width / 2 + 55, this.height - 29, 100, 20, DialogTexts.GUI_DONE, (button) -> {
-            Objects.requireNonNull(this.minecraft).displayGuiScreen(this.parentScreen);
+        this.addButton(new Button(this.width / 2 + 55, this.height - 32, 100, 20, DialogTexts.GUI_DONE, (button) -> {
+            Objects.requireNonNull(this.minecraft).displayGuiScreen(this.parent);
             BindingRegistry registry = BindingRegistry.getInstance();
             registry.resetBindingHash();
             registry.save();
         }));
+    }
+
+    @Override
+    protected void constructEntries(List<Item> entries)
+    {
+        this.updateList(entries, false);
     }
 
     @Override
@@ -73,9 +83,6 @@ public class ButtonBindingScreen extends Screen
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(matrixStack);
-        this.bindingList.render(matrixStack, this.selectedBinding == null ? mouseX : -1, this.selectedBinding == null ? mouseY : -1, partialTicks);
-        drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
         super.render(matrixStack, this.selectedBinding == null ? mouseX : -1, this.selectedBinding == null ? mouseY : -1, partialTicks);
 
         if(this.selectedBinding != null)
@@ -92,7 +99,10 @@ public class ButtonBindingScreen extends Screen
     {
         if(this.selectedBinding != null)
         {
-            return true;
+            if(this.isWaitingForButtonInput())
+            {
+                return true;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -120,5 +130,77 @@ public class ButtonBindingScreen extends Screen
             return true;
         }
         return false;
+    }
+
+    @Override
+    protected Item createItemFromBinding(ButtonBinding binding)
+    {
+        return new ButtonBindingItem(binding);
+    }
+
+    public class ButtonBindingItem extends Item implements ISearchable
+    {
+        private final ButtonBinding binding;
+        private final Button bindingButton;
+        private final Button deleteButton;
+        private final Button removeButton;
+
+        protected ButtonBindingItem(ButtonBinding binding)
+        {
+            super(new TranslationTextComponent(binding.getLabelKey()));
+            this.binding = binding;
+            this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> ButtonBindingScreen.this.setSelectedBinding(this.binding));
+            this.deleteButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button ->
+            {
+                binding.reset();
+                BindingRegistry registry = BindingRegistry.getInstance();
+                registry.resetBindingHash();
+                registry.save();
+            });
+            this.removeButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 0, 0, 16, 16, button -> {
+                if(binding instanceof KeyAdapterBinding) BindingRegistry.getInstance().removeKeyAdapter((KeyAdapterBinding) binding);
+                ButtonBindingScreen.this.list.removeEntry(this);
+            });
+            this.removeButton.visible = binding instanceof KeyAdapterBinding;
+        }
+
+        @Override
+        public String getLabel()
+        {
+            return this.label.copyRaw().getString();
+        }
+
+        @Override
+        public List<? extends IGuiEventListener> getEventListeners()
+        {
+            return ImmutableList.of(this.bindingButton, this.deleteButton);
+        }
+
+        @Override
+        @SuppressWarnings("ConstantConditions")
+        public void render(MatrixStack matrixStack, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
+        {
+            int color = this.binding.isConflictingContext() ? TextFormatting.RED.getColor() : TextFormatting.WHITE.getColor();
+            ButtonBindingScreen.this.minecraft.fontRenderer.func_243246_a(matrixStack, this.label, left - 15, y + 6, color);
+            this.bindingButton.x = left + width - 37;
+            this.bindingButton.y = y;
+            this.bindingButton.render(matrixStack, mouseX, mouseY, partialTicks);
+            this.deleteButton.x = left + width - 15;
+            this.deleteButton.y = y;
+            this.deleteButton.active = !this.binding.isDefault();
+            this.deleteButton.render(matrixStack, mouseX, mouseY, partialTicks);
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button)
+        {
+            if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.bindingButton.isHovered())
+            {
+                this.binding.setButton(-1);
+                this.bindingButton.playDownSound(Minecraft.getInstance().getSoundHandler());
+                return true;
+            }
+            return super.mouseClicked(mouseX, mouseY, button);
+        }
     }
 }

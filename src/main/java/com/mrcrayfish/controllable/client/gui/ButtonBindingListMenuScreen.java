@@ -1,0 +1,64 @@
+package com.mrcrayfish.controllable.client.gui;
+
+import com.mrcrayfish.controllable.client.BindingRegistry;
+import com.mrcrayfish.controllable.client.ButtonBinding;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+
+import java.util.*;
+
+/**
+ * Author: MrCrayfish
+ */
+public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
+{
+    protected Map<String, List<ButtonBinding>> categories = new LinkedHashMap<>();
+
+    protected ButtonBindingListMenuScreen(Screen parent, ITextComponent title, int itemHeight)
+    {
+        super(parent, title, itemHeight);
+    }
+
+    @Override
+    protected void constructEntries(List<Item> entries)
+    {
+        this.updateList(entries, false);
+    }
+
+    public void updateList(List<Item> entries, boolean showUnbound)
+    {
+        // Initialize map with categories to have a predictable order (map is linked)
+        this.categories.put("key.categories.movement", new ArrayList<>());
+        this.categories.put("key.categories.gameplay", new ArrayList<>());
+        this.categories.put("key.categories.inventory", new ArrayList<>());
+        this.categories.put("key.categories.creative", new ArrayList<>());
+        this.categories.put("key.categories.multiplayer", new ArrayList<>());
+        this.categories.put("key.categories.ui", new ArrayList<>());
+        this.categories.put("key.categories.misc", new ArrayList<>());
+        this.categories.put("key.categories.controllable_custom", new ArrayList<>());
+
+        // Add all button bindings to the appropriate category or create a new one
+        BindingRegistry.getInstance().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
+        {
+            // Only show unbound bindings for select binding screen for radial menu
+            if(showUnbound && binding.getButton() != -1) return;
+            List<ButtonBinding> list = this.categories.computeIfAbsent(binding.getCategory(), category -> new ArrayList<>());
+            list.add(binding);
+        });
+
+        // Sorts the button binding list then adds new entries to the option list for each category
+        this.categories.forEach((category, list) ->
+        {
+            if(!list.isEmpty())
+            {
+                Collections.sort(list);
+                entries.add(new TitleItem(new TranslationTextComponent(category).mergeStyle(TextFormatting.YELLOW, TextFormatting.BOLD)));
+                list.forEach(binding -> entries.add(this.createItemFromBinding(binding)));
+            }
+        });
+    }
+
+    protected abstract Item createItemFromBinding(ButtonBinding binding);
+}

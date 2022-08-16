@@ -17,37 +17,39 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-public class SelectKeyBindingScreen extends Screen
+public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
 {
-    private Screen parent;
-    private KeyBindingList bindingList;
-    private final ITextComponent note;
+    //private final ITextComponent note; //TODO reimplement note into list menu
     private Button resetButton;
 
     public SelectKeyBindingScreen(Screen parent)
     {
-        super(new TranslationTextComponent("controllable.gui.title.select_key_bindings"));
-        this.note = new TranslationTextComponent("controllable.gui.note").mergeStyle(TextFormatting.RED).append(new TranslationTextComponent("controllable.gui.key_bind_note").mergeStyle(TextFormatting.GRAY));
-        this.parent = parent;
+        super(parent, new TranslationTextComponent("controllable.gui.title.select_key_bindings"), 22);
+        //this.note = new TranslationTextComponent("controllable.gui.note").mergeStyle(TextFormatting.RED).append(new TranslationTextComponent("controllable.gui.key_bind_note").mergeStyle(TextFormatting.GRAY));
     }
 
     @Override
     protected void init()
     {
-        this.bindingList = new KeyBindingList(this, this.minecraft, this.width + 10, this.height, 45, this.height - 44, 22);
-        this.children.add(this.bindingList);
-        this.resetButton = this.addButton(new Button(this.width / 2 - 155, this.height - 29, 150, 20, new TranslationTextComponent("controllable.gui.reset"), (button) -> {
+        super.init();
+        this.resetButton = this.addButton(new Button(this.width / 2 - 155, this.height - 32, 150, 20, new TranslationTextComponent("controllable.gui.reset"), (button) -> {
             List<KeyAdapterBinding> copy = new ArrayList<>(BindingRegistry.getInstance().getKeyAdapters().values());
             copy.forEach(binding -> {
                 BindingRegistry.getInstance().removeKeyAdapter(binding);
                 RadialMenuHandler.instance().removeBinding(binding);
             });
-            this.bindingList.getEventListeners().stream().filter(entry -> entry instanceof KeyBindingList.KeyBindingEntry).map(entry -> (KeyBindingList.KeyBindingEntry) entry).forEach(KeyBindingList.KeyBindingEntry::updateButtons);
+            this.list.getEventListeners().stream().filter(entry -> entry instanceof KeyBindingItem).map(entry -> (KeyBindingItem) entry).forEach(KeyBindingItem::updateButtons);
             this.updateButtons();
         }));
-        this.addButton(new Button(this.width / 2 + 5, this.height - 29, 150, 20, DialogTexts.GUI_DONE, (button) -> {
+        this.addButton(new Button(this.width / 2 + 5, this.height - 32, 150, 20, DialogTexts.GUI_DONE, (button) -> {
             this.minecraft.displayGuiScreen(this.parent);
         }));
+        this.updateButtons();
+    }
+
+    @Override
+    protected void onChange()
+    {
         this.updateButtons();
     }
 
@@ -59,10 +61,7 @@ public class SelectKeyBindingScreen extends Screen
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(matrixStack);
-        this.bindingList.render(matrixStack, mouseX, mouseY, partialTicks);
-        drawCenteredString(matrixStack, this.font, this.title, this.width / 2, 12, 0xFFFFFF);
-        drawCenteredString(matrixStack, this.font, this.note, this.width / 2, 26, 0xFFFFFF);
+        //drawCenteredString(matrixStack, this.font, this.note, this.width / 2, 26, 0xFFFFFF);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 }
