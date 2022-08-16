@@ -230,8 +230,8 @@ public class ControllerInput
                 IGuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
                 if(hoveredListener instanceof AbstractList<?>)
                 {
-                    hoveredListener = null;
                     AbstractList<?> list = (AbstractList<?>) hoveredListener;
+                    hoveredListener = null;
                     int count = list.getEventListeners().size();
                     for(int i = 0; i < count; i++)
                     {
