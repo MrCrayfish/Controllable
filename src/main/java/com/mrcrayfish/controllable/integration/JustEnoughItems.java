@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.mixin.client.jei.*;
 import mezz.jei.Internal;
+import mezz.jei.common.util.ImmutableRect2i;
 import mezz.jei.gui.PageNavigation;
 import mezz.jei.gui.elements.GuiIconButton;
 import mezz.jei.gui.elements.GuiIconToggleButton;
@@ -12,7 +13,6 @@ import mezz.jei.gui.overlay.IngredientGrid;
 import mezz.jei.gui.overlay.IngredientGridWithNavigation;
 import mezz.jei.render.IngredientListRenderer;
 import mezz.jei.runtime.JeiRuntime;
-import mezz.jei.util.ImmutableRect2i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class JustEnoughItems
         JeiRuntime runtime = Internal.getRuntime();
         if(runtime != null && runtime.getIngredientListOverlay().isListDisplayed())
         {
-            // JEI just needs getters and I wouldn't have to do this mess
+            // JEI just needs getters, and I wouldn't have to do this mess
             IngredientGridWithNavigation ingredientGridWithNavigation = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).getContents();
             IngredientGrid ingredientGrid = ((IngredientGridWithNavigationMixin) ingredientGridWithNavigation).getIngredientGrid();
             IngredientListRenderer ingredientListRenderer = ((IngredientGridMixin) ingredientGrid).getIngredientListRenderer();
