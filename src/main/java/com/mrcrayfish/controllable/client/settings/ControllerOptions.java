@@ -1,10 +1,7 @@
 package com.mrcrayfish.controllable.client.settings;
 
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.client.ActionVisibility;
-import com.mrcrayfish.controllable.client.ControllerIcons;
-import com.mrcrayfish.controllable.client.CursorType;
-import com.mrcrayfish.controllable.client.Thumbstick;
+import com.mrcrayfish.controllable.client.*;
 import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.util.math.MathHelper;
@@ -143,5 +140,15 @@ public class ControllerOptions
     }, (gameSettings, option) -> {
         Thumbstick thumbstick = option.get(gameSettings);
         return new TranslationTextComponent("controllable.options.radialThumbstick.format", new TranslationTextComponent(thumbstick.getKey()));
+    });
+
+    public static final ControllableEnumOption<SneakMode> SNEAK_MODE = new ControllableEnumOption<>("controllable.options.sneakMode", SneakMode.class, gameSettings -> {
+        return Config.CLIENT.options.sneakMode.get();
+    }, (gameSettings, value) -> {
+        Config.CLIENT.options.sneakMode.set(value);
+        Config.save();
+    }, (gameSettings, option) -> {
+        SneakMode sneakMode = option.get(gameSettings);
+        return new TranslationTextComponent("controllable.options.sneakMode.format", new TranslationTextComponent("controllable.sneakMode." + sneakMode.getString()));
     });
 }

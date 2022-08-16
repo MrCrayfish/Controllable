@@ -1,9 +1,6 @@
 package com.mrcrayfish.controllable;
 
-import com.mrcrayfish.controllable.client.ActionVisibility;
-import com.mrcrayfish.controllable.client.ControllerIcons;
-import com.mrcrayfish.controllable.client.CursorType;
-import com.mrcrayfish.controllable.client.Thumbstick;
+import com.mrcrayfish.controllable.client.*;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -51,6 +48,7 @@ public class Config
             public final ForgeConfigSpec.BooleanValue quickCraft;
             public final ForgeConfigSpec.BooleanValue uiSounds;
             public final ForgeConfigSpec.EnumValue<Thumbstick> radialThumbstick;
+            public final ForgeConfigSpec.EnumValue<SneakMode> sneakMode;
 
             public Options(ForgeConfigSpec.Builder builder)
             {
@@ -71,6 +69,7 @@ public class Config
                     this.quickCraft = builder.comment("If enabled, allows you to craft quickly when clicking an item in the recipe book").define("quickCraft", true);
                     this.uiSounds = builder.comment("If enabled, plays a pop sound when you navigate in inventories, menus or scrolling the radial menu").translation("controllable.config.uiSounds").define("uiSounds", true);
                     this.radialThumbstick = builder.comment("The thumbstick to use when scrolling items in the radial menu").translation("controllable.config.radialThumbstick").defineEnum("radialThumbstick", Thumbstick.RIGHT);
+                    this.sneakMode = builder.comment("The behaviour to use for sneaking. Toggle means to press once to sneak then press again to stand again. Hold means you must hold the sneak button and releasing will make the player stand again.").translation("controllable.config.sneakMode").defineEnum("sneakMode", SneakMode.TOGGLE);
                 }
                 builder.pop();
             }
