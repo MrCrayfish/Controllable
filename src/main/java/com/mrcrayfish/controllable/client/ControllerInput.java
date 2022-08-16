@@ -962,6 +962,8 @@ public class ControllerInput
 
     private void scrollRecipeTab(RecipeBookComponent recipeBook, int dir)
     {
+        if(!recipeBook.isVisible())
+            return;
         RecipeBookComponentMixin recipeBookMixin = ((RecipeBookComponentMixin) recipeBook);
         RecipeBookTabButton currentTab = recipeBookMixin.getCurrentTab();
         List<RecipeBookTabButton> tabs = recipeBookMixin.getRecipeTabs();
@@ -979,6 +981,8 @@ public class ControllerInput
 
     private void scrollRecipePage(RecipeBookComponent recipeBook, int dir)
     {
+        if(!recipeBook.isVisible())
+            return;
         RecipeBookPageAccessor page = (RecipeBookPageAccessor)((RecipeBookComponentMixin) recipeBook).getRecipeBookPage();
         if(dir > 0 && page.getForwardButton().visible || dir < 0 && page.getBackButton().visible)
         {
