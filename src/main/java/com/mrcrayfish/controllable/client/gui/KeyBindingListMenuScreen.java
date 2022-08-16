@@ -108,7 +108,7 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
 
         protected KeyBindingItem(KeyBinding mapping)
         {
-            super(new TranslationTextComponent(mapping.getTranslationKey()));
+            super(new TranslationTextComponent(mapping.getKeyDescription()));
             this.mapping = mapping;
             Collection<KeyAdapterBinding> bindings = BindingRegistry.getInstance().getKeyAdapters().values();
             this.addBinding = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button ->
