@@ -959,6 +959,8 @@ public class ControllerInput
 
     private void scrollRecipeTab(RecipeBookGui recipeBook, int dir)
     {
+        if(!recipeBook.isVisible())
+            return;
         RecipeBookGuiMixin recipeBookMixin = ((RecipeBookGuiMixin) recipeBook);
         RecipeTabToggleWidget currentTab = recipeBookMixin.getCurrentTab();
         List<RecipeTabToggleWidget> tabs = recipeBookMixin.getRecipeTabs();
@@ -976,6 +978,8 @@ public class ControllerInput
 
     private void scrollRecipePage(RecipeBookGui recipeBook, int dir)
     {
+        if(!recipeBook.isVisible())
+            return;
         RecipeBookPageAccessor page = (RecipeBookPageAccessor)((RecipeBookGuiMixin) recipeBook).getRecipeBookPage();
         if(dir > 0 && page.getForwardButton().visible || dir < 0 && page.getBackButton().visible)
         {
