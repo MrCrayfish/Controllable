@@ -9,6 +9,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
+import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
 import com.mrcrayfish.controllable.integration.JustEnoughItems;
@@ -18,6 +19,7 @@ import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.INestedGuiEventHandler;
 import net.minecraft.client.gui.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.recipebook.*;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
@@ -1024,7 +1026,40 @@ public class ControllerInput
         {
             if(listener instanceof Widget)
             {
-                widgets.add((Widget) listener);
+                Widget widget = (Widget) listener;
+                if(widget.active && widget.visible)
+                {
+                    widgets.add((Widget) listener);
+                }
+            }
+            else if(listener instanceof AbstractList<?>)
+            {
+                AbstractList<?> list = (AbstractList<?>) listener;
+                int count = list.getEventListeners().size();
+                for(int i = 0; i < count; i++)
+                {
+                    int rowTop = ReflectUtil.getAbstractListRowTop(list, i);
+                    int rowBottom = ReflectUtil.getAbstractListRowBottom(list, i);
+                    if(rowTop >= list.getTop() && rowBottom <= list.getBottom()) // Is visible
+                    {
+                        AbstractList.AbstractListEntry<?> entry = list.getEventListeners().get(i);
+                        if(entry instanceof INestedGuiEventHandler)
+                        {
+                            INestedGuiEventHandler handler = (INestedGuiEventHandler) entry;
+                            for(IGuiEventListener child : handler.getEventListeners())
+                            {
+                                if(child instanceof Widget)
+                                {
+                                    Widget widget = (Widget) child;
+                                    if(widget.active && widget.visible)
+                                    {
+                                        widgets.add((Widget) child);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -1044,7 +1079,7 @@ public class ControllerInput
 
         for(Widget widget : widgets)
         {
-            if(widget == null || widget.isHovered() || !widget.visible)
+            if(widget == null || widget.isHovered() || !widget.visible || !widget.active)
                 continue;
             int posX = widget.x + widget.getWidth() / 2;
             int posY = widget.y + widget.getHeightRealms() / 2;
