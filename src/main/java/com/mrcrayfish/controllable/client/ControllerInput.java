@@ -804,10 +804,9 @@ public class ControllerInput
                         this.scrollCreativeTabs((CreativeModeInventoryScreen) mc.screen, 1);
                         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                     }
-                    else if(mc.screen instanceof RecipeUpdateListener)
+                    else if(mc.screen instanceof RecipeUpdateListener listener)
                     {
-                        RecipeUpdateListener recipeShownListener = (RecipeUpdateListener) mc.screen;
-                        this.scrollRecipePage(recipeShownListener.getRecipeBookComponent(), 1);
+                        this.scrollRecipePage(listener.getRecipeBookComponent(), 1);
                     }
                 }
                 else if(ButtonBindings.NEXT_CREATIVE_TAB.isButtonPressed())
@@ -817,26 +816,23 @@ public class ControllerInput
                         this.scrollCreativeTabs((CreativeModeInventoryScreen) mc.screen, -1);
                         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                     }
-                    else if(mc.screen instanceof RecipeUpdateListener)
+                    else if(mc.screen instanceof RecipeUpdateListener listener)
                     {
-                        RecipeUpdateListener recipeShownListener = (RecipeUpdateListener) mc.screen;
-                        this.scrollRecipePage(recipeShownListener.getRecipeBookComponent(), -1);
+                        this.scrollRecipePage(listener.getRecipeBookComponent(), -1);
                     }
                 }
                 else if(ButtonBindings.NEXT_RECIPE_TAB.isButtonPressed())
                 {
-                    if(mc.screen instanceof RecipeUpdateListener)
+                    if(mc.screen instanceof RecipeUpdateListener listener)
                     {
-                        RecipeUpdateListener recipeShownListener = (RecipeUpdateListener) mc.screen;
-                        this.scrollRecipeTab(recipeShownListener.getRecipeBookComponent(), -1);
+                        this.scrollRecipeTab(listener.getRecipeBookComponent(), -1);
                     }
                 }
                 else if(ButtonBindings.PREVIOUS_RECIPE_TAB.isButtonPressed())
                 {
-                    if(mc.screen instanceof RecipeUpdateListener)
+                    if(mc.screen instanceof RecipeUpdateListener listener)
                     {
-                        RecipeUpdateListener recipeShownListener = (RecipeUpdateListener) mc.screen;
-                        this.scrollRecipeTab(recipeShownListener.getRecipeBookComponent(), 1);
+                        this.scrollRecipeTab(listener.getRecipeBookComponent(), 1);
                     }
                 }
                 else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
@@ -958,6 +954,8 @@ public class ControllerInput
 
     private void scrollRecipeTab(RecipeBookComponent recipeBook, int dir)
     {
+        if(!recipeBook.isVisible())
+            return;
         RecipeBookComponentMixin recipeBookMixin = ((RecipeBookComponentMixin) recipeBook);
         RecipeBookTabButton currentTab = recipeBookMixin.getCurrentTab();
         List<RecipeBookTabButton> tabs = recipeBookMixin.getRecipeTabs();
@@ -975,6 +973,8 @@ public class ControllerInput
 
     private void scrollRecipePage(RecipeBookComponent recipeBook, int dir)
     {
+        if(!recipeBook.isVisible())
+            return;
         RecipeBookPageAccessor page = (RecipeBookPageAccessor)((RecipeBookComponentMixin) recipeBook).getRecipeBookPage();
         if(dir > 0 && page.getForwardButton().visible || dir < 0 && page.getBackButton().visible)
         {
