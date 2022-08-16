@@ -19,6 +19,7 @@ import com.mrcrayfish.controllable.integration.JustEnoughItems;
 import com.mrcrayfish.controllable.mixin.client.CreativeModeInventoryScreenMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
+import net.minecraft.Util;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
@@ -29,10 +30,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.*;
 import net.minecraft.client.gui.screens.recipebook.*;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -95,6 +93,7 @@ public class ControllerInput
     private boolean moved;
     private float targetPitch;
     private float targetYaw;
+    private long lastMerchantScroll;
 
     private int dropCounter = -1;
 
@@ -389,10 +388,15 @@ public class ControllerInput
         double mouseY = this.virtualMouseY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
         if(mc.screen != null && this.lastUse > 0)
         {
-            GuiEventListener hoveredListener = mc.screen.children().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
-            if(hoveredListener instanceof AbstractSelectionList<?>)
+            if(mc.screen instanceof MerchantScreen screen)
             {
-                this.handleListScrolling((AbstractSelectionList<?>) hoveredListener, controller);
+                this.handleMerchantScrolling(screen, controller);
+                return;
+            }
+            GuiEventListener hoveredListener = mc.screen.children().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+            if(hoveredListener instanceof AbstractSelectionList<?> selectionList)
+            {
+                this.handleListScrolling(selectionList, controller);
             }
         }
 
@@ -1301,6 +1305,28 @@ public class ControllerInput
         }
         dir *= Minecraft.getInstance().getDeltaFrameTime();
         list.setScrollAmount(list.getScrollAmount() + dir * 10);
+    }
+
+    private void handleMerchantScrolling(MerchantScreen screen, Controller controller)
+    {
+        double dir = 0;
+        float yValue = Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
+        if(Math.abs(yValue) >= 0.5F)
+        {
+            this.setControllerInUse();
+            dir = -yValue;
+        }
+        else
+        {
+            // Do this to allow thumbstick to be tap up or down
+            this.lastMerchantScroll = 0;
+        }
+        long scrollTime = Util.getMillis();
+        if(dir != 0 && scrollTime - this.lastMerchantScroll >= 150)
+        {
+            screen.mouseScrolled(this.getMouseX(), this.getMouseY(), Math.signum(dir));
+            this.lastMerchantScroll = scrollTime;
+        }
     }
 
     private double getMouseX()
