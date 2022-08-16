@@ -16,31 +16,31 @@ description="Adds the ability to use a controller to play Minecraft"
 [[dependencies.controllable]]
    modId="forge"
    mandatory=true
-   versionRange="[42.0.1,)"
+   versionRange="[43.0.11,)"
    ordering="NONE"
    side="CLIENT"
 [[dependencies.controllable]]
    modId="minecraft"
    mandatory=true
-   versionRange="[1.19.1,1.20)"
+   versionRange="[1.19.2,1.20)"
    ordering="NONE"
    side="CLIENT"
 [[dependencies.controllable]]
    modId="jei"
    mandatory=false
-   versionRange="[11.2.0.241,)"
+   versionRange="[11.2.0.246,)"
    ordering="NONE"
    side="CLIENT"
 [[dependencies.controllable]]
    modId="configured"
    mandatory=false
-   versionRange="[1.5.3,)"
+   versionRange="[1.5.6,)"
    ordering="NONE"
    side="CLIENT"
 [[dependencies.controllable]]
    modId="catalogue"
    mandatory=false
-   versionRange="[1.6.1,)"
+   versionRange="[1.6.3,)"
    ordering="NONE"
    side="CLIENT"
 

@@ -12,7 +12,7 @@ plugins {
 
 apply plugin: 'org.spongepowered.mixin'
 
-version = "0.16.4-1.19.1"
+version = "0.16.4-1.19.2"
 group = "com.mrcrayfish"
 archivesBaseName = "controllable"
 
@@ -23,7 +23,7 @@ mixin {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.19.1'
+    mappings channel: 'official', version: '1.19.2'
     
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -99,10 +99,10 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.1-42.0.1'
-    implementation fg.deobf('curse.maven:configured-457570:3872190')
+    minecraft 'net.minecraftforge:forge:1.19.2-43.0.11'
+    implementation fg.deobf('curse.maven:configured-457570:3903908')
     implementation fg.deobf('curse.maven:catalogue-459701:3873264')
-    implementation fg.deobf('mezz.jei:jei-1.19.1-forge:11.2.0.241')
+    implementation fg.deobf('mezz.jei:jei-1.19.2-forge:11.2.0.246')
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
