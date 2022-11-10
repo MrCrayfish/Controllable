@@ -21,7 +21,7 @@ public class ButtonStates
         return this.states[index];
     }
 
-    protected void setState(int index, boolean state)
+    public void setState(int index, boolean state)
     {
         if(index < 0 || index >= states.length)
             return;

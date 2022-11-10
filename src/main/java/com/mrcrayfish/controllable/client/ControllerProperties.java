@@ -18,6 +18,10 @@ public class ControllerProperties
     private static String lastController = "";
     private static String selectedMapping = "";
 
+    // TODO add async poll rate Hz setting
+    // TODO move the async settings into ControllerOptions
+    private static Boolean asyncPolling = null;
+
     public static void load(File configFolder)
     {
         if(!loaded)
@@ -37,6 +41,8 @@ public class ControllerProperties
                         properties.load(is);
                         lastController = properties.getProperty("CurrentController", "");
                         selectedMapping = properties.getProperty("SelectedMapping", "");
+                        String asyncPollingStr = properties.getProperty("AsyncPolling");
+                        asyncPolling = asyncPollingStr == null ? null : Boolean.parseBoolean(asyncPollingStr);
                     }
                 }
             }
@@ -56,6 +62,14 @@ public class ControllerProperties
         Properties properties = new Properties();
         properties.setProperty("LastController", lastController);
         properties.setProperty("SelectedMapping", selectedMapping);
+
+        // Only write the AsyncPolling setting to file if it is set; this way we can change the default after it's
+        // determined to be stable, and existing users who upgrade won't be stuck at the old setting.
+        if(asyncPolling != null)
+        {
+            properties.setProperty("AsyncPolling", asyncPolling.toString());
+        }
+
         try
         {
             properties.store(new FileOutputStream(file), "Controller Properties");
@@ -84,5 +98,11 @@ public class ControllerProperties
     public static void setSelectedMapping(String selectedMapping)
     {
         ControllerProperties.selectedMapping = selectedMapping;
+    }
+
+    public static boolean isAsyncPollingEnabled()
+    {
+        // (default off if null)
+        return Boolean.TRUE.equals(asyncPolling);
     }
 }

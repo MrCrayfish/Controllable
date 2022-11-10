@@ -1,7 +1,21 @@
 package com.mrcrayfish.controllable;
 
 import com.google.common.io.ByteStreams;
-import com.mrcrayfish.controllable.client.*;
+import com.mrcrayfish.controllable.ButtonStateTracker.ButtonStateChange;
+import com.mrcrayfish.controllable.client.ButtonBinding;
+import com.mrcrayfish.controllable.client.Buttons;
+import com.mrcrayfish.controllable.client.Controller;
+import com.mrcrayfish.controllable.client.ControllerEvents;
+import com.mrcrayfish.controllable.client.ControllerInput;
+import com.mrcrayfish.controllable.client.ControllerManager;
+import com.mrcrayfish.controllable.client.ControllerPoller;
+import com.mrcrayfish.controllable.client.ControllerProperties;
+import com.mrcrayfish.controllable.client.ControllerToast;
+import com.mrcrayfish.controllable.client.GuiEvents;
+import com.mrcrayfish.controllable.client.IControllerListener;
+import com.mrcrayfish.controllable.client.Mappings;
+import com.mrcrayfish.controllable.client.RadialMenuHandler;
+import com.mrcrayfish.controllable.client.RenderEvents;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingScreen;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import net.minecraft.client.Minecraft;
@@ -40,6 +54,7 @@ public class Controllable implements IControllerListener
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
+    private static ControllerPoller poller;
     private static ControllerManager manager;
     private static Controller controller;
     private static ControllerInput input;
@@ -116,6 +131,9 @@ public class Controllable implements IControllerListener
                 }
             }
 
+            Controllable.poller = new ControllerPoller(Controllable.manager);
+            Controllable.poller.startAsyncPolling();
+
             Mappings.load(configFolder);
 
             /* Registers events */
@@ -135,17 +153,15 @@ public class Controllable implements IControllerListener
     {
         Minecraft.getInstance().enqueue(() ->
         {
-            if(Controllable.controller == null)
+            if(Controllable.controller == null && Config.CLIENT.options.autoSelect.get())
             {
-                if(Config.CLIENT.options.autoSelect.get())
-                {
-                    setController(new Controller(jid));
-                }
+                Controller newController = new Controller(jid);
+                setController(newController);
 
                 Minecraft mc = Minecraft.getInstance();
-                if(mc.player != null && Controllable.controller != null)
+                if(mc.player != null)
                 {
-                    Minecraft.getInstance().getToastGui().add(new ControllerToast(true, Controllable.controller.getName()));
+                    Minecraft.getInstance().getToastGui().add(new ControllerToast(true, newController.getName()));
                 }
             }
         });
@@ -157,25 +173,21 @@ public class Controllable implements IControllerListener
     {
         Minecraft.getInstance().enqueue(() ->
         {
-            if(Controllable.controller != null)
+            Controller oldController = Controllable.controller;
+            if(oldController != null && oldController.getJid() == jid)
             {
-                if(Controllable.controller.getJid() == jid)
+                setController(null);
+
+                if(Config.CLIENT.options.autoSelect.get() && manager.getControllerCount() > 0)
                 {
-                    Controller oldController = Controllable.controller;
+                    Optional<Integer> optional = manager.getControllers().keySet().stream().min(Comparator.comparing(i -> i));
+                    optional.ifPresent(minJid -> setController(new Controller(minJid)));
+                }
 
-                    setController(null);
-
-                    if(Config.CLIENT.options.autoSelect.get() && manager.getControllerCount() > 0)
-                    {
-                        Optional<Integer> optional = manager.getControllers().keySet().stream().min(Comparator.comparing(i -> i));
-                        optional.ifPresent(minJid -> setController(new Controller(minJid)));
-                    }
-
-                    Minecraft mc = Minecraft.getInstance();
-                    if(mc.player != null)
-                    {
-                        Minecraft.getInstance().getToastGui().add(new ControllerToast(false, oldController.getName()));
-                    }
+                Minecraft mc = Minecraft.getInstance();
+                if(mc.player != null)
+                {
+                    Minecraft.getInstance().getToastGui().add(new ControllerToast(false, oldController.getName()));
                 }
             }
         });
@@ -199,60 +211,47 @@ public class Controllable implements IControllerListener
         if(event.phase != TickEvent.Phase.START)
             return;
 
-        if(manager != null)
+        if(!poller.isAsyncPollingEnabled())
         {
-            manager.update();
+            poller.poll();
         }
-        if(controller != null)
+        Controller controller = Controllable.controller;
+        ButtonStateTracker stateTracker = poller.getStateTracker(controller);
+        if(stateTracker != null)
         {
-            controller.updateGamepadState();
-            gatherAndQueueControllerInput();
+            processButtonStates(stateTracker, controller);
         }
     }
     
-    private static void gatherAndQueueControllerInput()
-    {
-        Controller currentController = controller;
-        if(currentController == null)
-            return;
-        ButtonStates states = new ButtonStates();
-        states.setState(Buttons.A, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_A));
-        states.setState(Buttons.B, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_B));
-        states.setState(Buttons.X, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_X));
-        states.setState(Buttons.Y, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_Y));
-        states.setState(Buttons.SELECT, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_BACK));
-        states.setState(Buttons.HOME, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_GUIDE));
-        states.setState(Buttons.START, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_START));
-        states.setState(Buttons.LEFT_THUMB_STICK, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB));
-        states.setState(Buttons.RIGHT_THUMB_STICK, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB));
-        states.setState(Buttons.LEFT_BUMPER, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER));
-        states.setState(Buttons.RIGHT_BUMPER, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER));
-        states.setState(Buttons.LEFT_TRIGGER, currentController.getLTriggerValue() >= 0.5F);
-        states.setState(Buttons.RIGHT_TRIGGER, currentController.getRTriggerValue() >= 0.5F);
-        states.setState(Buttons.DPAD_UP, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP));
-        states.setState(Buttons.DPAD_DOWN, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
-        states.setState(Buttons.DPAD_LEFT, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
-        states.setState(Buttons.DPAD_RIGHT, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
-        processButtonStates(states);
-    }
-
-    private static void processButtonStates(ButtonStates states)
+    private static void processButtonStates(ButtonStateTracker stateTracker, Controller controller)
     {
         ButtonBinding.tick();
-        for(int i = 0; i < Buttons.BUTTONS.length; i++)
+
+        synchronized(stateTracker)
         {
-            processButton(Buttons.BUTTONS[i], states);
+            boolean[] changedButtons = new boolean[Buttons.LENGTH];
+            ButtonStateChange change;
+            while ((change = stateTracker.poll()) != null)
+            {
+                processButton(change.button, change.state, controller);
+                changedButtons[change.button] = true;
+            }
+            ButtonStates states = stateTracker.getLastState();
+            for (int button = 0; button < changedButtons.length; button++) {
+                if(!changedButtons[button])
+                {
+                    processButton(button, states.getState(button), controller);
+                }
+            }
         }
     }
 
-    private static void processButton(int index, ButtonStates newStates)
+    private static void processButton(int index, boolean state, Controller controller)
     {
-        boolean state = newStates.getState(index);
-
         Screen screen = Minecraft.getInstance().currentScreen;
         if(screen instanceof ControllerLayoutScreen)
         {
-            ((ControllerLayoutScreen) screen).processButton(index, newStates);
+            ((ControllerLayoutScreen) screen).processButton(index, state);
             return;
         }
 
@@ -305,11 +304,9 @@ public class Controllable implements IControllerListener
      */
     public static boolean isButtonPressed(int button)
     {
-        return controller != null && controller.getButtonsStates().getState(button);
+        Controller c = controller;
+        return c != null && c.getButtonsStates().getState(button);
     }
 
-    private static boolean getButtonState(int buttonCode)
-    {
-        return controller != null && controller.getGamepadState().buttons(buttonCode) == GLFW.GLFW_PRESS;
-    }
+
 }

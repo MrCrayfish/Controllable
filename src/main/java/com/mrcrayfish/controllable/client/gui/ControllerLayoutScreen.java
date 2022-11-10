@@ -277,10 +277,8 @@ public class ControllerLayoutScreen extends Screen
         }
     }
 
-    public void processButton(int index, ButtonStates newStates)
+    public void processButton(int index, boolean state)
     {
-        boolean state = newStates.getState(index);
-
         if(state && this.onButtonInput(index))
         {
             return;
