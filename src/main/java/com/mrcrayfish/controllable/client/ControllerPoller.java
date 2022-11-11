@@ -63,6 +63,10 @@ public class ControllerPoller
      */
     public void poll()
     {
+        if(!Minecraft.getInstance().isRunning())
+        {
+            return;
+        }
         Minecraft.getInstance().enqueue(() ->
         {
             manager.update();
