@@ -82,6 +82,8 @@
     "controllable.options.virtualMouse.desc": "If enabled, the game will use a virtual cursor instead of the real cursor. This must be turned on to be able to run multiple instances!",
     "controllable.options.consoleHotbar": "Console Hotbar",
     "controllable.options.consoleHotbar.desc": "If enabled, hotbar will render closer to the center of the screen like on console.",
+    "controllable.options.asyncPolling": "Async Polling Enabled",
+    "controllable.options.asyncPolling.desc": "If enabled, the controller inputs will be polled in a background thread instead of the main thread. This can be more responsive at low framerates.",
     "controllable.options.cursorType": "Cursor Type",
     "controllable.options.cursorType.desc": "The image to use for the cursor. This only applies if virtual mouse is enabled!",
     "controllable.options.cursorType.format": "Cursor Type: %s",

@@ -51,6 +51,7 @@ public class Config
             public final ForgeConfigSpec.EnumValue<SneakMode> sneakMode;
             public final ForgeConfigSpec.EnumValue<Thumbstick> cursorThumbstick;
             public final ForgeConfigSpec.DoubleValue hoverModifier;
+            public final ForgeConfigSpec.BooleanValue asyncPolling;
 
             public Options(ForgeConfigSpec.Builder builder)
             {
@@ -74,6 +75,7 @@ public class Config
                     this.sneakMode = builder.comment("The behaviour to use for sneaking. Toggle means to press once to sneak then press again to stand again. Hold means you must hold the sneak button and releasing will make the player stand again.").translation("controllable.config.sneakMode").defineEnum("sneakMode", SneakMode.TOGGLE);
                     this.cursorThumbstick = builder.comment("The thumbstick that controls moving the cursor").translation("controllable.config.cursorThumbstick").defineEnum("cursorThumbstick", Thumbstick.LEFT);
                     this.hoverModifier = builder.comment("The scale of the mouse speed when hovering a widget or item slot").defineInRange("hoverModifier", 0.6, 0.05, 1.0);
+                    this.asyncPolling = builder.comment("If enabled, the controller inputs will be polled in a background thread instead of the main thread. This can be more responsive at low framerates.").define("asyncPolling", false);
                 }
                 builder.pop();
             }

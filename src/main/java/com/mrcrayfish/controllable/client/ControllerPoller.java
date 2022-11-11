@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mrcrayfish.controllable.ButtonStateTracker;
 import com.mrcrayfish.controllable.ButtonStates;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
@@ -11,6 +12,7 @@ import javax.annotation.Nullable;
 import java.util.WeakHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class ControllerPoller
@@ -26,7 +28,11 @@ public class ControllerPoller
 
     private final ControllerManager manager;
     private final WeakHashMap<Controller, ButtonStateTracker> stateTrackers;
-    private ScheduledExecutorService executor;
+    private volatile ScheduledExecutorService executor;
+
+    // these variables are accessed only from the async polling thread, so they do not need to be volatile
+    private int scheduledRate;
+    private ScheduledFuture<?> scheduledFuture;
 
     public ControllerPoller(ControllerManager manager)
     {
@@ -36,12 +42,12 @@ public class ControllerPoller
 
     public boolean isAsyncPollingEnabled()
     {
-        return ControllerProperties.isAsyncPollingEnabled();
+        return Config.CLIENT.options.asyncPolling.get();
     }
 
     public void startAsyncPolling()
     {
-        if(!isAsyncPollingEnabled() || this.executor != null)
+        if(this.executor != null)
         {
             return;
         }
@@ -50,8 +56,27 @@ public class ControllerPoller
                 new ThreadFactoryBuilder().setNameFormat("Controllable-Poller-%d").setDaemon(true).build());
         // by using daemon threads, we don't have to worry about cleanup during exit
 
-        // TODO the poll rate should be configurable
-        executor.scheduleAtFixedRate(this::poll, 0, 1000000000L / POLL_RATE_HZ, TimeUnit.NANOSECONDS);
+        executor.execute(this::asyncPoll);
+    }
+
+    private void asyncPoll()
+    {
+        int pollRateHz = isAsyncPollingEnabled() ? POLL_RATE_HZ : 1;
+        if (pollRateHz != scheduledRate)
+        {
+            if (scheduledFuture != null)
+            {
+                scheduledFuture.cancel(false);
+            }
+            long period = 1000000000L / pollRateHz;
+            scheduledFuture = executor.scheduleAtFixedRate(this::asyncPoll, period, period, TimeUnit.NANOSECONDS);
+            scheduledRate = pollRateHz;
+        }
+
+        if (isAsyncPollingEnabled())
+        {
+            poll();
+        }
     }
 
     /**

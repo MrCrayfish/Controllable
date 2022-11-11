@@ -171,4 +171,11 @@ public class ControllerOptions
         double mouseSpeed = Config.CLIENT.options.hoverModifier.get();
         return new TranslationTextComponent("controllable.options.hoverModifier.format", FORMAT.format(mouseSpeed));
     });
+
+    public static final BooleanOption ASYNC_POLLING = new ControllableBooleanOption("controllable.options.asyncPolling", gameSettings -> {
+        return Config.CLIENT.options.asyncPolling.get();
+    }, (gameSettings, value) -> {
+        Config.CLIENT.options.asyncPolling.set(value);
+        Config.save();
+    });
 }
