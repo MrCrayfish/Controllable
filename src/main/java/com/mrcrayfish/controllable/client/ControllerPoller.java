@@ -92,7 +92,7 @@ public class ControllerPoller
         {
             return;
         }
-        Minecraft.getInstance().enqueue(() ->
+        Minecraft.getInstance().execute(() ->
         {
             manager.update();
             Controller controller = Controllable.getController();
