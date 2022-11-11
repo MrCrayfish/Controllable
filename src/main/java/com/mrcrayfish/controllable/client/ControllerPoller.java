@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mrcrayfish.controllable.ButtonStateTracker;
 import com.mrcrayfish.controllable.ButtonStates;
 import com.mrcrayfish.controllable.Controllable;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
@@ -62,13 +63,18 @@ public class ControllerPoller
      */
     public void poll()
     {
-        manager.update();
-        Controller controller = Controllable.getController();
-        if(controller != null)
+        Minecraft.getInstance().enqueue(() ->
         {
-            controller.updateGamepadState();
-            gatherAndQueueControllerInput(controller);
-        }
+            manager.update();
+            Controller controller = Controllable.getController();
+            if(controller != null)
+            {
+                if(controller.updateGamepadState())
+                {
+                    gatherAndQueueControllerInput(controller);
+                }
+            }
+        });
     }
 
     private void gatherAndQueueControllerInput(Controller controller)

@@ -1,5 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
+import com.google.common.base.Preconditions;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
@@ -17,6 +19,8 @@ public class ControllerManager
 
     public void update()
     {
+        Preconditions.checkState(Minecraft.getInstance().isOnExecutionThread(),
+                "update must be called from the main thread");
         int connectedCount = 0;
         for(int jid = GLFW.GLFW_JOYSTICK_1; jid <= GLFW.GLFW_JOYSTICK_LAST; jid++)
         {

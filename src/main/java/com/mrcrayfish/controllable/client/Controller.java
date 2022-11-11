@@ -1,6 +1,8 @@
 package com.mrcrayfish.controllable.client;
 
+import com.google.common.base.Preconditions;
 import com.mrcrayfish.controllable.ButtonStates;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
@@ -51,6 +53,8 @@ public class Controller
      */
     public boolean updateGamepadState()
     {
+        Preconditions.checkState(Minecraft.getInstance().isOnExecutionThread(),
+                "updateGamepadState should only be called from the main thread");
         return GLFW.glfwGetGamepadState(this.jid, this.controller);
     }
 

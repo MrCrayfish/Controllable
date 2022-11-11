@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable;
 
+import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.mrcrayfish.controllable.ButtonStateTracker.ButtonStateChange;
 import com.mrcrayfish.controllable.client.ButtonBinding;
@@ -151,46 +152,44 @@ public class Controllable implements IControllerListener
     @OnlyIn(Dist.CLIENT)
     public void connected(int jid)
     {
-        Minecraft.getInstance().enqueue(() ->
+        Preconditions.checkState(Minecraft.getInstance().isOnExecutionThread(),
+                "connected should be run on main thread");
+        if(Controllable.controller == null && Config.CLIENT.options.autoSelect.get())
         {
-            if(Controllable.controller == null && Config.CLIENT.options.autoSelect.get())
-            {
-                Controller newController = new Controller(jid);
-                setController(newController);
+            Controller newController = new Controller(jid);
+            setController(newController);
 
-                Minecraft mc = Minecraft.getInstance();
-                if(mc.player != null)
-                {
-                    Minecraft.getInstance().getToastGui().add(new ControllerToast(true, newController.getName()));
-                }
+            Minecraft mc = Minecraft.getInstance();
+            if(mc.player != null)
+            {
+                Minecraft.getInstance().getToastGui().add(new ControllerToast(true, newController.getName()));
             }
-        });
+        }
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void disconnected(int jid)
     {
-        Minecraft.getInstance().enqueue(() ->
+        Preconditions.checkState(Minecraft.getInstance().isOnExecutionThread(),
+                "disconnected should be run on main thread");
+        Controller oldController = Controllable.controller;
+        if(oldController != null && oldController.getJid() == jid)
         {
-            Controller oldController = Controllable.controller;
-            if(oldController != null && oldController.getJid() == jid)
+            setController(null);
+
+            if(Config.CLIENT.options.autoSelect.get() && manager.getControllerCount() > 0)
             {
-                setController(null);
-
-                if(Config.CLIENT.options.autoSelect.get() && manager.getControllerCount() > 0)
-                {
-                    Optional<Integer> optional = manager.getControllers().keySet().stream().min(Comparator.comparing(i -> i));
-                    optional.ifPresent(minJid -> setController(new Controller(minJid)));
-                }
-
-                Minecraft mc = Minecraft.getInstance();
-                if(mc.player != null)
-                {
-                    Minecraft.getInstance().getToastGui().add(new ControllerToast(false, oldController.getName()));
-                }
+                Optional<Integer> optional = manager.getControllers().keySet().stream().min(Comparator.comparing(i -> i));
+                optional.ifPresent(minJid -> setController(new Controller(minJid)));
             }
-        });
+
+            Minecraft mc = Minecraft.getInstance();
+            if(mc.player != null)
+            {
+                Minecraft.getInstance().getToastGui().add(new ControllerToast(false, oldController.getName()));
+            }
+        }
     }
 
     public static void setController(@Nullable Controller controller)
