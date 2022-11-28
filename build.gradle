@@ -90,8 +90,8 @@ repositories {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.18.2-40.1.0'
-    implementation fg.deobf('mezz.jei:jei-1.18.2:9.7.1.232')
-    implementation fg.deobf('curse.maven:configured-457570:3721946')
+    implementation fg.deobf("mezz.jei:jei-1.18.2-forge:10.2.1.283")
+    implementation fg.deobf('curse.maven:configured-457570:4010624')
     implementation fg.deobf('curse.maven:catalogue-459701:3803098')
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

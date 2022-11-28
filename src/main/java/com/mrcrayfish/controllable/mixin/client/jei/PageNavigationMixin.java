@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.mixin.client.jei;
 
-import mezz.jei.gui.PageNavigation;
-import mezz.jei.gui.elements.GuiIconButton;
+import mezz.jei.common.gui.PageNavigation;
+import mezz.jei.common.gui.elements.GuiIconButton;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.gen.Accessor;
