@@ -800,9 +800,10 @@ public class ControllerInput
             {
                 if(ButtonBindings.INVENTORY.isButtonPressed())
                 {
-                    if(mc.player != null)
+                    if(mc.screen != null)
                     {
-                        mc.player.closeContainer();
+                        // Fake an escape press for best support
+                        mc.screen.keyPressed(GLFW.GLFW_KEY_ESCAPE, GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_ESCAPE), 0);
                     }
                 }
                 else if(ButtonBindings.PREVIOUS_CREATIVE_TAB.isButtonPressed())
