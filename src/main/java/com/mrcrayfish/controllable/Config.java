@@ -17,16 +17,11 @@ public class Config
 
     public static class Client
     {
-        public final ForgeConfigSpec.LongValue controllerPollInterval;
         public final Options options;
 
         Client(ForgeConfigSpec.Builder builder)
         {
             builder.comment("Client configuration settings").push("client");
-            this.controllerPollInterval = builder
-                    .comment("The time in milliseconds to wait before polling the controller. The lower the value the better the input latency but drains the controller battery faster.")
-                    .translation("controllable.configgui.controllerPollInterval")
-                    .defineInRange("controllerPollInterval", 8L, 1L, 128L);
             this.options = new Options(builder);
             builder.pop();
         }
@@ -51,6 +46,7 @@ public class Config
             public final ForgeConfigSpec.EnumValue<SneakMode> sneakMode;
             public final ForgeConfigSpec.EnumValue<Thumbstick> cursorThumbstick;
             public final ForgeConfigSpec.DoubleValue hoverModifier;
+            public final ForgeConfigSpec.BooleanValue fpsPollingFix;
 
             public Options(ForgeConfigSpec.Builder builder)
             {
@@ -74,6 +70,7 @@ public class Config
                     this.sneakMode = builder.comment("The behaviour to use for sneaking. Toggle means to press once to sneak then press again to stand again. Hold means you must hold the sneak button and releasing will make the player stand again.").translation("controllable.config.sneakMode").defineEnum("sneakMode", SneakMode.TOGGLE);
                     this.cursorThumbstick = builder.comment("The thumbstick that controls moving the cursor").translation("controllable.config.cursorThumbstick").defineEnum("cursorThumbstick", Thumbstick.LEFT);
                     this.hoverModifier = builder.comment("The scale of the mouse speed when hovering a widget or item slot").defineInRange("hoverModifier", 0.6, 0.05, 1.0);
+                    this.fpsPollingFix = builder.comment("Enabling this option will improve polling of controllers when your game FPS is capped. This will not have an effect if your game is already running at a low FPS without a cap.").define("fpsPollingFix", false);
                 }
                 builder.pop();
             }

@@ -12,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
@@ -77,6 +78,35 @@ public class MinecraftMixin
         if(Controllable.getController() != null)
         {
             cir.setReturnValue(true);
+        }
+    }
+
+    // Note: Minecraft Development plugin is failing to process this correctly.
+    @SuppressWarnings("InvalidInjectorMethodSignature")
+    @ModifyVariable(method = "runTick", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/Minecraft;getFramerateLimit()I"), index = 7)
+    private int controllableModifyFramerate(int originalFps)
+    {
+        Minecraft mc = (Minecraft) (Object) this;
+        if(mc.getOverlay() == null)
+        {
+            if(Config.CLIENT.options.fpsPollingFix.get())
+            {
+                return 260; // To bypass "fps < 260" condition
+            }
+        }
+        return originalFps;
+    }
+
+    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getFramerateLimit()I"))
+    private void controllableWaitEvents(boolean outOfMemory, CallbackInfo ci)
+    {
+        Minecraft mc = (Minecraft) (Object) this;
+        if(mc.getOverlay() == null)
+        {
+            if(Config.CLIENT.options.fpsPollingFix.get())
+            {
+                Controllable.queueInputsWait();
+            }
         }
     }
 }
