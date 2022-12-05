@@ -43,6 +43,7 @@ public class ControllerOptions
     public static final ControllerSetting<Thumbstick> RADIAL_THUMBSTICK = createValuesSetting("controllable.options.radialThumbstick", Thumbstick.class, Config.CLIENT.options.radialThumbstick);
     public static final ControllerSetting<SneakMode> SNEAK_MODE = createValuesSetting("controllable.options.sneakMode", SneakMode.class, Config.CLIENT.options.sneakMode);
     public static final ControllerSetting<Thumbstick> CURSOR_THUMBSTICK = createValuesSetting("controllable.options.cursorThumbstick", Thumbstick.class, Config.CLIENT.options.cursorThumbstick);
+    public static final ControllerSetting<Boolean> FPS_POLLING_FIX = createToggleSetting("controllable.options.fpsPollingFix", Config.CLIENT.options.fpsPollingFix);
 
     public static ControllerSetting<Boolean> createToggleSetting(String key, ForgeConfigSpec.ConfigValue<Boolean> configValue)
     {
