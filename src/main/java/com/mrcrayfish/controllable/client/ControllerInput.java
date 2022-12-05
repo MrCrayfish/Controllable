@@ -33,6 +33,7 @@ import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.*;
 import net.minecraft.client.gui.screens.recipebook.*;
 import net.minecraft.client.player.Input;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -45,6 +46,7 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
@@ -526,7 +528,7 @@ public class ControllerInput
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onInputUpdate(MovementInputUpdateEvent event)
     {
-        Player player = Minecraft.getInstance().player;
+        LocalPlayer player = Minecraft.getInstance().player;
         if(player == null)
             return;
 
@@ -598,11 +600,6 @@ public class ControllerInput
                     event.getInput().up = dir > 0;
                     event.getInput().down = dir < 0;
                     event.getInput().forwardImpulse = dir * Mth.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
-
-                    if(event.getInput().shiftKeyDown)
-                    {
-                        event.getInput().forwardImpulse *= 0.3D;
-                    }
                 }
 
                 if(player.getVehicle() instanceof Boat)
@@ -617,11 +614,6 @@ public class ControllerInput
                     event.getInput().right = dir < 0;
                     event.getInput().left = dir > 0;
                     event.getInput().leftImpulse = dir * Mth.clamp((Math.abs(controller.getLThumbStickXValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
-
-                    if(event.getInput().shiftKeyDown)
-                    {
-                        event.getInput().leftImpulse *= 0.3D;
-                    }
                 }
             }
 
@@ -639,6 +631,14 @@ public class ControllerInput
         if(ButtonBindings.USE_ITEM.isButtonDown() && mc.rightClickDelay == 0 && !mc.player.isUsingItem())
         {
             mc.startUseItem();
+        }
+
+        // Applies the sneaking bonus when player has Swift Sneak enchantments on boots
+        float sneakBonus = Mth.clamp(0.3F + EnchantmentHelper.getSneakingSpeedBonus(player), 0.0F, 1.0F);
+        if(player.isMovingSlowly())
+        {
+            event.getInput().forwardImpulse *= sneakBonus;
+            event.getInput().leftImpulse *= sneakBonus;
         }
     }
 
