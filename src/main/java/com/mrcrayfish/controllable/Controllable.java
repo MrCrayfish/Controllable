@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable;
 
 import com.google.common.io.ByteStreams;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.screens.ButtonBindingScreen;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
@@ -26,8 +27,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.Queue;
 
 /**
  * Author: MrCrayfish
@@ -42,6 +45,8 @@ public class Controllable
     private static ControllerInput input;
     private static File configFolder;
     private static boolean jeiLoaded;
+
+    private static final Queue<ButtonStates> INPUT_QUEUE = new ArrayDeque<>();
 
     public Controllable()
     {
@@ -174,6 +179,7 @@ public class Controllable
             MinecraftForge.EVENT_BUS.register(new ControllerEvents());
             MinecraftForge.EVENT_BUS.register(RadialMenuHandler.instance());
             MinecraftForge.EVENT_BUS.addListener(this::controllerTick);
+            MinecraftForge.EVENT_BUS.addListener(this::renderTick);
         });
     }
 
@@ -192,25 +198,41 @@ public class Controllable
 
     private void controllerTick(TickEvent.ClientTickEvent event)
     {
-        if(event.phase != TickEvent.Phase.START)
-            return;
+        gatherAndQueueControllerInput();
 
+        // Process button changes at the start of the client tick
+        if(event.phase == TickEvent.Phase.START)
+        {
+            while(!INPUT_QUEUE.isEmpty())
+            {
+                processButtonStates(INPUT_QUEUE.poll());
+            }
+        }
+    }
+
+    private void renderTick(TickEvent.RenderTickEvent event)
+    {
+        // Gather input before and after render due to significant time difference
+        gatherAndQueueControllerInput();
+    }
+
+    private static void gatherAndQueueControllerInput()
+    {
+        // Updates the manager, which handles hot swapping
         if(manager != null)
         {
             manager.update();
         }
-        if(controller != null)
-        {
-            controller.updateGamepadState();
-            gatherAndQueueControllerInput();
-        }
-    }
-    
-    private static void gatherAndQueueControllerInput()
-    {
+
+        // Don't process if no controller is selected
         Controller currentController = controller;
         if(currentController == null)
             return;
+
+        // Updates the internal GLFW gamepad state
+        currentController.updateGamepadState();
+
+        // Capture all inputs and queue
         ButtonStates states = new ButtonStates();
         states.setState(Buttons.A, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_A));
         states.setState(Buttons.B, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_B));
@@ -229,7 +251,7 @@ public class Controllable
         states.setState(Buttons.DPAD_DOWN, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
         states.setState(Buttons.DPAD_LEFT, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
         states.setState(Buttons.DPAD_RIGHT, getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
-        processButtonStates(states);
+        INPUT_QUEUE.offer(states);
     }
 
     private static void processButtonStates(ButtonStates states)
@@ -289,6 +311,23 @@ public class Controllable
         {
             states.setState(index, false);
             input.handleButtonInput(controller, index, false, false);
+        }
+    }
+
+    /**
+     * Allows a controller to be polled while the main thread is waiting due to FPS limit. This
+     * overrides the wait behaviour of Minecraft and is off by default. Do not call this method, it
+     * is internal only.
+     */
+    public static void queueInputsWait()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        int fps = mc.level != null || mc.screen == null && mc.getOverlay() == null ? mc.getWindow().getFramerateLimit() : 60;
+        int captureCount = 4; // The amount of times to capture controller input while waiting
+        for(int i = 0; i < captureCount; i++)
+        {
+            RenderSystem.limitDisplayFPS(fps * captureCount);
+            gatherAndQueueControllerInput();
         }
     }
 
