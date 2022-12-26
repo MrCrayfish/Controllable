@@ -314,25 +314,32 @@ public class RenderEvents
                 /* Draw description text */
                 if(side == Action.Side.LEFT)
                 {
-                    if(Config.CLIENT.options.hintBackground.get())
-                    {
-                        Screen.fill(poseStack, x + 18 - 3, y, x + 18 + mc.font.width(action.getDescription()) + 2, y + 13, mc.options.getBackgroundColor(0.5F));
-                    }
+                    int textWidth = mc.font.width(action.getDescription());
+                    this.drawHintBackground(poseStack, x + 18, y, textWidth, 13);
                     mc.font.draw(poseStack, action.getDescription(), x + 18, y + 3, 0xFFFFFFFF);
                     leftIndex++;
                 }
                 else
                 {
-                    int width = mc.font.width(action.getDescription());
-                    if(Config.CLIENT.options.hintBackground.get())
-                    {
-                        Screen.fill(poseStack, x - 5 - width - 3, y, x - 5 + 2, y + 13, mc.options.getBackgroundColor(0.5F));
-                    }
-                    mc.font.draw(poseStack, action.getDescription(), x - 5 - width, y + 3, 0xFFFFFFFF);
+                    int textWidth = mc.font.width(action.getDescription());
+                    this.drawHintBackground(poseStack, x - 5 - textWidth, y, textWidth, 13);
+                    mc.font.draw(poseStack, action.getDescription(), x - 5 - textWidth, y + 3, 0xFFFFFFFF);
                     rightIndex++;
                 }
             }
         }
+    }
+
+    private void drawHintBackground(PoseStack poseStack, int x, int y, int width, int height)
+    {
+        if(!Config.CLIENT.options.hintBackground.get())
+            return;
+
+        Minecraft mc = Minecraft.getInstance();
+        int backgroundColor = mc.options.getBackgroundColor(0.5F);
+        Screen.fill(poseStack, x - 3 + 1, y, x + width + 2 - 1, y + 1, backgroundColor);
+        Screen.fill(poseStack, x - 3, y + 1, x + width + 2, y + height - 1, backgroundColor);
+        Screen.fill(poseStack, x - 3 + 1, y + height - 1, x + width + 2 - 1, y + height, backgroundColor);
     }
 
     private void renderMiniPlayer()
