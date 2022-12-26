@@ -26,6 +26,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
@@ -258,7 +259,7 @@ public class RadialMenuHandler
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onRenderScreen(TickEvent.RenderTickEvent event)
     {
         if(event.phase != TickEvent.Phase.END)
@@ -305,15 +306,21 @@ public class RadialMenuHandler
     {
         this.updateSelected();
 
+
         PoseStack poseStack = new PoseStack();
         Minecraft mc = Minecraft.getInstance();
-        poseStack.translate(0, -10, 0);
-        poseStack.translate((int) (mc.getWindow().getGuiScaledWidth() / 2F), (int) (mc.getWindow().getGuiScaledHeight() / 2F), 0);
 
         float animation = Mth.lerp(partialTicks, this.prevAnimateTicks, this.animateTicks) / 5F;
         float c1 = 1.70158F;
         float c3 = c1 + 1;
         animation = (float) (1 + c3 * Math.pow(animation - 1, 3) + c1 * Math.pow(animation - 1, 2));
+
+        // Draw background
+        Screen.fill(poseStack, 0, 0, mc.getWindow().getWidth(), mc.getWindow().getHeight(), 0x78101010);
+
+        poseStack.translate(0, -10, 0);
+        poseStack.translate((int) (mc.getWindow().getGuiScaledWidth() / 2F), (int) (mc.getWindow().getGuiScaledHeight() / 2F), 0);
+
         //matrixStack.scale(animation, animation, animation);
 
         poseStack.pushPose();
@@ -469,7 +476,11 @@ public class RadialMenuHandler
         @Override
         protected void draw(PoseStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation)
         {
-            float color = selected ? 1.0F : 0.1F;
+            int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
+            float alpha = ((color >> 24) & 0xFF) / 255F;
+            float red = ((color >> 16) & 0xFF) / 255F;
+            float green = ((color >> 8) & 0xFF) / 255F;
+            float blue = ((color >> 0) & 0xFF) / 255F;
 
             matrixStack.translate(0, 90, 0);
 
@@ -478,14 +489,27 @@ public class RadialMenuHandler
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
 
+            alpha = Math.min(1.0F, alpha * animation);
+
             // Draw background
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             BufferBuilder buffer = Tesselator.getInstance().getBuilder();
             buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            buffer.vertex(matrixStack.last().pose(), -15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.vertex(matrixStack.last().pose(), -15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            // Top (reduced width by 2)
+            buffer.vertex(matrixStack.last().pose(), -14, -15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), -14, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 14, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 14, -15, 0).color(red, green, blue, alpha).endVertex();
+            // Middle
+            buffer.vertex(matrixStack.last().pose(), -15, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), -15, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 15, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 15, -14, 0).color(red, green, blue, alpha).endVertex();
+            // Bottom (reduced width by 2)
+            buffer.vertex(matrixStack.last().pose(), -14, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), -14, 15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 14, 15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 14, 14, 0).color(red, green, blue, alpha).endVertex();
             BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
@@ -527,7 +551,11 @@ public class RadialMenuHandler
         @Override
         protected void draw(PoseStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation)
         {
-            float color = selected ? 1.0F : 0.1F;
+            int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
+            float alpha = ((color >> 24) & 0xFF) / 255F;
+            float red = ((color >> 16) & 0xFF) / 255F;
+            float green = ((color >> 8) & 0xFF) / 255F;
+            float blue = ((color >> 0) & 0xFF) / 255F;
 
             matrixStack.translate(0, -90, 0);
 
@@ -536,14 +564,27 @@ public class RadialMenuHandler
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
 
+            alpha = Math.min(1.0F, alpha * animation);
+
             // Draw background
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             BufferBuilder buffer = Tesselator.getInstance().getBuilder();
             buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            buffer.vertex(matrixStack.last().pose(), -15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.vertex(matrixStack.last().pose(), -15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 15, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 15, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
+            // Top (reduced width by 2)
+            buffer.vertex(matrixStack.last().pose(), -14, -15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), -14, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 14, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 14, -15, 0).color(red, green, blue, alpha).endVertex();
+            // Middle
+            buffer.vertex(matrixStack.last().pose(), -15, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), -15, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 15, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 15, -14, 0).color(red, green, blue, alpha).endVertex();
+            // Bottom (reduced width by 2)
+            buffer.vertex(matrixStack.last().pose(), -14, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), -14, 15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 14, 15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(matrixStack.last().pose(), 14, 14, 0).color(red, green, blue, alpha).endVertex();
             BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
@@ -591,7 +632,13 @@ public class RadialMenuHandler
         {
             poseStack.pushPose();
 
-            float color = selected ? 1.0F : 0.1F;
+            int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
+            float alpha = ((color >> 24) & 0xFF) / 255F;
+            float red = ((color >> 16) & 0xFF) / 255F;
+            float green = ((color >> 8) & 0xFF) / 255F;
+            float blue = ((color >> 0) & 0xFF) / 255F;
+
+            float start = left ? -1 : 1;
             float end = (left ? -150F : 150F) * animation;
 
             poseStack.translate((1.0F - animation) * (left ? -20 : 20), 0, 0);
@@ -605,10 +652,25 @@ public class RadialMenuHandler
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             BufferBuilder buffer = Tesselator.getInstance().getBuilder();
             buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            buffer.vertex(poseStack.last().pose(), 0, -15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.vertex(poseStack.last().pose(), 0, 15, 0).color(color, color, color, 0.6F * animation).endVertex();
-            buffer.vertex(poseStack.last().pose(), end, 15, 0).color(color, color, color, 0.0F).endVertex();
-            buffer.vertex(poseStack.last().pose(), end, -15, 0).color(color, color, color, 0.0F).endVertex();
+
+            // Top (offset by 1)
+            buffer.vertex(poseStack.last().pose(), start, -15, 0).color(red, green, blue, alpha * animation).endVertex();
+            buffer.vertex(poseStack.last().pose(), start, -14, 0).color(red, green, blue, alpha * animation).endVertex();
+            buffer.vertex(poseStack.last().pose(), end, -14, 0).color(red, green, blue, 0.0F).endVertex();
+            buffer.vertex(poseStack.last().pose(), end, -15, 0).color(red, green, blue, 0.0F).endVertex();
+
+            // Middle
+            buffer.vertex(poseStack.last().pose(), 0, -14, 0).color(red, green, blue, alpha * animation).endVertex();
+            buffer.vertex(poseStack.last().pose(), 0, 14, 0).color(red, green, blue, alpha * animation).endVertex();
+            buffer.vertex(poseStack.last().pose(), end, 14, 0).color(red, green, blue, 0.0F).endVertex();
+            buffer.vertex(poseStack.last().pose(), end, -14, 0).color(red, green, blue, 0.0F).endVertex();
+
+            // Bottom (offset by 1)
+            buffer.vertex(poseStack.last().pose(), start, 14, 0).color(red, green, blue, alpha * animation).endVertex();
+            buffer.vertex(poseStack.last().pose(), start, 15, 0).color(red, green, blue, alpha * animation).endVertex();
+            buffer.vertex(poseStack.last().pose(), end, 15, 0).color(red, green, blue, 0.0F).endVertex();
+            buffer.vertex(poseStack.last().pose(), end, 14, 0).color(red, green, blue, 0.0F).endVertex();
+
             BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
