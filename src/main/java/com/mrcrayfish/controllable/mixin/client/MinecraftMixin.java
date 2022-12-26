@@ -72,6 +72,7 @@ public class MinecraftMixin
         }
     }
 
+    // Prevents the game from pausing (when losing focus) when a controller is plugged in.
     @Inject(method = "isWindowActive", at = @At(value = "HEAD"), cancellable = true)
     private void isWindowActiveHead(CallbackInfoReturnable<Boolean> cir)
     {
@@ -89,7 +90,7 @@ public class MinecraftMixin
         Minecraft mc = (Minecraft) (Object) this;
         if(mc.getOverlay() == null)
         {
-            if(Config.CLIENT.options.fpsPollingFix.get())
+            if(Config.CLIENT.options.fpsPollingFix.get() && mc.options.framerateLimit().get() < 40)
             {
                 return 260; // To bypass "fps < 260" condition
             }
@@ -103,7 +104,7 @@ public class MinecraftMixin
         Minecraft mc = (Minecraft) (Object) this;
         if(mc.getOverlay() == null)
         {
-            if(Config.CLIENT.options.fpsPollingFix.get())
+            if(Config.CLIENT.options.fpsPollingFix.get() && mc.options.framerateLimit().get() < 40)
             {
                 Controllable.queueInputsWait();
             }
