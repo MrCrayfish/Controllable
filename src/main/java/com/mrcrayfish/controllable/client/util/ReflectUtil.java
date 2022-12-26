@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.util;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -37,6 +38,20 @@ public class ReflectUtil
         {
             e.printStackTrace();
             return -1000000;
+        }
+    }
+
+    public static int getListItemHeight(AbstractSelectionList<?> list)
+    {
+        try
+        {
+            Field field = ObfuscationReflectionHelper.findField(AbstractSelectionList.class, "f_93387_");
+            field.setAccessible(true);
+            return (int) field.get(list);
+        }
+        catch(IllegalAccessException e)
+        {
+            return 10;
         }
     }
 }

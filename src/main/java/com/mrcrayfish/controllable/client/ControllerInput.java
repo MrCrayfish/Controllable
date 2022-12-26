@@ -7,10 +7,7 @@ import com.mojang.math.Vector3d;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
-import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
-import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
-import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
-import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
+import com.mrcrayfish.controllable.client.gui.navigation.*;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.event.ControllerEvent;
@@ -1000,7 +997,7 @@ public class ControllerInput
         int mouseX = (int) (this.mouseX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth());
         int mouseY = (int) (this.mouseY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight());
 
-        List<NavigationPoint> points = this.gatherNavigationPoints(screen);
+        List<NavigationPoint> points = this.gatherNavigationPoints(screen, navigate, mouseX, mouseY);
 
         // Gather any extra navigation points from event
         GatherNavigationPointsEvent event = new GatherNavigationPointsEvent();
@@ -1008,34 +1005,38 @@ public class ControllerInput
         points.addAll(event.getPoints());
 
         // Get only the points that are in the target direction
-        List<NavigationPoint> targetPoints = points.stream().filter(point -> navigate.getPredicate().test(point, mouseX, mouseY)).collect(Collectors.toList());
-        if(targetPoints.isEmpty())
+        points.removeIf(p -> !navigate.getPredicate().test(p, mouseX, mouseY));
+        if(points.isEmpty())
             return;
 
         Vector3d mousePos = new Vector3d(mouseX, mouseY, 0);
-        Optional<NavigationPoint> minimumPointOptional = targetPoints.stream().min(navigate.getMinComparator(mouseX, mouseY));
+        Optional<NavigationPoint> minimumPointOptional = points.stream().min(navigate.getMinComparator(mouseX, mouseY));
         double minimumDelta = navigate.getKeyExtractor().apply(minimumPointOptional.get(), mousePos) + 10;
-        Optional<NavigationPoint> targetPointOptional = targetPoints.stream().filter(point -> navigate.getKeyExtractor().apply(point, mousePos) <= minimumDelta).min(Comparator.comparing(p -> p.distanceTo(mouseX, mouseY)));
+        Optional<NavigationPoint> targetPointOptional = points.stream().filter(point -> navigate.getKeyExtractor().apply(point, mousePos) <= minimumDelta).min(Comparator.comparing(p -> p.distanceTo(mouseX, mouseY)));
         if(targetPointOptional.isPresent())
         {
-            this.performMouseDrag(this.mouseX, this.mouseY, 0, 0);
             NavigationPoint targetPoint = targetPointOptional.get();
-            int screenX = (int) (targetPoint.getX() / ((double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth()));
-            int screenY = (int) (targetPoint.getY() / ((double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight()));
-            double lastTarxpos = this.mouseX;
-            double lastTarypos = this.mouseY;
-            this.mouseX = this.prevMouseX = screenX;
-            this.mouseY = this.prevMouseY = screenY;
-            this.setMousePosition(screenX, screenY);
-            if(Config.CLIENT.options.uiSounds.get())
+            targetPoint.onNavigate();
+            mc.tell(() -> // Run next frame to allow lists to update widget positions
             {
-                mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, 2.0F));
-            }
-            this.performMouseDrag(this.mouseX, this.mouseY, screenX - lastTarxpos, screenY - lastTarypos);
+                this.performMouseDrag(this.mouseX, this.mouseY, 0, 0);
+                int screenX = (int) (targetPoint.getX() / ((double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth()));
+                int screenY = (int) (targetPoint.getY() / ((double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight()));
+                double lastTarxpos = this.mouseX;
+                double lastTarypos = this.mouseY;
+                this.mouseX = this.prevMouseX = screenX;
+                this.mouseY = this.prevMouseY = screenY;
+                this.setMousePosition(screenX, screenY);
+                if(Config.CLIENT.options.uiSounds.get())
+                {
+                    mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, 2.0F));
+                }
+                this.performMouseDrag(this.mouseX, this.mouseY, screenX - lastTarxpos, screenY - lastTarypos);
+            });
         }
     }
 
-    private List<NavigationPoint> gatherNavigationPoints(Screen screen)
+    private List<NavigationPoint> gatherNavigationPoints(Screen screen, Navigate navigate, int mouseX, int mouseY)
     {
         List<NavigationPoint> points = new ArrayList<>();
 
@@ -1063,23 +1064,32 @@ public class ControllerInput
             else if(listener instanceof AbstractSelectionList<?> list)
             {
                 int count = list.children().size();
+                int itemHeight = ReflectUtil.getListItemHeight(list);
                 for(int i = 0; i < count; i++)
                 {
+                    AbstractSelectionList.Entry<?> entry = list.children().get(i);
                     int rowTop = ReflectUtil.getAbstractListRowTop(list, i);
                     int rowBottom = ReflectUtil.getAbstractListRowBottom(list, i);
-                    if(rowTop >= list.getTop() && rowBottom <= list.getBottom()) // Is visible
+                    if(rowTop > list.getTop() - itemHeight && rowBottom < list.getBottom() + itemHeight)
                     {
-                        AbstractSelectionList.Entry<?> entry = list.children().get(i);
+                        if(navigate == Navigate.UP || navigate == Navigate.DOWN)
+                        {
+                            points.add(new ListEntryNavigationPoint(list, entry, i));
+                        }
                         if(entry instanceof ContainerEventHandler handler)
                         {
                             for(GuiEventListener child : handler.children())
                             {
                                 if(child instanceof AbstractWidget widget && widget.active && widget.visible)
                                 {
-                                    widgets.add((AbstractWidget) child);
+                                    points.add(new ListWidgetNavigationPoint(widget, list, entry));
                                 }
                             }
                         }
+                    }
+                    else if(list.isMouseOver(mouseX, mouseY))
+                    {
+                        points.add(new ListEntryNavigationPoint(list, entry, i));
                     }
                 }
             }
