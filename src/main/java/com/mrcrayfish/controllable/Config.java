@@ -71,7 +71,7 @@ public class Config
                     this.sneakMode = builder.comment("The behaviour to use for sneaking. Toggle means to press once to sneak then press again to stand again. Hold means you must hold the sneak button and releasing will make the player stand again.").translation("controllable.config.sneakMode").defineEnum("sneakMode", SneakMode.TOGGLE);
                     this.cursorThumbstick = builder.comment("The thumbstick that controls moving the cursor").translation("controllable.config.cursorThumbstick").defineEnum("cursorThumbstick", Thumbstick.LEFT);
                     this.hoverModifier = builder.comment("The scale of the mouse speed when hovering a widget or item slot").defineInRange("hoverModifier", 0.6, 0.05, 1.0);
-                    this.fpsPollingFix = builder.comment("Enabling this option will improve polling of controllers when your game FPS is capped. This will not have an effect if your game is already running at a low FPS without a cap.").define("fpsPollingFix", false);
+                    this.fpsPollingFix = builder.comment("Enabling this option will improve polling of controllers when your game FPS is capped. This will not have an effect if your game is already running at a low FPS without a cap.").define("fpsPollingFix", true);
                     this.hintBackground = builder.comment("Draws a transparent background behind the text of the button hint").define("hintBackground", true);
                 }
                 builder.pop();
