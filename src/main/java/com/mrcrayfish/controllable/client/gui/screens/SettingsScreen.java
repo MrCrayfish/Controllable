@@ -61,7 +61,7 @@ public class SettingsScreen extends ListMenuScreen
         entries.add(new TitleItem(Component.literal("Display").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
         entries.add(new WidgetRow(ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.CONSOLE_HOTBAR));
         entries.add(new WidgetRow(ControllerOptions.CONTROLLER_ICONS, ControllerOptions.SHOW_ACTIONS));
-        entries.add(new WidgetRow(ControllerOptions.CURSOR_TYPE, null));
+        entries.add(new WidgetRow(ControllerOptions.CURSOR_TYPE, ControllerOptions.HINT_BACKGROUND));
 
         entries.add(new TitleItem(Component.literal("Sounds").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
         entries.add(new WidgetRow(ControllerOptions.UI_SOUNDS));
