@@ -135,16 +135,16 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
             RadialItemList.this.minecraft.font.draw(poseStack, this.label, left + 5, top + 5, 0xFFFFFF);
             RadialItemList.this.minecraft.font.draw(poseStack, this.description, left + 5, top + 18, 0xFFFFFF);
             this.colorButton.visible = RadialItemList.this.getSelected() == this;
-            this.colorButton.x = left + RadialItemList.this.getRowWidth() - 78;
-            this.colorButton.y = top + 6;
+            this.colorButton.setX(left + RadialItemList.this.getRowWidth() - 78);
+            this.colorButton.setY(top + 6);
             this.colorButton.render(poseStack, mouseX, mouseY, partialTicks);
             this.moveUpButton.visible = RadialItemList.this.getSelected() == this;
-            this.moveUpButton.x = left + RadialItemList.this.getRowWidth() - 34;
-            this.moveUpButton.y = top + 6;
+            this.moveUpButton.setX(left + RadialItemList.this.getRowWidth() - 34);
+            this.moveUpButton.setY(top + 6);
             this.moveUpButton.render(poseStack, mouseX, mouseY, partialTicks);
             this.moveDownButton.visible = RadialItemList.this.getSelected() == this;
-            this.moveDownButton.x = left + RadialItemList.this.getRowWidth() - 56;
-            this.moveDownButton.y = top + 6;
+            this.moveDownButton.setX(left + RadialItemList.this.getRowWidth() - 56);
+            this.moveDownButton.setY(top + 6);
             this.moveDownButton.render(poseStack, mouseX, mouseY, partialTicks);
         }
 

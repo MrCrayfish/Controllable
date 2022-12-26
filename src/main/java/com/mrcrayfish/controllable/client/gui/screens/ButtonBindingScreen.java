@@ -9,6 +9,7 @@ import com.mrcrayfish.controllable.client.ISearchable;
 import com.mrcrayfish.controllable.client.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -52,7 +53,7 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
     {
         super.init();
 
-        this.buttonReset = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 32, 100, 20, Component.translatable("controllable.gui.resetBinds"), (button) -> {
+        this.buttonReset = this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 155, this.height - 32, 100, 20, Component.translatable("controllable.gui.resetBinds"), (button) -> {
             this.minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.restore_default_buttons"), result -> {
                 if(result) {
                     BindingRegistry registry = BindingRegistry.getInstance();
@@ -65,11 +66,11 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         }));
         this.buttonReset.active = BindingRegistry.getInstance().getBindings().stream().noneMatch(ButtonBinding::isDefault);
 
-        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 32, 100, 20, Component.translatable("controllable.gui.add_key_bind"), button -> {
+        this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 50, this.height - 32, 100, 20, Component.translatable("controllable.gui.add_key_bind"), button -> {
             Objects.requireNonNull(this.minecraft).setScreen(new SelectKeyBindingScreen(this));
         }));
 
-        this.addRenderableWidget(new Button(this.width / 2 + 55, this.height - 32, 100, 20, CommonComponents.GUI_DONE, (button) -> {
+        this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 55, this.height - 32, 100, 20, CommonComponents.GUI_DONE, (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(this.parent);
             BindingRegistry registry = BindingRegistry.getInstance();
             registry.resetBindingHash();
@@ -191,11 +192,11 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         {
             int color = this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor();
             ButtonBindingScreen.this.minecraft.font.draw(poseStack, this.label, left, y + 6, color);
-            this.bindingButton.x = left + width - 42;
-            this.bindingButton.y = y;
+            this.bindingButton.setX(left + width - 42);
+            this.bindingButton.setY(y);
             this.bindingButton.render(poseStack, mouseX, mouseY, partialTicks);
-            this.deleteButton.x = left + width - 20;
-            this.deleteButton.y = y;
+            this.deleteButton.setX(left + width - 20);
+            this.deleteButton.setY(y);
             this.deleteButton.active = !this.binding.isDefault();
             this.deleteButton.render(poseStack, mouseX, mouseY, partialTicks);
         }

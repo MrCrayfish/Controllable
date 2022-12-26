@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.client.ISearchable;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -34,7 +35,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
     protected void init()
     {
         super.init();
-        this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 29, 150, 20, Component.translatable("controllable.gui.restoreDefaults"), (button) -> {
+        this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 155, this.height - 29, 150, 20, Component.translatable("controllable.gui.restoreDefaults"), (button) -> {
             this.minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     ((RadialMenuConfigureScreen) this.parent).getBindings().clear();
@@ -44,7 +45,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
                 return true;
             }));
         }));
-        this.addRenderableWidget(new Button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_DONE, (button) -> {
+        this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_DONE, (button) -> {
             this.minecraft.setScreen(this.parent);
         }));
     }
@@ -108,11 +109,11 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
         {
             int color = this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor();
             SelectButtonBindingScreen.this.minecraft.font.draw(matrixStack, this.label, left - 15, y + 6, color);
-            this.bindingButton.x = left + width - 37;
-            this.bindingButton.y = y;
+            this.bindingButton.setX(left + width - 37);
+            this.bindingButton.setY(y);
             this.bindingButton.render(matrixStack, mouseX, mouseY, partialTicks);
-            this.deleteButton.x = left + width - 15;
-            this.deleteButton.y = y;
+            this.deleteButton.setX(left + width - 15);
+            this.deleteButton.setY(y);
             this.deleteButton.render(matrixStack, mouseX, mouseY, partialTicks);
         }
     }

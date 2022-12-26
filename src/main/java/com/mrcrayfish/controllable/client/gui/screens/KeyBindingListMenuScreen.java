@@ -161,11 +161,11 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
         public void render(PoseStack matrixStack, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
             KeyBindingListMenuScreen.this.minecraft.font.draw(matrixStack, this.label, left, y + 6, 0xFFFFFF);
-            this.addBinding.x = left + width - 42;
-            this.addBinding.y = y;
+            this.addBinding.setX(left + width - 42);
+            this.addBinding.setY(y);
             this.addBinding.render(matrixStack, mouseX, mouseY, partialTicks);
-            this.removeBinding.x = left + width - 20;
-            this.removeBinding.y = y;
+            this.removeBinding.setX(left + width - 20);
+            this.removeBinding.setY(y);
             this.removeBinding.render(matrixStack, mouseX, mouseY, partialTicks);
         }
 

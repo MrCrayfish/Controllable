@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.gui.screens;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.ControllerManager;
 import com.mrcrayfish.controllable.client.gui.ControllerList;
+import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -34,10 +35,10 @@ public class ControllerSelectionScreen extends Screen
     {
         this.listControllers = new ControllerList(this.manager, this.minecraft, this.width, this.height, 45, this.height - 44, 22);
         this.addWidget(this.listControllers);
-        this.btnSettings = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 32, 72, 20, Component.translatable("controllable.gui.settings"), this::handleSettings));
-        this.btnRemap = this.addRenderableWidget(new Button(this.width / 2 - 76, this.height - 32, 72, 20, Component.translatable("controllable.gui.binding"), this::handleConfigure));
-        this.btnLayout = this.addRenderableWidget(new Button(this.width / 2 + 4, this.height - 32, 72, 20, Component.translatable("controllable.gui.layout"), this::handleLayout));
-        this.btnBack = this.addRenderableWidget(new Button(this.width / 2 + 82, this.height - 32, 72, 20, Component.translatable("controllable.gui.back"), this::handleCancel));
+        this.btnSettings = this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 154, this.height - 32, 72, 20, Component.translatable("controllable.gui.settings"), this::handleSettings));
+        this.btnRemap = this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 76, this.height - 32, 72, 20, Component.translatable("controllable.gui.binding"), this::handleConfigure));
+        this.btnLayout = this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 4, this.height - 32, 72, 20, Component.translatable("controllable.gui.layout"), this::handleLayout));
+        this.btnBack = this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 82, this.height - 32, 72, 20, Component.translatable("controllable.gui.back"), this::handleCancel));
         this.btnRemap.active = this.listControllers.getSelected() != null;
     }
 

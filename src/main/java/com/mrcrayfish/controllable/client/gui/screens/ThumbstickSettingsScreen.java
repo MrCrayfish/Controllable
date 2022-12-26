@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.OptionsList;
 import net.minecraft.client.gui.screens.Screen;
@@ -54,7 +55,7 @@ public class ThumbstickSettingsScreen extends Screen
 
         this.addWidget(this.optionsRowList);
 
-        this.addRenderableWidget(new Button(this.width / 2 - 100, this.height - 27, 200, 20, CommonComponents.GUI_BACK, (button) -> {
+        this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 100, this.height - 27, 200, 20, CommonComponents.GUI_BACK, (button) -> {
             this.minecraft.setScreen(this.layoutScreen);
         }));
     }

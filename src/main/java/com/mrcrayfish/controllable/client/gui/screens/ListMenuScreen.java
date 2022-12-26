@@ -33,7 +33,6 @@ public abstract class ListMenuScreen extends Screen
     protected final int itemHeight;
     protected EntryList list;
     protected List<Item> entries;
-    protected List<FormattedCharSequence> activeTooltip;
     protected FocusedEditBox activeTextField;
     protected FocusedEditBox searchTextField;
     protected Component subTitle;
@@ -118,9 +117,12 @@ public abstract class ListMenuScreen extends Screen
      *
      * @param tooltip a tooltip list to show
      */
-    public void setActiveTooltip(List<FormattedCharSequence> tooltip)
+    public void setActiveTooltip(@Nullable List<FormattedCharSequence> tooltip)
     {
-        this.activeTooltip = tooltip;
+        if(tooltip != null)
+        {
+            this.setTooltipForNextRenderPass(tooltip);
+        }
     }
 
     protected void updateTooltip(int mouseX, int mouseY)
@@ -134,9 +136,6 @@ public abstract class ListMenuScreen extends Screen
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
     {
-        // Resets the active tooltip each draw call
-        this.activeTooltip = null;
-
         // Draws the background texture (dirt or custom texture)
         this.renderBackground(poseStack);
 
@@ -158,23 +157,6 @@ public abstract class ListMenuScreen extends Screen
 
         // Gives a chance for child classes to set the active tooltip
         this.updateTooltip(mouseX, mouseY);
-
-        // Draws the active tooltip otherwise tries to draw button tooltips
-        if(this.activeTooltip != null)
-        {
-            this.renderTooltip(poseStack, this.activeTooltip, mouseX, mouseY);
-        }
-        else
-        {
-            for(GuiEventListener widget : this.children())
-            {
-                if(widget instanceof Button && ((Button) widget).isHoveredOrFocused())
-                {
-                    ((Button) widget).renderToolTip(poseStack, mouseX, mouseY);
-                    break;
-                }
-            }
-        }
     }
 
     @Override
@@ -258,7 +240,8 @@ public abstract class ListMenuScreen extends Screen
                 {
                     if(o instanceof Button)
                     {
-                        ((Button) o).renderToolTip(poseStack, mouseX, mouseY);
+                        //TODO figure out tooltips?
+                        //((Button) o).renderToolTip(poseStack, mouseX, mouseY);
                     }
                 });
             });

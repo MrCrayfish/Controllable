@@ -3,7 +3,6 @@ package com.mrcrayfish.controllable.client;
 import com.mojang.blaze3d.Blaze3D;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3d;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
@@ -13,7 +12,6 @@ import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
 import com.mrcrayfish.controllable.integration.JEIControllablePlugin;
-import com.mrcrayfish.controllable.mixin.client.CreativeModeInventoryScreenMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import net.minecraft.Util;
@@ -48,11 +46,13 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.gui.CreativeTabsScreenPage;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
@@ -934,24 +934,20 @@ public class ControllerInput
 
         try
         {
-            Method method = ObfuscationReflectionHelper.findMethod(CreativeModeInventoryScreen.class, "m_98560_", CreativeModeTab.class);
-            method.setAccessible(true);
-            if(dir > 0)
+            List<CreativeTabsScreenPage> pages = ObfuscationReflectionHelper.getPrivateValue(CreativeModeInventoryScreen.class, screen, "pages");
+            if(pages != null)
             {
-                if(screen.getSelectedTab() < CreativeModeTab.TABS.length - 1)
+                if(dir > 0)
                 {
-                    method.invoke(screen, CreativeModeTab.TABS[screen.getSelectedTab() + 1]);
+                    screen.setCurrentPage(pages.get(Math.min(pages.indexOf(screen.getCurrentPage()) + 1, pages.size() - 1)));
                 }
-            }
-            else if(dir < 0)
-            {
-                if(screen.getSelectedTab() > 0)
+                else if(dir < 0)
                 {
-                    method.invoke(screen, CreativeModeTab.TABS[screen.getSelectedTab() - 1]);
+                    screen.setCurrentPage(pages.get(Math.max(pages.indexOf(screen.getCurrentPage()) - 1, 0)));
                 }
             }
         }
-        catch(IllegalAccessException | InvocationTargetException e)
+        catch(Exception e)
         {
             e.printStackTrace();
         }
@@ -1112,24 +1108,17 @@ public class ControllerInput
         {
             if(widget == null || widget.isHoveredOrFocused() || !widget.visible || !widget.active)
                 continue;
-            int posX = widget.x + widget.getWidth() / 2;
-            int posY = widget.y + widget.getHeight() / 2;
+            int posX = widget.getX() + widget.getWidth() / 2;
+            int posY = widget.getY() + widget.getHeight() / 2;
             points.add(new WidgetNavigationPoint(posX, posY, widget));
         }
 
-        if(screen instanceof CreativeModeInventoryScreen)
+        if(screen instanceof CreativeModeInventoryScreen creativeScreen)
         {
-            int tabPage = CreativeModeInventoryScreenMixin.getTabPage();
-            int start = tabPage * 10;
-            int end = Math.min(CreativeModeTab.TABS.length, ((tabPage + 1) * 10 + 2));
-            for(int i = start; i < end; i++)
-            {
-                CreativeModeTab group = CreativeModeTab.TABS[i];
-                if(group != null)
-                {
-                    points.add(this.getCreativeTabPoint((CreativeModeInventoryScreen) screen, group));
-                }
-            }
+            CreativeTabsScreenPage page = creativeScreen.getCurrentPage();
+            page.getVisibleTabs().forEach(tab -> {
+                points.add(this.getCreativeTabPoint((CreativeModeInventoryScreen) screen, creativeScreen.getCurrentPage(), tab));
+            });
         }
 
         if(Controllable.isJeiLoaded())
@@ -1143,10 +1132,10 @@ public class ControllerInput
     /**
      * Gets the navigation point of a creative tab.
      */
-    private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeModeTab tab)
+    private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeTabsScreenPage page, CreativeModeTab tab)
     {
-        boolean topRow = tab.isTopRow();
-        int column = tab.getColumn();
+        boolean topRow = page.isTop(tab);
+        int column = page.getColumn(tab);
         int width = 28;
         int height = 32;
         int x = screen.getGuiLeft() + width * column;
@@ -1445,8 +1434,8 @@ public class ControllerInput
         LEFT((p, x, y) -> p.getX() < x, (p, v) -> Math.abs(p.getY() - v.y)),
         RIGHT((p, x, y) -> p.getX() > x + 1, (p, v) -> Math.abs(p.getY() - v.y));
 
-        private NavigatePredicate predicate;
-        private BiFunction<? super NavigationPoint, Vector3d, Double> keyExtractor;
+        private final NavigatePredicate predicate;
+        private final BiFunction<? super NavigationPoint, Vector3d, Double> keyExtractor;
 
         Navigate(NavigatePredicate predicate, BiFunction<? super NavigationPoint, Vector3d, Double> keyExtractor)
         {

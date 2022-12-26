@@ -35,7 +35,7 @@ public class ColorButton extends Button
 
     public ColorButton(int x, int y, OnPress onPress)
     {
-        super(x, y, 20, 20, CommonComponents.EMPTY, onPress);
+        super(x, y, 20, 20, CommonComponents.EMPTY, onPress, DEFAULT_NARRATION);
     }
 
     public void setColor(ChatFormatting color)
@@ -65,8 +65,8 @@ public class ColorButton extends Button
         super.renderButton(poseStack, mouseX, mouseY, partialTicks);
         RenderSystem.disableTexture();
         RenderSystem.disableDepthTest();
-        fill(poseStack, this.x + 4, this.y + 4, this.x + 16, this.y + 16, 0xFF000000);
-        fill(poseStack, this.x + 5, this.y + 5, this.x + 15, this.y + 15, COLORS[this.index].getColor() + 0xFF000000);
+        fill(poseStack, this.getX() + 4, this.getY() + 4, this.getX() + 16, this.getY() + 16, 0xFF000000);
+        fill(poseStack, this.getX() + 5, this.getY() + 5, this.getX() + 15, this.getY() + 15, COLORS[this.index].getColor() + 0xFF000000);
         RenderSystem.enableDepthTest();
         RenderSystem.enableTexture();
     }
