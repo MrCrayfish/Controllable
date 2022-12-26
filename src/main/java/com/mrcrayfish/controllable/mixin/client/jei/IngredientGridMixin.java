@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.mixin.client.jei;
 
-import mezz.jei.common.gui.overlay.IngredientGrid;
-import mezz.jei.common.render.IngredientListRenderer;
+import mezz.jei.gui.overlay.IngredientGrid;
+import mezz.jei.gui.overlay.IngredientListRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.gen.Accessor;

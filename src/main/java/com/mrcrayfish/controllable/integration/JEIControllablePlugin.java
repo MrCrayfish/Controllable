@@ -1,18 +1,21 @@
 package com.mrcrayfish.controllable.integration;
 
+import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.mixin.client.jei.*;
-import mezz.jei.common.Internal;
-import mezz.jei.common.gui.PageNavigation;
-import mezz.jei.common.gui.elements.GuiIconButton;
-import mezz.jei.common.gui.elements.GuiIconToggleButton;
-import mezz.jei.common.gui.overlay.IngredientGrid;
-import mezz.jei.common.gui.overlay.IngredientGridWithNavigation;
-import mezz.jei.common.render.IngredientListRenderer;
-import mezz.jei.common.runtime.JeiRuntime;
+import mezz.jei.api.IModPlugin;
+import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.common.util.ImmutableRect2i;
+import mezz.jei.gui.PageNavigation;
+import mezz.jei.gui.elements.GuiIconButton;
+import mezz.jei.gui.elements.GuiIconToggleButton;
+import mezz.jei.gui.overlay.IngredientGrid;
+import mezz.jei.gui.overlay.IngredientGridWithNavigation;
+import mezz.jei.gui.overlay.IngredientListRenderer;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +23,29 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-public class JustEnoughItems
+@JeiPlugin
+public class JEIControllablePlugin implements IModPlugin
 {
+    private static final ResourceLocation ID = new ResourceLocation(Reference.MOD_ID, "jei_plugin");
+
+    private static IJeiRuntime runtime;
+
+    @Override
+    public ResourceLocation getPluginUid()
+    {
+        return ID;
+    }
+
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime runtime)
+    {
+        JEIControllablePlugin.runtime = runtime;
+    }
+
     public static List<NavigationPoint> getNavigationPoints()
     {
         List<NavigationPoint> points = new ArrayList<>();
-        JeiRuntime runtime = Internal.getRuntime().orElse(null);
+        IJeiRuntime runtime = JEIControllablePlugin.runtime;
         if(runtime != null && runtime.getIngredientListOverlay().isListDisplayed())
         {
             // JEI just needs getters, and I wouldn't have to do this mess
@@ -53,3 +73,4 @@ public class JustEnoughItems
         return points;
     }
 }
+

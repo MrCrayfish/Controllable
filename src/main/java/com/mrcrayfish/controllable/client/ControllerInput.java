@@ -12,7 +12,7 @@ import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
-import com.mrcrayfish.controllable.integration.JustEnoughItems;
+import com.mrcrayfish.controllable.integration.JEIControllablePlugin;
 import com.mrcrayfish.controllable.mixin.client.CreativeModeInventoryScreenMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
@@ -63,7 +63,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * Author: MrCrayfish
@@ -1135,7 +1134,7 @@ public class ControllerInput
 
         if(Controllable.isJeiLoaded())
         {
-            points.addAll(JustEnoughItems.getNavigationPoints());
+            points.addAll(JEIControllablePlugin.getNavigationPoints());
         }
 
         return points;

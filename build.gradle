@@ -102,7 +102,7 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.19.2-43.1.34'
     implementation fg.deobf('curse.maven:configured-457570:3903908')
     implementation fg.deobf('curse.maven:catalogue-459701:3873264')
-    implementation fg.deobf('mezz.jei:jei-1.19.2-forge:11.2.0.246')
+    implementation fg.deobf('mezz.jei:jei-1.19.2-forge:11.5.0.297')
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

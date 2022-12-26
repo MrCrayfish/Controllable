@@ -3,7 +3,7 @@ package com.mrcrayfish.controllable.mixin.client.jei;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerInput;
-import mezz.jei.common.input.MouseUtil;
+import mezz.jei.gui.input.MouseUtil;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
