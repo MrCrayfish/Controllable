@@ -680,7 +680,7 @@ public class ControllerInput
             }
             else if(mc.screen == null)
             {
-                if(ButtonBindings.INVENTORY.isButtonPressed() && mc.gameMode != null && mc.player != null)
+                if(ButtonBindings.OPEN_INVENTORY.isButtonPressed() && mc.gameMode != null && mc.player != null)
                 {
                     if(mc.gameMode.isServerControlledInventory())
                     {
@@ -793,7 +793,7 @@ public class ControllerInput
             }
             else
             {
-                if(ButtonBindings.INVENTORY.isButtonPressed())
+                if(ButtonBindings.CLOSE_INVENTORY.isButtonPressed())
                 {
                     if(mc.screen != null)
                     {
