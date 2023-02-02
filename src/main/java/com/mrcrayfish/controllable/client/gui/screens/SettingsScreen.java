@@ -48,25 +48,25 @@ public class SettingsScreen extends ListMenuScreen
     @Override
     protected void constructEntries(List<Item> entries)
     {
-        entries.add(new TitleItem(Component.literal("General").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
-        entries.add(new WidgetRow(ControllerOptions.MOUSE_SPEED));
+        entries.add(new TitleItem(Component.translatable("controllable.gui.title.general").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+        entries.add(new WidgetRow(ControllerOptions.MOUSE_SPEED, ControllerOptions.LIST_SCROLL_SPEED));
         entries.add(new WidgetRow(ControllerOptions.DEAD_ZONE, ControllerOptions.HOVER_MODIFIER));
         entries.add(new WidgetRow(ControllerOptions.RADIAL_THUMBSTICK, ControllerOptions.CURSOR_THUMBSTICK));
 
-        entries.add(new TitleItem(Component.literal("Gameplay").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+        entries.add(new TitleItem(Component.translatable("controllable.gui.title.gameplay").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
         entries.add(new WidgetRow(ControllerOptions.ROTATION_SPEED));
         entries.add(new WidgetRow(ControllerOptions.INVERT_LOOK, ControllerOptions.INVERT_ROTATION));
         entries.add(new WidgetRow(ControllerOptions.QUICK_CRAFT, ControllerOptions.SNEAK_MODE));
 
-        entries.add(new TitleItem(Component.literal("Display").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+        entries.add(new TitleItem(Component.translatable("controllable.gui.title.display").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
         entries.add(new WidgetRow(ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.CONSOLE_HOTBAR));
         entries.add(new WidgetRow(ControllerOptions.CONTROLLER_ICONS, ControllerOptions.SHOW_ACTIONS));
         entries.add(new WidgetRow(ControllerOptions.CURSOR_TYPE, ControllerOptions.HINT_BACKGROUND));
 
-        entries.add(new TitleItem(Component.literal("Sounds").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+        entries.add(new TitleItem(Component.translatable("controllable.gui.title.sounds").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
         entries.add(new WidgetRow(ControllerOptions.UI_SOUNDS));
 
-        entries.add(new TitleItem(Component.literal("Advanced").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+        entries.add(new TitleItem(Component.translatable("controllable.gui.title.advanced").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
         entries.add(new WidgetRow(ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.AUTO_SELECT));
         entries.add(new WidgetRow(ControllerOptions.FPS_POLLING_FIX, null));
     }
