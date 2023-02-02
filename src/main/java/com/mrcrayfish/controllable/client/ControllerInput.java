@@ -436,13 +436,15 @@ public class ControllerInput
         if(mc.screen == null)
         {
             float deadZone = Config.CLIENT.options.deadZone.get().floatValue();
+            float pitchSensitivity = Config.CLIENT.options.pitchSensitivity.get().floatValue();
+            float yawSensitivity = Config.CLIENT.options.yawSensitivity.get().floatValue();
 
             /* Handles rotating the yaw of player */
             if(Math.abs(controller.getRThumbStickXValue()) >= deadZone)
             {
                 this.setControllerInUse();
                 double rotationSpeed = Config.CLIENT.options.rotationSpeed.get();
-                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
+                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed * yawSensitivity, (float) rotationSpeed * pitchSensitivity);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
                     float deadZoneTrimX = (controller.getRThumbStickXValue() > 0 ? 1 : -1) * deadZone;
@@ -454,7 +456,7 @@ public class ControllerInput
             {
                 this.setControllerInUse();
                 double rotationSpeed = Config.CLIENT.options.rotationSpeed.get();
-                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed, (float) rotationSpeed * 0.75F);
+                ControllerEvent.Turn turnEvent = new ControllerEvent.Turn(controller, (float) rotationSpeed * yawSensitivity, (float) rotationSpeed * pitchSensitivity);
                 if(!MinecraftForge.EVENT_BUS.post(turnEvent))
                 {
                     float deadZoneTrimY = (controller.getRThumbStickYValue() > 0 ? 1 : -1) * deadZone;
