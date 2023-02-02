@@ -33,6 +33,7 @@ public class ControllerOptions
     public static final ControllerSetting<CursorType> CURSOR_TYPE = createValuesSetting("controllable.options.cursorType", CursorType.class, Config.CLIENT.options.cursorType);
     public static final ControllerSetting<ControllerIcons> CONTROLLER_ICONS = createValuesSetting("controllable.options.controllerIcons", ControllerIcons.class, Config.CLIENT.options.controllerIcons);
     public static final ControllerSetting<Boolean> INVERT_LOOK = createToggleSetting("controllable.options.invertLook", Config.CLIENT.options.invertLook);
+    public static final ControllerSetting<Boolean> INVERT_ROTATION = createToggleSetting("controllable.options.invertRotation", Config.CLIENT.options.invertRotation);
     public static final ControllerSetting<Double> DEAD_ZONE = createSliderSetting("controllable.options.deadZone", Config.CLIENT.options.deadZone, 0.01);
     public static final ControllerSetting<Double> ROTATION_SPEED = createSliderSetting("controllable.options.rotationSpeed", Config.CLIENT.options.rotationSpeed, 1.0);
     public static final ControllerSetting<Double> MOUSE_SPEED = createSliderSetting("controllable.options.mouseSpeed", Config.CLIENT.options.mouseSpeed, 1.0);

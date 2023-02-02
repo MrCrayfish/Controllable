@@ -36,6 +36,7 @@ public class Config
             public final ForgeConfigSpec.EnumValue<CursorType> cursorType;
             public final ForgeConfigSpec.EnumValue<ControllerIcons> controllerIcons;
             public final ForgeConfigSpec.BooleanValue invertLook;
+            public final ForgeConfigSpec.BooleanValue invertRotation;
             public final ForgeConfigSpec.DoubleValue deadZone;
             public final ForgeConfigSpec.DoubleValue rotationSpeed;
             public final ForgeConfigSpec.DoubleValue mouseSpeed;
@@ -61,6 +62,7 @@ public class Config
                     this.cursorType = builder.comment("The image to use for the cursor. This only applies if virtual mouse is enabled!").defineEnum("cursorType", CursorType.LIGHT);
                     this.controllerIcons = builder.comment("The controller icons to use in game to display actions").defineEnum("controllerIcons", ControllerIcons.DEFAULT);
                     this.invertLook = builder.comment("If enabled, inverts the controls on the Y axis for the camera").define("invertLook", false);
+                    this.invertRotation = builder.comment("If enabled, inverts the controls on the X axis for the camera").define("invertRotation", false);
                     this.deadZone = builder.comment("The distance you have to move the thumbstick before it's input is registered. This fixes drifting as some thumbsticks don't center to zero.").defineInRange("deadZone", 0.15, 0.0, 1.0);
                     this.rotationSpeed = builder.comment("The speed which the camera turns in game").defineInRange("rotationSpeed", 25.0, 0.0, 100.0);
                     this.mouseSpeed = builder.comment("The speed which the cursor or virtual mouse moves around the screen").defineInRange("mouseSpeed", 15.0, 0.0, 50.0);
