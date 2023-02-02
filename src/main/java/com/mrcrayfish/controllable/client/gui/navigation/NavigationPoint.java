@@ -35,6 +35,11 @@ public abstract class NavigationPoint
         return this.type;
     }
 
+    /**
+     * Called when the cursor navigates to this point
+     */
+    public void onNavigate() {}
+
     protected enum Type
     {
         BASIC,
