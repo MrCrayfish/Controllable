@@ -49,6 +49,7 @@ public class Config
             public final ForgeConfigSpec.DoubleValue hoverModifier;
             public final ForgeConfigSpec.BooleanValue fpsPollingFix;
             public final ForgeConfigSpec.BooleanValue hintBackground;
+            public final ForgeConfigSpec.DoubleValue listScrollSpeed;
 
             public Options(ForgeConfigSpec.Builder builder)
             {
@@ -75,6 +76,7 @@ public class Config
                     this.hoverModifier = builder.comment("The scale of the mouse speed when hovering a widget or item slot").defineInRange("hoverModifier", 0.6, 0.05, 1.0);
                     this.fpsPollingFix = builder.comment("Enabling this option will improve polling of controllers when your game FPS is capped. This will not have an effect if your game is already running at a low FPS without a cap.").define("fpsPollingFix", true);
                     this.hintBackground = builder.comment("Draws a transparent background behind the text of the button hint").define("hintBackground", true);
+                    this.listScrollSpeed = builder.comment("The speed that lists scroll").defineInRange("listScrollSpeed", 10.0, 1.0, 30.0);
                 }
                 builder.pop();
             }
