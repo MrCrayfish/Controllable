@@ -39,6 +39,8 @@ public class Config
             public final ForgeConfigSpec.BooleanValue invertRotation;
             public final ForgeConfigSpec.DoubleValue deadZone;
             public final ForgeConfigSpec.DoubleValue rotationSpeed;
+            public final ForgeConfigSpec.DoubleValue pitchSensitivity;
+            public final ForgeConfigSpec.DoubleValue yawSensitivity;
             public final ForgeConfigSpec.DoubleValue mouseSpeed;
             public final ForgeConfigSpec.EnumValue<ActionVisibility> showActions;
             public final ForgeConfigSpec.BooleanValue quickCraft;
@@ -66,6 +68,8 @@ public class Config
                     this.invertRotation = builder.comment("If enabled, inverts the controls on the X axis for the camera").define("invertRotation", false);
                     this.deadZone = builder.comment("The distance you have to move the thumbstick before it's input is registered. This fixes drifting as some thumbsticks don't center to zero.").defineInRange("deadZone", 0.15, 0.0, 1.0);
                     this.rotationSpeed = builder.comment("The speed which the camera turns in game").defineInRange("rotationSpeed", 25.0, 0.0, 100.0);
+                    this.pitchSensitivity = builder.comment("The sensitivity of the camera's pitch rotation when applying the rotation speed. Setting to 1.0 would mean applying 100% of the rotation speed.").defineInRange("pitchSensitivity", 0.75, 0.0, 1.0);
+                    this.yawSensitivity = builder.comment("The sensitivity of the camera's yaw rotation when applying the rotation speed. Setting to 1.0 would mean applying 100% of the rotation speed.").defineInRange("yawSensitivity", 1.0, 0.0, 1.0);
                     this.mouseSpeed = builder.comment("The speed which the cursor or virtual mouse moves around the screen").defineInRange("mouseSpeed", 15.0, 0.0, 50.0);
                     this.showActions = builder.comment("If enabled, shows common actions when displaying available on the screen").defineEnum("showActions", ActionVisibility.MINIMAL);
                     this.quickCraft = builder.comment("If enabled, allows you to craft quickly when clicking an item in the recipe book").define("quickCraft", true);

@@ -54,6 +54,7 @@ public class SettingsScreen extends ListMenuScreen
 
         entries.add(new TitleItem(Component.translatable("controllable.gui.title.gameplay").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
         entries.add(new WidgetRow(ControllerOptions.ROTATION_SPEED));
+        entries.add(new WidgetRow(ControllerOptions.PITCH_SENSITIVITY, ControllerOptions.YAW_SENSITIVITY));
         entries.add(new WidgetRow(ControllerOptions.INVERT_LOOK, ControllerOptions.INVERT_ROTATION));
         entries.add(new WidgetRow(ControllerOptions.QUICK_CRAFT, ControllerOptions.SNEAK_MODE));
 
