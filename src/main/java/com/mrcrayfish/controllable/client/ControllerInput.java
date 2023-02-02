@@ -8,10 +8,11 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.navigation.*;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
-import com.mrcrayfish.controllable.integration.JEIControllablePlugin;
+import com.mrcrayfish.controllable.integration.ControllableJeiPlugin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import net.minecraft.Util;
@@ -56,8 +57,6 @@ import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -1121,9 +1120,9 @@ public class ControllerInput
             });
         }
 
-        if(Controllable.isJeiLoaded())
+        if(Controllable.isJeiLoaded() && ClientHelper.isPlayingGame())
         {
-            points.addAll(JEIControllablePlugin.getNavigationPoints());
+            points.addAll(ControllableJeiPlugin.getNavigationPoints());
         }
 
         return points;
