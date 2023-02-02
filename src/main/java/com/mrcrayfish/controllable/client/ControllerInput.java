@@ -1315,7 +1315,7 @@ public class ControllerInput
             dir = yValue;
         }
         dir *= Minecraft.getInstance().getDeltaFrameTime();
-        list.setScrollAmount(list.getScrollAmount() + dir * 10);
+        list.setScrollAmount(list.getScrollAmount() + dir * Config.CLIENT.options.listScrollSpeed.get());
     }
 
     private void handleMerchantScrolling(MerchantScreen screen, Controller controller)

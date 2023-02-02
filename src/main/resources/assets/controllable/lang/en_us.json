@@ -122,6 +122,8 @@
     "controllable.options.hintBackground": "Hint Background",
     "controllable.options.hintBackground.format": "Hint Background: %s",
     "controllable.options.hintBackground.desc": "Draws a transparent background behind the text of the button hint",
+    "controllable.options.listScrollSpeed": "List Scroll Speed",
+    "controllable.options.listScrollSpeed.desc": "The speed that lists scroll",
     "controllable.controller.default": "Default",
     "controllable.controller.playstation_4": "Playstation 4",
     "controllable.controller.playstation_3": "Playstation 3",

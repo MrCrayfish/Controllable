@@ -50,7 +50,7 @@ public class SettingsScreen extends ListMenuScreen
     protected void constructEntries(List<Item> entries)
     {
         entries.add(new TitleItem(new TextComponent("General").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
-        entries.add(new WidgetRow(ControllerOptions.MOUSE_SPEED));
+        entries.add(new WidgetRow(ControllerOptions.MOUSE_SPEED, ControllerOptions.LIST_SCROLL_SPEED));
         entries.add(new WidgetRow(ControllerOptions.DEAD_ZONE, ControllerOptions.HOVER_MODIFIER));
         entries.add(new WidgetRow(ControllerOptions.RADIAL_THUMBSTICK, ControllerOptions.CURSOR_THUMBSTICK));
 
