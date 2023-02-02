@@ -50,11 +50,11 @@ public class SettingsScreen extends ListMenuScreen
         entries.add(new TitleItem(Component.literal("General").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
         entries.add(new WidgetRow(ControllerOptions.MOUSE_SPEED));
         entries.add(new WidgetRow(ControllerOptions.DEAD_ZONE, ControllerOptions.HOVER_MODIFIER));
-        entries.add(new WidgetRow(ControllerOptions.INVERT_LOOK, ControllerOptions.INVERT_ROTATION));
         entries.add(new WidgetRow(ControllerOptions.RADIAL_THUMBSTICK, ControllerOptions.CURSOR_THUMBSTICK));
 
         entries.add(new TitleItem(Component.literal("Gameplay").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
         entries.add(new WidgetRow(ControllerOptions.ROTATION_SPEED));
+        entries.add(new WidgetRow(ControllerOptions.INVERT_LOOK, ControllerOptions.INVERT_ROTATION));
         entries.add(new WidgetRow(ControllerOptions.QUICK_CRAFT, ControllerOptions.SNEAK_MODE));
 
         entries.add(new TitleItem(Component.literal("Display").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
