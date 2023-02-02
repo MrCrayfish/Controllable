@@ -89,7 +89,7 @@ public class RenderEvents
                     }
                 }
 
-                actionMap.put(ButtonBindings.INVENTORY, new Action(ActionDescriptions.CLOSE_INVENTORY, Action.Side.RIGHT));
+                actionMap.put(ButtonBindings.CLOSE_INVENTORY, new Action(ActionDescriptions.CLOSE_INVENTORY, Action.Side.RIGHT));
             }
             else if(mc.screen == null)
             {
@@ -207,7 +207,7 @@ public class RenderEvents
                         actionMap.put(ButtonBindings.JUMP, new Action(ActionDescriptions.JUMP, Action.Side.LEFT));
                     }
 
-                    actionMap.put(ButtonBindings.INVENTORY, new Action(ActionDescriptions.INVENTORY, Action.Side.LEFT));
+                    actionMap.put(ButtonBindings.OPEN_INVENTORY, new Action(ActionDescriptions.OPEN_INVENTORY, Action.Side.LEFT));
 
                     if(verbose && (!mc.player.getOffhandItem().isEmpty() || !mc.player.containerMenu.getCarried().isEmpty())) //TODO test
                     {

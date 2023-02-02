@@ -25,7 +25,8 @@ public class BindingRegistry
         getInstance().register(ButtonBindings.JUMP);
         getInstance().register(ButtonBindings.SNEAK);
         getInstance().register(ButtonBindings.SPRINT);
-        getInstance().register(ButtonBindings.INVENTORY);
+        getInstance().register(ButtonBindings.OPEN_INVENTORY);
+        getInstance().register(ButtonBindings.CLOSE_INVENTORY);
         getInstance().register(ButtonBindings.SWAP_HANDS);
         getInstance().register(ButtonBindings.DROP_ITEM);
         getInstance().register(ButtonBindings.USE_ITEM);
@@ -48,6 +49,7 @@ public class BindingRegistry
         getInstance().register(ButtonBindings.PICKUP_ITEM);
         getInstance().register(ButtonBindings.QUICK_MOVE);
         getInstance().register(ButtonBindings.SPLIT_STACK);
+        getInstance().register(ButtonBindings.SOCIAL_INTERACTIONS);
         getInstance().register(ButtonBindings.ADVANCEMENTS);
         getInstance().register(ButtonBindings.HIGHLIGHT_PLAYERS);
         getInstance().register(ButtonBindings.CINEMATIC_CAMERA);

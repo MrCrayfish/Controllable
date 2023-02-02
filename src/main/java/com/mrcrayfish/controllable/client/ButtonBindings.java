@@ -10,7 +10,8 @@ public class ButtonBindings
     public static final ButtonBinding JUMP = new ButtonBinding(Buttons.A, "key.jump", "key.categories.movement", KeyConflictContext.IN_GAME);
     public static final ButtonBinding SNEAK = new ButtonBinding(Buttons.RIGHT_THUMB_STICK, "key.sneak", "key.categories.movement", KeyConflictContext.IN_GAME);
     public static final ButtonBinding SPRINT = new ButtonBinding(Buttons.LEFT_THUMB_STICK, "key.sprint", "key.categories.movement", KeyConflictContext.IN_GAME);
-    public static final ButtonBinding INVENTORY = new ButtonBinding(Buttons.Y, "key.inventory", "key.categories.inventory", KeyConflictContext.UNIVERSAL);
+    public static final ButtonBinding OPEN_INVENTORY = new ButtonBinding(Buttons.Y, "controllable.key.openInventory", "key.categories.inventory", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding CLOSE_INVENTORY = new ButtonBinding(Buttons.Y, "controllable.key.closeInventory", "key.categories.inventory", KeyConflictContext.GUI);
     public static final ButtonBinding SWAP_HANDS = new ButtonBinding(Buttons.X, "key.swapOffhand", "key.categories.gameplay", KeyConflictContext.IN_GAME);
     public static final ButtonBinding DROP_ITEM = new ButtonBinding(Buttons.DPAD_DOWN, "key.drop", "key.categories.gameplay", KeyConflictContext.IN_GAME);
     public static final ButtonBinding USE_ITEM = new ButtonBinding(Buttons.LEFT_TRIGGER, "key.use", "key.categories.gameplay", KeyConflictContext.IN_GAME);
@@ -33,7 +34,7 @@ public class ButtonBindings
     public static final ButtonBinding PICKUP_ITEM = new ButtonBinding(Buttons.A, "controllable.key.pickupItem", "key.categories.inventory", KeyConflictContext.GUI);
     public static final ButtonBinding QUICK_MOVE = new ButtonBinding(Buttons.B, "controllable.key.quickMove", "key.categories.inventory", KeyConflictContext.GUI);
     public static final ButtonBinding SPLIT_STACK = new ButtonBinding(Buttons.X, "controllable.key.splitStack", "key.categories.inventory", KeyConflictContext.GUI);
-    //public static final ButtonBinding SOCIAL_INTERACTIONS = new ButtonBinding(-1, "controllable.key.socialInteractions", "key.categories.multiplayer", KeyConflictContext.IN_GAME);
+    public static final ButtonBinding SOCIAL_INTERACTIONS = new ButtonBinding(-1, "key.socialInteractions", "key.categories.multiplayer", KeyConflictContext.IN_GAME);
     public static final ButtonBinding ADVANCEMENTS = new ButtonBinding(-1, "key.advancements", "key.categories.misc", KeyConflictContext.IN_GAME);
     public static final ButtonBinding HIGHLIGHT_PLAYERS = new ButtonBinding(-1, "key.spectatorOutlines", "key.categories.misc", KeyConflictContext.IN_GAME);
     public static final ButtonBinding CINEMATIC_CAMERA = new ButtonBinding(-1, "key.smoothCamera", "key.categories.misc", KeyConflictContext.IN_GAME);
