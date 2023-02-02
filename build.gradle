@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'maven-publish'
 
-version = "0.16.6-1.18.2"
+version = "0.17.0-1.18.2"
 group = "com.mrcrayfish"
 archivesBaseName = "controllable"
 
