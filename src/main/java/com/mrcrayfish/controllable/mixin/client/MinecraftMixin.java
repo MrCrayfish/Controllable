@@ -90,7 +90,7 @@ public class MinecraftMixin
         Minecraft mc = (Minecraft) (Object) this;
         if(mc.getOverlay() == null)
         {
-            if(Config.CLIENT.options.fpsPollingFix.get() && mc.options.framerateLimit().get() < 40)
+            if(Config.CLIENT.options.fpsPollingFix.get() && mc.getFramerateLimit() < 40)
             {
                 return 260; // To bypass "fps < 260" condition
             }
@@ -104,7 +104,7 @@ public class MinecraftMixin
         Minecraft mc = (Minecraft) (Object) this;
         if(mc.getOverlay() == null)
         {
-            if(Config.CLIENT.options.fpsPollingFix.get() && mc.options.framerateLimit().get() < 40)
+            if(Config.CLIENT.options.fpsPollingFix.get() && mc.getFramerateLimit() < 40)
             {
                 Controllable.queueInputsWait();
             }

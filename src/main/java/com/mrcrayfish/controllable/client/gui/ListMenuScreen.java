@@ -3,9 +3,9 @@ package com.mrcrayfish.controllable.client.gui;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.ISearchable;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
@@ -68,7 +68,7 @@ public abstract class ListMenuScreen extends Screen
         this.constructEntries(entries);
         this.entries = ImmutableList.copyOf(entries); //Should this still be immutable?
         this.list = new EntryList(this.entries, this.calculateTop());
-        this.list.setRenderBackground(!isPlayingGame());
+        this.list.setRenderBackground(!ClientHelper.isPlayingGame());
         this.addWidget(this.list);
 
         // Adds a search text field to the top of the screen
@@ -185,11 +185,6 @@ public abstract class ListMenuScreen extends Screen
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    public static boolean isPlayingGame()
-    {
-        return Minecraft.getInstance().player != null;
     }
 
     protected class EntryList extends ContainerObjectSelectionList<Item>

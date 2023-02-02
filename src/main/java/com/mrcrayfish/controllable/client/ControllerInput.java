@@ -9,10 +9,11 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.navigation.*;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
-import com.mrcrayfish.controllable.integration.JustEnoughItems;
+import com.mrcrayfish.controllable.integration.ControllableJeiPlugin;
 import com.mrcrayfish.controllable.mixin.client.CreativeModeInventoryScreenMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentMixin;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
@@ -1128,9 +1129,9 @@ public class ControllerInput
             }
         }
 
-        if(Controllable.isJeiLoaded())
+        if(Controllable.isJeiLoaded() && ClientHelper.isPlayingGame())
         {
-            points.addAll(JustEnoughItems.getNavigationPoints());
+            points.addAll(ControllableJeiPlugin.getNavigationPoints());
         }
 
         return points;
