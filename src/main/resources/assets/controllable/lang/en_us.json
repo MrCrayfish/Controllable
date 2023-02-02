@@ -90,6 +90,8 @@
     "controllable.options.controllerIcons.format": "Icons: %s",
     "controllable.options.invertLook": "Invert Look",
     "controllable.options.invertLook.desc": "If enabled, inverts the controls on the Y axis for the camera",
+    "controllable.options.invertRotation": "Invert Rotation",
+    "controllable.options.invertRotation.desc": "If enabled, inverts the controls on the X axis for the camera",
     "controllable.options.showActions": "Show Actions",
     "controllable.options.showActions.desc": "If enabled, shows common actions when displaying available on the screen",
     "controllable.options.showActions.format": "Show Actions: %s",

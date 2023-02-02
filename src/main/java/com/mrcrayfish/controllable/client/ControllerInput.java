@@ -406,7 +406,7 @@ public class ControllerInput
             float elapsedTicks = Minecraft.getInstance().getDeltaFrameTime();
             if(!RadialMenuHandler.instance().isVisible())
             {
-                player.turn((this.targetYaw / 0.15) * elapsedTicks, (this.targetPitch / 0.15) * (Config.CLIENT.options.invertLook.get() ? -1 : 1) * elapsedTicks);
+                player.turn((this.targetYaw / 0.15) * (Config.CLIENT.options.invertRotation.get() ? -1 : 1) * elapsedTicks, (this.targetPitch / 0.15) * (Config.CLIENT.options.invertLook.get() ? -1 : 1) * elapsedTicks);
             }
             if(player.getVehicle() != null)
             {
