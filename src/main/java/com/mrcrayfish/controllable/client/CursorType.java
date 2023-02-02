@@ -1,37 +1,28 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.client.settings.SettingEnum;
+
 /**
  * Author: MrCrayfish
  */
-public enum CursorType
+public enum CursorType implements SettingEnum
 {
-    LIGHT("light"),
-    DARK("dark"),
-    CONSOLE("console"),
-    LEGACY_LIGHT("legacy_light"),
-    LEGACY_DARK("legacy_dark");
+    LIGHT("controllable.cursor.light"),
+    DARK("controllable.cursor.dark"),
+    CONSOLE("controllable.cursor.console"),
+    LEGACY_LIGHT("controllable.cursor.legacy_light"),
+    LEGACY_DARK("controllable.cursor.legacy_dark");
 
-    private final String id;
+    private final String key;
 
-    CursorType(String id)
+    CursorType(String key)
     {
-        this.id = id;
+        this.key = key;
     }
 
-    public String getId()
+    @Override
+    public String getKey()
     {
-        return this.id;
-    }
-
-    public static CursorType byId(String id)
-    {
-        for(CursorType cursorType : values())
-        {
-            if(cursorType.id.equals(id))
-            {
-                return cursorType;
-            }
-        }
-        return LIGHT;
+        return this.key;
     }
 }

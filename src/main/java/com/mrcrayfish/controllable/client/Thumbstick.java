@@ -1,22 +1,25 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.client.settings.SettingEnum;
+
 /**
  * Author: MrCrayfish
  */
-public enum Thumbstick
+public enum Thumbstick implements SettingEnum
 {
-    LEFT("left"),
-    RIGHT("right");
+    LEFT("controllable.thumbstick.left"),
+    RIGHT("controllable.thumbstick.right");
 
-    private final String id;
+    private final String key;
 
     Thumbstick(String key)
     {
-        this.id = key;
+        this.key = key;
     }
 
-    public String getId()
+    @Override
+    public String getKey()
     {
-        return this.id;
+        return this.key;
     }
 }

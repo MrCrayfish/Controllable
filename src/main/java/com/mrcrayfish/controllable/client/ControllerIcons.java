@@ -1,9 +1,11 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.client.settings.SettingEnum;
+
 /**
  * Author: MrCrayfish
  */
-public enum ControllerIcons
+public enum ControllerIcons implements SettingEnum
 {
     DEFAULT("default"),
     PLAYSTATION_4("playstation_4"),
@@ -15,27 +17,16 @@ public enum ControllerIcons
     GAMECUBE("gamecube"),
     STEAM("steam");
 
-    private final String id;
+    private final String key;
 
-    ControllerIcons(String id)
+    ControllerIcons(String key)
     {
-        this.id = id;
+        this.key = key;
     }
 
-    public String getId()
+    @Override
+    public String getKey()
     {
-        return this.id;
-    }
-
-    public static ControllerIcons byName(String name)
-    {
-        for(ControllerIcons controllerIcons : values())
-        {
-            if(controllerIcons.id.equals(name))
-            {
-                return controllerIcons;
-            }
-        }
-        return DEFAULT;
+        return this.key;
     }
 }

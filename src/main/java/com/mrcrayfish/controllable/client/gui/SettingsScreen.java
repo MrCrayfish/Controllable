@@ -3,8 +3,11 @@ package com.mrcrayfish.controllable.client.gui;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
-import net.minecraft.client.Option;
+import com.mrcrayfish.controllable.client.settings.ControllerSetting;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.TooltipAccessor;
@@ -24,17 +27,6 @@ import java.util.Optional;
  */
 public class SettingsScreen extends ListMenuScreen
 {
-    private static final Option[] OPTIONS = new Option[]{
-            ControllerOptions.AUTO_SELECT, ControllerOptions.RENDER_MINI_PLAYER,
-            ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.CONSOLE_HOTBAR,
-            ControllerOptions.CONTROLLER_ICONS, ControllerOptions.CURSOR_TYPE,
-            ControllerOptions.INVERT_LOOK, ControllerOptions.DEAD_ZONE,
-            ControllerOptions.ROTATION_SPEED, ControllerOptions.MOUSE_SPEED,
-            ControllerOptions.SHOW_ACTIONS, ControllerOptions.QUICK_CRAFT,
-            ControllerOptions.UI_SOUNDS, ControllerOptions.RADIAL_THUMBSTICK,
-            ControllerOptions.SNEAK_MODE, ControllerOptions.CURSOR_THUMBSTICK,
-            ControllerOptions.HOVER_MODIFIER
-    };
     private List<FormattedCharSequence> hoveredTooltip;
     private int hoveredCounter;
 
@@ -57,20 +49,27 @@ public class SettingsScreen extends ListMenuScreen
     @Override
     protected void constructEntries(List<Item> entries)
     {
-        for(int i = 0; i < OPTIONS.length; i += 2)
-        {
-            entries.add(new OptionRowItem(this.getOption(i), this.getOption(i + 1)));
-        }
-    }
+        entries.add(new TitleItem(new TextComponent("General").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+        entries.add(new WidgetRow(ControllerOptions.MOUSE_SPEED));
+        entries.add(new WidgetRow(ControllerOptions.DEAD_ZONE));
+        entries.add(new WidgetRow(ControllerOptions.INVERT_LOOK, ControllerOptions.HOVER_MODIFIER));
+        entries.add(new WidgetRow(ControllerOptions.RADIAL_THUMBSTICK, ControllerOptions.CURSOR_THUMBSTICK));
 
-    @Nullable
-    private Option getOption(int index)
-    {
-        if(index >= 0 && index < OPTIONS.length)
-        {
-            return OPTIONS[index];
-        }
-        return null;
+        entries.add(new TitleItem(new TextComponent("Gameplay").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+        entries.add(new WidgetRow(ControllerOptions.ROTATION_SPEED));
+        entries.add(new WidgetRow(ControllerOptions.QUICK_CRAFT, ControllerOptions.SNEAK_MODE));
+
+        entries.add(new TitleItem(new TextComponent("Display").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+        entries.add(new WidgetRow(ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.CONSOLE_HOTBAR));
+        entries.add(new WidgetRow(ControllerOptions.CONTROLLER_ICONS, ControllerOptions.SHOW_ACTIONS));
+        entries.add(new WidgetRow(ControllerOptions.CURSOR_TYPE, null));
+
+        entries.add(new TitleItem(new TextComponent("Sounds").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+        entries.add(new WidgetRow(ControllerOptions.UI_SOUNDS));
+
+        entries.add(new TitleItem(new TextComponent("Advanced").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+        entries.add(new WidgetRow(ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.AUTO_SELECT));
+        entries.add(new WidgetRow(ControllerOptions.FPS_POLLING_FIX, null));
     }
 
     @Override
@@ -99,7 +98,9 @@ public class SettingsScreen extends ListMenuScreen
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
     {
         super.render(poseStack, mouseX, mouseY, partialTicks);
-        this.hoveredTooltip = this.getHoveredToolTip(mouseX, mouseY);
+        List<FormattedCharSequence> tooltip = this.getHoveredToolTip(mouseX, mouseY);
+        if(this.hoveredTooltip != tooltip || Controllable.isButtonPressed(Buttons.A)) this.hoveredCounter = 0;
+        this.hoveredTooltip = tooltip;
         if(this.hoveredTooltip != null && this.hoveredCounter >= 10)
         {
             this.renderTooltip(poseStack, this.hoveredTooltip, mouseX, mouseY);
@@ -109,7 +110,7 @@ public class SettingsScreen extends ListMenuScreen
     @Nullable
     private List<FormattedCharSequence> getHoveredToolTip(int mouseX, int mouseY)
     {
-        if(this.list.getHovered() instanceof OptionRowItem item)
+        if(this.list.getHovered() instanceof WidgetRow item)
         {
             List<? extends GuiEventListener> listeners = item.children();
             for(GuiEventListener listener : listeners)
@@ -123,17 +124,23 @@ public class SettingsScreen extends ListMenuScreen
         return null;
     }
 
-    public class OptionRowItem extends Item
+    public class WidgetRow extends Item
     {
         private final AbstractWidget optionOne;
         private final AbstractWidget optionTwo;
 
-        public OptionRowItem(Option o1, @Nullable Option o2)
+        public WidgetRow(ControllerSetting<?> leftWidget)
         {
             super(TextComponent.EMPTY);
-            this.optionOne = o1.createButton(SettingsScreen.this.minecraft.options, 0, 0, 150);
-            this.optionTwo = Optional.ofNullable(o2).map(o -> o.createButton(SettingsScreen.this.minecraft.options, 0, 0, 150)).orElse(null);
+            this.optionOne = leftWidget.createWidget(0, 0, 310, 20).get();
+            this.optionTwo = null;
+        }
 
+        public WidgetRow(ControllerSetting<?> leftWidget, @Nullable ControllerSetting<?> rightWidget)
+        {
+            super(TextComponent.EMPTY);
+            this.optionOne = leftWidget.createWidget(0, 0, 150, 20).get();
+            this.optionTwo = Optional.ofNullable(rightWidget).map(o -> o.createWidget(0, 0, 150, 20).get()).orElse(null);
         }
 
         @Override

@@ -1,21 +1,25 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.client.settings.SettingEnum;
+
 /**
  * Author: MrCrayfish
  */
-public enum SneakMode
+public enum SneakMode implements SettingEnum
 {
-    TOGGLE("toggle"), HOLD("hold");
+    TOGGLE("controllable.sneakMode.toggle"),
+    HOLD("controllable.sneakMode.hold");
 
-    private String id;
+    private final String key;
 
-    SneakMode(String id)
+    SneakMode(String key)
     {
-        this.id = id;
+        this.key = key;
     }
 
-    public String getId()
+    @Override
+    public String getKey()
     {
-        return id;
+        return this.key;
     }
 }
