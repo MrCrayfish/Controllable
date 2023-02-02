@@ -316,13 +316,21 @@ public class RenderEvents
                 /* Draw description text */
                 if(side == Action.Side.LEFT)
                 {
-                    mc.font.draw(poseStack, action.getDescription(), x + 18, y + 3, Color.WHITE.getRGB());
+                    if(Config.CLIENT.options.hintBackground.get())
+                    {
+                        Screen.fill(poseStack, x + 18 - 3, y, x + 18 + mc.font.width(action.getDescription()) + 2, y + 13, mc.options.getBackgroundColor(0.5F));
+                    }
+                    mc.font.draw(poseStack, action.getDescription(), x + 18, y + 3, 0xFFFFFFFF);
                     leftIndex++;
                 }
                 else
                 {
                     int width = mc.font.width(action.getDescription());
-                    mc.font.draw(poseStack, action.getDescription(), x - 5 - width, y + 3, Color.WHITE.getRGB());
+                    if(Config.CLIENT.options.hintBackground.get())
+                    {
+                        Screen.fill(poseStack, x - 5 - width - 3, y, x - 5 + 2, y + 13, mc.options.getBackgroundColor(0.5F));
+                    }
+                    mc.font.draw(poseStack, action.getDescription(), x - 5 - width, y + 3, 0xFFFFFFFF);
                     rightIndex++;
                 }
             }
