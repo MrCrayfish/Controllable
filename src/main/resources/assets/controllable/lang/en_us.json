@@ -199,6 +199,8 @@
     "controllable.key.hotbar_slot_7": "Hotbar Slot #7",
     "controllable.key.hotbar_slot_8": "Hotbar Slot #8",
     "controllable.key.hotbar_slot_9": "Hotbar Slot #9",
+    "controllable.key.openInventory": "Open Inventory",
+    "controllable.key.closeInventory": "Close Inventory",
     "controllable.tooltip.craft": "Click to Craft Item",
     "controllable.config.uiSounds": "UI Sounds",
     "controllable.config.radialThumbstick": "Radial Thumbstick",
