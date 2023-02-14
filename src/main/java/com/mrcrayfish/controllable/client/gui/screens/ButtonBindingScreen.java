@@ -3,12 +3,12 @@ package com.mrcrayfish.controllable.client.gui.screens;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.controllable.client.BindingRegistry;
-import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.ISearchable;
-import com.mrcrayfish.controllable.client.KeyAdapterBinding;
+import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -19,10 +19,11 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Author: MrCrayfish
@@ -151,15 +152,19 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
     {
         private final ButtonBinding binding;
         private final Button bindingButton;
-        private final Button deleteButton;
+        private final Button resetButton;
         private final Button removeButton;
 
         protected ButtonBindingItem(ButtonBinding binding)
         {
             super(Component.translatable(binding.getLabelKey()));
             this.binding = binding;
-            this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> ButtonBindingScreen.this.setSelectedBinding(this.binding));
-            this.deleteButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button ->
+            this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> ButtonBindingScreen.this.setSelectedBinding(this.binding), (btn, poseStack, mouseX, mouseY) -> {
+                if(btn.isHoveredOrFocused()) {
+                    ButtonBindingScreen.this.renderComponentTooltip(poseStack, this.getBindingTooltip(binding), mouseX, mouseY);
+                }
+            });
+            this.resetButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button ->
             {
                 binding.reset();
                 BindingRegistry registry = BindingRegistry.getInstance();
@@ -173,6 +178,28 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
             this.removeButton.visible = binding instanceof KeyAdapterBinding;
         }
 
+        private List<Component> getBindingTooltip(ButtonBinding binding)
+        {
+            if(Controllable.getInput().isControllerInUse())
+            {
+                List<Component> components = new ArrayList<>();
+                components.add(Component.translatable("controllable.gui.change_binding", ClientHelper.getButtonComponent(Buttons.A)).withStyle(ChatFormatting.YELLOW));
+                if(binding.getButton() != -1)
+                {
+                    components.add(Component.translatable("controllable.gui.clear_binding", ClientHelper.getButtonComponent(Buttons.X)).withStyle(ChatFormatting.YELLOW));
+                }
+                return components;
+            }
+
+            List<Component> components = new ArrayList<>();
+            components.add(Component.translatable("controllable.gui.change_binding", ClientHelper.getButtonComponent(Buttons.A)).withStyle(ChatFormatting.YELLOW));
+            if(binding.getButton() != -1)
+            {
+                components.add(Component.translatable("controllable.gui.clear_binding", ClientHelper.getButtonComponent(Buttons.X)).withStyle(ChatFormatting.YELLOW));
+            }
+            return components;
+        }
+
         @Override
         public String getLabel()
         {
@@ -182,7 +209,7 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         @Override
         public List<? extends GuiEventListener> children()
         {
-            return ImmutableList.of(this.bindingButton, this.deleteButton);
+            return ImmutableList.of(this.bindingButton, this.resetButton);
         }
 
         @Override
@@ -194,10 +221,10 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
             this.bindingButton.x = left + width - 42;
             this.bindingButton.y = y;
             this.bindingButton.render(poseStack, mouseX, mouseY, partialTicks);
-            this.deleteButton.x = left + width - 20;
-            this.deleteButton.y = y;
-            this.deleteButton.active = !this.binding.isDefault();
-            this.deleteButton.render(poseStack, mouseX, mouseY, partialTicks);
+            this.resetButton.x = left + width - 20;
+            this.resetButton.y = y;
+            this.resetButton.active = !this.binding.isDefault();
+            this.resetButton.render(poseStack, mouseX, mouseY, partialTicks);
         }
 
         @Override

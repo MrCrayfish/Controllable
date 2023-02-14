@@ -29,4 +29,19 @@ public enum ControllerIcons implements SettingEnum
     {
         return this.key;
     }
+
+    public static void main(String[] args)
+    {
+        System.out.print("\"");
+        for(int i = 0; i < values().length * 17; i++)
+        {
+            System.out.print("\\u" + Integer.toHexString((32 + i) | 0x10000).substring(1));
+            if(i > 0 && (i + 1) % 17 == 0)
+            {
+                System.out.print("\",");
+                System.out.println();
+                System.out.print("\"");
+            }
+        }
+    }
 }

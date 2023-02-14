@@ -12,13 +12,18 @@ import net.minecraft.resources.ResourceLocation;
  */
 public class ImageButton extends Button
 {
-    private ResourceLocation texture;
-    private int imageU, imageV;
-    private int imageWidth, imageHeight;
+    private final ResourceLocation texture;
+    private final int imageU, imageV;
+    private final int imageWidth, imageHeight;
 
     public ImageButton(int x, int y, int width, ResourceLocation texture, int imageU, int imageV, int imageWidth, int imageHeight, OnPress onPress)
     {
-        super(x, y, width, 20, CommonComponents.EMPTY, onPress);
+        this(x, y, width, texture, imageU, imageV, imageWidth, imageHeight, onPress, NO_TOOLTIP);
+    }
+
+    public ImageButton(int x, int y, int width, ResourceLocation texture, int imageU, int imageV, int imageWidth, int imageHeight, OnPress onPress, OnTooltip onTooltip)
+    {
+        super(x, y, width, 20, CommonComponents.EMPTY, onPress, onTooltip);
         this.texture = texture;
         this.imageU = imageU;
         this.imageV = imageV;

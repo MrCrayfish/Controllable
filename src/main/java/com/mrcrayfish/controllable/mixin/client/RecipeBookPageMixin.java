@@ -2,6 +2,8 @@ package com.mrcrayfish.controllable.mixin.client;
 
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.Buttons;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.network.chat.Component;
@@ -22,7 +24,7 @@ public class RecipeBookPageMixin
     {
         if(Controllable.getInput().isControllerInUse() && Config.CLIENT.options.quickCraft.get())
         {
-            components.add(Component.translatable("controllable.tooltip.craft").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLUE));
+            components.add(Component.translatable("controllable.tooltip.craft", ClientHelper.getButtonComponent(Buttons.A)).withStyle(ChatFormatting.YELLOW));
         }
         return components;
     }

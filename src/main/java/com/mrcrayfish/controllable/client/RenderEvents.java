@@ -38,6 +38,8 @@ import java.util.Map;
 public class RenderEvents
 {
     public static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Reference.MOD_ID, "textures/gui/buttons.png");
+    public static final int CONTROLLER_BUTTONS_WIDTH = 221;
+    public static final int CONTROLLER_BUTTONS_HEIGHT = 117;
 
     private Map<Integer, Action> actions = new HashMap<>();
     private int selectedRadialIndex = -1;
@@ -309,7 +311,7 @@ public class RenderEvents
 
                 /* Draw buttons icon */
                 PoseStack poseStack = new PoseStack();
-                Screen.blit(poseStack, x, y, texU, texV, size, size, 256, 256);
+                Screen.blit(poseStack, x, y, texU, texV, size, size, CONTROLLER_BUTTONS_WIDTH, CONTROLLER_BUTTONS_HEIGHT);
 
                 /* Draw description text */
                 if(side == Action.Side.LEFT)

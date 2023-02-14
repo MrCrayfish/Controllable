@@ -68,6 +68,8 @@
     "controllable.gui.restore_default_buttons": "Are you sure you want to restore the default configuration?",
     "controllable.gui.reset_keybinds": "Are you sure you want to reset all custom keybinds?",
     "controllable.gui.reset_selected_bindings": "Are you sure you want to restore the default bindings?",
+    "controllable.gui.change_binding": "Press %s to Change",
+    "controllable.gui.clear_binding": "Press %s to Clear",
     "controllable.options.forceFeedback": "Vibration",
     "controllable.options.forceFeedback.desc": "If enabled, some actions will cause the controller to vibrate",
     "controllable.options.autoSelect": "Auto Select",
@@ -201,7 +203,7 @@
     "controllable.key.hotbar_slot_9": "Hotbar Slot #9",
     "controllable.key.openInventory": "Open Inventory",
     "controllable.key.closeInventory": "Close Inventory",
-    "controllable.tooltip.craft": "Click to Craft Item",
+    "controllable.tooltip.craft": "Press %s to Craft Item",
     "controllable.config.uiSounds": "UI Sounds",
     "controllable.config.radialThumbstick": "Radial Thumbstick",
     "key.categories.controllable_custom": "Custom"
