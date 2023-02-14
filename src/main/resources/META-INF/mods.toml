@@ -46,4 +46,5 @@ description="Adds the ability to use a controller to play Minecraft"
 
 [modproperties.controllable]
    catalogueImageIcon="controllable_icon.png"
+   catalogueBackground="controllable_background.png"
    configuredBackground="minecraft:textures/block/cobblestone.png"
