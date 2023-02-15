@@ -2,6 +2,8 @@ package com.mrcrayfish.controllable.client.settings;
 
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.apache.commons.lang3.tuple.Pair;
@@ -9,6 +11,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
+import java.util.function.Supplier;
 
 /**
  * Author: MrCrayfish
@@ -44,7 +47,8 @@ public class ControllerOptions
     public static final ControllerSetting<Double> HOVER_MODIFIER = createSliderSetting("controllable.options.hoverModifier", Config.CLIENT.options.hoverModifier, 0.05);
     public static final ControllerSetting<ActionVisibility> SHOW_ACTIONS = createValuesSetting("controllable.options.showActions", ActionVisibility.class, Config.CLIENT.options.showActions);
     public static final ControllerSetting<Thumbstick> RADIAL_THUMBSTICK = createValuesSetting("controllable.options.radialThumbstick", Thumbstick.class, Config.CLIENT.options.radialThumbstick);
-    public static final ControllerSetting<SneakMode> SNEAK_MODE = createValuesSetting("controllable.options.sneakMode", SneakMode.class, Config.CLIENT.options.sneakMode);
+    public static final VanillaSetting<Boolean> SNEAK_MODE = createVanillaSetting(() -> Minecraft.getInstance().options.toggleCrouch());
+    public static final VanillaSetting<Boolean> SPRINT_MODE = createVanillaSetting(() -> Minecraft.getInstance().options.toggleSprint());
     public static final ControllerSetting<Thumbstick> CURSOR_THUMBSTICK = createValuesSetting("controllable.options.cursorThumbstick", Thumbstick.class, Config.CLIENT.options.cursorThumbstick);
     public static final ControllerSetting<Boolean> FPS_POLLING_FIX = createToggleSetting("controllable.options.fpsPollingFix", Config.CLIENT.options.fpsPollingFix);
     public static final ControllerSetting<Boolean> HINT_BACKGROUND = createToggleSetting("controllable.options.hintBackground", Config.CLIENT.options.hintBackground);
@@ -67,6 +71,11 @@ public class ControllerOptions
         Pair<Object, Object> minMax = getMinMax(spec.getRange());
         if(minMax == null) throw new IllegalArgumentException("Invalid config value for slider. Can only be of type Double or Integer");
         return new ControllerSliderSetting(key, configValue, (double) minMax.getLeft(), (double) minMax.getRight(), stepSize);
+    }
+
+    public static <T> VanillaSetting<T> createVanillaSetting(Supplier<OptionInstance<T>> optionSupplier)
+    {
+        return new VanillaSetting<>(optionSupplier);
     }
 
     @Nullable

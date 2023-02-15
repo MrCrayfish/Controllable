@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 /**
  * Author: MrCrayfish
  */
-public abstract class ControllerSetting<T>
+public abstract class ControllerSetting<T> implements SettingProvider
 {
     protected final Component label;
     @Nullable
@@ -25,6 +25,4 @@ public abstract class ControllerSetting<T>
         this.tooltip = I18n.exists(key + ".desc") ? Tooltip.create(Component.translatable(key + ".desc")) : null;
         this.configValue = configValue;
     }
-
-    public abstract Supplier<AbstractWidget> createWidget(int x, int y, int width, int height);
 }
