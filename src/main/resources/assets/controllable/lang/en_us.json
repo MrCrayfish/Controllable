@@ -136,6 +136,7 @@
     "controllable.options.listScrollSpeed": "List Scroll Speed",
     "controllable.options.listScrollSpeed.desc": "The speed that lists scroll",
     "controllable.controller.default": "Default",
+    "controllable.controller.playstation_5": "Playstation 5",
     "controllable.controller.playstation_4": "Playstation 4",
     "controllable.controller.playstation_3": "Playstation 3",
     "controllable.controller.xbox_one": "Xbox One",
