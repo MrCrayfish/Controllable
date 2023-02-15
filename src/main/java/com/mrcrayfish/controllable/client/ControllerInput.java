@@ -559,7 +559,7 @@ public class ControllerInput
             this.keyboardSneaking = false;
         }
 
-        if(Config.CLIENT.options.sneakMode.get() == SneakMode.HOLD)
+        if(!mc.options.toggleCrouch().get())
         {
             this.sneaking = ButtonBindings.SNEAK.isButtonDown();
         }
@@ -712,9 +712,19 @@ public class ControllerInput
                 {
                     if(mc.player != null && !mc.player.getAbilities().flying && !this.isFlying && !mc.player.isPassenger())
                     {
-                        if(Config.CLIENT.options.sneakMode.get() == SneakMode.TOGGLE)
+                        if(mc.options.toggleCrouch().get())
                         {
                             this.sneaking = !this.sneaking;
+                            if(!this.sneaking && mc.options.keyShift.isDown())
+                            {
+                                this.keyboardSneaking = false;
+                                mc.options.keyShift.setDown(true);
+                            }
+                            else if(this.sneaking && !mc.options.keyShift.isDown())
+                            {
+                                this.keyboardSneaking = true;
+                                mc.options.keyShift.setDown(true);
+                            }
                         }
                     }
                 }

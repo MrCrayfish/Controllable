@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
 import com.mrcrayfish.controllable.client.settings.ControllerSetting;
+import com.mrcrayfish.controllable.client.settings.SettingProvider;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -57,7 +58,8 @@ public class SettingsScreen extends ListMenuScreen
         entries.add(new WidgetRow(ControllerOptions.ROTATION_SPEED));
         entries.add(new WidgetRow(ControllerOptions.PITCH_SENSITIVITY, ControllerOptions.YAW_SENSITIVITY));
         entries.add(new WidgetRow(ControllerOptions.INVERT_LOOK, ControllerOptions.INVERT_ROTATION));
-        entries.add(new WidgetRow(ControllerOptions.QUICK_CRAFT, ControllerOptions.SNEAK_MODE));
+        entries.add(new WidgetRow(ControllerOptions.SNEAK_MODE, ControllerOptions.SPRINT_MODE));
+        entries.add(new WidgetRow(ControllerOptions.QUICK_CRAFT, null));
 
         entries.add(new TitleItem(Component.translatable("controllable.gui.title.display").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
         entries.add(new WidgetRow(ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.CONSOLE_HOTBAR));
@@ -141,14 +143,14 @@ public class SettingsScreen extends ListMenuScreen
         private final AbstractWidget optionOne;
         private final AbstractWidget optionTwo;
 
-        public WidgetRow(ControllerSetting<?> leftWidget)
+        public WidgetRow(SettingProvider leftWidget)
         {
             super(CommonComponents.EMPTY);
             this.optionOne = leftWidget.createWidget(0, 0, 310, 20).get();
             this.optionTwo = null;
         }
 
-        public WidgetRow(ControllerSetting<?> leftWidget, @Nullable ControllerSetting<?> rightWidget)
+        public WidgetRow(SettingProvider leftWidget, @Nullable SettingProvider rightWidget)
         {
             super(CommonComponents.EMPTY);
             this.optionOne = leftWidget.createWidget(0, 0, 150, 20).get();

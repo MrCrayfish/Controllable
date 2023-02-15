@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 /**
  * Author: MrCrayfish
  */
-public abstract class ControllerSetting<T>
+public abstract class ControllerSetting<T> implements SettingProvider
 {
     protected final Component label;
     protected final List<FormattedCharSequence> tooltip;
@@ -26,6 +26,4 @@ public abstract class ControllerSetting<T>
         this.tooltip = I18n.exists(key + ".desc") ? Minecraft.getInstance().font.split(Component.translatable(key + ".desc"), 200) : Collections.emptyList();
         this.configValue = configValue;
     }
-
-    public abstract Supplier<AbstractWidget> createWidget(int x, int y, int width, int height);
 }
