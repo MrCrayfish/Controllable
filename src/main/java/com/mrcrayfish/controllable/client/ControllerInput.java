@@ -37,6 +37,7 @@ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.inventory.RecipeBookMenu;
@@ -698,7 +699,16 @@ public class ControllerInput
                 {
                     if(mc.player != null)
                     {
-                        mc.player.setSprinting(true);
+                        LocalPlayer player = mc.player;
+                        boolean canSprint = !player.isSprinting() && !player.hasEffect(MobEffects.BLINDNESS);
+                        boolean hasRequiredFood = (float) player.getFoodData().getFoodLevel() > 6.0F || player.getAbilities().mayfly;
+                        boolean hasImpulse = player.isUnderWater() ? player.input.hasForwardImpulse() : (double) player.input.forwardImpulse >= 0.8D;
+                        boolean canSwimInFluid = !(player.isInWater() || player.isInFluidType((fluidType, height) -> player.canSwimInFluidType(fluidType))) || (player.isUnderWater() || player.canStartSwimming());
+                        boolean usingItem = player.isUsingItem();
+                        if(canSprint && canSwimInFluid && hasImpulse && hasRequiredFood && !usingItem)
+                        {
+                            player.setSprinting(true);
+                        }
                     }
                 }
                 else if(ButtonBindings.SNEAK.isButtonPressed())
