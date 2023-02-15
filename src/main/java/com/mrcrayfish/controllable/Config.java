@@ -62,7 +62,7 @@ public class Config
                     this.renderMiniPlayer = builder.comment("If enabled, the player will render in the top left corner likes Bedrock Edition").define("renderMiniPlayer", true);
                     this.virtualMouse = builder.comment("If enabled, the game will use a virtual cursor instead of the real cursor. This must be turned on to be able to run multiple instances!").define("virtualMouse", true);
                     this.consoleHotbar = builder.comment("If enabled, hotbar will render closer to the center of the screen like on console.").define("consoleHotbar", false);
-                    this.cursorType = builder.comment("The image to use for the cursor. This only applies if virtual mouse is enabled!").defineEnum("cursorType", CursorType.LIGHT);
+                    this.cursorType = builder.comment("The image to use for the cursor. This only applies if virtual mouse is enabled!").defineEnum("cursorType", CursorType.CONSOLE);
                     this.controllerIcons = builder.comment("The controller icons to use in game to display actions").defineEnum("controllerIcons", ControllerIcons.DEFAULT);
                     this.invertLook = builder.comment("If enabled, inverts the controls on the Y axis for the camera").define("invertLook", false);
                     this.invertRotation = builder.comment("If enabled, inverts the controls on the X axis for the camera").define("invertRotation", false);
