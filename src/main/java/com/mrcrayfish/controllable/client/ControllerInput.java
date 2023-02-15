@@ -590,6 +590,7 @@ public class ControllerInput
             if((!RadialMenuHandler.instance().isVisible() || Config.CLIENT.options.radialThumbstick.get() != Thumbstick.LEFT) && !MinecraftForge.EVENT_BUS.post(new ControllerEvent.Move(controller)))
             {
                 float deadZone = Config.CLIENT.options.deadZone.get().floatValue();
+                float sneakBonus = player.isMovingSlowly() ? Mth.clamp(0.3F + EnchantmentHelper.getSneakingSpeedBonus(player), 0.0F, 1.0F) : 1.0F;
 
                 if(Math.abs(controller.getLThumbStickYValue()) >= deadZone)
                 {
@@ -598,6 +599,7 @@ public class ControllerInput
                     event.getInput().up = dir > 0;
                     event.getInput().down = dir < 0;
                     event.getInput().forwardImpulse = dir * Mth.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
+                    event.getInput().forwardImpulse *= sneakBonus;
                 }
 
                 if(player.getVehicle() instanceof Boat)
@@ -612,6 +614,7 @@ public class ControllerInput
                     event.getInput().right = dir < 0;
                     event.getInput().left = dir > 0;
                     event.getInput().leftImpulse = dir * Mth.clamp((Math.abs(controller.getLThumbStickXValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
+                    event.getInput().leftImpulse *= sneakBonus;
                 }
             }
 
@@ -629,14 +632,6 @@ public class ControllerInput
         if(ButtonBindings.USE_ITEM.isButtonDown() && mc.rightClickDelay == 0 && !mc.player.isUsingItem())
         {
             mc.startUseItem();
-        }
-
-        // Applies the sneaking bonus when player has Swift Sneak enchantments on boots
-        float sneakBonus = Mth.clamp(0.3F + EnchantmentHelper.getSneakingSpeedBonus(player), 0.0F, 1.0F);
-        if(player.isMovingSlowly())
-        {
-            event.getInput().forwardImpulse *= sneakBonus;
-            event.getInput().leftImpulse *= sneakBonus;
         }
     }
 
