@@ -39,7 +39,7 @@ public class RenderEvents
 {
     public static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Reference.MOD_ID, "textures/gui/buttons.png");
     public static final int CONTROLLER_BUTTONS_WIDTH = 221;
-    public static final int CONTROLLER_BUTTONS_HEIGHT = 117;
+    public static final int CONTROLLER_BUTTONS_HEIGHT = 130;
 
     private Map<Integer, Action> actions = new HashMap<>();
     private int selectedRadialIndex = -1;

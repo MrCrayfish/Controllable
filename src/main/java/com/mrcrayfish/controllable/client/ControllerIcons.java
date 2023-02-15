@@ -8,6 +8,7 @@ import com.mrcrayfish.controllable.client.settings.SettingEnum;
 public enum ControllerIcons implements SettingEnum
 {
     DEFAULT("controllable.controller.default"),
+    PLAYSTATION_5("controllable.controller.playstation_5"),
     PLAYSTATION_4("controllable.controller.playstation_4"),
     PLAYSTATION_3("controllable.controller.playstation_3"),
     XBOX_ONE("controllable.controller.xbox_one"),
