@@ -42,6 +42,6 @@ public class ButtonBindingButton extends Button
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, RenderEvents.CONTROLLER_BUTTONS);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        this.blit(poseStack, this.getX() + (this.width - size) / 2 + 1, this.getY() + 3, texU, texV, size, size);
+        blit(poseStack, this.getX() + (this.width - size) / 2 + 1, this.getY() + 3, texU, texV, size, size, RenderEvents.CONTROLLER_BUTTONS_WIDTH, RenderEvents.CONTROLLER_BUTTONS_HEIGHT);
     }
 }
