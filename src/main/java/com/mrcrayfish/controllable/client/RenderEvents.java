@@ -5,18 +5,28 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Reference;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.event.GatherActionsEvent;
 import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
 import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
+import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
+import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
+import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -24,12 +34,14 @@ import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.client.event.ContainerScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,8 +67,7 @@ public class RenderEvents
             Map<ButtonBinding, Action> actionMap = new LinkedHashMap<>();
 
             ActionVisibility visibility = Config.CLIENT.options.showActions.get();
-            if(visibility == ActionVisibility.NONE)
-                return;
+            if(visibility == ActionVisibility.NONE) return;
 
             boolean verbose = visibility == ActionVisibility.ALL;
 
@@ -240,12 +251,10 @@ public class RenderEvents
     @SubscribeEvent
     public void onRenderScreen(TickEvent.RenderTickEvent event)
     {
-        if(event.phase != TickEvent.Phase.END)
-            return;
+        if(event.phase != TickEvent.Phase.END) return;
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.options.hideGui)
-            return;
+        if(mc.options.hideGui) return;
 
         if(Controllable.getController() != null)
         {
@@ -281,7 +290,7 @@ public class RenderEvents
             {
                 Action action = this.actions.get(button);
                 Action.Side side = action.getSide();
-                
+
                 if(mc.options.showSubtitles().get() && mc.screen == null)
                 {
                     side = Action.Side.LEFT;
@@ -306,8 +315,7 @@ public class RenderEvents
                 RenderSystem.setShaderTexture(0, CONTROLLER_BUTTONS);
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-                if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2)
-                    continue;
+                if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2) continue;
 
                 /* Draw buttons icon */
                 PoseStack poseStack = new PoseStack();
@@ -334,8 +342,7 @@ public class RenderEvents
 
     private void drawHintBackground(PoseStack poseStack, int x, int y, int width, int height)
     {
-        if(!Config.CLIENT.options.hintBackground.get())
-            return;
+        if(!Config.CLIENT.options.hintBackground.get()) return;
 
         Minecraft mc = Minecraft.getInstance();
         int backgroundColor = mc.options.getBackgroundColor(0.5F);
@@ -352,6 +359,40 @@ public class RenderEvents
             if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
             {
                 InventoryScreen.renderEntityInInventory(20, 45, 20, 0, 0, mc.player);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRenderBackground(ContainerScreenEvent.Render.Background event)
+    {
+        if(event.getContainerScreen() instanceof RecipeUpdateListener listener)
+        {
+            RecipeBookComponent recipeBook = listener.getRecipeBookComponent();
+            if(!recipeBook.isVisible())
+                return;
+
+            Font font = Minecraft.getInstance().font;
+
+            List<RecipeBookTabButton> tabButtons = ((RecipeBookComponentAccessor) recipeBook).getTabButtons();
+            if(!tabButtons.isEmpty())
+            {
+                RecipeBookTabButton first = tabButtons.get(0);
+                RecipeBookTabButton last = tabButtons.get(tabButtons.size() - 1);
+                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.NEXT_RECIPE_TAB.getButton()), first.x + 15 - 5, first.y - 13, 0xFFFFFF);
+                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.x + 15 - 5, last.y + last.getHeight() + 13 - 9, 0xFFFFFF);
+            }
+
+            RecipeBookPage page = ((RecipeBookComponentAccessor) recipeBook).getRecipeBookPage();
+            StateSwitchingButton forwardButton = ((RecipeBookPageAccessor) page).getForwardButton();
+            if(forwardButton.visible)
+            {
+                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.x + 24 - 5, forwardButton.y + 4, 0xFFFFFF);
+            }
+            StateSwitchingButton backButton = ((RecipeBookPageAccessor) page).getBackButton();
+            if(backButton.visible)
+            {
+                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.x - 24 + 12 - 5, backButton.y + 4, 0xFFFFFF);
             }
         }
     }
