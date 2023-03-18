@@ -14,7 +14,7 @@
         "client.MinecraftMixin",
         "client.MouseHelperMixin",
         "client.OptifineGameRendererMixin",
-        "client.RecipeBookComponentMixin",
+        "client.RecipeBookComponentAccessor",
         "client.RecipeBookPageAccessor",
         "client.RecipeBookPageMixin",
         "client.jei.GuiIconToggleButtonMixin",

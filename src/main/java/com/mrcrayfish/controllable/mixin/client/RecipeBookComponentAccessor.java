@@ -14,7 +14,7 @@ import java.util.List;
  * Author: MrCrayfish
  */
 @Mixin(RecipeBookComponent.class)
-public interface RecipeBookComponentMixin
+public interface RecipeBookComponentAccessor
 {
     @Accessor("filterButton")
     StateSwitchingButton getFilterButton();
@@ -33,4 +33,7 @@ public interface RecipeBookComponentMixin
 
     @Invoker("updateCollections")
     void invokeUpdateCollections(boolean resetPages);
+
+    @Accessor("tabButtons")
+    List<RecipeBookTabButton> getTabButtons();
 }

@@ -13,7 +13,7 @@ import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.event.ControllerEvent;
 import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
 import com.mrcrayfish.controllable.integration.ControllableJeiPlugin;
-import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentMixin;
+import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import net.minecraft.Util;
 import net.minecraft.client.CameraType;
@@ -220,9 +220,9 @@ public class ControllerInput
                     RecipeBookComponent recipeBook = ((RecipeUpdateListener) mc.screen).getRecipeBookComponent();
                     if(recipeBook.isVisible())
                     {
-                        eventListeners.add(((RecipeBookComponentMixin) recipeBook).getFilterButton());
-                        eventListeners.addAll(((RecipeBookComponentMixin) recipeBook).getRecipeTabs());
-                        RecipeBookPage recipeBookPage = ((RecipeBookComponentMixin) recipeBook).getRecipeBookPage();
+                        eventListeners.add(((RecipeBookComponentAccessor) recipeBook).getFilterButton());
+                        eventListeners.addAll(((RecipeBookComponentAccessor) recipeBook).getRecipeTabs());
+                        RecipeBookPage recipeBookPage = ((RecipeBookComponentAccessor) recipeBook).getRecipeBookPage();
                         eventListeners.addAll(((RecipeBookPageAccessor) recipeBookPage).getButtons());
                         eventListeners.add(((RecipeBookPageAccessor) recipeBookPage).getForwardButton());
                         eventListeners.add(((RecipeBookPageAccessor) recipeBookPage).getBackButton());
@@ -973,7 +973,7 @@ public class ControllerInput
     {
         if(!recipeBook.isVisible())
             return;
-        RecipeBookComponentMixin recipeBookMixin = ((RecipeBookComponentMixin) recipeBook);
+        RecipeBookComponentAccessor recipeBookMixin = ((RecipeBookComponentAccessor) recipeBook);
         RecipeBookTabButton currentTab = recipeBookMixin.getCurrentTab();
         List<RecipeBookTabButton> tabs = recipeBookMixin.getRecipeTabs();
         int nextTabIndex = tabs.indexOf(currentTab) + dir;
@@ -992,7 +992,7 @@ public class ControllerInput
     {
         if(!recipeBook.isVisible())
             return;
-        RecipeBookPageAccessor page = (RecipeBookPageAccessor)((RecipeBookComponentMixin) recipeBook).getRecipeBookPage();
+        RecipeBookPageAccessor page = (RecipeBookPageAccessor)((RecipeBookComponentAccessor) recipeBook).getRecipeBookPage();
         if(dir > 0 && page.getForwardButton().visible || dir < 0 && page.getBackButton().visible)
         {
             int currentPage = page.getCurrentPage();
@@ -1111,9 +1111,9 @@ public class ControllerInput
             RecipeBookComponent recipeBook = ((RecipeUpdateListener) screen).getRecipeBookComponent();
             if(recipeBook.isVisible())
             {
-                widgets.add(((RecipeBookComponentMixin) recipeBook).getFilterButton());
-                widgets.addAll(((RecipeBookComponentMixin) recipeBook).getRecipeTabs());
-                RecipeBookPage recipeBookPage = ((RecipeBookComponentMixin) recipeBook).getRecipeBookPage();
+                widgets.add(((RecipeBookComponentAccessor) recipeBook).getFilterButton());
+                widgets.addAll(((RecipeBookComponentAccessor) recipeBook).getRecipeTabs());
+                RecipeBookPage recipeBookPage = ((RecipeBookComponentAccessor) recipeBook).getRecipeBookPage();
                 widgets.addAll(((RecipeBookPageAccessor) recipeBookPage).getButtons());
                 widgets.add(((RecipeBookPageAccessor) recipeBookPage).getForwardButton());
                 widgets.add(((RecipeBookPageAccessor) recipeBookPage).getBackButton());
@@ -1176,7 +1176,7 @@ public class ControllerInput
         if(!(screen.getMenu() instanceof RecipeBookMenu<?>))
             return;
 
-        RecipeBookPage recipeBookPage = ((RecipeBookComponentMixin) listener.getRecipeBookComponent()).getRecipeBookPage();
+        RecipeBookPage recipeBookPage = ((RecipeBookComponentAccessor) listener.getRecipeBookComponent()).getRecipeBookPage();
         RecipeButton recipeButton = ((RecipeBookPageAccessor) recipeBookPage).getButtons().stream().filter(RecipeButton::isHoveredOrFocused).findFirst().orElse(null);
         if(recipeButton != null)
         {
