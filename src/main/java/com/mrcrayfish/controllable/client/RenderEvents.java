@@ -366,6 +366,9 @@ public class RenderEvents
     @SubscribeEvent
     public void onRenderBackground(ContainerScreenEvent.Render.Background event)
     {
+        if(!Controllable.getInput().isControllerInUse())
+            return;
+
         if(event.getContainerScreen() instanceof RecipeUpdateListener listener)
         {
             RecipeBookComponent recipeBook = listener.getRecipeBookComponent();
