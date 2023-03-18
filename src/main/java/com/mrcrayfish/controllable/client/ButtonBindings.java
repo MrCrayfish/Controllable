@@ -51,4 +51,5 @@ public class ButtonBindings
     public static final ButtonBinding HOTBAR_SLOT_8 = new ButtonBinding(-1, "controllable.key.hotbar_slot_8", "key.categories.misc", KeyConflictContext.IN_GAME);
     public static final ButtonBinding HOTBAR_SLOT_9 = new ButtonBinding(-1, "controllable.key.hotbar_slot_9", "key.categories.misc", KeyConflictContext.IN_GAME);
     public static final ButtonBinding[] HOTBAR_SLOTS = {HOTBAR_SLOT_1, HOTBAR_SLOT_2, HOTBAR_SLOT_3, HOTBAR_SLOT_4, HOTBAR_SLOT_5, HOTBAR_SLOT_6, HOTBAR_SLOT_7, HOTBAR_SLOT_8, HOTBAR_SLOT_9};
+    public static final ButtonBinding TOGGLE_CRAFT_BOOK = new ButtonBinding(Buttons.LEFT_THUMB_STICK, "controllable.key.toggleCraftBook", "key.categories.inventory", KeyConflictContext.GUI);
 }
