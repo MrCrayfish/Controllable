@@ -204,6 +204,7 @@
     "controllable.key.hotbar_slot_9": "Hotbar Slot #9",
     "controllable.key.openInventory": "Open Inventory",
     "controllable.key.closeInventory": "Close Inventory",
+    "controllable.key.toggleCraftBook": "Toggle Craft Book",
     "controllable.tooltip.more_recipes": "Press %s to View More",
     "controllable.tooltip.craft": "Press %s to Craft Item",
     "controllable.config.uiSounds": "UI Sounds",
