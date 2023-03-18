@@ -15,6 +15,7 @@ import com.mrcrayfish.controllable.event.ControllerEvent;
 import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
 import com.mrcrayfish.controllable.integration.ControllableJeiPlugin;
 import com.mrcrayfish.controllable.mixin.client.CreativeModeInventoryScreenMixin;
+import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import net.minecraft.Util;
@@ -1119,10 +1120,20 @@ public class ControllerInput
             {
                 widgets.add(((RecipeBookComponentAccessor) recipeBook).getFilterButton());
                 widgets.addAll(((RecipeBookComponentAccessor) recipeBook).getRecipeTabs());
-                RecipeBookPage recipeBookPage = ((RecipeBookComponentAccessor) recipeBook).getRecipeBookPage();
-                widgets.addAll(((RecipeBookPageAccessor) recipeBookPage).getButtons());
-                widgets.add(((RecipeBookPageAccessor) recipeBookPage).getForwardButton());
-                widgets.add(((RecipeBookPageAccessor) recipeBookPage).getBackButton());
+
+                RecipeBookPage page = ((RecipeBookComponentAccessor) recipeBook).getRecipeBookPage();
+                OverlayRecipeComponent overlay = ((RecipeBookPageAccessor) page).getOverlay();
+                if(overlay.isVisible())
+                {
+                    widgets.addAll(((OverlayRecipeComponentAccessor) overlay).getRecipeButtons());
+                }
+                else
+                {
+                    RecipeBookPage recipeBookPage = ((RecipeBookComponentAccessor) recipeBook).getRecipeBookPage();
+                    widgets.addAll(((RecipeBookPageAccessor) recipeBookPage).getButtons());
+                    widgets.add(((RecipeBookPageAccessor) recipeBookPage).getForwardButton());
+                    widgets.add(((RecipeBookPageAccessor) recipeBookPage).getBackButton());
+                }
             }
         }
 
