@@ -382,20 +382,20 @@ public class RenderEvents
             {
                 RecipeBookTabButton first = tabButtons.get(0);
                 RecipeBookTabButton last = tabButtons.get(tabButtons.size() - 1);
-                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.NEXT_RECIPE_TAB.getButton()), first.x + 15 - 5, first.y - 13, 0xFFFFFF);
-                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.x + 15 - 5, last.y + last.getHeight() + 13 - 9, 0xFFFFFF);
+                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.NEXT_RECIPE_TAB.getButton()), first.getX() + 15 - 5, first.getY() - 13, 0xFFFFFF);
+                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.getX() + 15 - 5, last.getY() + last.getHeight() + 13 - 9, 0xFFFFFF);
             }
 
             RecipeBookPage page = ((RecipeBookComponentAccessor) recipeBook).getRecipeBookPage();
             StateSwitchingButton forwardButton = ((RecipeBookPageAccessor) page).getForwardButton();
             if(forwardButton.visible)
             {
-                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.x + 24 - 5, forwardButton.y + 4, 0xFFFFFF);
+                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.getX() + 24 - 5, forwardButton.getY() + 4, 0xFFFFFF);
             }
             StateSwitchingButton backButton = ((RecipeBookPageAccessor) page).getBackButton();
             if(backButton.visible)
             {
-                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.x - 24 + 12 - 5, backButton.y + 4, 0xFFFFFF);
+                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.getX() - 24 + 12 - 5, backButton.getY() + 4, 0xFFFFFF);
             }
         }
     }

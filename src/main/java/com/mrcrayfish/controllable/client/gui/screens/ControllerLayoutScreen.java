@@ -88,23 +88,23 @@ public class ControllerLayoutScreen extends Screen
         this.controllerButtons.add(new ControllerAxis(this, Buttons.LEFT_THUMB_STICK, 9, 12, 0, 0, 7, 7, 5));
         this.controllerButtons.add(new ControllerAxis(this, Buttons.RIGHT_THUMB_STICK, 22, 12, 0, 0, 7, 7, 5));
 
-        this.doneButton = this.addRenderableWidget(new Button(this.width / 2 - 154, this.height - 32, 100, 20, Component.translatable("controllable.gui.save"), (button) -> {
+        this.doneButton = this.addRenderableWidget(Button.builder(Component.translatable("controllable.gui.save"), (button) -> {
             this.updateControllerMapping();
             this.minecraft.setScreen(this.parentScreen);
-        }));
+        }).pos(this.width / 2 - 154, this.height - 32).size(100, 20).build());
 
-        this.resetButton = this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 32, 100, 20, Component.translatable("controllable.gui.reset"), (button) -> {
+        this.resetButton = this.addRenderableWidget(Button.builder(Component.translatable("controllable.gui.reset"), (button) -> {
             this.entry.getReassignments().clear();
             this.entry.setSwitchThumbsticks(false);
             this.entry.setFlipLeftX(false);
             this.entry.setFlipLeftY(false);
             this.entry.setFlipRightX(false);
             this.entry.setFlipRightY(false);
-        }));
+        }).pos(this.width / 2 - 50, this.height - 32).size(100, 20).build());
 
-        this.addRenderableWidget(new Button(this.width / 2 + 54, this.height - 32, 100, 20, Component.translatable("gui.cancel"), (button) -> {
+        this.addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), (button) -> {
             this.minecraft.setScreen(this.parentScreen);
-        }));
+        }).pos(this.width / 2 + 54, this.height - 32).size(100, 20).build());
 
         int width = 38 * 5;
         int x = this.width / 2 - width / 2;

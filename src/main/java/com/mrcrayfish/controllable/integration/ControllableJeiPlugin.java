@@ -43,6 +43,12 @@ public class ControllableJeiPlugin implements IModPlugin
         ControllableJeiPlugin.runtime = runtime;
     }
 
+    @Override
+    public void onRuntimeUnavailable()
+    {
+        ControllableJeiPlugin.runtime = null;
+    }
+
     public static List<NavigationPoint> getNavigationPoints()
     {
         List<NavigationPoint> points = new ArrayList<>();
@@ -64,13 +70,13 @@ public class ControllableJeiPlugin implements IModPlugin
 
                 PageNavigation navigation = ((IngredientGridWithNavigationMixin) ingredientGridWithNavigation).getNavigation();
                 GuiIconButton backButton = ((PageNavigationMixin) navigation).getBackButton();
-                points.add(new WidgetNavigationPoint(backButton.x + backButton.getWidth() / 2.0, backButton.y + backButton.getHeight() / 2.0, backButton));
+                points.add(new WidgetNavigationPoint(backButton.getX() + backButton.getWidth() / 2.0, backButton.getY() + backButton.getHeight() / 2.0, backButton));
                 GuiIconButton nextButton = ((PageNavigationMixin) navigation).getNextButton();
-                points.add(new WidgetNavigationPoint(nextButton.x + nextButton.getWidth() / 2.0, nextButton.y + nextButton.getHeight() / 2.0, nextButton));
+                points.add(new WidgetNavigationPoint(nextButton.getX() + nextButton.getWidth() / 2.0, nextButton.getY() + nextButton.getHeight() / 2.0, nextButton));
 
                 GuiIconToggleButton configToggleButton = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).getConfigButton();
                 GuiIconButton configButton = ((GuiIconToggleButtonMixin) configToggleButton).getButton();
-                points.add(new WidgetNavigationPoint(configButton.x + configButton.getWidth() / 2.0, configButton.y + configButton.getHeight() / 2.0, nextButton));
+                points.add(new WidgetNavigationPoint(configButton.getX() + configButton.getWidth() / 2.0, configButton.getY() + configButton.getHeight() / 2.0, nextButton));
             }
         });
         return points;

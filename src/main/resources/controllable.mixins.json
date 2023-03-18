@@ -8,7 +8,6 @@
     "client": [
         "client.ClientModLoaderMixin",
         "client.ContainerScreenMixin",
-        "client.CreativeModeInventoryScreenMixin",
         "client.ForgeIngameGuiMixin",
         "client.GameRendererMixin",
         "client.KeyMappingMixin",

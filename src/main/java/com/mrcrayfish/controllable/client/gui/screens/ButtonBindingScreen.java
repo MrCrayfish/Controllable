@@ -9,10 +9,12 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -54,7 +56,7 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
     {
         super.init();
 
-        this.buttonReset = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 32, 100, 20, Component.translatable("controllable.gui.resetBinds"), (button) -> {
+        this.buttonReset = this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 155, this.height - 32, 100, 20, Component.translatable("controllable.gui.resetBinds"), (button) -> {
             this.minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.restore_default_buttons"), result -> {
                 if(result) {
                     BindingRegistry registry = BindingRegistry.getInstance();
@@ -67,11 +69,11 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         }));
         this.buttonReset.active = BindingRegistry.getInstance().getBindings().stream().noneMatch(ButtonBinding::isDefault);
 
-        this.addRenderableWidget(new Button(this.width / 2 - 50, this.height - 32, 100, 20, Component.translatable("controllable.gui.add_key_bind"), button -> {
+        this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 50, this.height - 32, 100, 20, Component.translatable("controllable.gui.add_key_bind"), button -> {
             Objects.requireNonNull(this.minecraft).setScreen(new SelectKeyBindingScreen(this));
         }));
 
-        this.addRenderableWidget(new Button(this.width / 2 + 55, this.height - 32, 100, 20, CommonComponents.GUI_DONE, (button) -> {
+        this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 55, this.height - 32, 100, 20, CommonComponents.GUI_DONE, (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(this.parent);
             BindingRegistry registry = BindingRegistry.getInstance();
             registry.resetBindingHash();
@@ -160,11 +162,7 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         {
             super(Component.translatable(binding.getLabelKey()));
             this.binding = binding;
-            this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> ButtonBindingScreen.this.setSelectedBinding(this.binding), (btn, poseStack, mouseX, mouseY) -> {
-                if(btn.isHoveredOrFocused()) {
-                    ButtonBindingScreen.this.renderComponentTooltip(poseStack, this.getBindingTooltip(binding), mouseX, mouseY);
-                }
-            });
+            this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> ButtonBindingScreen.this.setSelectedBinding(this.binding));
             this.resetButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button ->
             {
                 binding.reset();
@@ -219,11 +217,12 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         {
             int color = this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor();
             ButtonBindingScreen.this.minecraft.font.draw(poseStack, this.label, left, y + 6, color);
-            this.bindingButton.x = left + width - 42;
-            this.bindingButton.y = y;
+            this.bindingButton.setTooltip(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
+            this.bindingButton.setX(left + width - 42);
+            this.bindingButton.setY(y);
             this.bindingButton.render(poseStack, mouseX, mouseY, partialTicks);
-            this.resetButton.x = left + width - 20;
-            this.resetButton.y = y;
+            this.resetButton.setX(left + width - 20);
+            this.resetButton.setY(y);
             this.resetButton.active = !this.binding.isDefault();
             this.resetButton.render(poseStack, mouseX, mouseY, partialTicks);
         }

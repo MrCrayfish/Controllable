@@ -1,6 +1,8 @@
 package com.mrcrayfish.controllable.client.util;
 
 import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
@@ -9,6 +11,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * Author: MrCrayfish
@@ -72,5 +75,11 @@ public class ReflectUtil
             e.printStackTrace();
             return null;
         }
+    }
+
+
+    public static void pushLinesToTooltip(Tooltip tooltip, List<FormattedCharSequence> lines)
+    {
+        ObfuscationReflectionHelper.setPrivateValue(Tooltip.class, tooltip, lines, "f_256766_");
     }
 }

@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -36,14 +37,14 @@ public class ConfirmationScreen extends Screen
     {
         List<FormattedCharSequence> lines = this.font.split(this.message, 300);
         int messageOffset = (lines.size() * (this.font.lineHeight + 2)) / 2;
-        this.addRenderableWidget(new Button(this.width / 2 - 105, this.height / 2 + messageOffset, 100, 20, this.positiveText, button ->
+        this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 105, this.height / 2 + messageOffset, 100, 20, this.positiveText, button ->
         {
             if(this.handler.apply(true))
             {
                 this.minecraft.setScreen(this.parent);
             }
         }));
-        this.addRenderableWidget(new Button(this.width / 2 + 5, this.height / 2 + messageOffset, 100, 20, this.negativeText, button ->
+        this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 5, this.height / 2 + messageOffset, 100, 20, this.negativeText, button ->
         {
             if(this.handler.apply(false))
             {

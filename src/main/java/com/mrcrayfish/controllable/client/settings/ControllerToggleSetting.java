@@ -20,9 +20,13 @@ public class ControllerToggleSetting extends ControllerSetting<Boolean>
     @Override
     public Supplier<AbstractWidget> createWidget(int x, int y, int width, int height)
     {
-        return () -> CycleButton.onOffBuilder(this.configValue.get()).withTooltip(value -> this.tooltip).create(x, y, width, height, this.label, (button, value) -> {
-            this.configValue.set(value);
-            Config.save();
-        });
+        return () -> {
+            AbstractWidget widget = CycleButton.onOffBuilder(this.configValue.get()).withTooltip(value -> this.tooltip).create(x, y, width, height, this.label, (button, value) -> {
+                this.configValue.set(value);
+                Config.save();
+            });
+            widget.setTooltipDelay(500);
+            return widget;
+        };
     }
 }

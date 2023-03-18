@@ -33,13 +33,13 @@ public class ListWidgetNavigationPoint extends NavigationPoint
     @Override
     public double getX()
     {
-        return this.widget.x + this.widget.getWidth() / 2;
+        return this.widget.getX() + this.widget.getWidth() / 2;
     }
 
     @Override
     public double getY()
     {
-        return this.widget.y + this.widget.getHeight() / 2;
+        return this.widget.getY() + this.widget.getHeight() / 2;
     }
 
     @Override

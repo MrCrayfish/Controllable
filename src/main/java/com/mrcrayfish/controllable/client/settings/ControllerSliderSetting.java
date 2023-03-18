@@ -27,9 +27,14 @@ public class ControllerSliderSetting extends ControllerSetting<Double>
     @Override
     public Supplier<AbstractWidget> createWidget(int x, int y, int width, int height)
     {
-        return () -> new LazySliderWidget(this.label, x, y, width, height, this.min, this.max, this.configValue.get(), this.stepSize, value -> {
-            this.configValue.set(value);
-            Config.save();
-        }).setTooltip(this.tooltip);
+        return () -> {
+            AbstractWidget slider = new LazySliderWidget(this.label, x, y, width, height, this.min, this.max, this.configValue.get(), this.stepSize, value -> {
+                this.configValue.set(value);
+                Config.save();
+            });
+            slider.setTooltip(this.tooltip);
+            slider.setTooltipDelay(500);
+            return slider;
+        };
     }
 }

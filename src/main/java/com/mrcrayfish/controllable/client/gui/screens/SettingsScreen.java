@@ -11,7 +11,6 @@ import com.mrcrayfish.controllable.client.settings.SettingProvider;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.TooltipAccessor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -41,9 +40,9 @@ public class SettingsScreen extends ListMenuScreen
     protected void init()
     {
         super.init();
-        this.addRenderableWidget(new Button(this.width / 2 - 100, this.height - 32, 200, 20, CommonComponents.GUI_BACK, (button) -> {
+        this.addRenderableWidget(Button.builder(CommonComponents.GUI_BACK, (button) -> {
             this.minecraft.setScreen(this.parent);
-        }));
+        }).pos(this.width / 2 - 100, this.height - 32).size(200, 20).build());
     }
 
     @Override
@@ -100,30 +99,6 @@ public class SettingsScreen extends ListMenuScreen
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
     {
         super.render(poseStack, mouseX, mouseY, partialTicks);
-        List<FormattedCharSequence> tooltip = this.getHoveredToolTip(mouseX, mouseY);
-        if(this.hoveredTooltip != tooltip || Controllable.isButtonPressed(Buttons.A)) this.hoveredCounter = 0;
-        this.hoveredTooltip = tooltip;
-        if(this.hoveredTooltip != null && this.hoveredCounter >= 10)
-        {
-            this.renderTooltip(poseStack, this.hoveredTooltip, mouseX, mouseY);
-        }
-    }
-
-    @Nullable
-    private List<FormattedCharSequence> getHoveredToolTip(int mouseX, int mouseY)
-    {
-        if(this.list.getHovered() instanceof WidgetRow item)
-        {
-            List<? extends GuiEventListener> listeners = item.children();
-            for(GuiEventListener listener : listeners)
-            {
-                if(listener.isMouseOver(mouseX, mouseY) && listener instanceof TooltipAccessor accessor)
-                {
-                    return accessor.getTooltip();
-                }
-            }
-        }
-        return null;
     }
 
     @Override
@@ -160,13 +135,13 @@ public class SettingsScreen extends ListMenuScreen
         @Override
         public void render(PoseStack matrixStack, int index, int top, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean hovered, float partialTicks)
         {
-            this.optionOne.x = left;
-            this.optionOne.y = top;
+            this.optionOne.setX(left);
+            this.optionOne.setY(top);
             this.optionOne.render(matrixStack, mouseX, mouseY, partialTicks);
             if(this.optionTwo != null)
             {
-                this.optionTwo.x = left + width - 150;
-                this.optionTwo.y = top;
+                this.optionTwo.setX(left + width - 150);
+                this.optionTwo.setY(top);
                 this.optionTwo.render(matrixStack, mouseX, mouseY, partialTicks);
             }
         }

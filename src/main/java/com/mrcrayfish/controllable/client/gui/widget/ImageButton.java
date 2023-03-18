@@ -18,12 +18,7 @@ public class ImageButton extends Button
 
     public ImageButton(int x, int y, int width, ResourceLocation texture, int imageU, int imageV, int imageWidth, int imageHeight, OnPress onPress)
     {
-        this(x, y, width, texture, imageU, imageV, imageWidth, imageHeight, onPress, NO_TOOLTIP);
-    }
-
-    public ImageButton(int x, int y, int width, ResourceLocation texture, int imageU, int imageV, int imageWidth, int imageHeight, OnPress onPress, OnTooltip onTooltip)
-    {
-        super(x, y, width, 20, CommonComponents.EMPTY, onPress, onTooltip);
+        super(x, y, width, 20, CommonComponents.EMPTY, onPress, DEFAULT_NARRATION);
         this.texture = texture;
         this.imageU = imageU;
         this.imageV = imageV;
@@ -39,7 +34,7 @@ public class ImageButton extends Button
         RenderSystem.setShaderTexture(0, this.texture);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         if(!this.active) RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 1.0F);
-        this.blit(poseStack, this.x + (this.width - this.imageWidth) / 2, this.y + (this.height - this.imageHeight) / 2, this.imageU, this.imageV, this.imageWidth, this.imageHeight);
+        this.blit(poseStack, this.getX() + (this.width - this.imageWidth) / 2, this.getY() + (this.height - this.imageHeight) / 2, this.imageU, this.imageV, this.imageWidth, this.imageHeight);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 }

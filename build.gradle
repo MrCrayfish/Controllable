@@ -23,7 +23,7 @@ mixin {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.19.2'
+    mappings channel: 'official', version: '1.19.3'
     
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -99,9 +99,9 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.2-43.2.0'
-    implementation fg.deobf('curse.maven:configured-457570:3903908')
-    implementation fg.deobf('curse.maven:catalogue-459701:4171024')
+    minecraft 'net.minecraftforge:forge:1.19.3-44.0.37'
+    implementation fg.deobf('curse.maven:configured-457570:4166861')
+    implementation fg.deobf('curse.maven:catalogue-459701:4171025')
     compileOnly fg.deobf('mezz.jei:jei-1.19.2-forge:11.5.0.297')
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

@@ -7,9 +7,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.RenderEvents;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.CommonComponents;
 
@@ -22,12 +20,7 @@ public class ButtonBindingButton extends Button
 
     public ButtonBindingButton(int x, int y, ButtonBinding binding, OnPress onPress)
     {
-        this(x, y, binding, onPress, NO_TOOLTIP);
-    }
-
-    public ButtonBindingButton(int x, int y, ButtonBinding binding, OnPress onPress, OnTooltip tooltip)
-    {
-        super(x, y, 20, 20, CommonComponents.EMPTY, onPress, tooltip);
+        super(x, y, 20, 20, CommonComponents.EMPTY, onPress, DEFAULT_NARRATION);
         this.binding = binding;
     }
 
@@ -49,6 +42,6 @@ public class ButtonBindingButton extends Button
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, RenderEvents.CONTROLLER_BUTTONS);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        blit(poseStack, this.x + (this.width - size) / 2 + 1, this.y + 3, texU, texV, size, size, RenderEvents.CONTROLLER_BUTTONS_WIDTH, RenderEvents.CONTROLLER_BUTTONS_HEIGHT);
+        blit(poseStack, this.getX() + (this.width - size) / 2 + 1, this.getY() + 3, texU, texV, size, size, RenderEvents.CONTROLLER_BUTTONS_WIDTH, RenderEvents.CONTROLLER_BUTTONS_HEIGHT);
     }
 }

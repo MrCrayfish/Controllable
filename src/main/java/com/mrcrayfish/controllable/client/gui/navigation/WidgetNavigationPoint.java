@@ -1,21 +1,21 @@
 package com.mrcrayfish.controllable.client.gui.navigation;
 
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.AbstractWidget;
 
 /**
  * Author: MrCrayfish
  */
 public class WidgetNavigationPoint extends NavigationPoint
 {
-    private Widget widget;
+    private final AbstractWidget widget;
 
-    public WidgetNavigationPoint(double x, double y, Widget widget)
+    public WidgetNavigationPoint(double x, double y, AbstractWidget widget)
     {
         super(x, y, Type.WIDGET);
         this.widget = widget;
     }
 
-    public Widget getWidget()
+    public AbstractWidget getWidget()
     {
         return this.widget;
     }
