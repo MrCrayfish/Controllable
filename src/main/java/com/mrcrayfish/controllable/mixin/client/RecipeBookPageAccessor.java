@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.mixin.client;
 
 import net.minecraft.client.gui.components.StateSwitchingButton;
+import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.screens.recipebook.RecipeButton;
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,6 +9,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.List;
+
+//TODO just use reflection
 
 /**
  * Author: MrCrayfish
@@ -32,4 +35,7 @@ public interface RecipeBookPageAccessor
 
     @Invoker("updateButtonsForPage")
     void invokeUpdateButtonsForPage();
+
+    @Accessor("overlay")
+    OverlayRecipeComponent getOverlay();
 }
