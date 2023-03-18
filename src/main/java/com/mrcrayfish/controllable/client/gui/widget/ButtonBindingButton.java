@@ -16,7 +16,7 @@ import net.minecraft.network.chat.CommonComponents;
  */
 public class ButtonBindingButton extends Button
 {
-    private ButtonBinding binding;
+    private final ButtonBinding binding;
 
     public ButtonBindingButton(int x, int y, ButtonBinding binding, OnPress onPress)
     {
@@ -34,7 +34,7 @@ public class ButtonBindingButton extends Button
     {
         super.renderButton(poseStack, mouseX, mouseY, partialTicks);
         Controller controller = Controllable.getController();
-        if(controller == null)
+        if(controller == null || this.binding.getButton() < 0)
             return;
         int texU = this.binding.getButton() * 13;
         int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
