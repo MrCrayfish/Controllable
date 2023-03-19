@@ -507,7 +507,7 @@ public class ControllerInput
     public void onOpenScreen(ScreenEvent.Opening event)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.level != null && mc.player != null && mc.isPaused() && Config.SERVER.restrictToController.get() && !this.isControllerInUse())
+        if(ClientHelper.isPlayingGame() && mc.isPaused() && Config.SERVER.restrictToController.get() && !this.isControllerInUse())
         {
             if(event.getScreen() instanceof ContainerScreen)
             {
@@ -520,7 +520,7 @@ public class ControllerInput
     public void onMouseClicked(InputEvent.MouseButton.Pre event)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.level != null && (mc.screen == null || mc.screen instanceof ContainerScreen))
+        if(ClientHelper.isPlayingGame() && (mc.screen == null || mc.screen instanceof ContainerScreen))
         {
             if(Config.SERVER.restrictToController.get())
             {

@@ -25,6 +25,7 @@ public class ClientHelper
 
     public static boolean isPlayingGame()
     {
-        return Minecraft.getInstance().player != null;
+        Minecraft mc = Minecraft.getInstance();
+        return mc.getConnection() != null && mc.getConnection().getConnection().isConnected();
     }
 }
