@@ -19,8 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MouseHandler.class)
 public class MouseHelperMixin
 {
-    @Shadow @Final private Minecraft minecraft;
-
     @Inject(method = "onMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;turnPlayer()V"))
     private void beforeUpdateLook(long handle, double x, double y, CallbackInfo ci)
     {
