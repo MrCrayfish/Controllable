@@ -505,7 +505,7 @@ public class ControllerInput
     public void onOpenScreen(ScreenEvent.Opening event)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.level != null && mc.player != null && mc.isPaused() && Config.SERVER.restrictToController.get() && !this.isControllerInUse())
+        if(ClientHelper.isPlayingGame() && Config.SERVER.restrictToController.get() && !this.isControllerInUse())
         {
             if(event.getScreen() instanceof ContainerScreen)
             {

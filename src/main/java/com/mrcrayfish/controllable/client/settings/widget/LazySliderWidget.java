@@ -1,8 +1,18 @@
 package com.mrcrayfish.controllable.client.settings.widget;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraftforge.client.gui.ScreenUtils;
 import net.minecraftforge.client.gui.widget.ForgeSlider;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -13,6 +23,8 @@ import java.util.function.Consumer;
  */
 public class LazySliderWidget extends ForgeSlider
 {
+    private static final ResourceLocation SLIDER_LOCATION = new ResourceLocation("textures/gui/slider.png");
+
     private final Consumer<Double> onChange;
     private boolean pressed = false;
 
@@ -45,5 +57,28 @@ public class LazySliderWidget extends ForgeSlider
             this.pressed = false;
         }
         return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public void renderWidget(@NotNull PoseStack poseStack, int mouseX, int mouseY, float partialTick)
+    {
+        RenderSystem.setShaderTexture(0, SLIDER_LOCATION);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableDepthTest();
+
+        // Draw background
+        blitNineSliced(poseStack, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 20, 4, 200, 20, 0, 0);
+
+        // Draw slider
+        int sliderYImage = (this.isHoveredOrFocused() ? 3 : 2) * 20;
+        int sliderX = this.getX() + (int) (this.value * (double) (this.width - 8));
+        blitNineSliced(poseStack, sliderX, this.getY(), 8, 20, 20, 4, 200, 20, 0, sliderYImage);
+
+        // Draw text
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int textColor = (this.active ? 0xFFFFFF : 0xA0A0A0) | Mth.ceil(this.alpha * 255.0F) << 24;
+        this.renderScrollingString(poseStack, Minecraft.getInstance().font, 2, textColor);
     }
 }

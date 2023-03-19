@@ -32,7 +32,8 @@ public class ClientHelper
 
     public static boolean isPlayingGame()
     {
-        return Minecraft.getInstance().player != null;
+        Minecraft mc = Minecraft.getInstance();
+        return mc.getConnection() != null && mc.getConnection().isAcceptingMessages();
     }
 
     public static <T extends FormattedText> Tooltip createListTooltip(List<T> lines)

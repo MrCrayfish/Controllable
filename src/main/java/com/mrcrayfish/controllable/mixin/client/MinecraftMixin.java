@@ -84,7 +84,7 @@ public class MinecraftMixin
 
     // Note: Minecraft Development plugin is failing to process this correctly.
     @SuppressWarnings("InvalidInjectorMethodSignature")
-    @ModifyVariable(method = "runTick", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/Minecraft;getFramerateLimit()I"), index = 9)
+    @ModifyVariable(method = "runTick", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/Minecraft;getFramerateLimit()I"), index = 8)
     private int controllableModifyFramerate(int originalFps)
     {
         Minecraft mc = (Minecraft) (Object) this;

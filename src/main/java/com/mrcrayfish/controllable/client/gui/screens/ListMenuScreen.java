@@ -328,9 +328,9 @@ public abstract class ListMenuScreen extends Screen
         }
 
         @Override
-        protected void onFocusedChanged(boolean focused)
+        public void setFocused(boolean focused)
         {
-            super.onFocusedChanged(focused);
+            super.setFocused(focused);
             if(focused)
             {
                 if(ListMenuScreen.this.activeTextField != null && ListMenuScreen.this.activeTextField != this)

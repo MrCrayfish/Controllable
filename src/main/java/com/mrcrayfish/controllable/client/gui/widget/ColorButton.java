@@ -60,14 +60,15 @@ public class ColorButton extends Button
     }
 
     @Override
-    public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
+    public void renderWidget(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
     {
-        super.renderButton(poseStack, mouseX, mouseY, partialTicks);
-        RenderSystem.disableTexture();
+        //TODO is the disable texture needed?
+        super.renderWidget(poseStack, mouseX, mouseY, partialTicks);
+        //RenderSystem.disableTexture();
         RenderSystem.disableDepthTest();
         fill(poseStack, this.getX() + 4, this.getY() + 4, this.getX() + 16, this.getY() + 16, 0xFF000000);
         fill(poseStack, this.getX() + 5, this.getY() + 5, this.getX() + 15, this.getY() + 15, COLORS[this.index].getColor() + 0xFF000000);
         RenderSystem.enableDepthTest();
-        RenderSystem.enableTexture();
+        //RenderSystem.enableTexture();
     }
 }

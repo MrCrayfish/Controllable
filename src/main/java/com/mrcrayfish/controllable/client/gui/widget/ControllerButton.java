@@ -22,9 +22,9 @@ public class ControllerButton extends Button
     }
 
     @Override
-    public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void renderWidget(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
+        super.renderWidget(matrixStack, mouseX, mouseY, partialTicks);
         boolean mouseOver = ScreenUtil.isMouseWithin(mouseX, mouseY, this.getX(), this.getY(), this.width, this.height);
         int textureV = 43;
         if(mouseOver)
@@ -34,6 +34,6 @@ public class ControllerButton extends Button
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        this.blit(matrixStack, this.getX(), this.getY(), 0, textureV, this.width, this.height);
+        blit(matrixStack, this.getX(), this.getY(), 0, textureV, this.width, this.height);
     }
 }

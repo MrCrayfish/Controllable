@@ -484,7 +484,7 @@ public class RadialMenuHandler
 
             matrixStack.translate(0, 90, 0);
 
-            RenderSystem.disableTexture();
+            //RenderSystem.disableTexture(); //TODO test this
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
@@ -513,7 +513,7 @@ public class RadialMenuHandler
             BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
-            RenderSystem.enableTexture();
+            //RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -559,7 +559,7 @@ public class RadialMenuHandler
 
             matrixStack.translate(0, -90, 0);
 
-            RenderSystem.disableTexture();
+            //RenderSystem.disableTexture(); //TODO test
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
@@ -588,7 +588,7 @@ public class RadialMenuHandler
             BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
-            RenderSystem.enableTexture();
+            //RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -643,7 +643,7 @@ public class RadialMenuHandler
 
             poseStack.translate((1.0F - animation) * (left ? -20 : 20), 0, 0);
 
-            RenderSystem.disableTexture();
+            //RenderSystem.disableTexture(); TODO test
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
@@ -674,7 +674,7 @@ public class RadialMenuHandler
             BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
-            RenderSystem.enableTexture();
+            //RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
             if(this.label != null)

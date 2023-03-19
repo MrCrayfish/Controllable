@@ -68,10 +68,10 @@ public class ScreenEvents
         if(Config.CLIENT.options.consoleHotbar.get() && INCLUDED_OVERLAYS.contains(event.getOverlay().overlay()))
         {
             event.getPoseStack().translate(0, -20, 0);
-            if(event.getOverlay() == VanillaGuiOverlay.HOTBAR.type())
+            /*if(event.getOverlay() == VanillaGuiOverlay.HOTBAR.type())
             {
-                RenderSystem.getModelViewStack().translate(0, -20, 0);
-            }
+                //RenderSystem.getModelViewStack().translate(0, -20, 0);
+            }*/
         }
     }
 
@@ -81,11 +81,11 @@ public class ScreenEvents
         if(Config.CLIENT.options.consoleHotbar.get() && INCLUDED_OVERLAYS.contains(event.getOverlay().overlay()))
         {
             event.getPoseStack().translate(0, 20, 0);
-            if(event.getOverlay() == VanillaGuiOverlay.HOTBAR.type())
+            /*if(event.getOverlay() == VanillaGuiOverlay.HOTBAR.type())
             {
-                RenderSystem.getModelViewStack().translate(0, 20, 0);
-                RenderSystem.applyModelViewMatrix();
-            }
+                //RenderSystem.getModelViewStack().translate(0, 20, 0);
+                //RenderSystem.applyModelViewMatrix();
+            }*/
         }
     }
 }

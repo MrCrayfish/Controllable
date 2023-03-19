@@ -261,7 +261,7 @@ public class RenderEvents
             if(Controllable.getInput().getLastUse() > 0)
             {
                 this.renderHints();
-                this.renderMiniPlayer();
+                this.renderMiniPlayer(new PoseStack());
             }
         }
         else if(mc.screen == null && Config.SERVER.restrictToController.get())
@@ -351,14 +351,14 @@ public class RenderEvents
         Screen.fill(poseStack, x - 3 + 1, y + height - 1, x + width + 2 - 1, y + height, backgroundColor);
     }
 
-    private void renderMiniPlayer()
+    private void renderMiniPlayer(PoseStack poseStack)
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.player != null && mc.screen == null && Config.CLIENT.options.renderMiniPlayer.get())
         {
             if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
             {
-                InventoryScreen.renderEntityInInventory(20, 45, 20, 0, 0, mc.player);
+                InventoryScreen.renderEntityInInventoryFollowsAngle(poseStack, 20, 45, 20, 0, 0, mc.player);
             }
         }
     }
