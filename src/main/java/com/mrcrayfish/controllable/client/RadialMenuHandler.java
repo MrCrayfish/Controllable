@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mrcrayfish.controllable.Config;
@@ -305,10 +306,14 @@ public class RadialMenuHandler
     private void renderRadialMenu(float partialTicks)
     {
         this.updateSelected();
-
-
+        
+        PoseStack modelStack = RenderSystem.getModelViewStack();
+        modelStack.pushPose();
+        modelStack.setIdentity();
+        modelStack.translate(0, 0, 1000F - net.minecraftforge.client.ForgeHooksClient.getGuiFarPlane());
+        RenderSystem.applyModelViewMatrix();
+        Lighting.setupFor3DItems();
         PoseStack poseStack = new PoseStack();
-        Minecraft mc = Minecraft.getInstance();
 
         float animation = Mth.lerp(partialTicks, this.prevAnimateTicks, this.animateTicks) / 5F;
         float c1 = 1.70158F;
@@ -316,6 +321,7 @@ public class RadialMenuHandler
         animation = (float) (1 + c3 * Math.pow(animation - 1, 3) + c1 * Math.pow(animation - 1, 2));
 
         // Draw background
+        Minecraft mc = Minecraft.getInstance();
         Screen.fill(poseStack, 0, 0, mc.getWindow().getWidth(), mc.getWindow().getHeight(), 0x78101010);
 
         poseStack.translate(0, -10, 0);
@@ -333,6 +339,9 @@ public class RadialMenuHandler
 
         this.drawRadialItems(this.rightItems, poseStack, mc, animation);
         this.drawRadialItems(this.leftItems, poseStack, mc, animation);
+
+        modelStack.popPose();
+        RenderSystem.applyModelViewMatrix();
     }
 
     private void drawRadialItems(List<AbstractRadialItem> items, PoseStack matrixStack, Minecraft mc, float animation)
