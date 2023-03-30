@@ -1,5 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
@@ -15,7 +17,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -26,7 +27,6 @@ import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -38,6 +38,7 @@ import net.minecraftforge.client.event.ContainerScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.joml.Matrix4f;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -251,17 +252,27 @@ public class RenderEvents
     @SubscribeEvent
     public void onRenderScreen(TickEvent.RenderTickEvent event)
     {
-        if(event.phase != TickEvent.Phase.END) return;
+        if(event.phase != TickEvent.Phase.END)
+            return;
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.options.hideGui) return;
+        if(mc.options.hideGui)
+            return;
+
+        PoseStack modelStack = RenderSystem.getModelViewStack();
+        modelStack.pushPose();
+        modelStack.setIdentity();
+        modelStack.translate(0, 0, 1000F - net.minecraftforge.client.ForgeHooksClient.getGuiFarPlane());
+        RenderSystem.applyModelViewMatrix();
+        Lighting.setupFor3DItems();
+        PoseStack poseStack = new PoseStack();
 
         if(Controllable.getController() != null)
         {
             if(Controllable.getInput().getLastUse() > 0)
             {
-                this.renderHints();
-                this.renderMiniPlayer(new PoseStack());
+                this.renderHints(poseStack);
+                this.renderMiniPlayer(poseStack);
             }
         }
         else if(mc.screen == null && Config.SERVER.restrictToController.get())
@@ -274,9 +285,12 @@ public class RenderEvents
             Screen.drawCenteredString(new PoseStack(), mc.font, Component.translatable("controllable.gui.plug_in_controller"), width / 2, height / 2, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
         }
+
+        modelStack.popPose();
+        RenderSystem.applyModelViewMatrix();
     }
 
-    private void renderHints()
+    private void renderHints(PoseStack poseStack)
     {
         if(!MinecraftForge.EVENT_BUS.post(new RenderAvailableActionsEvent()))
         {
@@ -318,7 +332,6 @@ public class RenderEvents
                 if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2) continue;
 
                 /* Draw buttons icon */
-                PoseStack poseStack = new PoseStack();
                 Screen.blit(poseStack, x, y, texU, texV, size, size, CONTROLLER_BUTTONS_WIDTH, CONTROLLER_BUTTONS_HEIGHT);
 
                 /* Draw description text */
