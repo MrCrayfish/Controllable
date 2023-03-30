@@ -1,10 +1,10 @@
 package com.mrcrayfish.controllable.event;
 
-import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import net.minecraftforge.eventbus.api.Event;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class GatherNavigationPointsEvent extends Event
 {
-    private List<NavigationPoint> points = new ArrayList<>();
+    private final List<NavigationPoint> points = new ArrayList<>();
 
     public void addPoint(NavigationPoint point)
     {
@@ -21,6 +21,6 @@ public class GatherNavigationPointsEvent extends Event
 
     public List<NavigationPoint> getPoints()
     {
-        return ImmutableList.copyOf(this.points);
+        return Collections.unmodifiableList(this.points);
     }
 }

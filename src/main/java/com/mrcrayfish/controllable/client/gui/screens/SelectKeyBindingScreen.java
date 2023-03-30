@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Author: MrCrayfish
@@ -31,7 +32,7 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
     {
         super.init();
         this.resetButton = this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 155, this.height - 32, 150, 20, Component.translatable("controllable.gui.reset"), (button) -> {
-            this.minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_keybinds"), result -> {
+            Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_keybinds"), result -> {
                 if(result) {
                     List<KeyAdapterBinding> copy = new ArrayList<>(BindingRegistry.getInstance().getKeyAdapters().values());
                     copy.forEach(binding -> {
@@ -45,7 +46,7 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
             }));
         }));
         this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 5, this.height - 32, 150, 20, CommonComponents.GUI_DONE, (button) -> {
-            this.minecraft.setScreen(this.parent);
+            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));
         this.updateButtons();
     }

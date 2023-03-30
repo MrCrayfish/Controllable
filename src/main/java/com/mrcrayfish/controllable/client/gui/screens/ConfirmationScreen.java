@@ -2,7 +2,6 @@ package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -54,6 +53,7 @@ public class ConfirmationScreen extends Screen
     }
 
     @Override
+    @SuppressWarnings("IntegerDivisionInFloatingPointContext")
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(poseStack);

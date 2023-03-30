@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonBindingEntry>
 {
-    private List<ButtonBindingData> bindings;
+    private final List<ButtonBindingData> bindings;
     private ButtonBinding selectedBinding;
 
     public RadialItemList(Minecraft mc, int width, int height, int top, int bottom, List<ButtonBindingData> bindings)
@@ -65,8 +65,7 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     @Override
     public int getRowLeft()
     {
-        if(true) return super.getRowLeft();
-        return this.x0 + this.width / 2 - this.getRowWidth() / 2;
+        return super.getRowLeft();
     }
 
     @Override
@@ -75,28 +74,28 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     class ButtonBindingEntry extends ContainerObjectSelectionList.Entry<ButtonBindingEntry>
     {
         private final ButtonBindingData data;
+        private final Component description;
+        private final Button moveUpButton;
+        private final Button moveDownButton;
         private Component label;
-        private Component description;
         private ColorButton colorButton;
-        private Button moveUpButton;
-        private Button moveDownButton;
 
         public ButtonBindingEntry(ButtonBindingData data)
         {
             this.data = data;
-            this.label = Component.translatable(data.getBinding().getLabelKey()).withStyle(data.getColor());
             this.description = Component.translatable(data.getBinding().getCategory());
-            this.colorButton = new ColorButton(0, 0, button -> {
-                data.setColor(this.colorButton.getColor());
-                this.label = this.label.copy().withStyle(this.colorButton.getColor());
-            });
-            this.colorButton.setColor(data.getColor());
             this.moveUpButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 98, 35, 10, 10, button -> {
                 this.shiftBinding(false);
             });
             this.moveDownButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 35, 10, 10, button -> {
                 this.shiftBinding(true);
             });
+            this.label = Component.translatable(data.getBinding().getLabelKey()).withStyle(data.getColor());
+            this.colorButton = new ColorButton(0, 0, button -> {
+                data.setColor(this.colorButton.getColor());
+                this.label = this.label.copy().withStyle(this.colorButton.getColor());
+            });
+            this.colorButton.setColor(data.getColor());
             this.updateButtons();
         }
 

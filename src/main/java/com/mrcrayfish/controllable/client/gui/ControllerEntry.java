@@ -15,8 +15,8 @@ import org.lwjgl.glfw.GLFW;
  */
 public final class ControllerEntry extends AbstractSelectionList.Entry<ControllerEntry>
 {
-    private ControllerList controllerList;
-    private int jid;
+    private final ControllerList controllerList;
+    private final int jid;
 
     public ControllerEntry(ControllerList controllerList, int jid)
     {

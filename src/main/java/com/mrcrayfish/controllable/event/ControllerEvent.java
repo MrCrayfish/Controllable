@@ -9,7 +9,7 @@ import net.minecraftforge.eventbus.api.Event;
  */
 public abstract class ControllerEvent extends Event
 {
-    private Controller controller;
+    private final Controller controller;
 
     public ControllerEvent(Controller controller)
     {
@@ -24,16 +24,16 @@ public abstract class ControllerEvent extends Event
     @Cancelable
     public static class ButtonInput extends ControllerEvent
     {
-        private int originalButton;
+        private final int originalButton;
+        private final boolean state;
         private int button;
-        private boolean state;
 
         public ButtonInput(Controller controller, int button, boolean state)
         {
             super(controller);
             this.originalButton = button;
-            this.button = button;
             this.state = state;
+            this.button = button;
         }
 
         /**

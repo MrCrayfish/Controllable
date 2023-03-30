@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 /**
  * Author: MrCrayfish
  */
+@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 public class ListWidgetNavigationPoint extends NavigationPoint
 {
     private final AbstractWidget widget;

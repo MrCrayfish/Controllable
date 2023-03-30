@@ -12,8 +12,8 @@ import java.util.Map;
  */
 public class GatherActionsEvent extends Event
 {
-    private Map<ButtonBinding, Action> actions;
-    private ActionVisibility visibility;
+    private final Map<ButtonBinding, Action> actions;
+    private final ActionVisibility visibility;
 
     public GatherActionsEvent(Map<ButtonBinding, Action> actions, ActionVisibility visibility)
     {

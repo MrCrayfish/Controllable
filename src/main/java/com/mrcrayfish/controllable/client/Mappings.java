@@ -9,6 +9,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Author: MrCrayfish
@@ -77,7 +78,7 @@ public class Mappings
                 Entry entry = MAPPINGS.get(mapping);
                 controller.setMapping(entry);
                 if(entry != null)
-                ControllerProperties.setSelectedMapping(mapping);
+                    ControllerProperties.setSelectedMapping(mapping);
                 changed = true;
             }
             else
@@ -95,15 +96,25 @@ public class Mappings
 
     private static void loadInternalMapping(String mappingName)
     {
-        try(Reader reader = new InputStreamReader(Mappings.class.getResourceAsStream("/mappings/" + mappingName + ".json")))
+        try(InputStream is = Mappings.class.getResourceAsStream("/mappings/" + mappingName + ".json"))
         {
-            Entry entry = GSON.fromJson(reader, Entry.class);
-            entry.internal = true;
-            MAPPINGS.put(entry.getId(), entry);
+            if(is == null)
+                return;
+
+            try(Reader reader = new InputStreamReader(is))
+            {
+                Entry entry = GSON.fromJson(reader, Entry.class);
+                entry.internal = true;
+                MAPPINGS.put(entry.getId(), entry);
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
         }
         catch(IOException e)
         {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -219,11 +230,7 @@ public class Mappings
         public int remap(int button)
         {
             Integer value = this.reassignments.get(button);
-            if(value != null)
-            {
-                return value;
-            }
-            return button;
+            return Objects.requireNonNullElse(value, button);
         }
 
         public Entry copy()

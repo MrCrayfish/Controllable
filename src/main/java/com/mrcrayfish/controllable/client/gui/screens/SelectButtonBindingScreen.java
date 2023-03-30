@@ -15,6 +15,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Author: MrCrayfish
@@ -36,7 +37,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
     {
         super.init();
         this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 155, this.height - 29, 150, 20, Component.translatable("controllable.gui.restoreDefaults"), (button) -> {
-            this.minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
+            Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     ((RadialMenuConfigureScreen) this.parent).getBindings().clear();
                     ((RadialMenuConfigureScreen) this.parent).getBindings().addAll(RadialMenuHandler.instance().getDefaults());
@@ -46,7 +47,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
             }));
         }));
         this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_DONE, (button) -> {
-            this.minecraft.setScreen(this.parent);
+            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));
     }
 

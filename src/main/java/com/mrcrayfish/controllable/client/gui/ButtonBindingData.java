@@ -8,7 +8,7 @@ import net.minecraft.ChatFormatting;
  */
 public class ButtonBindingData
 {
-    private ButtonBinding binding;
+    private final ButtonBinding binding;
     private ChatFormatting color;
 
     public ButtonBindingData(ButtonBinding binding, ChatFormatting color)

@@ -12,13 +12,13 @@ import java.util.List;
 public class ButtonBinding implements Comparable<ButtonBinding>
 {
     private final int defaultButton;
+    private final String descriptionKey;
+    private final String category;
+    private final IKeyConflictContext context;
+    private final boolean reserved;
     private int button;
-    private String descriptionKey;
-    private String category;
-    private IKeyConflictContext context;
     private boolean pressed;
     private int pressedTime;
-    private boolean reserved;
     private boolean active;
 
     public ButtonBinding(int button, String descriptionKey, String category, IKeyConflictContext context)
@@ -28,8 +28,8 @@ public class ButtonBinding implements Comparable<ButtonBinding>
 
     ButtonBinding(int button, String descriptionKey, String category, IKeyConflictContext context, boolean reserved)
     {
-        this.defaultButton = button;
         this.button = button;
+        this.defaultButton = button;
         this.descriptionKey = descriptionKey;
         this.category = category;
         this.context = context;

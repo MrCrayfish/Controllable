@@ -4,17 +4,15 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.*;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -22,11 +20,11 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Author: MrCrayfish
@@ -101,7 +99,7 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         if(this.selectedBinding != null)
         {
             RenderSystem.disableDepthTest();
-            this.fillGradient(poseStack, 0, 0, this.width, this.height, -1072689136, -804253680);
+            fillGradient(poseStack, 0, 0, this.width, this.height, -1072689136, -804253680);
             drawCenteredString(poseStack, this.font, Component.translatable("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
         }

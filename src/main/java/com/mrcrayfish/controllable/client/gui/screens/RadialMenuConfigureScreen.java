@@ -5,7 +5,6 @@ import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.RadialItemList;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -20,7 +19,7 @@ import java.util.Objects;
  */
 public class RadialMenuConfigureScreen extends Screen
 {
-    private List<ButtonBindingData> bindings;
+    private final List<ButtonBindingData> bindings;
     private RadialItemList list;
 
     public RadialMenuConfigureScreen(LinkedHashSet<ButtonBindingData> bindings)

@@ -504,7 +504,6 @@ public class ControllerInput
     @SubscribeEvent
     public void onOpenScreen(ScreenEvent.Opening event)
     {
-        Minecraft mc = Minecraft.getInstance();
         if(ClientHelper.isPlayingGame() && Config.SERVER.restrictToController.get() && !this.isControllerInUse())
         {
             if(event.getScreen() instanceof ContainerScreen)
@@ -1038,6 +1037,9 @@ public class ControllerInput
 
         Vector3d mousePos = new Vector3d(mouseX, mouseY, 0);
         Optional<NavigationPoint> minimumPointOptional = points.stream().min(navigate.getMinComparator(mouseX, mouseY));
+        if(minimumPointOptional.isEmpty())
+            return;
+
         double minimumDelta = navigate.getKeyExtractor().apply(minimumPointOptional.get(), mousePos) + 10;
         Optional<NavigationPoint> targetPointOptional = points.stream().filter(point -> navigate.getKeyExtractor().apply(point, mousePos) <= minimumDelta).min(Comparator.comparing(p -> p.distanceTo(mouseX, mouseY)));
         if(targetPointOptional.isPresent())
@@ -1049,8 +1051,8 @@ public class ControllerInput
                 this.performMouseDrag(this.mouseX, this.mouseY, 0, 0);
                 int screenX = (int) (targetPoint.getX() / ((double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth()));
                 int screenY = (int) (targetPoint.getY() / ((double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight()));
-                double lastTarxpos = this.mouseX;
-                double lastTarypos = this.mouseY;
+                double lastTargetX = this.mouseX;
+                double lastTargetY = this.mouseY;
                 this.mouseX = this.prevMouseX = screenX;
                 this.mouseY = this.prevMouseY = screenY;
                 this.setMousePosition(screenX, screenY);
@@ -1058,7 +1060,7 @@ public class ControllerInput
                 {
                     mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, 2.0F));
                 }
-                this.performMouseDrag(this.mouseX, this.mouseY, screenX - lastTarxpos, screenY - lastTarypos);
+                this.performMouseDrag(this.mouseX, this.mouseY, screenX - lastTargetX, screenY - lastTargetY);
             });
         }
     }
@@ -1413,6 +1415,7 @@ public class ControllerInput
         }
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private void invokeMouseClick(Screen screen, int button, double mouseX, double mouseY)
     {
         Minecraft mc = Minecraft.getInstance();
@@ -1450,6 +1453,7 @@ public class ControllerInput
         }
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private void invokeMouseReleased(Screen screen, int button, double mouseX, double mouseY)
     {
         Minecraft mc = Minecraft.getInstance();
@@ -1498,21 +1502,6 @@ public class ControllerInput
         public Comparator<NavigationPoint> getMinComparator(int mouseX, int mouseY)
         {
             return Comparator.comparing(p -> this.keyExtractor.apply(p, new Vector3d(mouseX, mouseY, 0)));
-        }
-
-        public static void main(String[] args)
-        {
-            int slotX = 10;
-            int slotY = 20;
-            int mouseX = 50;
-            int mouseY = 20;
-            angle(new SlotNavigationPoint(slotX, slotY, null), mouseX, mouseY, 0);
-        }
-
-        private static boolean angle(NavigationPoint point, int mouseX, int mouseY, double offset)
-        {
-            double angle = Math.toDegrees(Math.atan2(point.getY() - mouseY, point.getX() - mouseX)) + offset;
-            return angle > -45 && angle < 45;
         }
     }
 

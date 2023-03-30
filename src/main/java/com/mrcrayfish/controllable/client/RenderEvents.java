@@ -1,7 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
@@ -38,7 +37,6 @@ import net.minecraftforge.client.event.ContainerScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.joml.Matrix4f;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -54,8 +52,7 @@ public class RenderEvents
     public static final int CONTROLLER_BUTTONS_WIDTH = 221;
     public static final int CONTROLLER_BUTTONS_HEIGHT = 130;
 
-    private Map<Integer, Action> actions = new HashMap<>();
-    private int selectedRadialIndex = -1;
+    private final Map<Integer, Action> actions = new HashMap<>();
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event)
@@ -125,7 +122,7 @@ public class RenderEvents
                     if(blockHit)
                     {
                         BlockHitResult blockHitResult = (BlockHitResult) mc.hitResult;
-                        canOpenBlock = mc.level.getBlockState(blockHitResult.getBlockPos()).getBlock() instanceof BaseEntityBlock;
+                        canOpenBlock = mc.level != null && mc.level.getBlockState(blockHitResult.getBlockPos()).getBlock() instanceof BaseEntityBlock;
                     }
 
                     if(!mc.player.isUsingItem())
@@ -249,6 +246,7 @@ public class RenderEvents
         }
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     @SubscribeEvent
     public void onRenderScreen(TickEvent.RenderTickEvent event)
     {

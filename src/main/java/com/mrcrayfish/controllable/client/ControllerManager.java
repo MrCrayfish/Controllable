@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class ControllerManager
 {
-    private Set<IControllerListener> listeners = new HashSet<>();
+    private final Set<IControllerListener> listeners = new HashSet<>();
     private Map<Integer, String> controllers = new HashMap<>();
 
     public void update()

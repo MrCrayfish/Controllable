@@ -2,11 +2,12 @@ package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.OptionsList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+
+import java.util.Objects;
 
 /**
  * Author: MrCrayfish
@@ -25,7 +26,7 @@ public class ThumbstickSettingsScreen extends Screen
     @Override
     protected void init()
     {
-        this.optionsRowList = new OptionsList(this.minecraft, this.width, this.height, 32, this.height - 32, 25);
+        this.optionsRowList = new OptionsList(Objects.requireNonNull(this.minecraft), this.width, this.height, 32, this.height - 32, 25);
 
         /*this.optionsRowList.addBig(ControllerOptions.createOnOff("controllable.options.switchThumbsticks", gameSettings -> {
             return this.layoutScreen.getEntry().isThumbsticksSwitched();

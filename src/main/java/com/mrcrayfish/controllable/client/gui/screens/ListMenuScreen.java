@@ -129,7 +129,7 @@ public abstract class ListMenuScreen extends Screen
     {
         if(ScreenUtil.isMouseWithin(10, 13, 23, 23, mouseX, mouseY))
         {
-            this.setActiveTooltip(this.minecraft.font.split(Component.translatable("configured.gui.info"), 200));
+            this.setActiveTooltip(Objects.requireNonNull(this.minecraft).font.split(Component.translatable("configured.gui.info"), 200));
         }
     }
 
@@ -175,7 +175,7 @@ public abstract class ListMenuScreen extends Screen
     {
         public EntryList(List<Item> entries, int top)
         {
-            super(ListMenuScreen.this.minecraft, ListMenuScreen.this.width, ListMenuScreen.this.height, top, ListMenuScreen.this.height - 44, ListMenuScreen.this.itemHeight);
+            super(Objects.requireNonNull(ListMenuScreen.this.minecraft), ListMenuScreen.this.width, ListMenuScreen.this.height, top, ListMenuScreen.this.height - 44, ListMenuScreen.this.itemHeight);
             entries.forEach(this::addEntry);
         }
 
@@ -272,7 +272,7 @@ public abstract class ListMenuScreen extends Screen
 
         public void setTooltip(Component text, int maxWidth)
         {
-            this.tooltip = ListMenuScreen.this.minecraft.font.split(text, maxWidth);
+            this.tooltip = Objects.requireNonNull(ListMenuScreen.this.minecraft).font.split(text, maxWidth);
         }
 
         @Override
@@ -316,7 +316,7 @@ public abstract class ListMenuScreen extends Screen
         @Override
         public void render(PoseStack poseStack, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
-            Screen.drawCenteredString(poseStack, ListMenuScreen.this.minecraft.font, this.label, left + width / 2, top + 5, 0xFFFFFF);
+            Screen.drawCenteredString(poseStack, Objects.requireNonNull(ListMenuScreen.this.minecraft).font, this.label, left + width / 2, top + 5, 0xFFFFFF);
         }
     }
 

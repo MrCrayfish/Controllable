@@ -56,9 +56,7 @@ public class BindingRegistry
         getInstance().register(ButtonBindings.FULLSCREEN);
         getInstance().register(ButtonBindings.DEBUG_INFO);
         getInstance().register(ButtonBindings.RADIAL_MENU);
-        Stream.of(ButtonBindings.HOTBAR_SLOTS).forEach(binding -> {
-            getInstance().register(binding);
-        });
+        Stream.of(ButtonBindings.HOTBAR_SLOTS).forEach(binding -> getInstance().register(binding));
         getInstance().register(ButtonBindings.TOGGLE_CRAFT_BOOK);
     }
 
@@ -73,10 +71,10 @@ public class BindingRegistry
         return instance;
     }
 
-    private List<ButtonBinding> bindings = new ArrayList<>();
-    private Map<String, ButtonBinding> registeredBindings = new HashMap<>();
-    private Map<String, KeyAdapterBinding> keyAdapters = new HashMap<>();
-    private Map<Integer, List<ButtonBinding>> idToButtonList = new HashMap<>();
+    private final List<ButtonBinding> bindings = new ArrayList<>();
+    private final Map<String, ButtonBinding> registeredBindings = new HashMap<>();
+    private final Map<String, KeyAdapterBinding> keyAdapters = new HashMap<>();
+    private final Map<Integer, List<ButtonBinding>> idToButtonList = new HashMap<>();
 
     private BindingRegistry() {}
 

@@ -3,10 +3,7 @@ package com.mrcrayfish.controllable.client.gui.screens;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.settings.ControllerOptions;
-import com.mrcrayfish.controllable.client.settings.ControllerSetting;
 import com.mrcrayfish.controllable.client.settings.SettingProvider;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -15,10 +12,10 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FormattedCharSequence;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -26,9 +23,6 @@ import java.util.Optional;
  */
 public class SettingsScreen extends ListMenuScreen
 {
-    private List<FormattedCharSequence> hoveredTooltip;
-    private int hoveredCounter;
-
     protected SettingsScreen(Screen parent)
     {
         super(parent, Component.translatable("controllable.gui.title.settings"), 24);
@@ -41,7 +35,7 @@ public class SettingsScreen extends ListMenuScreen
     {
         super.init();
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_BACK, (button) -> {
-            this.minecraft.setScreen(this.parent);
+            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }).pos(this.width / 2 - 100, this.height - 32).size(200, 20).build());
     }
 
@@ -77,22 +71,6 @@ public class SettingsScreen extends ListMenuScreen
     public void onClose()
     {
         Config.save();
-    }
-
-    @Override
-    public void tick()
-    {
-        if(this.hoveredTooltip != null)
-        {
-            if(this.hoveredCounter < 20)
-            {
-                this.hoveredCounter++;
-            }
-        }
-        else
-        {
-            this.hoveredCounter = 0;
-        }
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.mrcrayfish.controllable.client.util;
 
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Reference;
-import com.mrcrayfish.controllable.client.Buttons;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Tooltip;
@@ -36,6 +35,7 @@ public class ClientHelper
         return mc.getConnection() != null && mc.getConnection().isAcceptingMessages();
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends FormattedText> Tooltip createListTooltip(List<T> lines)
     {
         List<FormattedCharSequence> charSequenceList = Language.getInstance().getVisualOrder((List<FormattedText>) lines);

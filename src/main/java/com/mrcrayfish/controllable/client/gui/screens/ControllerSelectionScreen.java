@@ -8,15 +8,17 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.util.Objects;
+
 /**
  * Author: MrCrayfish
  */
 public class ControllerSelectionScreen extends Screen
 {
     private int controllerCount;
-    private ControllerManager manager;
+    private final ControllerManager manager;
     private ControllerList listControllers;
-    private Screen previousScreen;
+    private final Screen previousScreen;
     private Button btnSettings;
     private Button btnRemap;
     private Button btnLayout;
@@ -66,21 +68,21 @@ public class ControllerSelectionScreen extends Screen
 
     private void handleSettings(Button button)
     {
-        this.minecraft.setScreen(new SettingsScreen(this));
+        Objects.requireNonNull(this.minecraft).setScreen(new SettingsScreen(this));
     }
 
     private void handleConfigure(Button button)
     {
-        this.minecraft.setScreen(new ButtonBindingScreen(this));
+        Objects.requireNonNull(this.minecraft).setScreen(new ButtonBindingScreen(this));
     }
 
     private void handleLayout(Button button)
     {
-        this.minecraft.setScreen(new ControllerLayoutScreen(this));
+        Objects.requireNonNull(this.minecraft).setScreen(new ControllerLayoutScreen(this));
     }
 
     private void handleCancel(Button button)
     {
-        this.minecraft.setScreen(this.previousScreen);
+        Objects.requireNonNull(this.minecraft).setScreen(this.previousScreen);
     }
 }

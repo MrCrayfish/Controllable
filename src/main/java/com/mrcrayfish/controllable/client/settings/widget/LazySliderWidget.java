@@ -3,14 +3,10 @@ package com.mrcrayfish.controllable.client.settings.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraftforge.client.gui.ScreenUtils;
 import net.minecraftforge.client.gui.widget.ForgeSlider;
 import org.jetbrains.annotations.NotNull;
 

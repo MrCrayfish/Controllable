@@ -69,6 +69,7 @@ public final class KeyAdapterBinding extends ButtonBinding
         }
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private void handlePressed(int action, int key, int modifiers)
     {
         Screen screen = Minecraft.getInstance().screen;

@@ -1,7 +1,10 @@
 package com.mrcrayfish.controllable.client.settings;
 
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.client.*;
+import com.mrcrayfish.controllable.client.ActionVisibility;
+import com.mrcrayfish.controllable.client.ControllerIcons;
+import com.mrcrayfish.controllable.client.CursorType;
+import com.mrcrayfish.controllable.client.Thumbstick;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -10,7 +13,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.text.DecimalFormat;
 import java.util.function.Supplier;
 
 /**
@@ -18,8 +20,6 @@ import java.util.function.Supplier;
  */
 public class ControllerOptions
 {
-    private static final DecimalFormat FORMAT = new DecimalFormat("0.#");
-
     //public static final ControllerSetting<Boolean> FORCE_FEEDBACK = createBoolean("controllable.options.forceFeedback", Config.CLIENT.options.forceFeedback);
 
     /*public static final CycleOption<Boolean> FORCE_FEEDBACK = createOnOff(, options -> {

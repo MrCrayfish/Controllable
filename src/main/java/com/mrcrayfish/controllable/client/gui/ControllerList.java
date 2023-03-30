@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class ControllerList extends AbstractSelectionList<ControllerEntry>
 {
-    private ControllerManager manager;
+    private final ControllerManager manager;
 
     public ControllerList(ControllerManager manager, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
     {

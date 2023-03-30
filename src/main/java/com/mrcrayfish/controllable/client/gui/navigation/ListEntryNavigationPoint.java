@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.AbstractSelectionList;
 /**
  * Author: MrCrayfish
  */
+@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 public class ListEntryNavigationPoint extends NavigationPoint
 {
     private final AbstractSelectionList<?> list;

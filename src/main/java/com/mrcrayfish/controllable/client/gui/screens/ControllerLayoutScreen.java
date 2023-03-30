@@ -23,10 +23,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Author: MrCrayfish
@@ -35,12 +32,12 @@ public class ControllerLayoutScreen extends Screen
 {
     public static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/controller.png");
 
-    private List<ControllerButton> controllerButtons = new ArrayList<>();
+    private final List<ControllerButton> controllerButtons = new ArrayList<>();
 
     private int configureButton = -1;
     private boolean validLayout;
-    private Screen parentScreen;
-    private LayoutButtonStates states = new LayoutButtonStates();
+    private final Screen parentScreen;
+    private final LayoutButtonStates states = new LayoutButtonStates();
     private Mappings.Entry entry;
     private Button doneButton;
     private Button resetButton;
@@ -90,7 +87,7 @@ public class ControllerLayoutScreen extends Screen
 
         this.doneButton = this.addRenderableWidget(Button.builder(Component.translatable("controllable.gui.save"), (button) -> {
             this.updateControllerMapping();
-            this.minecraft.setScreen(this.parentScreen);
+            Objects.requireNonNull(this.minecraft).setScreen(this.parentScreen);
         }).pos(this.width / 2 - 154, this.height - 32).size(100, 20).build());
 
         this.resetButton = this.addRenderableWidget(Button.builder(Component.translatable("controllable.gui.reset"), (button) -> {
@@ -103,7 +100,7 @@ public class ControllerLayoutScreen extends Screen
         }).pos(this.width / 2 - 50, this.height - 32).size(100, 20).build());
 
         this.addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), (button) -> {
-            this.minecraft.setScreen(this.parentScreen);
+            Objects.requireNonNull(this.minecraft).setScreen(this.parentScreen);
         }).pos(this.width / 2 + 54, this.height - 32).size(100, 20).build());
 
         int width = 38 * 5;
@@ -111,7 +108,7 @@ public class ControllerLayoutScreen extends Screen
         int y = this.height / 2 - 50 - 35;
 
         this.thumbstickButton = this.addRenderableWidget(new ImageButton(x + width / 2 - 10, y + 90, 20, TEXTURE, 92, 0, 16, 16, button -> {
-            this.minecraft.setScreen(new ThumbstickSettingsScreen(this));
+            Objects.requireNonNull(this.minecraft).setScreen(new ThumbstickSettingsScreen(this));
         }));
     }
 
@@ -149,7 +146,7 @@ public class ControllerLayoutScreen extends Screen
         if(this.configureButton != -1)
         {
             RenderSystem.disableDepthTest();
-            this.fillGradient(poseStack, 0, 0, this.width, this.height, -1072689136, -804253680);
+            fillGradient(poseStack, 0, 0, this.width, this.height, -1072689136, -804253680);
             drawCenteredString(poseStack, this.font, Component.translatable("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
             return;

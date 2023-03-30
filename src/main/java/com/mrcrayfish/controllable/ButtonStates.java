@@ -7,7 +7,7 @@ import com.mrcrayfish.controllable.client.Buttons;
  */
 public class ButtonStates
 {
-    private boolean[] states;
+    private final boolean[] states;
 
     public ButtonStates()
     {

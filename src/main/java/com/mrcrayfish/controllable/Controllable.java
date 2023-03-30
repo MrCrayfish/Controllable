@@ -94,7 +94,7 @@ public class Controllable
                 {
                     byte[] bytes = ByteStreams.toByteArray(is);
                     ByteBuffer buffer = MemoryUtil.memASCIISafe(new String(bytes));
-                    if(buffer != null && GLFW.glfwUpdateGamepadMappings(buffer))
+                    if(GLFW.glfwUpdateGamepadMappings(buffer))
                     {
                         LOGGER.info("Successfully updated gamepad mappings");
                     }
@@ -230,7 +230,8 @@ public class Controllable
             return;
 
         // Updates the internal GLFW gamepad state
-        currentController.updateGamepadState();
+        if(!currentController.updateGamepadState())
+            return;
 
         // Capture all inputs and queue
         ButtonStates states = new ButtonStates();

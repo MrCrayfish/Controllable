@@ -59,7 +59,7 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
         return ImmutableList.copyOf(bindings);
     });
 
-    private Map<String, List<KeyMapping>> categories = new LinkedHashMap<>();
+    private final Map<String, List<KeyMapping>> categories = new LinkedHashMap<>();
 
     protected KeyBindingListMenuScreen(Screen parent, Component title, int itemHeight)
     {
@@ -76,16 +76,16 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
     @Override
     protected void constructEntries(List<Item> entries)
     {
-        this.updateList(entries, false);
+        this.updateList(entries);
     }
 
-    public void updateList(List<Item> entries, boolean showUnbound)
+    public void updateList(List<Item> entries)
     {
         // Clear the list of bindings for each category
         this.categories.forEach((category, list) -> list.clear());
 
         // Gather all keys bindings and add to corresponding category in map
-        Stream.of(this.minecraft.options.keyMappings).filter(binding -> !DEFAULT_BINDINGS.contains(binding)).forEach(binding -> {
+        Stream.of(Objects.requireNonNull(this.minecraft).options.keyMappings).filter(binding -> !DEFAULT_BINDINGS.contains(binding)).forEach(binding -> {
             this.categories.computeIfAbsent(binding.getCategory(), category -> new ArrayList<>()).add(binding);
         });
 

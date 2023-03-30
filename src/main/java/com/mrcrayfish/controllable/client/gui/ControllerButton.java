@@ -14,10 +14,10 @@ public class ControllerButton extends GuiComponent
 {
     protected ControllerLayoutScreen screen;
     protected int button;
-    private int x, y;
-    private int u, v;
-    private int width, height;
-    private int scale;
+    private final int x, y;
+    private final int u, v;
+    private final int width, height;
+    private final int scale;
     private boolean hovered;
 
     public ControllerButton(ControllerLayoutScreen screen, int button, int x, int y, int u, int v, int width, int height, int scale)
@@ -78,6 +78,6 @@ public class ControllerButton extends GuiComponent
 
     public boolean isMissingMapping()
     {
-        return !this.screen.getReassignments().values().contains(this.button) && this.screen.remap(this.button) != this.button;
+        return !this.screen.getReassignments().containsValue(this.button) && this.screen.remap(this.button) != this.button;
     }
 }

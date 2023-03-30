@@ -42,18 +42,10 @@ public class ControllerEvents
             UseAnim action = event.getItem().getUseAnimation();
             switch(action)
             {
-                case BLOCK:
-                    magnitudeFactor = 0.25F;
-                    break;
-                case SPEAR:
-                    magnitudeFactor = Mth.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 0.25F) / 0.25F;
-                    break;
-                case BOW:
-                    magnitudeFactor = Mth.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 1.0F) / 1.0F;
-                    break;
-                case CROSSBOW:
-                    magnitudeFactor = Mth.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 1.5F) / 1.5F;
-                    break;
+                case BLOCK -> magnitudeFactor = 0.25F;
+                case SPEAR -> magnitudeFactor = Mth.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 0.25F) / 0.25F;
+                case BOW ->  magnitudeFactor = Mth.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 1.0F);
+                case CROSSBOW -> magnitudeFactor = Mth.clamp((event.getItem().getUseDuration() - event.getDuration()) / 20F, 0.0F, 1.5F) / 1.5F;
             }
             //controller.getGamepadState().rumble(0.5F * magnitudeFactor, 0.5F * magnitudeFactor, 50); //50ms is one tick
         }
@@ -74,7 +66,7 @@ public class ControllerEvents
         }
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.level != null && Config.CLIENT.options.forceFeedback.get())
+        if(mc.level != null && mc.player != null && Config.CLIENT.options.forceFeedback.get())
         {
             if(this.prevHealth == -1)
             {

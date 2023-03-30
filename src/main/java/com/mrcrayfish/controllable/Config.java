@@ -1,6 +1,9 @@
 package com.mrcrayfish.controllable;
 
-import com.mrcrayfish.controllable.client.*;
+import com.mrcrayfish.controllable.client.ActionVisibility;
+import com.mrcrayfish.controllable.client.ControllerIcons;
+import com.mrcrayfish.controllable.client.CursorType;
+import com.mrcrayfish.controllable.client.Thumbstick;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 

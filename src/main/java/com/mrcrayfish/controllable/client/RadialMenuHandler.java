@@ -23,6 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraftforge.common.MinecraftForge;
@@ -303,6 +304,7 @@ public class RadialMenuHandler
         }
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private void renderRadialMenu(float partialTicks)
     {
         this.updateSelected();
@@ -486,10 +488,10 @@ public class RadialMenuHandler
         protected void draw(PoseStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation)
         {
             int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
-            float alpha = ((color >> 24) & 0xFF) / 255F;
-            float red = ((color >> 16) & 0xFF) / 255F;
-            float green = ((color >> 8) & 0xFF) / 255F;
-            float blue = ((color >> 0) & 0xFF) / 255F;
+            float alpha = FastColor.ARGB32.alpha(color) / 255F;
+            float red = FastColor.ARGB32.red(color) / 255F;
+            float green = FastColor.ARGB32.green(color) / 255F;
+            float blue = FastColor.ARGB32.blue(color) / 255F;
 
             matrixStack.translate(0, 90, 0);
 
@@ -561,10 +563,10 @@ public class RadialMenuHandler
         protected void draw(PoseStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation)
         {
             int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
-            float alpha = ((color >> 24) & 0xFF) / 255F;
-            float red = ((color >> 16) & 0xFF) / 255F;
-            float green = ((color >> 8) & 0xFF) / 255F;
-            float blue = ((color >> 0) & 0xFF) / 255F;
+            float alpha = FastColor.ARGB32.alpha(color) / 255F;
+            float red = FastColor.ARGB32.red(color) / 255F;
+            float green = FastColor.ARGB32.green(color) / 255F;
+            float blue = FastColor.ARGB32.blue(color) / 255F;
 
             matrixStack.translate(0, -90, 0);
 
@@ -642,10 +644,10 @@ public class RadialMenuHandler
             poseStack.pushPose();
 
             int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
-            float alpha = ((color >> 24) & 0xFF) / 255F;
-            float red = ((color >> 16) & 0xFF) / 255F;
-            float green = ((color >> 8) & 0xFF) / 255F;
-            float blue = ((color >> 0) & 0xFF) / 255F;
+            float alpha = FastColor.ARGB32.alpha(color) / 255F;
+            float red = FastColor.ARGB32.red(color) / 255F;
+            float green = FastColor.ARGB32.green(color) / 255F;
+            float blue = FastColor.ARGB32.blue(color) / 255F;
 
             float start = left ? -1 : 1;
             float end = (left ? -150F : 150F) * animation;

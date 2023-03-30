@@ -7,7 +7,7 @@ import net.minecraft.world.inventory.Slot;
  */
 public class SlotNavigationPoint extends NavigationPoint
 {
-    private Slot slot;
+    private final Slot slot;
 
     public SlotNavigationPoint(double x, double y, Slot slot)
     {
