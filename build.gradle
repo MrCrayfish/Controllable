@@ -12,7 +12,7 @@ plugins {
 
 apply plugin: 'org.spongepowered.mixin'
 
-version = "0.18.0-1.19.4"
+version = "0.18.1-1.19.4"
 group = "com.mrcrayfish"
 archivesBaseName = "controllable"
 
