@@ -1,0 +1,42 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${mod_version}",
+    "name": "${mod_name}",
+    "description": "${mod_desc}",
+    "authors": [ "${mod_author}" ],
+    "contact": {
+        "homepage": "${mod_homepage}",
+        "sources": "${mod_source}",
+        "issues": "${mod_issues}"
+    },
+    "license": "${mod_license}",
+    "icon": "${mod_id}_icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.example.examplemod.ExampleMod"
+        ],
+        "client": []
+    },
+    "mixins": [
+        "modid.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=${fabric_loader_version}",
+        "fabric": "*",
+        "minecraft": "${minecraft_version}",
+        "java": ">=17"
+    },
+    "custom": {
+        "configured": {
+            "configs": [],
+            "background": "minecraft:textures/block/dirt.png"
+        },
+        "catalogue": {
+            "banner": "${mod_id}_banner.png",
+            "background": "${mod_id}_background.png"
+        }
+    }
+}
+  

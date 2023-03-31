@@ -1,0 +1,80 @@
+plugins {
+    id 'java'
+    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
+    id 'maven-publish'
+}
+
+archivesBaseName = "${mod_id}-common"
+version = "${minecraft_version}-${mod_version}"
+
+minecraft {
+    version(minecraft_version)
+    runs {
+        if (project.hasProperty('common_runs_enabled') ? project.findProperty('common_runs_enabled').toBoolean() : true) {
+
+            server(project.hasProperty('common_server_run_name') ? project.findProperty('common_server_run_name') : 'vanilla_server') {
+                workingDirectory(this.file("run"))
+            }
+            client(project.hasProperty('common_client_run_name') ? project.findProperty('common_client_run_name') : 'vanilla_client') {
+                workingDirectory(this.file("run"))
+            }
+        }
+    }
+}
+
+configurations {
+    compileOnly.extendsFrom library
+}
+
+dependencies {
+    compileOnly "org.spongepowered:mixin:0.8.5"
+    implementation "com.google.code.findbugs:jsr305:3.0.2"
+    compileOnly "com.mrcrayfish:framework-common:${minecraft_version}-${framework_version}"
+    implementation "mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}"
+}
+
+processResources {
+    def buildProps = project.properties.clone()
+    filesMatching(['pack.mcmeta']) {
+        expand buildProps
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+
+            artifact jar
+            artifact sourcesJar
+
+            pom.withXml {
+                def depsNode = asNode().appendNode('dependencies')
+                [this.configurations.library].each {
+                    it.allDependencies.each {
+                        def depNode = depsNode.appendNode('dependency')
+                        depNode.appendNode('groupId', it.group)
+                        depNode.appendNode('artifactId', it.name)
+                        depNode.appendNode('version', it.version)
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url "file://" + System.getenv("LOCAL_MAVEN")
+        }
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/MrCrayfish/Maven"
+            credentials {
+                username = githubCredentials['GITHUB_USERNAME']
+                password = githubCredentials['GITHUB_TOKEN']
+            }
+        }
+    }
+}

@@ -1,0 +1,143 @@
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'org.spongepowered.mixin'
+}
+
+archivesBaseName = "${mod_id}-forge"
+version = "${minecraft_version}-${mod_version}"
+
+mixin {
+    add sourceSets.main, "controllable.refmap.json"
+    config 'controllable.common.mixins.json'
+    config 'controllable.mixins.json'
+}
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+
+    if (project.hasProperty('forge_ats_enabled') && project.findProperty('forge_ats_enabled').toBoolean()) {
+        accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+        project.logger.debug('Forge Access Transformers are enabled for this project.')
+    }
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Client'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                modClientRun {
+                    source sourceSets.main
+                    source sourceSets.test
+                    source project(":Common").sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Server'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                modServerRun {
+                    source sourceSets.main
+                    source sourceSets.test
+                    source project(":Common").sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+            ideaModule "${rootProject.name}.${project.name}.main"
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            taskName 'Data'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                modDataRun {
+                    source sourceSets.main
+                    source project(":Common").sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+sourceSets.main.resources.srcDir 'src/generated/resources'
+
+configurations {
+    implementation.extendsFrom library
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    implementation fg.deobf("com.mrcrayfish:framework-forge:${minecraft_version}-${framework_version}")
+    implementation "mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}"
+    compileOnly fg.deobf("mezz.jei:jei-${jei_minecraft_version}-forge:${jei_version}")
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    compileOnly project(":Common")
+    testCompileOnly project(":Common")
+}
+
+tasks.withType(JavaCompile) {
+    source(project(":Common").sourceSets.main.allSource)
+}
+
+processResources {
+    from project(":Common").sourceSets.main.resources
+    inputs.property "version", project.version
+
+    filesMatching("META-INF/mods.toml") {
+        expand project.properties
+    }
+}
+
+jar.finalizedBy('reobfJar')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+
+            artifact jar
+            artifact sourcesJar
+
+            pom.withXml {
+                def depsNode = asNode().appendNode('dependencies')
+                [this.configurations.library].each {
+                    it.allDependencies.each {
+                        def depNode = depsNode.appendNode('dependency')
+                        depNode.appendNode('groupId', it.group)
+                        depNode.appendNode('artifactId', it.name)
+                        depNode.appendNode('version', it.version)
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url "file://" + System.getenv("LOCAL_MAVEN")
+        }
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/MrCrayfish/Maven"
+            credentials {
+                username = rootProject.githubCredentials['GITHUB_USERNAME']
+                password = rootProject.githubCredentials['GITHUB_TOKEN']
+            }
+        }
+    }
+}

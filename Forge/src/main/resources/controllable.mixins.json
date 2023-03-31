@@ -1,0 +1,19 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "com.mrcrayfish.controllable.mixin",
+    "plugin": "com.mrcrayfish.controllable.mixin.ControllableMixinPlugin",
+    "compatibilityLevel": "JAVA_17",
+    "mixins": [
+        "client.jei.MouseUtilMixin"
+    ],
+    "client": [
+        "client.ClientModLoaderMixin", "client.ForgeGuiMixin", "client.GameRendererMixin",
+        "client.KeyMappingMixin", "client.OptifineGameRendererMixin",
+        "client.ForgeRecipeBookPageMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
+  

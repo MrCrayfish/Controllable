@@ -1,142 +1,77 @@
-buildscript {
-    dependencies {
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+def githubFile = new File(System.getenv("GITHUB_CREDENTIALS"))
+def githubProperties = new Properties()
+githubProperties.load(new FileInputStream(githubFile))
+project.ext {
+    githubCredentials = githubProperties
+}
+
+subprojects {
+
+    apply plugin: 'java'
+
+    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+    java.withSourcesJar()
+    java.withJavadocJar()
+
+    configurations {
+        library
     }
-}
 
-plugins {
-    id 'eclipse'
-    id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '5.+'
-}
-
-apply plugin: 'org.spongepowered.mixin'
-
-version = "0.18.0-1.19.4"
-group = "com.mrcrayfish"
-archivesBaseName = "controllable"
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-mixin {
-    add sourceSets.main, "controllable.refmap.json"
-}
-
-minecraft {
-    mappings channel: 'official', version: '1.19.4'
-    
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
-    runs {
-        client {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', 'controllable'
-            arg "-mixin.config=controllable.mixins.json"
-            mods {
-                controllable {
-                    source sourceSets.main
-                }
-            }
+    jar {
+        from(rootProject.file("LICENSE")) {
+            rename { "${it}_${mod_name}" }
         }
-
-        server {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', 'controllable'
-            arg "-mixin.config=controllable.mixins.json"
-            mods {
-                controllable {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        gameTestServer {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', 'controllable'
-            mods {
-                controllable {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            args '--mod', 'controllable', '--all', '--output', file('src/generated/resources/')
-            mods {
-                controllable {
-                    source sourceSets.main
-                }
-            }
+        manifest {
+            attributes([
+                    'Specification-Title'     : mod_name,
+                    'Specification-Vendor'    : mod_author,
+                    'Specification-Version'   : project.jar.archiveVersion,
+                    'Implementation-Title'    : project.name,
+                    'Implementation-Version'  : project.jar.archiveVersion,
+                    'Implementation-Vendor'   : mod_author,
+                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    'Timestamp'               : System.currentTimeMillis(),
+                    'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
+                    'Built-On-Minecraft'      : minecraft_version
+            ])
         }
     }
-}
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-repositories {
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.dev"
-    }
-    maven {
-        url = "https://www.cursemaven.com"
-    }
-}
-
-dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.4-45.0.9'
-    compileOnly fg.deobf('curse.maven:configured-457570:4166861')
-    compileOnly fg.deobf('curse.maven:catalogue-459701:4171025')
-    compileOnly fg.deobf('mezz.jei:jei-1.19.2-forge:11.5.0.297')
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-}
-
-jar {
-    manifest {
-        attributes([
-            "Specification-Title": "Controllable",
-            "Specification-Vendor": "MrCrayfish",
-            "Specification-Version": "1",
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"MrCrayfish",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "Signing-Fingerprint": project.hasProperty('fingerprint') ? project.property('fingerprint') : 'unsigned',
-            "MixinConfigs" : "controllable.mixins.json"
-        ])
-    }
-}
-
-jar.finalizedBy('reobfJar')
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact jar
+    sourcesJar {
+        from(rootProject.file("LICENSE")) {
+            rename { "${it}_${mod_name}" }
         }
     }
+
     repositories {
+        mavenCentral()
         maven {
-            url "file:///X:/localmaven/mcmods"
+            name = 'Sponge / Mixin'
+            url = 'https://repo.spongepowered.org/repository/maven-public/'
+        }
+        maven {
+            name = 'BlameJared Maven (CrT / Bookshelf)'
+            url = 'https://maven.blamejared.com'
+        }
+        maven {
+            name = "MrCrayfish (GitHub)"
+            url = "https://maven.pkg.github.com/MrCrayfish/Maven"
+            credentials {
+                username = githubCredentials['GITHUB_USERNAME']
+                password = githubCredentials['GITHUB_TOKEN']
+            }
         }
     }
-}
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+    tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = 'UTF-8'
+        it.options.release = 17
+    }
+
+    // Disables Gradle's custom module metadata from being published to maven. The
+    // metadata includes mapped dependencies which are not reasonably consumable by
+    // other mod developers.
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
 }

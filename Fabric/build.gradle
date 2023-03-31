@@ -1,0 +1,115 @@
+plugins {
+    id 'fabric-loom' version '1.0-SNAPSHOT'
+    id 'maven-publish'
+    id 'idea'
+}
+
+archivesBaseName = "${mod_id}-fabric"
+version = "${minecraft_version}-${mod_version}"
+
+sourceSets {
+    testMod {
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.runtimeClasspath
+        compileClasspath += test.compileClasspath
+        runtimeClasspath += test.runtimeClasspath
+    }
+}
+
+configurations {
+    implementation.extendsFrom library
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    modImplementation "com.mrcrayfish:framework-fabric:${minecraft_version}-${framework_version}"
+    modCompileOnlyApi "mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}"
+    modCompileOnlyApi "mezz.jei:jei-${jei_minecraft_version}-fabric-api:${jei_version}"
+    modRuntimeOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
+    implementation "com.google.code.findbugs:jsr305:3.0.2"
+    implementation project(":Common")
+    testModImplementation sourceSets.main.output
+    testModImplementation sourceSets.test.output
+}
+
+loom {
+    //accessWidenerPath = file("src/main/resources/example.accesswidener")
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+        testModClient {
+            inherit client
+            setConfigName("Fabric Test Client")
+            setSource(sourceSets.testMod)
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+    }
+}
+
+processResources {
+    from project(":Common").sourceSets.main.resources
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand project.properties
+    }
+}
+
+tasks.withType(JavaCompile) {
+    source(project(":Common").sourceSets.main.allSource)
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+
+            artifact remapJar
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+
+            pom.withXml {
+                def depsNode = asNode().appendNode('dependencies')
+                [this.configurations.library].each {
+                    it.allDependencies.each {
+                        def depNode = depsNode.appendNode('dependency')
+                        depNode.appendNode('groupId', it.group)
+                        depNode.appendNode('artifactId', it.name)
+                        depNode.appendNode('version', it.version)
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url "file://" + System.getenv("LOCAL_MAVEN")
+        }
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/MrCrayfish/Maven"
+            credentials {
+                username = rootProject.githubCredentials['GITHUB_USERNAME']
+                password = rootProject.githubCredentials['GITHUB_TOKEN']
+            }
+        }
+    }
+}
+
+loom.disableDeprecatedPomGeneration(publishing.publications.mavenJava)
