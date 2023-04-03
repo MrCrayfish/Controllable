@@ -39,26 +39,6 @@ public class ScreenEvents
         INCLUDED_OVERLAYS = builder.build();
     }
 
-    private final ControllerManager manager;
-
-    public ScreenEvents(ControllerManager manager)
-    {
-        this.manager = manager;
-    }
-
-    @SubscribeEvent(receiveCanceled = true)
-    public void onOpenGui(ScreenEvent.Init.Post event)
-    {
-        /* Resets the controller button states */
-        ButtonBinding.resetButtonStates();
-
-        if(event.getScreen() instanceof OptionsScreen)
-        {
-            int y = event.getScreen().height / 6 + 72 - 6;
-            event.addListener(new ControllerButton((event.getScreen().width / 2) + 5 + 150 + 4, y, button -> Minecraft.getInstance().setScreen(new ControllerSelectionScreen(manager, event.getScreen()))));
-        }
-    }
-
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onRenderOverlay(RenderGuiOverlayEvent.Pre event)
     {

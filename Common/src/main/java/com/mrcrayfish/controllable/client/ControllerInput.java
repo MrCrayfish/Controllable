@@ -108,7 +108,7 @@ public class ControllerInput
         TickEvents.END_RENDER.register(this::onRenderTickEnd);
         ScreenEvents.OPENED.register(this::onScreenOpened);
         ScreenEvents.BEFORE_DRAW.register(this::onScreenRenderPre);
-        ScreenEvents.AFTER_DRAW.register(this::onScreenRenderPost);
+        ScreenEvents.AFTER_DRAW.register(this::drawVirtualCursor);
         ClientEvents.PLAYER_INPUT_UPDATE.register(this::onInputUpdate);
     }
 
@@ -352,19 +352,19 @@ public class ControllerInput
         }
     }
 
-    //TODO this might not work
-    public void onScreenRenderPost(Screen screen, PoseStack poseStack, int mouseX, int mouseY, float partialTick)
+    public void drawVirtualCursor(Screen screen, PoseStack poseStack, int mouseX, int mouseY, float partialTick)
     {
         if(Controllable.getController() != null && Config.CLIENT.client.options.virtualMouse.get() && this.lastUse > 0)
         {
             poseStack.pushPose();
             CursorType type = Config.CLIENT.client.options.cursorType.get();
-            Minecraft minecraft = Minecraft.getInstance();
-            if(minecraft.player == null || (minecraft.player.inventoryMenu.getCarried().isEmpty() || type == CursorType.CONSOLE))
+            Minecraft mc = Minecraft.getInstance();
+            if(mc.player == null || (mc.player.inventoryMenu.getCarried().isEmpty() || type == CursorType.CONSOLE))
             {
-                double mX = (this.prevMouseX + (this.mouseX - this.prevMouseX) * Minecraft.getInstance().getFrameTime());
-                double mY = (this.prevMouseY + (this.mouseY - this.prevMouseY) * Minecraft.getInstance().getFrameTime());
-                poseStack.translate(mX / minecraft.getWindow().getGuiScale(), mY / minecraft.getWindow().getGuiScale(), 500);
+                double guiScale = mc.getWindow().getGuiScale();
+                double virtualCursorX = (this.prevMouseX + (this.mouseX - this.prevMouseX) * mc.getFrameTime());
+                double virtualCursorY = (this.prevMouseY + (this.mouseY - this.prevMouseY) * mc.getFrameTime());
+                poseStack.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, 500);
                 RenderSystem.setShaderTexture(0, CURSOR_TEXTURE);
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 if(type == CursorType.CONSOLE)

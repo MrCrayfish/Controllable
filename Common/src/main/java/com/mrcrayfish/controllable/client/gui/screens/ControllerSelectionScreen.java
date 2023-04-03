@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.ControllerManager;
+import com.mrcrayfish.controllable.client.InputProcessor;
 import com.mrcrayfish.controllable.client.gui.IControllerList;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.controllable.platform.ClientServices;
@@ -25,10 +26,10 @@ public class ControllerSelectionScreen extends Screen
     private Button btnLayout;
     private Button btnBack;
 
-    public ControllerSelectionScreen(ControllerManager manager, Screen previousScreen)
+    public ControllerSelectionScreen(Screen previousScreen)
     {
         super(Component.translatable("controllable.gui.title.select_controller"));
-        this.manager = manager;
+        this.manager = InputProcessor.get().getManager();
         this.previousScreen = previousScreen;
         this.controllerCount = manager.getControllerCount();
     }

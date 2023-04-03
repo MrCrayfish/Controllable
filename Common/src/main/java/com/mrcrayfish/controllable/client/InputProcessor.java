@@ -233,6 +233,11 @@ public class InputProcessor
         }
     }
 
+    public ControllerManager getManager()
+    {
+        return this.manager;
+    }
+
     public ControllerInput getInput()
     {
         return this.input;

@@ -1,8 +1,8 @@
 package com.mrcrayfish.controllable.client.settings;
 
+import com.mrcrayfish.controllable.client.gui.widget.LazySlider;
 import com.mrcrayfish.framework.api.config.DoubleProperty;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 
 import java.util.function.Supplier;
 
@@ -27,13 +27,10 @@ public class ControllerSliderSetting extends ControllerSetting<Double>
     public Supplier<AbstractWidget> createWidget(int x, int y, int width, int height)
     {
         return () -> {
-            /*AbstractWidget slider = new LazySliderWidget(this.label, x, y, width, height, this.min, this.max, this.configValue.get(), this.stepSize, value -> {
-                this.configValue.set(value);
-            });
+            AbstractWidget slider = new LazySlider(x, y, width, height, this.label, this.configValue.get(), this.min, this.max, this.stepSize, this.configValue::set);
             slider.setTooltip(this.tooltip);
             slider.setTooltipDelay(500);
-            return slider;*/
-            return Button.builder(this.label, var1 -> {}).pos(x, y).size(width, height).build();
+            return slider;
         };
     }
 }
