@@ -252,13 +252,13 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public int getAbstractListTop(AbstractSelectionList<?> list)
     {
-        return 0;
+        return list.getTop();
     }
 
     @Override
     public int getAbstractListBottom(AbstractSelectionList<?> list)
     {
-        return 0;
+        return list.getBottom();
     }
 
     @Override
