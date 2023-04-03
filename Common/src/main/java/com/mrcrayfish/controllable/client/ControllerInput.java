@@ -172,9 +172,6 @@ public class ControllerInput
         }
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.mouseHandler.isMouseGrabbed())
-            return;
-
         if(mc.screen == null || mc.screen instanceof ControllerLayoutScreen)
             return;
 
