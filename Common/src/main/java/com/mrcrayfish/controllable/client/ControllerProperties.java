@@ -1,7 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Constants;
-import com.mrcrayfish.controllable.Controllable;
 
 import java.io.File;
 import java.io.FileInputStream;

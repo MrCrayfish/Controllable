@@ -11,11 +11,11 @@
         "client.ForgeRecipeBookPageMixin",
         "client.KeyMappingMixin",
         "client.OptifineGameRendererMixin",
-        "client.jei.MouseUtilMixin",
         "client.jei.GuiIconToggleButtonMixin",
         "client.jei.IngredientGridMixin",
         "client.jei.IngredientGridWithNavigationMixin",
         "client.jei.IngredientListOverlayMixin",
+        "client.jei.MouseUtilMixin",
         "client.jei.PageNavigationMixin"
     ],
     "injectors": {

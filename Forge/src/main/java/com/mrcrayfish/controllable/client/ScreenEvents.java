@@ -2,12 +2,7 @@ package com.mrcrayfish.controllable.client;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.client.gui.screens.ControllerSelectionScreen;
-import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.EventPriority;

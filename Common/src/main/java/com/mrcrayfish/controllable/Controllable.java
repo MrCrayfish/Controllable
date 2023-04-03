@@ -1,15 +1,12 @@
 package com.mrcrayfish.controllable;
 
-import com.google.common.io.ByteStreams;
-import com.mrcrayfish.controllable.client.*;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.MemoryUtil;
+import com.mrcrayfish.controllable.client.Controller;
+import com.mrcrayfish.controllable.client.ControllerInput;
+import com.mrcrayfish.controllable.client.ControllerProperties;
+import com.mrcrayfish.controllable.client.InputProcessor;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
 
 public class Controllable
 {

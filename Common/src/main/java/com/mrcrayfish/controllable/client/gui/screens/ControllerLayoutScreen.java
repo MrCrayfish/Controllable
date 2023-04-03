@@ -2,9 +2,9 @@ package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.controllable.client.ButtonStates;
-import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.Constants;
+import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.ButtonStates;
 import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.Mappings;
@@ -23,7 +23,11 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Author: MrCrayfish

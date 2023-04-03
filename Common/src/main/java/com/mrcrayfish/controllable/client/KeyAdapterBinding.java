@@ -6,9 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import org.lwjgl.glfw.GLFW;
 
-import java.lang.reflect.Field;
-import java.util.EnumMap;
-
 /**
  * A special binding that translates button presses to key presses. This binding does not need to be
  * registered and is added by players during runtime.
