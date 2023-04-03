@@ -20,6 +20,7 @@ import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import com.mrcrayfish.controllable.platform.ClientServices;
+import com.mrcrayfish.controllable.platform.Services;
 import com.mrcrayfish.framework.api.event.ClientEvents;
 import com.mrcrayfish.framework.api.event.ScreenEvents;
 import com.mrcrayfish.framework.api.event.TickEvents;
@@ -364,7 +365,8 @@ public class ControllerInput
                 double guiScale = mc.getWindow().getGuiScale();
                 double virtualCursorX = (this.prevMouseX + (this.mouseX - this.prevMouseX) * mc.getFrameTime());
                 double virtualCursorY = (this.prevMouseY + (this.mouseY - this.prevMouseY) * mc.getFrameTime());
-                poseStack.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, 3000);
+                double zIndex = Services.PLATFORM.isForge() ? 500 : 3000; // Hack until I make Forge/Fabric calls the same
+                poseStack.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, zIndex);
                 RenderSystem.setShaderTexture(0, CURSOR_TEXTURE);
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 if(type == CursorType.CONSOLE)
