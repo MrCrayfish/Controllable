@@ -4,7 +4,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
 import net.minecraft.client.KeyMapping;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraft.client.gui.Gui;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -12,13 +12,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 /**
  * Author: MrCrayfish
  */
-@Mixin(ForgeGui.class)
-public class ForgeGuiMixin
+@Mixin(Gui.class)
+public class GuiMixin
 {
-    /**
-     * Fixes record name rendering not being offset by console hotbar
-     */
-    @Redirect(method = "renderPlayerList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"))
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"))
     private boolean controllableRenderPlayerList(KeyMapping mapping)
     {
         return mapping.isDown() || canShowPlayerList();

@@ -26,9 +26,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     modImplementation "com.mrcrayfish:framework-fabric:${minecraft_version}-${framework_version}"
-    modCompileOnlyApi "mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}"
-    modCompileOnlyApi "mezz.jei:jei-${jei_minecraft_version}-fabric-api:${jei_version}"
-    modRuntimeOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
+    modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
     implementation "com.google.code.findbugs:jsr305:3.0.2"
     implementation project(":Common")
     testModImplementation sourceSets.main.output
@@ -36,7 +34,10 @@ dependencies {
 }
 
 loom {
-    //accessWidenerPath = file("src/main/resources/example.accesswidener")
+    accessWidenerPath = file("src/main/resources/controllable.accesswidener")
+    mixin {
+        defaultRefmapName = "${mod_id}-refmap.json"
+    }
     runs {
         client {
             client()

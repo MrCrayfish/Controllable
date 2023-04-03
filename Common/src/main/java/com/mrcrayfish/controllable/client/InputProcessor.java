@@ -1,15 +1,21 @@
 package com.mrcrayfish.controllable.client;
 
+import com.google.common.io.ByteStreams;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.gui.screens.ButtonBindingScreen;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.MemoryUtil;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.Optional;
@@ -100,6 +106,36 @@ public class InputProcessor
             }
         });
         return manager;
+    }
+
+    public static void onFinishedClientLoad()
+    {
+        /* Update gamepad mappings */
+        try(InputStream is = Mappings.class.getResourceAsStream("/gamecontrollerdb.txt"))
+        {
+            if(is != null)
+            {
+                byte[] bytes = ByteStreams.toByteArray(is);
+                ByteBuffer buffer = MemoryUtil.memASCIISafe(new String(bytes));
+                if(GLFW.glfwUpdateGamepadMappings(buffer))
+                {
+                    Constants.LOG.info("Successfully updated gamepad mappings");
+                }
+            }
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        /* Attempts to load the first controller connected if auto select is enabled */
+        if(Config.CLIENT.client.options.autoSelect.get())
+        {
+            if(GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_1) && GLFW.glfwJoystickIsGamepad(GLFW.GLFW_JOYSTICK_1))
+            {
+                InputProcessor.get().setController(new Controller(GLFW.GLFW_JOYSTICK_1));
+            }
+        }
     }
 
     private void pollControllerInput(boolean process)

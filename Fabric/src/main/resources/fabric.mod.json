@@ -12,23 +12,29 @@
     },
     "license": "${mod_license}",
     "icon": "${mod_id}_icon.png",
-    "environment": "*",
+    "environment": "client",
     "entrypoints": {
-        "main": [
-            "com.example.examplemod.ExampleMod"
-        ],
-        "client": []
+        "client": [
+            "com.mrcrayfish.controllable.ControllableMod"
+        ]
     },
     "mixins": [
-        "modid.mixins.json"
+        "controllable.common.mixins.json",
+        "controllable.mixins.json"
     ],
     "depends": {
         "fabricloader": ">=${fabric_loader_version}",
         "fabric": "*",
         "minecraft": "${minecraft_version}",
-        "java": ">=17"
+        "java": ">=17",
+        "framework": ">=${framework_version}"
     },
     "custom": {
+        "framework": {
+            "configs": [
+                "com.mrcrayfish.controllable.Config"
+            ]
+        },
         "configured": {
             "configs": [],
             "background": "minecraft:textures/block/dirt.png"

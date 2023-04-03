@@ -20,25 +20,7 @@ public class Controllable
     {
         configFolder = com.mrcrayfish.framework.platform.Services.CONFIG.getConfigPath().toFile();
         jeiLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("jei");
-
         ControllerProperties.load(configFolder);
-
-        try(InputStream is = Mappings.class.getResourceAsStream("/gamecontrollerdb.txt"))
-        {
-            if(is != null)
-            {
-                byte[] bytes = ByteStreams.toByteArray(is);
-                ByteBuffer buffer = MemoryUtil.memASCIISafe(new String(bytes));
-                if(GLFW.glfwUpdateGamepadMappings(buffer))
-                {
-                    Constants.LOG.info("Successfully updated gamepad mappings");
-                }
-            }
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
     }
 
     public static ControllerInput getInput()

@@ -24,7 +24,9 @@ public class ControllerProperties
         if(!loaded)
         {
             Properties properties = new Properties();
-            file = new File(configFolder, "controllable/controller.properties");
+            File folder = new File(configFolder, "controllable");
+            folder.mkdirs();
+            file = new File(folder, "controller.properties");
             try
             {
                 if(file.createNewFile())

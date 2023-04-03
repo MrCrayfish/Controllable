@@ -299,7 +299,7 @@ public class ControllerInput
     private void onScreenOpened(Screen screen)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.screen == null)
+        if(screen != null)
         {
             this.nearSlot = false;
             this.moved = false;
@@ -364,7 +364,7 @@ public class ControllerInput
                 double guiScale = mc.getWindow().getGuiScale();
                 double virtualCursorX = (this.prevMouseX + (this.mouseX - this.prevMouseX) * mc.getFrameTime());
                 double virtualCursorY = (this.prevMouseY + (this.mouseY - this.prevMouseY) * mc.getFrameTime());
-                poseStack.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, 500);
+                poseStack.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, 3000);
                 RenderSystem.setShaderTexture(0, CURSOR_TEXTURE);
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 if(type == CursorType.CONSOLE)

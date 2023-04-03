@@ -13,12 +13,12 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
  * Author: MrCrayfish
  */
 @Mixin(GameRenderer.class)
-public class ForgeGameRendererMixin
+public class FabricGameRendererMixin
 {
     /**
-     * Fixes the mouse position when virtual mouse is turned on for controllers.
+     * Fixes the x mouse position when virtual mouse is turned on for controllers.
      */
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;drawScreen(Lnet/minecraft/client/gui/screens/Screen;Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V", remap = false), index = 2)
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderWithTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V"), index = 1)
     private int controllableModifyMouseX(int mouseX)
     {
         ControllerInput input = Controllable.getInput();
@@ -30,7 +30,10 @@ public class ForgeGameRendererMixin
         return mouseX;
     }
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;drawScreen(Lnet/minecraft/client/gui/screens/Screen;Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V", remap = false), index = 3)
+    /**
+     * Fixes the y mouse position when virtual mouse is turned on for controllers.
+     */
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderWithTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V"), index = 2)
     private int controllableModifyMouseY(int mouseY)
     {
         ControllerInput input = Controllable.getInput();

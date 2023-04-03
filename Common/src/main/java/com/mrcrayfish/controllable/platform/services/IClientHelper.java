@@ -27,6 +27,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -35,25 +36,52 @@ import java.util.Map;
  */
 public interface IClientHelper
 {
-    List<RadialMenuHandler.AbstractRadialItem> sendLegacyGatherRadialMenuItemsEvent();
+    default List<RadialMenuHandler.AbstractRadialItem> sendLegacyGatherRadialMenuItemsEvent()
+    {
+        return Collections.emptyList();
+    }
 
-    void sendLegacyGatherActionsEvent(Map<ButtonBinding, Action> actionMap, ActionVisibility visibility);
+    default void sendLegacyGatherActionsEvent(Map<ButtonBinding, Action> actionMap, ActionVisibility visibility) {}
 
-    boolean sendLegacyRenderAvailableActionsEvent();
+    default boolean sendLegacyRenderAvailableActionsEvent()
+    {
+        return false;
+    }
 
-    boolean sendLegacyRenderPlayerPreviewEvent();
+    default boolean sendLegacyRenderPlayerPreviewEvent()
+    {
+        return false;
+    }
 
-    boolean sendLegacyControllerEventTurn(Controller controller, Value<Float> yawSpeed, Value<Float> pitchSpeed);
+    default boolean sendLegacyControllerEventTurn(Controller controller, Value<Float> yawSpeed, Value<Float> pitchSpeed)
+    {
+        return false;
+    }
 
-    boolean sendLegacyControllerEventButtonInput(Controller controller, Value<Integer> newButton, int button, boolean state);
+    default boolean sendLegacyControllerEventButtonInput(Controller controller, Value<Integer> newButton, int button, boolean state)
+    {
+        return false;
+    }
 
-    boolean sendLegacyControllerEventButton(Controller controller);
+    default boolean sendLegacyControllerEventButton(Controller controller)
+    {
+        return false;
+    }
 
-    boolean sendLegacyControllerEventMove(Controller controller);
+    default boolean sendLegacyControllerEventMove(Controller controller)
+    {
+        return false;
+    }
 
-    List<NavigationPoint> sendLegacyGatherNavigationPoints();
+    default List<NavigationPoint> sendLegacyGatherNavigationPoints()
+    {
+        return Collections.emptyList();
+    }
 
-    float getGuiFarPlane();
+    default float getGuiFarPlane()
+    {
+        return 2000F;
+    }
 
     boolean sendScreenInput(Screen screen, int key, int action, int modifiers);
 

@@ -8,7 +8,6 @@ import net.minecraftforge.client.extensions.IForgeKeyMapping;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-//TODO fabric version
 /**
  * Author: MrCrayfish
  */

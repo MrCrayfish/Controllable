@@ -1,0 +1,24 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "com.mrcrayfish.controllable.mixin",
+    "compatibilityLevel": "JAVA_17",
+    "refmap": "controllable.refmap.json",
+    "client": [
+        "client.FabricGameRendererMixin",
+        "client.FabricMinecraftMixin",
+        "client.FabricRecipeBookPageMixin",
+        "client.GuiMixin",
+        "client.KeyMappingMixin",
+        "client.jei.GuiIconToggleButtonMixin",
+        "client.jei.IngredientGridMixin",
+        "client.jei.IngredientGridWithNavigationMixin",
+        "client.jei.IngredientListOverlayMixin",
+        "client.jei.MouseUtilMixin",
+        "client.jei.PageNavigationMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
+  
