@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface IngredientListOverlayMixin
 {
     @Accessor(value = "contents", remap = false)
-    IngredientGridWithNavigation getContents();
+    IngredientGridWithNavigation controllableGetContents();
 
     @Accessor(value = "configButton", remap = false)
-    GuiIconToggleButton getConfigButton();
+    GuiIconToggleButton controllableGetConfigButton();
 }

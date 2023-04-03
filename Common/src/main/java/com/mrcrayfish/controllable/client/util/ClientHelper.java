@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.util;
 
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
+import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Tooltip;
@@ -40,8 +41,7 @@ public class ClientHelper
     {
         List<FormattedCharSequence> charSequenceList = Language.getInstance().getVisualOrder((List<FormattedText>) lines);
         Tooltip blank = Tooltip.create(CommonComponents.EMPTY);
-        //TODO finish this
-        //ReflectUtil.pushLinesToTooltip(blank, charSequenceList);
+        ClientServices.CLIENT.pushLinesToTooltip(blank, charSequenceList);
         return blank;
     }
 }

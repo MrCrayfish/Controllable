@@ -6,6 +6,7 @@
     "refmap": "controllable.refmap.json",
     "client": [
         "client.ContainerScreenMixin",
+        "client.GameRendererMixin",
         "client.MinecraftMixin",
         "client.MouseHelperMixin",
         "client.OverlayRecipeButtonAccessor",

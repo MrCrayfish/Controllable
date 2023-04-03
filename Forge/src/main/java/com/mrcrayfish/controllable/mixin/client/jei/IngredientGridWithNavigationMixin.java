@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface IngredientGridWithNavigationMixin
 {
     @Accessor(value = "navigation", remap = false)
-    PageNavigation getNavigation();
+    PageNavigation controllableGetNavigation();
 
     @Accessor(value = "ingredientGrid", remap = false)
-    IngredientGrid getIngredientGrid();
+    IngredientGrid controllableGetIngredientGrid();
 }

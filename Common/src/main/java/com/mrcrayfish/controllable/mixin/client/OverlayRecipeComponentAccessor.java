@@ -7,8 +7,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.List;
 
-//TODO just use reflection
-
 /**
  * Author: MrCrayfish
  */
@@ -16,5 +14,5 @@ import java.util.List;
 public interface OverlayRecipeComponentAccessor
 {
     @Accessor("recipeButtons")
-    List<AbstractWidget> getRecipeButtons();
+    List<AbstractWidget> controllableGetRecipeButtons();
 }

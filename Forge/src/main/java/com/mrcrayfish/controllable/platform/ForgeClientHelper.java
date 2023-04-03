@@ -5,6 +5,8 @@ import com.mrcrayfish.controllable.client.ActionVisibility;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.ControllerManager;
+import com.mrcrayfish.controllable.client.ForgeCompatBindingContext;
+import com.mrcrayfish.controllable.client.IBindingContext;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import com.mrcrayfish.controllable.client.gui.ForgeControllerList;
 import com.mrcrayfish.controllable.client.gui.IControllerList;
@@ -20,28 +22,33 @@ import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
 import com.mrcrayfish.controllable.event.Value;
 import com.mrcrayfish.controllable.integration.JeiSupport;
 import com.mrcrayfish.controllable.platform.services.IClientHelper;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.GuiMessage;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.gui.CreativeTabsScreenPage;
+import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.lwjgl.glfw.GLFW;
 
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +58,7 @@ import java.util.Map;
  */
 public class ForgeClientHelper implements IClientHelper
 {
-    private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ObfuscationReflectionHelper.findField(CreativeModeInventoryScreen.class, "f_98508_");
+    public final Map<IKeyConflictContext, IBindingContext> keyContextMap = new Object2ObjectOpenHashMap<>();
 
     @Override
     @SuppressWarnings("deprecation")
@@ -360,27 +367,13 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public float getCreativeScrollOffset(CreativeModeInventoryScreen screen)
     {
-        try
-        {
-            return (float) CREATIVE_SCREEN_SCROLL_OFFSET.get(screen);
-        }
-        catch(IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return ReflectUtil.getCreativeScrollOffset(screen);
     }
 
     @Override
     public void setCreativeScrollOffset(CreativeModeInventoryScreen screen, float offset)
     {
-        try
-        {
-            CREATIVE_SCREEN_SCROLL_OFFSET.set(screen, offset);
-        }
-        catch(IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
-        }
+        ReflectUtil.setCreativeScrollOffset(screen, offset);
     }
 
     @Override
@@ -405,6 +398,43 @@ public class ForgeClientHelper implements IClientHelper
     public ResourceLocation getImageButtonResource(ImageButton btn)
     {
         return ReflectUtil.getImageButtonResource(btn);
+    }
+
+    @Override
+    public void pushLinesToTooltip(Tooltip blank, List<FormattedCharSequence> lines)
+    {
+        ReflectUtil.pushLinesToTooltip(blank, lines);
+    }
+
+    @Override
+    public int getKeyValue(KeyMapping mapping)
+    {
+        return mapping.getKey().getValue();
+    }
+
+    @Override
+    public void setKeyPressTime(KeyMapping mapping, int time)
+    {
+        ReflectUtil.setKeyPressTime(mapping, time);
+    }
+
+    @Override
+    public IBindingContext createBindingContext(KeyMapping mapping)
+    {
+        return this.keyContextMap.computeIfAbsent(mapping.getKeyConflictContext(), ForgeCompatBindingContext::new);
+    }
+
+    @Override
+    @SuppressWarnings("UnstableApiUsage")
+    public void sendKeyInputEvent(int key, int scanCode, int action, int modifiers)
+    {
+        ForgeHooksClient.onKeyInput(key, 0, action, modifiers);
+    }
+
+    @Override
+    public void clickSlot(AbstractContainerScreen<?> screen, Slot slotIn, int slotId, int mouseButton, ClickType type)
+    {
+        ReflectUtil.clickSlot(screen, slotIn, slotId, mouseButton, type);
     }
 
     private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeTabsScreenPage page, CreativeModeTab tab)

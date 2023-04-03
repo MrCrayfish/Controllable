@@ -373,7 +373,7 @@ public class RenderEvents
 
             Font font = Minecraft.getInstance().font;
 
-            List<RecipeBookTabButton> tabButtons = ((RecipeBookComponentAccessor) recipeBook).getTabButtons();
+            List<RecipeBookTabButton> tabButtons = ((RecipeBookComponentAccessor) recipeBook).controllableGetTabButtons();
             if(!tabButtons.isEmpty())
             {
                 RecipeBookTabButton first = tabButtons.get(0);
@@ -382,13 +382,13 @@ public class RenderEvents
                 font.draw(poseStack, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.getX() + 15 - 5, last.getY() + last.getHeight() + 13 - 9, 0xFFFFFF);
             }
 
-            RecipeBookPage page = ((RecipeBookComponentAccessor) recipeBook).getRecipeBookPage();
-            StateSwitchingButton forwardButton = ((RecipeBookPageAccessor) page).getForwardButton();
+            RecipeBookPage page = ((RecipeBookComponentAccessor) recipeBook).controllableGetRecipeBookPage();
+            StateSwitchingButton forwardButton = ((RecipeBookPageAccessor) page).controllableGetForwardButton();
             if(forwardButton.visible)
             {
                 font.draw(poseStack, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.getX() + 24 - 5, forwardButton.getY() + 4, 0xFFFFFF);
             }
-            StateSwitchingButton backButton = ((RecipeBookPageAccessor) page).getBackButton();
+            StateSwitchingButton backButton = ((RecipeBookPageAccessor) page).controllableGetBackButton();
             if(backButton.visible)
             {
                 font.draw(poseStack, ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.getX() - 24 + 12 - 5, backButton.getY() + 4, 0xFFFFFF);

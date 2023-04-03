@@ -22,7 +22,7 @@ public class ForgeRecipeBookPageMixin
 {
     //TODO fabric version
     @ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderComponentTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Ljava/util/List;IILnet/minecraft/world/item/ItemStack;)V"), index = 1)
-    private List<Component> modifyRenderToolTip(List<Component> components)
+    private List<Component> controllableModifyRenderToolTip(List<Component> components)
     {
         if(Controllable.getInput().isControllerInUse() && Config.CLIENT.client.options.quickCraft.get())
         {

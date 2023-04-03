@@ -4,8 +4,10 @@ import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
+import java.util.EnumMap;
 
 /**
  * A special binding that translates button presses to key presses. This binding does not need to be
@@ -15,17 +17,14 @@ import java.lang.reflect.Field;
  */
 public final class KeyAdapterBinding extends ButtonBinding
 {
-    private static Field pressedTimeField;
     private final KeyMapping keyMapping;
     private final String labelKey;
 
-    public KeyAdapterBinding(int button, KeyMapping keyMapping)
+    public KeyAdapterBinding(int button, KeyMapping mapping)
     {
-        //TODO finish this
-        //keyMapping.getKeyConflictContext()
-        super(button, keyMapping.getName() + ".custom", "key.categories.controllable_custom", null);
-        this.keyMapping = keyMapping;
-        this.labelKey = keyMapping.getName();
+        super(button, mapping.getName() + ".custom", "key.categories.controllable_custom", ClientServices.CLIENT.createBindingContext(mapping));
+        this.keyMapping = mapping;
+        this.labelKey = mapping.getName();
     }
 
     @Override
@@ -45,8 +44,8 @@ public final class KeyAdapterBinding extends ButtonBinding
         super.setPressed(pressed);
         this.keyMapping.setDown(pressed);
         if(pressed) this.updateKeyBindPressTime();
-        //TODO finish this
-        //this.handlePressed(pressed ? GLFW.GLFW_PRESS : GLFW.GLFW_RELEASE, this.keyMapping.getKey().getValue(), 0);
+        int key = ClientServices.CLIENT.getKeyValue(this.keyMapping);
+        this.handlePressed(pressed ? GLFW.GLFW_PRESS : GLFW.GLFW_RELEASE, key, 0);
     }
 
     @Override
@@ -57,22 +56,7 @@ public final class KeyAdapterBinding extends ButtonBinding
 
     private void updateKeyBindPressTime()
     {
-        if(true) return;
-
-        //TODO finish this
-
-        if(pressedTimeField == null)
-        {
-            //pressedTimeField = ObfuscationReflectionHelper.findField(KeyMapping.class, "f_90818_");
-        }
-        try
-        {
-            pressedTimeField.set(this.keyMapping, 1);
-        }
-        catch(IllegalAccessException e)
-        {
-            e.printStackTrace();
-        }
+        ClientServices.CLIENT.setKeyPressTime(this.keyMapping, 1);
     }
 
     private void handlePressed(int action, int key, int modifiers)
@@ -85,8 +69,6 @@ public final class KeyAdapterBinding extends ButtonBinding
                 return;
             }
         }
-
-        //TODO finish this
-        //net.minecraftforge.client.ForgeHooksClient.onKeyInput(this.keyMapping.getKey().getValue(), 0, action, 0);
+        ClientServices.CLIENT.sendKeyInputEvent(key, 0, action, modifiers);
     }
 }

@@ -2,12 +2,16 @@ package com.mrcrayfish.controllable.mixin.client;
 
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.InputProcessor;
 import com.mrcrayfish.controllable.platform.ClientServices;
+import com.mrcrayfish.framework.api.Environment;
+import com.mrcrayfish.framework.api.util.EnvironmentHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -27,7 +31,7 @@ public class MinecraftMixin
     public LocalPlayer player;
 
     @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;continueAttack(Z)V"), index = 0)
-    private boolean sendClickBlockToController(boolean original)
+    private boolean controllableSendClickBlockToController(boolean original)
     {
         return original || isLeftClicking();
     }
@@ -35,7 +39,7 @@ public class MinecraftMixin
     @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"), slice = @Slice(
             from = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z"),
             to = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;releaseUsingItem(Lnet/minecraft/world/entity/player/Player;)V")))
-    private boolean onKeyDown(KeyMapping mapping)
+    private boolean controllableOnKeyDown(KeyMapping mapping)
     {
         return mapping.isDown() || isRightClicking();
     }
@@ -66,7 +70,7 @@ public class MinecraftMixin
     }
 
     @Inject(method = "shouldEntityAppearGlowing", at = @At(value = "HEAD"), cancellable = true)
-    private void isEntityGlowing(Entity entity, CallbackInfoReturnable<Boolean> cir)
+    private void controllableIsEntityGlowing(Entity entity, CallbackInfoReturnable<Boolean> cir)
     {
         if(this.player != null && this.player.isSpectator() && ButtonBindings.HIGHLIGHT_PLAYERS.isButtonDown() && entity.getType() == EntityType.PLAYER)
         {
@@ -76,7 +80,7 @@ public class MinecraftMixin
 
     // Prevents the game from pausing (when losing focus) when a controller is plugged in.
     @Inject(method = "isWindowActive", at = @At(value = "HEAD"), cancellable = true)
-    private void isWindowActiveHead(CallbackInfoReturnable<Boolean> cir)
+    private void controllableIsWindowActiveHead(CallbackInfoReturnable<Boolean> cir)
     {
         if(Controllable.getController() != null)
         {

@@ -5,21 +5,26 @@ import com.mrcrayfish.controllable.client.ActionVisibility;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.ControllerManager;
+import com.mrcrayfish.controllable.client.IBindingContext;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import com.mrcrayfish.controllable.client.gui.IControllerList;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.event.Value;
 import net.minecraft.client.GuiMessage;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 
 import java.util.List;
@@ -111,4 +116,16 @@ public interface IClientHelper
     int getListItemHeight(AbstractSelectionList<?> list);
 
     ResourceLocation getImageButtonResource(ImageButton btn);
+
+    void pushLinesToTooltip(Tooltip blank, List<FormattedCharSequence> lines);
+
+    int getKeyValue(KeyMapping mapping);
+
+    void setKeyPressTime(KeyMapping mapping, int time);
+
+    IBindingContext createBindingContext(KeyMapping mapping);
+
+    void sendKeyInputEvent(int key, int scanCode, int action, int modifiers);
+
+    void clickSlot(AbstractContainerScreen<?> screen, Slot slotIn, int slotId, int mouseButton, ClickType type);
 }

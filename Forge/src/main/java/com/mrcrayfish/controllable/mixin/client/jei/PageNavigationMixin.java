@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface PageNavigationMixin
 {
     @Accessor(value = "nextButton", remap = false)
-    GuiIconButton getNextButton();
+    GuiIconButton controllableGetNextButton();
 
     @Accessor(value = "backButton", remap = false)
-    GuiIconButton getBackButton();
+    GuiIconButton controllableGetBackButton();
 }

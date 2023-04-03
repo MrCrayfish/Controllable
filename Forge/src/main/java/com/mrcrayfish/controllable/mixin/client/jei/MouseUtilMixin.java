@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MouseUtilMixin
 {
     @Inject(method = "getX", at = @At(value = "TAIL"), remap = false, cancellable = true)
-    private static void getX(CallbackInfoReturnable<Double> cir)
+    private static void controllableGetX(CallbackInfoReturnable<Double> cir)
     {
         ControllerInput input = Controllable.getInput();
         if(isVirtualMouseActive(input))
@@ -35,7 +35,7 @@ public class MouseUtilMixin
     }
 
     @Inject(method = "getY", at = @At(value = "TAIL"), remap = false, cancellable = true)
-    private static void getY(CallbackInfoReturnable<Double> cir)
+    private static void controllableGetY(CallbackInfoReturnable<Double> cir)
     {
         ControllerInput input = Controllable.getInput();
         if(isVirtualMouseActive(input))

@@ -33,9 +33,9 @@ public class JeiSupport
             if(runtime.getIngredientListOverlay().isListDisplayed())
             {
                 // JEI just needs getters, and I wouldn't have to do this mess
-                IngredientGridWithNavigation ingredientGridWithNavigation = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).getContents();
-                IngredientGrid ingredientGrid = ((IngredientGridWithNavigationMixin) ingredientGridWithNavigation).getIngredientGrid();
-                IngredientListRenderer ingredientListRenderer = ((IngredientGridMixin) ingredientGrid).getIngredientListRenderer();
+                IngredientGridWithNavigation ingredientGridWithNavigation = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).controllableGetContents();
+                IngredientGrid ingredientGrid = ((IngredientGridWithNavigationMixin) ingredientGridWithNavigation).controllableGetIngredientGrid();
+                IngredientListRenderer ingredientListRenderer = ((IngredientGridMixin) ingredientGrid).controllableGetIngredientListRenderer();
 
                 // Add each item on the screen as a navigation point
                 ingredientListRenderer.getSlots().forEach(slot ->
@@ -44,14 +44,14 @@ public class JeiSupport
                     points.add(new BasicNavigationPoint(area.getX() + area.getWidth() / 2.0, area.getY() + area.getHeight() / 2.0));
                 });
 
-                PageNavigation navigation = ((IngredientGridWithNavigationMixin) ingredientGridWithNavigation).getNavigation();
-                GuiIconButton backButton = ((PageNavigationMixin) navigation).getBackButton();
+                PageNavigation navigation = ((IngredientGridWithNavigationMixin) ingredientGridWithNavigation).controllableGetNavigation();
+                GuiIconButton backButton = ((PageNavigationMixin) navigation).controllableGetBackButton();
                 points.add(new WidgetNavigationPoint(backButton.getX() + backButton.getWidth() / 2.0, backButton.getY() + backButton.getHeight() / 2.0, backButton));
-                GuiIconButton nextButton = ((PageNavigationMixin) navigation).getNextButton();
+                GuiIconButton nextButton = ((PageNavigationMixin) navigation).controllableGetNextButton();
                 points.add(new WidgetNavigationPoint(nextButton.getX() + nextButton.getWidth() / 2.0, nextButton.getY() + nextButton.getHeight() / 2.0, nextButton));
 
-                GuiIconToggleButton configToggleButton = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).getConfigButton();
-                GuiIconButton configButton = ((GuiIconToggleButtonMixin) configToggleButton).getButton();
+                GuiIconToggleButton configToggleButton = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).controllableGetConfigButton();
+                GuiIconButton configButton = ((GuiIconToggleButtonMixin) configToggleButton).controllableGetButton();
                 points.add(new WidgetNavigationPoint(configButton.getX() + configButton.getWidth() / 2.0, configButton.getY() + configButton.getHeight() / 2.0, nextButton));
             }
         });

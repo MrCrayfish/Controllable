@@ -20,7 +20,7 @@ public class OptifineGameRendererMixin
      */
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/optifine/reflect/Reflector;callVoid(Lnet/optifine/reflect/ReflectorMethod;[Ljava/lang/Object;)V", remap = false), index = 1)
     @SuppressWarnings({"MixinAnnotationTarget", "InvalidInjectorMethodSignature", "UnresolvedMixinReference"})
-    private Object[] drawScreen(Object[] args)
+    private Object[] controllableDrawScreen(Object[] args)
     {
         ControllerInput input = Controllable.getInput();
         if(Controllable.getController() != null && Config.CLIENT.client.options.virtualMouse.get() && input.getLastUse() > 0)

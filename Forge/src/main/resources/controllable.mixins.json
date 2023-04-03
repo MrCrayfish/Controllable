@@ -4,13 +4,19 @@
     "package": "com.mrcrayfish.controllable.mixin",
     "plugin": "com.mrcrayfish.controllable.mixin.ControllableMixinPlugin",
     "compatibilityLevel": "JAVA_17",
-    "mixins": [
-        "client.jei.MouseUtilMixin"
-    ],
     "client": [
-        "client.ClientModLoaderMixin", "client.ForgeGuiMixin", "client.GameRendererMixin",
-        "client.KeyMappingMixin", "client.OptifineGameRendererMixin",
-        "client.ForgeRecipeBookPageMixin"
+        "client.ForgeGameRendererMixin",
+        "client.ForgeGuiMixin",
+        "client.ForgeMinecraftMixin",
+        "client.ForgeRecipeBookPageMixin",
+        "client.KeyMappingMixin",
+        "client.OptifineGameRendererMixin",
+        "client.jei.MouseUtilMixin",
+        "client.jei.GuiIconToggleButtonMixin",
+        "client.jei.IngredientGridMixin",
+        "client.jei.IngredientGridWithNavigationMixin",
+        "client.jei.IngredientListOverlayMixin",
+        "client.jei.PageNavigationMixin"
     ],
     "injectors": {
         "defaultRequire": 1

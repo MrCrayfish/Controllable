@@ -10,5 +10,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface OverlayRecipeButtonAccessor
 {
     @Accessor("isCraftable")
-    boolean isCraftable();
+    boolean controllableIsCraftable();
 }

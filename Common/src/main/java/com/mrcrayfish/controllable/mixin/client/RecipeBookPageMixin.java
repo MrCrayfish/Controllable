@@ -11,13 +11,11 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -42,10 +40,10 @@ public class RecipeBookPageMixin
         {
             if(this.minecraft.screen != null && this.overlay.isVisible())
             {
-                List<AbstractWidget> recipeButtons = ((OverlayRecipeComponentAccessor) this.overlay).getRecipeButtons();
+                List<AbstractWidget> recipeButtons = ((OverlayRecipeComponentAccessor) this.overlay).controllableGetRecipeButtons();
                 recipeButtons.stream().filter(AbstractWidget::isHoveredOrFocused).findFirst().ifPresent(btn ->
                 {
-                    if(((OverlayRecipeButtonAccessor) btn).isCraftable())
+                    if(((OverlayRecipeButtonAccessor) btn).controllableIsCraftable())
                     {
                         Component craftText = Component.translatable("controllable.tooltip.craft", ClientHelper.getButtonComponent(ButtonBindings.PICKUP_ITEM.getButton())).withStyle(ChatFormatting.YELLOW);
                         this.minecraft.screen.renderTooltip(stack, craftText, mouseX, mouseY);
