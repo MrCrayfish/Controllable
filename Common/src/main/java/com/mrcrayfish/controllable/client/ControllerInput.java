@@ -300,7 +300,7 @@ public class ControllerInput
     private void onScreenOpened(Screen screen)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(screen != null)
+        if(mc.screen == null)
         {
             this.nearSlot = false;
             this.moved = false;
