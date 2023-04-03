@@ -48,8 +48,8 @@ public class InputProcessor
         this.manager = InputProcessor.createManager();
         TickEvents.START_RENDER.register((partialTick) -> this.pollControllerInput(false));
         TickEvents.END_RENDER.register((partialTick) -> this.pollControllerInput(false));
-        TickEvents.START_CLIENT.register(() -> this.pollControllerInput(false));
-        TickEvents.END_CLIENT.register(() -> this.pollControllerInput(true));
+        TickEvents.START_CLIENT.register(() -> this.pollControllerInput(true));
+        TickEvents.END_CLIENT.register(() -> this.pollControllerInput(false));
     }
 
     private static ControllerManager createManager()
