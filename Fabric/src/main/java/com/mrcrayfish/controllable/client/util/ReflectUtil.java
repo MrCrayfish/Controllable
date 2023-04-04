@@ -5,7 +5,9 @@ import net.fabricmc.loader.api.MappingResolver;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.resources.ResourceLocation;
@@ -27,12 +29,12 @@ public class ReflectUtil
     private static final Method ABSTRACT_SELECTION_LIST_GET_ROW_TOP = ReflectUtil.findMethod(AbstractSelectionList.class, "net.minecraft.class_350", "method_25337", "(I)I", int.class);
     private static final Method ABSTRACT_SELECTION_LIST_GET_ROW_BOTTOM = ReflectUtil.findMethod(AbstractSelectionList.class, "net.minecraft.class_350", "method_25319", "(I)I", int.class);
     private static final Method ABSTRACT_CONTAINER_SCREEN_CLICK_SLOT = ReflectUtil.findMethod(AbstractContainerScreen.class, "net.minecraft.class_465", "method_2383", "(Lnet/minecraft/class_1735;IILnet/minecraft/class_1713;)V", Slot.class, int.class, int.class, ClickType.class);
+    private static final Method SCREEN_ADD_RENDER_WIDGET = ReflectUtil.findMethod(Screen.class, "net.minecraft.class_437", "method_37060", "(Lnet/minecraft/class_4068;)Lnet/minecraft/class_4068;", Renderable.class);
     private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ReflectUtil.findField(AbstractSelectionList.class, "net.minecraft.class_350", "field_22741", "I");
     private static final Field IMAGE_BUTTON_RESOURCE = ReflectUtil.findField(ImageButton.class, "net.minecraft.class_344", "field_2127", "Lnet/minecraft/class_2960;");
     private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ReflectUtil.findField(CreativeModeInventoryScreen.class, "net.minecraft.class_481", "field_2890", "F");
     private static final Field KEY_MAPPING_PRESS_TIME = ReflectUtil.findField(KeyMapping.class, "net.minecraft.class_304", "field_1661", "I");
     private static final Field TOOLTIP_LINES = ReflectUtil.findField(Tooltip.class, "net.minecraft.class_7919", "field_41103", "Ljava/util/List;");
-
 
     private static Method findMethod(Class<?> targetClass, String className, String methodName, String methodDesc, Class<?>... types)
     {
@@ -173,6 +175,18 @@ public class ReflectUtil
         catch(IllegalAccessException | InvocationTargetException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    public static void addRenderable(Screen screen, Renderable renderable)
+    {
+        try
+        {
+            SCREEN_ADD_RENDER_WIDGET.invoke(screen, renderable);
+        }
+        catch(InvocationTargetException | IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
         }
     }
 }

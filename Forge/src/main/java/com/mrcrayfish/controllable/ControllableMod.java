@@ -1,6 +1,8 @@
 package com.mrcrayfish.controllable;
 
 import com.mrcrayfish.controllable.client.ClientBootstrap;
+import com.mrcrayfish.controllable.client.ScreenEvents;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -23,6 +25,9 @@ public class ControllableMod
 
     private void onClientSetup(FMLClientSetupEvent event)
     {
-        event.enqueueWork(ClientBootstrap::init);
+        event.enqueueWork(() -> {
+            ClientBootstrap.init();
+            MinecraftForge.EVENT_BUS.register(new ScreenEvents());
+        });
     }
 }

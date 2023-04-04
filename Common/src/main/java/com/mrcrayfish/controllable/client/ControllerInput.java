@@ -32,8 +32,10 @@ import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.TabButton;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
@@ -47,6 +49,7 @@ import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -600,6 +603,7 @@ public class ControllerInput
         if(button != -1)
         {
             Value<Integer> newButton = new Value<>(button);
+            //TODO move into event helper
             boolean cancelled = ControllerEvents.INPUT.post().handle(controller, newButton, button, state);
             if(!cancelled)
             {
@@ -614,6 +618,7 @@ public class ControllerInput
             ButtonBinding.setButtonState(button, state);
         }
 
+        //TODO move into event helper
         boolean cancelled = ControllerEvents.BUTTON.post().handle(controller);
         if(!cancelled)
         {
@@ -786,7 +791,11 @@ public class ControllerInput
                 }
                 else if(ButtonBindings.PREVIOUS_CREATIVE_TAB.isButtonPressed())
                 {
-                    if(mc.screen instanceof CreativeModeInventoryScreen)
+                    if(mc.screen.children().stream().anyMatch(listener -> listener instanceof TabNavigationBar))
+                    {
+                        this.navigateTabBar(mc.screen, 1);
+                    }
+                    else if(mc.screen instanceof CreativeModeInventoryScreen)
                     {
                         this.scrollCreativeTabs((CreativeModeInventoryScreen) mc.screen, 1);
                         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
@@ -798,7 +807,11 @@ public class ControllerInput
                 }
                 else if(ButtonBindings.NEXT_CREATIVE_TAB.isButtonPressed())
                 {
-                    if(mc.screen instanceof CreativeModeInventoryScreen)
+                    if(mc.screen.children().stream().anyMatch(listener -> listener instanceof TabNavigationBar))
+                    {
+                        this.navigateTabBar(mc.screen, -1);
+                    }
+                    else if(mc.screen instanceof CreativeModeInventoryScreen)
                     {
                         this.scrollCreativeTabs((CreativeModeInventoryScreen) mc.screen, -1);
                         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
@@ -961,6 +974,31 @@ public class ControllerInput
         }
     }
 
+    private void navigateTabBar(Screen screen, int dir)
+    {
+        TabNavigationBar bar = screen.children().stream().filter(listener -> listener instanceof TabNavigationBar).map(listener -> (TabNavigationBar) listener).findFirst().orElse(null);
+        if(bar != null)
+        {
+            List<TabButton> buttons = new ArrayList<>();
+            bar.children().forEach(listener ->
+            {
+                if(listener instanceof TabButton button)
+                {
+                    buttons.add(button);
+                }
+            });
+            int selectedIndex = buttons.stream().filter(TabButton::isSelected).map(buttons::indexOf).findFirst().orElse(-1);
+            if(selectedIndex != -1)
+            {
+                int newIndex = selectedIndex + dir;
+                if(newIndex >= 0 && newIndex < buttons.size())
+                {
+                    bar.selectTab(newIndex, true);
+                }
+            }
+        }
+    }
+
     private void navigateMouse(Screen screen, Navigate navigate)
     {
         Minecraft mc = Minecraft.getInstance();
@@ -1067,6 +1105,16 @@ public class ControllerInput
                     }
                 }
             }
+            else if(listener instanceof TabNavigationBar navigationBar)
+            {
+                navigationBar.children().forEach(child ->
+                {
+                    if(child instanceof TabButton button)
+                    {
+                        widgets.add(button);
+                    }
+                });
+            }
         }
 
         if(screen instanceof RecipeUpdateListener)
@@ -1095,7 +1143,7 @@ public class ControllerInput
 
         for(AbstractWidget widget : widgets)
         {
-            if(widget == null || widget.isHoveredOrFocused() || !widget.visible || !widget.active)
+            if(widget == null || widget.isHovered() || !widget.visible || !widget.active)
                 continue;
             int posX = widget.getX() + widget.getWidth() / 2;
             int posY = widget.getY() + widget.getHeight() / 2;
