@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.gui.widget.TabNavigationHint;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
@@ -18,6 +19,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.StateSwitchingButton;
+import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -49,12 +51,24 @@ public class RenderEvents
     public static final int CONTROLLER_BUTTONS_HEIGHT = 130;
 
     private static final Map<Integer, Action> actions = new HashMap<>();
+    private static boolean navigationBarCheck;
 
     public static void init()
     {
         TickEvents.START_CLIENT.register(RenderEvents::onClientTickStart);
         ScreenEvents.AFTER_DRAW_CONTAINER_BACKGROUND.register(RenderEvents::onRenderBackground);
         TickEvents.END_RENDER.register((partialTick) -> RenderEvents.onRenderEnd());
+
+        // Adds a hint overlay renderable to screen that have a navigation bar
+        ScreenEvents.INIT.register(screen -> navigationBarCheck = false);
+        ScreenEvents.BEFORE_DRAW.register((screen, poseStack, i, i1, v) -> {
+            if(!navigationBarCheck) {
+                navigationBarCheck = true;
+                screen.children().stream().filter(e -> e instanceof TabNavigationBar).map(e -> (TabNavigationBar) e).findFirst().ifPresent(bar -> {
+                    ClientServices.CLIENT.addRenderableToScreen(screen, new TabNavigationHint(bar.children()));
+                });
+            }
+        });
     }
 
     private static void onClientTickStart()

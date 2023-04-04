@@ -285,4 +285,10 @@ public class FabricClientHelper implements IClientHelper
     {
         ReflectUtil.clickSlot(screen, slotIn, slotId, mouseButton, type);
     }
+
+    @Override
+    public void addRenderableToScreen(Screen screen, Renderable renderable)
+    {
+        ReflectUtil.addRenderable(screen, renderable);
+    }
 }

@@ -9,6 +9,7 @@ import com.mrcrayfish.controllable.client.IBindingContext;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import com.mrcrayfish.controllable.client.gui.IControllerList;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
+import com.mrcrayfish.controllable.client.gui.widget.TabNavigationHint;
 import com.mrcrayfish.controllable.event.Value;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
@@ -156,4 +157,6 @@ public interface IClientHelper
     void sendKeyInputEvent(int key, int scanCode, int action, int modifiers);
 
     void clickSlot(AbstractContainerScreen<?> screen, Slot slotIn, int slotId, int mouseButton, ClickType type);
+
+    void addRenderableToScreen(Screen screen, Renderable renderable);
 }

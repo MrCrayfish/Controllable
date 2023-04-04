@@ -2,12 +2,7 @@ package com.mrcrayfish.controllable.client;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.client.gui.widget.TabNavigationHint;
-import net.minecraft.client.gui.components.events.ContainerEventHandler;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -64,15 +59,5 @@ public class ScreenEvents
                 //RenderSystem.applyModelViewMatrix();
             }*/
         }
-    }
-
-    @SubscribeEvent
-    public void onInitScreen(ScreenEvent.Init.Post event)
-    {
-        event.getListenersList().stream().filter(listener -> listener instanceof TabNavigationBar).findFirst().ifPresent(listener ->
-        {
-            List<? extends GuiEventListener> tabs = ((ContainerEventHandler) listener).children();
-            event.getScreen().renderables.add(new TabNavigationHint(tabs));
-        });
     }
 }

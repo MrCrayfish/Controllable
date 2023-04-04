@@ -437,6 +437,12 @@ public class ForgeClientHelper implements IClientHelper
         ReflectUtil.clickSlot(screen, slotIn, slotId, mouseButton, type);
     }
 
+    @Override
+    public void addRenderableToScreen(Screen screen, Renderable renderable)
+    {
+        screen.renderables.add(renderable);
+    }
+
     private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeTabsScreenPage page, CreativeModeTab tab)
     {
         int guiLeft = ClientServices.CLIENT.getScreenLeft(screen);
