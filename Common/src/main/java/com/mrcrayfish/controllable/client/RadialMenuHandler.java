@@ -657,7 +657,6 @@ public class RadialMenuHandler
 
             poseStack.translate((1.0F - animation) * (left ? -20 : 20), 0, 0);
 
-            //RenderSystem.disableTexture(); TODO test
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
@@ -688,19 +687,18 @@ public class RadialMenuHandler
             BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
-            //RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
             if(this.label != null)
             {
                 int offset = !left ? 5 : -mc.font.width(this.label) - 5;
-                Screen.drawString(poseStack, mc.font, this.label, offset, -10, 0xFFFFFF);
+                mc.font.draw(poseStack, this.label, offset, -10, 0xFFFFFFFF);
             }
 
             if(this.description != null)
             {
                 int offset = !left ? 5 : -mc.font.width(this.description) - 5;
-                Screen.drawString(poseStack, mc.font, this.description, offset, 2, 0xFFFFFF);
+                mc.font.draw(poseStack, this.description, offset, 2, 0xFFFFFFFF);
             }
 
             poseStack.popPose();
