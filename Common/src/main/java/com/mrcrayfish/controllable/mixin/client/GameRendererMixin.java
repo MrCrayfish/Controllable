@@ -17,7 +17,7 @@ public class GameRendererMixin
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;pauseGame(Z)V"))
     private void controllableOnPause(Minecraft mc, boolean pauseOnly)
     {
-        if(Controllable.getController() == null || !Config.CLIENT.client.options.virtualMouse.get())
+        if(Controllable.getController() == null || !Config.CLIENT.client.options.virtualCursor.get())
         {
             mc.pauseGame(false);
         }

@@ -1,138 +1,232 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
-import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.controllable.client.settings.ControllerOptions;
-import com.mrcrayfish.controllable.client.settings.SettingProvider;
-import net.minecraft.ChatFormatting;
+import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.client.BindingRegistry;
+import com.mrcrayfish.controllable.client.ButtonBinding;
+import com.mrcrayfish.controllable.client.SneakMode;
+import com.mrcrayfish.controllable.client.SprintMode;
+import com.mrcrayfish.controllable.client.gui.components.ButtonBindingList;
+import com.mrcrayfish.controllable.client.gui.components.TabOptionEnumItem;
+import com.mrcrayfish.controllable.client.gui.components.TabOptionSliderItem;
+import com.mrcrayfish.controllable.client.gui.components.TabOptionToggleItem;
+import com.mrcrayfish.controllable.client.gui.components.TabSelectionList;
+import com.mrcrayfish.controllable.client.gui.widget.TabListWidget;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.components.tabs.GridLayoutTab;
+import net.minecraft.client.gui.components.tabs.Tab;
+import net.minecraft.client.gui.components.tabs.TabManager;
+import net.minecraft.client.gui.components.tabs.TabNavigationBar;
+import net.minecraft.client.gui.layouts.FrameLayout;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Author: MrCrayfish
  */
-public class SettingsScreen extends ListMenuScreen
+public class SettingsScreen extends Screen
 {
-    protected SettingsScreen(Screen parent)
+    @Nullable
+    private final Screen parent;
+    private final TabManager tabManager = new TabManager(this::addRenderableWidget, this::removeWidget);
+    private ScreenRectangle tabArea;
+    private TabNavigationBar navigationBar;
+    private Button doneButton;
+    private ButtonBinding selectedBinding;
+
+    protected SettingsScreen(@Nullable Screen parent)
     {
-        super(parent, Component.translatable("controllable.gui.title.settings"), 24);
-        this.setSearchBarVisible(false);
-        this.setRowWidth(310);
+        super(Component.translatable("controllable.settings"));
+        this.parent = parent;
     }
 
     @Override
     protected void init()
     {
-        super.init();
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_BACK, (button) -> {
-            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
-        }).pos(this.width / 2 - 100, this.height - 32).size(200, 20).build());
+        this.navigationBar = TabNavigationBar.builder(this.tabManager, this.width).addTabs(new GeneralTab(), new GameplayTab(), new BindingsTab()).build();
+        this.addRenderableWidget(this.navigationBar);
+        this.navigationBar.selectTab(0, false);
+        this.doneButton = this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (btn) -> this.minecraft.setScreen(this.parent)).pos((this.width - 200) / 2, this.height - 25).width(200).build());
+        this.repositionElements();
     }
 
     @Override
-    protected void constructEntries(List<Item> entries)
+    protected void repositionElements()
     {
-        entries.add(new TitleItem(Component.translatable("controllable.gui.title.general").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
-        entries.add(new WidgetRow(ControllerOptions.MOUSE_SPEED, ControllerOptions.LIST_SCROLL_SPEED));
-        entries.add(new WidgetRow(ControllerOptions.DEAD_ZONE, ControllerOptions.HOVER_MODIFIER));
-        entries.add(new WidgetRow(ControllerOptions.RADIAL_THUMBSTICK, ControllerOptions.CURSOR_THUMBSTICK));
-
-        entries.add(new TitleItem(Component.translatable("controllable.gui.title.gameplay").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
-        entries.add(new WidgetRow(ControllerOptions.ROTATION_SPEED));
-        entries.add(new WidgetRow(ControllerOptions.PITCH_SENSITIVITY, ControllerOptions.YAW_SENSITIVITY));
-        entries.add(new WidgetRow(ControllerOptions.INVERT_LOOK, ControllerOptions.INVERT_ROTATION));
-        entries.add(new WidgetRow(ControllerOptions.SNEAK_MODE, ControllerOptions.SPRINT_MODE));
-        entries.add(new WidgetRow(ControllerOptions.QUICK_CRAFT, null));
-
-        entries.add(new TitleItem(Component.translatable("controllable.gui.title.display").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
-        entries.add(new WidgetRow(ControllerOptions.RENDER_MINI_PLAYER, ControllerOptions.CONSOLE_HOTBAR));
-        entries.add(new WidgetRow(ControllerOptions.CONTROLLER_ICONS, ControllerOptions.SHOW_ACTIONS));
-        entries.add(new WidgetRow(ControllerOptions.CURSOR_TYPE, ControllerOptions.HINT_BACKGROUND));
-
-        entries.add(new TitleItem(Component.translatable("controllable.gui.title.sounds").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
-        entries.add(new WidgetRow(ControllerOptions.UI_SOUNDS));
-
-        entries.add(new TitleItem(Component.translatable("controllable.gui.title.advanced").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
-        entries.add(new WidgetRow(ControllerOptions.VIRTUAL_MOUSE, ControllerOptions.AUTO_SELECT));
-        entries.add(new WidgetRow(ControllerOptions.FPS_POLLING_FIX, null));
-    }
-
-    @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
-    {
-        super.render(poseStack, mouseX, mouseY, partialTicks);
-    }
-
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button)
-    {
-        boolean wasDragging = this.isDragging();
-        this.setDragging(false);
-        if(wasDragging && this.getFocused() != null)
+        if(this.navigationBar != null)
         {
-            return this.getFocused().mouseReleased(mouseX, mouseY, button);
+            this.navigationBar.setWidth(this.width);
+            this.navigationBar.arrangeElements();
+            ScreenRectangle navBarArea = this.navigationBar.getRectangle();
+            this.tabArea = new ScreenRectangle(0, navBarArea.height() - 1, this.width, this.height - navBarArea.height() - 30);
+            this.tabManager.setTabArea(this.tabArea);
+        }
+        if(this.doneButton != null)
+        {
+            this.doneButton.setX((this.width - 200) / 2);
+            this.doneButton.setY(this.height - 25);
+        }
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scroll)
+    {
+        if(super.mouseScrolled(mouseX, mouseY, scroll)) {
+            return true;
+        }
+
+        Tab currentTab = this.tabManager.getCurrentTab();
+        if(currentTab == null)
+            return false;
+
+        List<AbstractWidget> widgets = new ArrayList<>();
+        currentTab.visitChildren(widgets::add);
+        return widgets.stream().filter(widget -> widget.isMouseOver(mouseX, mouseY) && widget.mouseScrolled(mouseX, mouseY, scroll)).count() > 0;
+    }
+
+    @Override
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick)
+    {
+        this.renderBackground(poseStack);
+        boolean waitingForInput = this.isWaitingForButtonInput();
+        super.render(poseStack, !waitingForInput ? mouseX : -1, !waitingForInput ? mouseY : -1, partialTick);
+        if(waitingForInput)
+        {
+            RenderSystem.disableDepthTest();
+            fillGradient(poseStack, 0, 0, this.width, this.height, 0xC0101010, 0xD0101010);
+            drawCenteredString(poseStack, this.font, Component.translatable("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
+            RenderSystem.enableDepthTest();
+        }
+    }
+
+    @Override
+    public boolean keyPressed(int key, int action, int modifiers)
+    {
+        if(key == GLFW.GLFW_KEY_ESCAPE && this.selectedBinding != null)
+        {
+            this.selectedBinding = null;
+            return true;
+        }
+        else if(this.navigationBar.keyPressed(key))
+        {
+            return true;
+        }
+        return super.keyPressed(key, action, modifiers);
+    }
+
+    public void setSelectedBinding(ButtonBinding binding)
+    {
+        if(this.tabManager.getCurrentTab() instanceof BindingsTab)
+        {
+            this.selectedBinding = binding;
+        }
+    }
+
+    public boolean isWaitingForButtonInput()
+    {
+        if(this.selectedBinding != null && !(this.tabManager.getCurrentTab() instanceof BindingsTab))
+        {
+            this.selectedBinding = null;
+        }
+        return this.selectedBinding != null;
+    }
+
+    public boolean processButton(int index)
+    {
+        if(this.selectedBinding != null)
+        {
+            this.selectedBinding.setButton(index);
+            this.selectedBinding = null;
+            BindingRegistry registry = BindingRegistry.getInstance();
+            registry.resetBindingHash();
+            registry.save();
+            return true;
         }
         return false;
     }
 
-    public class WidgetRow extends Item
+    public class GeneralTab extends GridLayoutTab
     {
-        private final AbstractWidget optionOne;
-        private final AbstractWidget optionTwo;
+        private static final Component TITLE = Component.translatable("controllable.settings.tab.general.title");
 
-        public WidgetRow(SettingProvider leftWidget)
+        public GeneralTab()
         {
-            super(CommonComponents.EMPTY);
-            this.optionOne = leftWidget.createWidget(0, 0, 310, 20).get();
-            this.optionTwo = null;
+            super(TITLE);
+            GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
+            TabSelectionList optionsList = new TabSelectionList(SettingsScreen.this.minecraft, 24);
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.autoSelect));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.virtualCursor));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.thumbstickDeadZone, 0.01));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.controllerIcons));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.cursorSpeed, 1.0));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.cursorThumbstick));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.cursorType));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.listScrollSpeed, 1.0));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.hoverModifier, 0.05));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.uiSounds));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.fpsPollingFix));
+            rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, optionsList));
         }
+    }
 
-        public WidgetRow(SettingProvider leftWidget, @Nullable SettingProvider rightWidget)
+    public class GameplayTab extends GridLayoutTab
+    {
+        private static final Component TITLE = Component.translatable("controllable.settings.tab.gameplay.title");
+
+        public GameplayTab()
         {
-            super(CommonComponents.EMPTY);
-            this.optionOne = leftWidget.createWidget(0, 0, 150, 20).get();
-            this.optionTwo = Optional.ofNullable(rightWidget).map(o -> o.createWidget(0, 0, 150, 20).get()).orElse(null);
+            super(TITLE);
+            Minecraft mc = Objects.requireNonNull(SettingsScreen.this.minecraft);
+            GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
+            TabSelectionList optionsList = new TabSelectionList(mc, 24);
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.rotationSpeed, 1.0));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.pitchSensitivity, 0.01));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.yawSensitivity, 0.01));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.invertLook));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.invertRotation));
+            optionsList.addEntry(new TabOptionEnumItem<>(Component.translatable("controllable.gui.sneak_mode"), Component.translatable("controllable.gui.sneak_mode.desc"), () -> {
+                return mc.options.toggleCrouch().get() ? SneakMode.TOGGLE : SneakMode.HOLD;
+            }, sneakMode -> {
+                mc.options.toggleCrouch().set(sneakMode == SneakMode.TOGGLE);
+                mc.options.save();
+            }));
+            optionsList.addEntry(new TabOptionEnumItem<>(Component.translatable("controllable.gui.sprint_mode"), Component.translatable("controllable.gui.sprint_mode.desc"), () -> {
+                return mc.options.toggleSprint().get() ? SprintMode.TOGGLE : SprintMode.ONCE;
+            }, sprintMode -> {
+                mc.options.toggleSprint().set(sprintMode == SprintMode.TOGGLE);
+                mc.options.save();
+            }));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.quickCraft));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.showButtonHints));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.drawHintBackground));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.radialThumbstick));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.consoleHotbar));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.renderMiniPlayer));
+            rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, optionsList));
         }
+    }
 
-        @Override
-        public void render(PoseStack matrixStack, int index, int top, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean hovered, float partialTicks)
-        {
-            this.optionOne.setX(left);
-            this.optionOne.setY(top);
-            this.optionOne.render(matrixStack, mouseX, mouseY, partialTicks);
-            if(this.optionTwo != null)
-            {
-                this.optionTwo.setX(left + width - 150);
-                this.optionTwo.setY(top);
-                this.optionTwo.render(matrixStack, mouseX, mouseY, partialTicks);
-            }
-        }
+    public class BindingsTab extends GridLayoutTab
+    {
+        private static final Component TITLE = Component.translatable("controllable.settings.tab.bindings.title");
 
-        @Override
-        public List<? extends GuiEventListener> children()
+        public BindingsTab()
         {
-            return this.optionTwo != null ? ImmutableList.of(this.optionOne, this.optionTwo) : ImmutableList.of(this.optionOne);
-        }
-
-        @Override
-        public boolean mouseReleased(double mouseX, double mouseY, int button)
-        {
-            boolean wasDragging = this.isDragging();
-            this.setDragging(false);
-            if(wasDragging && this.getFocused() != null)
-            {
-                return this.getFocused().mouseReleased(mouseX, mouseY, button);
-            }
-            return false;
+            super(TITLE);
+            GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
+            rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, new ButtonBindingList(SettingsScreen.this, SettingsScreen.this.minecraft, 22)));
         }
     }
 }

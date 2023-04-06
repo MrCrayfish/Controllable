@@ -64,7 +64,7 @@ public class MinecraftMixin
         Controller controller = Controllable.getController();
         if(controller != null && ButtonBindings.ATTACK.isButtonDown())
         {
-            boolean usingVirtualMouse = (Config.CLIENT.client.options.virtualMouse.get() && Controllable.getInput().getLastUse() > 0);
+            boolean usingVirtualMouse = (Config.CLIENT.client.options.virtualCursor.get() && Controllable.getInput().getLastUse() > 0);
             return mc.screen == null && (mc.mouseHandler.isMouseGrabbed() || usingVirtualMouse);
         }
         return false;

@@ -14,6 +14,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.EventHelper;
+import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.event.Value;
 import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
@@ -49,7 +50,6 @@ import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -178,7 +178,7 @@ public class ControllerInput
         if(mc.screen == null || mc.screen instanceof ControllerLayoutScreen)
             return;
 
-        float deadZone = (float) Math.min(1.0F, Config.CLIENT.client.options.deadZone.get() + 0.25F);
+        float deadZone = (float) Math.min(1.0F, Config.CLIENT.client.options.thumbstickDeadZone.get() + 0.25F);
 
         /* Only need to run code if left thumb stick has input */
         boolean lastMoving = this.moving;
@@ -194,7 +194,7 @@ public class ControllerInput
             {
                 double mouseX = mc.mouseHandler.xpos();
                 double mouseY = mc.mouseHandler.ypos();
-                if(Controllable.getController() != null && Config.CLIENT.client.options.virtualMouse.get())
+                if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get())
                 {
                     mouseX = this.virtualMouseX;
                     mouseY = this.virtualMouseY;
@@ -217,7 +217,7 @@ public class ControllerInput
 
         if(Math.abs(this.mouseSpeedX) > 0F || Math.abs(this.mouseSpeedY) > 0F)
         {
-            double mouseSpeed = Config.CLIENT.client.options.mouseSpeed.get() * mc.getWindow().getGuiScale();
+            double mouseSpeed = Config.CLIENT.client.options.cursorSpeed.get() * mc.getWindow().getGuiScale();
 
             // When hovering over slots, slows down the mouse speed to make it easier
             if(mc.screen instanceof AbstractContainerScreen<?> screen)
@@ -291,7 +291,7 @@ public class ControllerInput
             this.handleCreativeScrolling((CreativeModeInventoryScreen) mc.screen, controller);
         }
 
-        if(Config.CLIENT.client.options.virtualMouse.get() && (this.mouseX != this.prevMouseX || this.mouseY != this.prevMouseY))
+        if(Config.CLIENT.client.options.virtualCursor.get() && (this.mouseX != this.prevMouseX || this.mouseY != this.prevMouseY))
         {
             this.performMouseDrag(this.virtualMouseX, this.virtualMouseY, this.mouseX - this.prevMouseX, this.mouseY - this.prevMouseY);
         }
@@ -355,7 +355,7 @@ public class ControllerInput
 
     public void drawVirtualCursor(Screen screen, PoseStack poseStack, int mouseX, int mouseY, float partialTick)
     {
-        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualMouse.get() && this.lastUse > 0)
+        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && this.lastUse > 0)
         {
             poseStack.pushPose();
             CursorType type = Config.CLIENT.client.options.cursorType.get();
@@ -395,10 +395,15 @@ public class ControllerInput
                 this.handleMerchantScrolling(screen, controller);
                 return;
             }
-            GuiEventListener hoveredListener = mc.screen.children().stream().filter(o -> o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
-            if(hoveredListener instanceof AbstractSelectionList<?> selectionList)
+
+            float yValue = Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
+            if(Math.abs(yValue) >= 0.2F)
             {
-                this.handleListScrolling(selectionList, controller);
+                GuiEventListener hoveredListener = ScreenUtil.findHoveredListener(mc.screen, mouseX, mouseY, listener -> listener instanceof AbstractSelectionList<?>).orElse(null);
+                if(hoveredListener instanceof AbstractSelectionList<?> selectionList)
+                {
+                    this.handleListScrolling(selectionList, controller);
+                }
             }
         }
 
@@ -436,7 +441,7 @@ public class ControllerInput
 
         if(mc.screen == null)
         {
-            float deadZone = Config.CLIENT.client.options.deadZone.get().floatValue();
+            float deadZone = Config.CLIENT.client.options.thumbstickDeadZone.get().floatValue();
             float pitchSensitivity = Config.CLIENT.client.options.pitchSensitivity.get().floatValue();
             float yawSensitivity = Config.CLIENT.client.options.yawSensitivity.get().floatValue();
             double rotationSpeed = Config.CLIENT.client.options.rotationSpeed.get();
@@ -544,7 +549,7 @@ public class ControllerInput
         {
             if((!RadialMenuHandler.instance().isVisible() || Config.CLIENT.client.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent(controller))
             {
-                float deadZone = Config.CLIENT.client.options.deadZone.get().floatValue();
+                float deadZone = Config.CLIENT.client.options.thumbstickDeadZone.get().floatValue();
                 float sneakBonus = player.isMovingSlowly() ? Mth.clamp(0.3F + EnchantmentHelper.getSneakingSpeedBonus(player), 0.0F, 1.0F) : 1.0F;
 
                 if(Math.abs(controller.getLThumbStickYValue()) >= deadZone)
@@ -1049,6 +1054,7 @@ public class ControllerInput
     private List<NavigationPoint> gatherNavigationPoints(Screen screen, Navigate navigate, int mouseX, int mouseY)
     {
         List<NavigationPoint> points = new ArrayList<>();
+        List<AbstractWidget> widgets = new ArrayList<>();
 
         if(screen instanceof AbstractContainerScreen<?> containerScreen)
         {
@@ -1064,57 +1070,9 @@ public class ControllerInput
             }
         }
 
-        List<AbstractWidget> widgets = new ArrayList<>();
         for(GuiEventListener listener : screen.children())
         {
-            if(listener instanceof AbstractWidget widget && widget.active && widget.visible)
-            {
-                widgets.add((AbstractWidget) listener);
-            }
-            else if(listener instanceof AbstractSelectionList<?> list)
-            {
-                int count = list.children().size();
-                int itemHeight = ClientServices.CLIENT.getListItemHeight(list);
-                for(int i = 0; i < count; i++)
-                {
-                    GuiEventListener entry = list.children().get(i);
-                    int rowTop = ClientServices.CLIENT.getAbstractListRowTop(list, i);
-                    int rowBottom = ClientServices.CLIENT.getAbstractListRowBottom(list, i);
-                    int listTop = ClientServices.CLIENT.getAbstractListTop(list);
-                    int listBottom = ClientServices.CLIENT.getAbstractListBottom(list);
-                    if(rowTop > listTop - itemHeight && rowBottom < listBottom + itemHeight)
-                    {
-                        if(navigate == Navigate.UP || navigate == Navigate.DOWN)
-                        {
-                            points.add(new ListEntryNavigationPoint(list, entry, i));
-                        }
-                        if(entry instanceof ContainerEventHandler handler)
-                        {
-                            for(GuiEventListener child : handler.children())
-                            {
-                                if(child instanceof AbstractWidget widget && widget.active && widget.visible)
-                                {
-                                    points.add(new ListWidgetNavigationPoint(widget, list, entry));
-                                }
-                            }
-                        }
-                    }
-                    else if(list.isMouseOver(mouseX, mouseY))
-                    {
-                        points.add(new ListEntryNavigationPoint(list, entry, i));
-                    }
-                }
-            }
-            else if(listener instanceof TabNavigationBar navigationBar)
-            {
-                navigationBar.children().forEach(child ->
-                {
-                    if(child instanceof TabButton button)
-                    {
-                        widgets.add(button);
-                    }
-                });
-            }
+            this.gatherNavigationPointsFromListener(listener, navigate, mouseX, mouseY, points);
         }
 
         if(screen instanceof RecipeUpdateListener)
@@ -1161,6 +1119,79 @@ public class ControllerInput
         }
 
         return points;
+    }
+
+    private void gatherNavigationPointsFromListener(GuiEventListener listener, Navigate navigate, int mouseX, int mouseY, List<NavigationPoint> points)
+    {
+        if(listener instanceof AbstractSelectionList<?> list)
+        {
+            this.gatherNavigationPointsFromAbstractList(list, navigate, mouseX, mouseY, points);
+        }
+        else if(listener instanceof TabNavigationBar navigationBar)
+        {
+            navigationBar.children().forEach(child ->
+            {
+                if(child instanceof TabButton button)
+                {
+                    this.createWidgetNavigationPoint(button, points);
+                }
+            });
+        }
+        else if(listener instanceof ContainerEventHandler handler)
+        {
+            handler.children().forEach(child ->
+            {
+                this.gatherNavigationPointsFromListener(child, navigate, mouseX, mouseY, points);
+            });
+        }
+        else if(listener instanceof AbstractWidget widget && widget.active && widget.visible)
+        {
+            this.createWidgetNavigationPoint(widget, points);
+        }
+    }
+
+    private void createWidgetNavigationPoint(AbstractWidget widget, List<NavigationPoint> points)
+    {
+        if(widget == null || widget.isHovered() || !widget.visible || !widget.active)
+            return;
+        int posX = widget.getX() + widget.getWidth() / 2;
+        int posY = widget.getY() + widget.getHeight() / 2;
+        points.add(new WidgetNavigationPoint(posX, posY, widget));
+    }
+
+    private void gatherNavigationPointsFromAbstractList(AbstractSelectionList<?> list, Navigate navigate, int mouseX, int mouseY, List<NavigationPoint> points)
+    {
+        int count = list.children().size();
+        int itemHeight = ClientServices.CLIENT.getListItemHeight(list);
+        for(int i = 0; i < count; i++)
+        {
+            GuiEventListener entry = list.children().get(i);
+            int rowTop = ClientServices.CLIENT.getAbstractListRowTop(list, i);
+            int rowBottom = ClientServices.CLIENT.getAbstractListRowBottom(list, i);
+            int listTop = ClientServices.CLIENT.getAbstractListTop(list);
+            int listBottom = ClientServices.CLIENT.getAbstractListBottom(list);
+            if(rowTop > listTop - itemHeight && rowBottom < listBottom + itemHeight)
+            {
+                if(navigate == Navigate.UP || navigate == Navigate.DOWN)
+                {
+                    points.add(new ListEntryNavigationPoint(list, entry, i));
+                }
+                if(entry instanceof ContainerEventHandler handler)
+                {
+                    for(GuiEventListener child : handler.children())
+                    {
+                        if(child instanceof AbstractWidget widget && widget.active && widget.visible)
+                        {
+                            points.add(new ListWidgetNavigationPoint(widget, list, entry));
+                        }
+                    }
+                }
+            }
+            else if(list.isMouseOver(mouseX, mouseY))
+            {
+                points.add(new ListEntryNavigationPoint(list, entry, i));
+            }
+        }
     }
 
     private void craftRecipeBookItem()
@@ -1273,7 +1304,7 @@ public class ControllerInput
 
     private void setMousePosition(double mouseX, double mouseY)
     {
-        if(Config.CLIENT.client.options.virtualMouse.get())
+        if(Config.CLIENT.client.options.virtualCursor.get())
         {
             this.virtualMouseX = mouseX;
             this.virtualMouseY = mouseY;
@@ -1346,7 +1377,7 @@ public class ControllerInput
     {
         Minecraft mc = Minecraft.getInstance();
         double mouseX = mc.mouseHandler.xpos();
-        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualMouse.get() && this.lastUse > 0)
+        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && this.lastUse > 0)
         {
             mouseX = this.virtualMouseX;
         }
@@ -1357,7 +1388,7 @@ public class ControllerInput
     {
         Minecraft mc = Minecraft.getInstance();
         double mouseY = mc.mouseHandler.ypos();
-        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualMouse.get() && this.lastUse > 0)
+        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && this.lastUse > 0)
         {
             mouseY = this.virtualMouseY;
         }

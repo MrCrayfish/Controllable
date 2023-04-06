@@ -8,6 +8,7 @@ import com.mrcrayfish.controllable.client.RenderEvents;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.GameRenderer;
@@ -59,5 +60,15 @@ public class ClientHelper
         Tooltip blank = Tooltip.create(CommonComponents.EMPTY);
         ClientServices.CLIENT.pushLinesToTooltip(blank, charSequenceList);
         return blank;
+    }
+
+    public static Component getOptionName(OptionInstance<Boolean> option)
+    {
+        return ClientServices.CLIENT.getOptionInstanceName(option);
+    }
+
+    public static Tooltip getOptionTooltip(OptionInstance<Boolean> option)
+    {
+        return ClientServices.CLIENT.getOptionInstanceTooltip(option);
     }
 }

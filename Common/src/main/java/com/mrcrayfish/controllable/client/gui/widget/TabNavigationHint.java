@@ -26,7 +26,7 @@ public class TabNavigationHint implements Renderable
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick)
     {
         // Don't render if tabs can't be navigated
-        if(!Controllable.getInput().isControllerInUse() || this.tabs.size() < 2)
+        if(!Controllable.getInput().isControllerInUse())
             return;
 
         ScreenRectangle firstTab = this.tabs.get(0).getRectangle();

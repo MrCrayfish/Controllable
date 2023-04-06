@@ -23,7 +23,7 @@ public class OptifineGameRendererMixin
     private Object[] controllableDrawScreen(Object[] args)
     {
         ControllerInput input = Controllable.getInput();
-        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualMouse.get() && input.getLastUse() > 0)
+        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && input.getLastUse() > 0)
         {
             Minecraft minecraft = Minecraft.getInstance();
             int mouseX = (int) (input.getVirtualMouseX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getWidth());

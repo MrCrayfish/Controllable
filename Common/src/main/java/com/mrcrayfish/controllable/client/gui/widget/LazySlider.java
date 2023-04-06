@@ -20,15 +20,22 @@ public class LazySlider extends AbstractSliderButton
     private final double step;
     private final Consumer<Double> onChange;
     private boolean pressed = false;
+    private boolean valueOnly = false;
 
     public LazySlider(int x, int y, int width, int height, Component label, double initialValue, double minValue, double maxValue, double step, Consumer<Double> onChange)
     {
-        super(x, y, width, height, label, parseValue(initialValue, step));
+        super(x, y, width, height, label, parseValue(initialValue, step, minValue, maxValue));
         this.label = label;
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.step = step;
         this.onChange = onChange;
+        this.updateMessage();
+    }
+
+    public void valueOnly()
+    {
+        this.valueOnly = true;
         this.updateMessage();
     }
 
@@ -60,15 +67,47 @@ public class LazySlider extends AbstractSliderButton
     @Override
     protected void updateMessage()
     {
-        this.setMessage(Component.empty().append(this.label).append(": ").append(FORMATTER.format(this.getValue())));
+        if(this.valueOnly)
+        {
+            this.setMessage(Component.empty().append(FORMATTER.format(this.getValue())));
+        }
+        else
+        {
+            this.setMessage(Component.empty().append(this.label).append(": ").append(FORMATTER.format(this.getValue())));
+        }
     }
 
     @Override
     protected void applyValue() {}
 
-    private static double parseValue(double value, double step)
+    private static double parseValue(double value, double step, double minValue, double maxValue)
     {
-        double scale = 1.0 / step;
-        return Mth.clamp(Mth.floor(value * scale) / scale, 0.0, 1.0);
+        double range = Math.abs(maxValue - minValue);
+        value -= minValue;
+        value /= range;
+        return value;
+    }
+
+    public void stepForward()
+    {
+        if(this.value < 1.0)
+        {
+            this.value = Mth.clamp(this.value + this.step / (this.maxValue - this.minValue), 0.0, 1.0);
+            this.updateMessage();
+        }
+    }
+
+    public void stepBackward()
+    {
+        if(this.value > 0.0)
+        {
+            this.value = Mth.clamp(this.value - this.step / (this.maxValue - this.minValue), 0.0, 1.0);
+            this.updateMessage();
+        }
+    }
+
+    public void triggerChangeCallback()
+    {
+        this.onChange.accept(this.getValue());
     }
 }

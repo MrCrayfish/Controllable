@@ -93,9 +93,9 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
         }
 
         @Override
-        public String getLabel()
+        public Component getLabel()
         {
-            return this.label.plainCopy().getString();
+            return this.label;
         }
 
         @Override

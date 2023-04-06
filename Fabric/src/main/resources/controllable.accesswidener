@@ -6,6 +6,8 @@ accessible field net/minecraft/client/MouseHandler lastMouseEventTime D
 accessible field net/minecraft/client/Minecraft rightClickDelay I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
+accessible field net/minecraft/client/OptionInstance caption Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/client/OptionInstance tooltip Lnet/minecraft/client/OptionInstance$TooltipSupplier;
 accessible method net/minecraft/client/Minecraft getFramerateLimit ()I
 accessible method net/minecraft/client/Minecraft startUseItem ()V
 accessible method net/minecraft/client/Minecraft startAttack ()Z

@@ -85,7 +85,7 @@ public abstract class ListMenuScreen extends Screen
         {
             this.updateSearchTextFieldSuggestion(s);
             this.list.replaceEntries(s.isEmpty() ? this.entries : this.entries.stream().filter(item -> {
-                return item instanceof ISearchable searchable && searchable.getLabel().toLowerCase(Locale.ENGLISH).contains(s.toLowerCase(Locale.ENGLISH));
+                return item instanceof ISearchable searchable && searchable.getLabel().plainCopy().toString().toLowerCase(Locale.ENGLISH).contains(s.toLowerCase(Locale.ENGLISH));
             }).collect(Collectors.toList()));
             if(!s.isEmpty())
             {
@@ -356,12 +356,12 @@ public abstract class ListMenuScreen extends Screen
             Optional<? extends ISearchable> optional = this.entries.stream()
                     .filter(item -> item instanceof ISearchable)
                     .map(item -> (ISearchable) item)
-                    .filter(info -> info.getLabel().toLowerCase(Locale.ENGLISH).startsWith(value.toLowerCase(Locale.ENGLISH)))
-                    .min(Comparator.comparing(ISearchable::getLabel));
+                    .filter(item -> item.getLabel().plainCopy().toString().toLowerCase(Locale.ENGLISH).startsWith(value.toLowerCase(Locale.ENGLISH)))
+                    .min(Comparator.comparing(item -> item.getLabel().plainCopy().toString()));
             if(optional.isPresent())
             {
                 int length = value.length();
-                String displayName = optional.get().getLabel();
+                String displayName = optional.get().getLabel().plainCopy().toString();
                 this.searchTextField.setSuggestion(displayName.substring(length));
             }
             else

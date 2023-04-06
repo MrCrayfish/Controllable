@@ -41,7 +41,7 @@ public class Config
             public final BoolProperty renderMiniPlayer = BoolProperty.create(true);
 
             @ConfigProperty(name = "virtualMouse", comment = "If enabled, the game will use a virtual cursor instead of the real cursor. This must be turned on to be able to run multiple instances!")
-            public final BoolProperty virtualMouse = BoolProperty.create(true);
+            public final BoolProperty virtualCursor = BoolProperty.create(true);
 
             @ConfigProperty(name = "consoleHotbar", comment = "If enabled, hotbar will render closer to the center of the screen like on console.")
             public final BoolProperty consoleHotbar = BoolProperty.create(false);
@@ -59,7 +59,7 @@ public class Config
             public final BoolProperty invertRotation = BoolProperty.create(false); //TODO rename
 
             @ConfigProperty(name = "deadZone", comment = "The distance you have to move the thumbstick before it's input is registered. This fixes drifting as some thumbsticks don't center to zero.")
-            public final DoubleProperty deadZone = DoubleProperty.create(0.15, 0.0, 1.0);
+            public final DoubleProperty thumbstickDeadZone = DoubleProperty.create(0.15, 0.0, 1.0);
 
             @ConfigProperty(name = "rotationSpeed", comment = "The speed which the camera turns in game")
             public final DoubleProperty rotationSpeed = DoubleProperty.create(25.0, 0.0, 100.0);
@@ -71,10 +71,10 @@ public class Config
             public final DoubleProperty yawSensitivity = DoubleProperty.create(1.0, 0.0, 1.0);
 
             @ConfigProperty(name = "mouseSpeed", comment = "The speed which the cursor or virtual mouse moves around the screen")
-            public final DoubleProperty mouseSpeed = DoubleProperty.create(15.0, 0.0, 50.0);
+            public final DoubleProperty cursorSpeed = DoubleProperty.create(15.0, 0.0, 50.0);
 
             @ConfigProperty(name = "showActions", comment = "If enabled, shows common actions when displaying available on the screen")
-            public final EnumProperty<ActionVisibility> showActions = EnumProperty.create(ActionVisibility.MINIMAL);
+            public final EnumProperty<ActionVisibility> showButtonHints = EnumProperty.create(ActionVisibility.MINIMAL);
 
             @ConfigProperty(name = "quickCraft", comment = "If enabled, allows you to craft quickly when clicking an item in the recipe book")
             public final BoolProperty quickCraft = BoolProperty.create(true);
@@ -95,7 +95,7 @@ public class Config
             public final BoolProperty fpsPollingFix = BoolProperty.create(false);
 
             @ConfigProperty(name = "hintBackground", comment = "Draws a transparent background behind the text of the button hint")
-            public final BoolProperty hintBackground = BoolProperty.create(true);
+            public final BoolProperty drawHintBackground = BoolProperty.create(true);
 
             @ConfigProperty(name = "listScrollSpeed", comment = "The speed that lists scroll")
             public final DoubleProperty listScrollSpeed = DoubleProperty.create(10.0, 1.0, 30.0);

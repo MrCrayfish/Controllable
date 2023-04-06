@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.gui.screens.ButtonBindingScreen;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -235,12 +236,9 @@ public class InputProcessor
             if(!states.getState(index))
             {
                 states.setState(index, true);
-                if(screen instanceof ButtonBindingScreen)
+                if(screen instanceof SettingsScreen settings && settings.isWaitingForButtonInput() && settings.processButton(index))
                 {
-                    if(((ButtonBindingScreen) screen).processButton(index))
-                    {
-                        return;
-                    }
+                    return;
                 }
                 this.input.handleButtonInput(controller, index, true, false);
             }

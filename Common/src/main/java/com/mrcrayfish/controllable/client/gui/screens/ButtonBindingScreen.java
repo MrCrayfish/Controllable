@@ -164,7 +164,10 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         {
             super(Component.translatable(binding.getLabelKey()));
             this.binding = binding;
-            this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> ButtonBindingScreen.this.setSelectedBinding(this.binding));
+            this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> {
+                ButtonBindingScreen.this.setSelectedBinding(this.binding);
+                return true;
+            });
             this.resetButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button ->
             {
                 binding.reset();
@@ -202,9 +205,9 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         }
 
         @Override
-        public String getLabel()
+        public Component getLabel()
         {
-            return this.label.plainCopy().getString();
+            return this.label;
         }
 
         @Override

@@ -22,7 +22,7 @@ public class ForgeGameRendererMixin
     private int controllableModifyMouseX(int mouseX)
     {
         ControllerInput input = Controllable.getInput();
-        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualMouse.get() && input.getLastUse() > 0)
+        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && input.getLastUse() > 0)
         {
             Minecraft minecraft = Minecraft.getInstance();
             return (int) (input.getVirtualMouseX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getScreenWidth());
@@ -34,7 +34,7 @@ public class ForgeGameRendererMixin
     private int controllableModifyMouseY(int mouseY)
     {
         ControllerInput input = Controllable.getInput();
-        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualMouse.get() && input.getLastUse() > 0)
+        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && input.getLastUse() > 0)
         {
             Minecraft minecraft = Minecraft.getInstance();
             return (int) (input.getVirtualMouseY() * (double) minecraft.getWindow().getGuiScaledHeight() / (double) minecraft.getWindow().getScreenHeight());

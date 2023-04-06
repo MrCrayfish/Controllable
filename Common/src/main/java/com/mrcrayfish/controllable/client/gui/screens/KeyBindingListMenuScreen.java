@@ -145,9 +145,9 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
         }
 
         @Override
-        public String getLabel()
+        public Component getLabel()
         {
-            return this.label.plainCopy().getString();
+            return this.label;
         }
 
         public void updateButtons()

@@ -8,6 +8,7 @@ import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.widget.TabNavigationHint;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
@@ -80,7 +81,7 @@ public class RenderEvents
 
             Map<ButtonBinding, Action> actionMap = new LinkedHashMap<>();
 
-            ActionVisibility visibility = Config.CLIENT.client.options.showActions.get();
+            ActionVisibility visibility = Config.CLIENT.client.options.showButtonHints.get();
             if(visibility == ActionVisibility.NONE) return;
 
             boolean verbose = visibility == ActionVisibility.ALL;
@@ -348,13 +349,11 @@ public class RenderEvents
 
     private static void drawHintBackground(PoseStack poseStack, int x, int y, int width, int height)
     {
-        if(!Config.CLIENT.client.options.hintBackground.get())
+        if(!Config.CLIENT.client.options.drawHintBackground.get())
             return;
         Minecraft mc = Minecraft.getInstance();
         int backgroundColor = mc.options.getBackgroundColor(0.5F);
-        Screen.fill(poseStack, x - 3 + 1, y, x + width + 2 - 1, y + 1, backgroundColor);
-        Screen.fill(poseStack, x - 3, y + 1, x + width + 2, y + height - 1, backgroundColor);
-        Screen.fill(poseStack, x - 3 + 1, y + height - 1, x + width + 2 - 1, y + height, backgroundColor);
+        ScreenUtil.drawRoundedBox(poseStack, x, y, width, height, backgroundColor);
     }
 
     private static void renderMiniPlayer(PoseStack poseStack)
