@@ -612,31 +612,15 @@ public class ControllerInput
         if(button != -1)
         {
             Value<Integer> newButton = new Value<>(button);
-            //TODO move into event helper
-            boolean cancelled = ControllerEvents.INPUT.post().handle(controller, newButton, button, state);
-            if(!cancelled)
-            {
-                cancelled = ClientServices.CLIENT.sendLegacyControllerEventButtonInput(controller, newButton, button, state);
-            }
-            if(cancelled)
-            {
+            if(EventHelper.postInputEvent(controller, newButton, button, state))
                 return;
-            }
 
             button = newButton.get();
             ButtonBinding.setButtonState(button, state);
         }
 
-        //TODO move into event helper
-        boolean cancelled = ControllerEvents.BUTTON.post().handle(controller);
-        if(!cancelled)
-        {
-            cancelled = ClientServices.CLIENT.sendLegacyControllerEventButton(controller);
-        }
-        if(cancelled)
-        {
+        if(EventHelper.postButtonEvent(controller))
             return;
-        }
 
         Minecraft mc = Minecraft.getInstance();
         if(state)
