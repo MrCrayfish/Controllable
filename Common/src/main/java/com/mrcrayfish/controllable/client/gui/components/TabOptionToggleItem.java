@@ -7,7 +7,6 @@ import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
-import com.mrcrayfish.controllable.platform.ClientServices;
 import com.mrcrayfish.framework.api.config.BoolProperty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -86,6 +85,9 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
+        if(!Controllable.getInput().isControllerInUse())
+            return super.mouseClicked(mouseX, mouseY, button);
+
         if(button != GLFW.GLFW_MOUSE_BUTTON_1)
             return false;
 
