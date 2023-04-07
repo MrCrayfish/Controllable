@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Buttons;
+import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.gui.widget.LazySlider;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
@@ -24,7 +25,7 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-public class TabOptionSliderItem extends TabOptionBaseItem
+public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatable
 {
     private final LazySlider slider;
     private long lastChange;
@@ -44,11 +45,13 @@ public class TabOptionSliderItem extends TabOptionBaseItem
     @Override
     public List<? extends GuiEventListener> children()
     {
-        if(Controllable.getInput().isControllerInUse())
-        {
-            return Collections.emptyList();
-        }
         return ImmutableList.of(this.slider);
+    }
+
+    @Override
+    public List<GuiEventListener> elements()
+    {
+        return Collections.emptyList();
     }
 
     @Override

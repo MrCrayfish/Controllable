@@ -8,6 +8,7 @@ import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.navigation.ListEntryNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.ListWidgetNavigationPoint;
+import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
@@ -1123,7 +1124,14 @@ public class ControllerInput
 
     private void gatherNavigationPointsFromListener(GuiEventListener listener, Navigate navigate, int mouseX, int mouseY, List<NavigationPoint> points)
     {
-        if(listener instanceof AbstractSelectionList<?> list)
+        if(listener instanceof Navigatable navigatable)
+        {
+            navigatable.elements().forEach(child ->
+            {
+                this.gatherNavigationPointsFromListener(child, navigate, mouseX, mouseY, points);
+            });
+        }
+        else if(listener instanceof AbstractSelectionList<?> list)
         {
             this.gatherNavigationPointsFromAbstractList(list, navigate, mouseX, mouseY, points);
         }

@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 /**
  * Author: MrCrayfish
  */
-public class TabListWidget extends AbstractWidget implements ContainerEventHandler, Navigatable
+public class TabListWidget extends AbstractWidget implements ContainerEventHandler
 {
     private final Supplier<ScreenRectangle> dimensions;
     private final TabSelectionList list;
@@ -29,12 +29,6 @@ public class TabListWidget extends AbstractWidget implements ContainerEventHandl
         super(0, 0, 100, 0, CommonComponents.EMPTY);
         this.dimensions = dimensions;
         this.list = list;
-    }
-
-    @Override
-    public boolean canNavigate()
-    {
-        return false;
     }
 
     @Override

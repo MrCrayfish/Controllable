@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.gui.components;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;

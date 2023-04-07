@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Buttons;
+import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.controllable.platform.ClientServices;
@@ -26,7 +27,7 @@ import java.util.function.Supplier;
 /**
  * Author: MrCrayfish
  */
-public class TabOptionToggleItem extends TabOptionBaseItem
+public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatable
 {
     private final AbstractWidget toggle;
 
@@ -59,11 +60,13 @@ public class TabOptionToggleItem extends TabOptionBaseItem
     @Override
     public List<? extends GuiEventListener> children()
     {
-        if(Controllable.getInput().isControllerInUse())
-        {
-            return Collections.emptyList();
-        }
         return ImmutableList.of(this.toggle);
+    }
+
+    @Override
+    public List<GuiEventListener> elements()
+    {
+        return Collections.emptyList();
     }
 
     @Override

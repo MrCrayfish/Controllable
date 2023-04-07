@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Buttons;
+import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.settings.SettingEnum;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
@@ -28,7 +29,7 @@ import java.util.function.Supplier;
 /**
  * Author: MrCrayfish
  */
-public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptionBaseItem
+public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptionBaseItem implements Navigatable
 {
     private final CycleButton<T> cycle;
     private boolean canChange;
@@ -57,11 +58,13 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
     @Override
     public List<? extends GuiEventListener> children()
     {
-        if(Controllable.getInput().isControllerInUse())
-        {
-            return Collections.emptyList();
-        }
         return ImmutableList.of(this.cycle);
+    }
+
+    @Override
+    public List<GuiEventListener> elements()
+    {
+        return Collections.emptyList();
     }
 
     @Override
