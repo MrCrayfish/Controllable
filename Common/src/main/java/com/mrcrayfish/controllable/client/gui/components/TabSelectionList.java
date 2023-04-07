@@ -104,16 +104,10 @@ public class TabSelectionList extends ContainerObjectSelectionList<TabSelectionL
     }
 
     @Override
-    public void visitWidgets(Consumer<AbstractWidget> var1)
-    {
-
-    }
+    public void visitWidgets(Consumer<AbstractWidget> consumer) {}
 
     @Override
-    public void updateNarration(NarrationElementOutput var1)
-    {
-
-    }
+    public void updateNarration(NarrationElementOutput output) {}
 
     public abstract static class Item extends ContainerObjectSelectionList.Entry<Item>
     {

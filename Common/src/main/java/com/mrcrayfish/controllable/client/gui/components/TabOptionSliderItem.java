@@ -92,22 +92,4 @@ public class TabOptionSliderItem extends TabOptionBaseItem
             }
         }
     }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button)
-    {
-        return this.slider.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean mouseDragged(double $$0, double $$1, int button, double $$3, double $$4)
-    {
-        return this.slider.mouseDragged($$0, $$1, button, $$3, $$4);
-    }
-
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button)
-    {
-        return this.slider.mouseReleased(mouseX, mouseY, button);
-    }
 }
