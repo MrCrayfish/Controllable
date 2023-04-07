@@ -69,11 +69,14 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+
+//TODO this has become a big mess, and really needs to be organised
 
 /**
  * Author: MrCrayfish
@@ -1073,7 +1076,7 @@ public class ControllerInput
 
         for(GuiEventListener listener : screen.children())
         {
-            this.gatherNavigationPointsFromListener(listener, navigate, mouseX, mouseY, points);
+            this.gatherNavigationPointsFromListener(listener, navigate, mouseX, mouseY, points, null, null);
         }
 
         if(screen instanceof RecipeUpdateListener)
@@ -1122,18 +1125,18 @@ public class ControllerInput
         return points;
     }
 
-    private void gatherNavigationPointsFromListener(GuiEventListener listener, Navigate navigate, int mouseX, int mouseY, List<NavigationPoint> points)
+    private void gatherNavigationPointsFromListener(GuiEventListener listener, Navigate navigate, int mouseX, int mouseY, List<NavigationPoint> points, @Nullable AbstractSelectionList<?> list, @Nullable GuiEventListener entry)
     {
         if(listener instanceof Navigatable navigatable)
         {
             navigatable.elements().forEach(child ->
             {
-                this.gatherNavigationPointsFromListener(child, navigate, mouseX, mouseY, points);
+                this.gatherNavigationPointsFromListener(child, navigate, mouseX, mouseY, points, list, entry);
             });
         }
-        else if(listener instanceof AbstractSelectionList<?> list)
+        else if(listener instanceof AbstractSelectionList<?> selectionList)
         {
-            this.gatherNavigationPointsFromAbstractList(list, navigate, mouseX, mouseY, points);
+            this.gatherNavigationPointsFromAbstractList(selectionList, navigate, mouseX, mouseY, points);
         }
         else if(listener instanceof TabNavigationBar navigationBar)
         {
@@ -1141,7 +1144,7 @@ public class ControllerInput
             {
                 if(child instanceof TabButton button)
                 {
-                    this.createWidgetNavigationPoint(button, points);
+                    this.createWidgetNavigationPoint(button, points, list, entry);
                 }
             });
         }
@@ -1149,22 +1152,29 @@ public class ControllerInput
         {
             handler.children().forEach(child ->
             {
-                this.gatherNavigationPointsFromListener(child, navigate, mouseX, mouseY, points);
+                this.gatherNavigationPointsFromListener(child, navigate, mouseX, mouseY, points, list, entry);
             });
         }
         else if(listener instanceof AbstractWidget widget && widget.active && widget.visible)
         {
-            this.createWidgetNavigationPoint(widget, points);
+            this.createWidgetNavigationPoint(widget, points, list, entry);
         }
     }
 
-    private void createWidgetNavigationPoint(AbstractWidget widget, List<NavigationPoint> points)
+    private void createWidgetNavigationPoint(AbstractWidget widget, List<NavigationPoint> points, @Nullable AbstractSelectionList<?> list, @Nullable GuiEventListener entry)
     {
         if(widget == null || widget.isHovered() || !widget.visible || !widget.active)
             return;
         int posX = widget.getX() + widget.getWidth() / 2;
         int posY = widget.getY() + widget.getHeight() / 2;
-        points.add(new WidgetNavigationPoint(posX, posY, widget));
+        if(list != null && entry != null)
+        {
+            points.add(new ListWidgetNavigationPoint(widget, list, entry));
+        }
+        else
+        {
+            points.add(new WidgetNavigationPoint(posX, posY, widget));
+        }
     }
 
     private void gatherNavigationPointsFromAbstractList(AbstractSelectionList<?> list, Navigate navigate, int mouseX, int mouseY, List<NavigationPoint> points)
@@ -1184,16 +1194,7 @@ public class ControllerInput
                 {
                     points.add(new ListEntryNavigationPoint(list, entry, i));
                 }
-                if(entry instanceof ContainerEventHandler handler)
-                {
-                    for(GuiEventListener child : handler.children())
-                    {
-                        if(child instanceof AbstractWidget widget && widget.active && widget.visible)
-                        {
-                            points.add(new ListWidgetNavigationPoint(widget, list, entry));
-                        }
-                    }
-                }
+                this.gatherNavigationPointsFromListener(entry, navigate, mouseX, mouseY, points, list, entry);
             }
             else if(list.isMouseOver(mouseX, mouseY))
             {
