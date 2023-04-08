@@ -10,6 +10,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.ListEntryNavigationPoin
 import com.mrcrayfish.controllable.client.gui.navigation.ListWidgetNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
+import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
 import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
@@ -1163,11 +1164,12 @@ public class ControllerInput
 
     private void gatherNavigationPointsFromAbstractList(AbstractSelectionList<?> list, Navigate navigate, int mouseX, int mouseY, List<NavigationPoint> points)
     {
-        int count = list.children().size();
+        List<? extends GuiEventListener> children = list.children();
+        int dir = navigate == Navigate.UP ? -1 : 1;
         int itemHeight = ClientServices.CLIENT.getListItemHeight(list);
-        for(int i = 0; i < count; i++)
+        for(int i = 0; i < children.size(); i++)
         {
-            GuiEventListener entry = list.children().get(i);
+            GuiEventListener entry = children.get(i);
             int rowTop = ClientServices.CLIENT.getAbstractListRowTop(list, i);
             int rowBottom = ClientServices.CLIENT.getAbstractListRowBottom(list, i);
             int listTop = ClientServices.CLIENT.getAbstractListTop(list);
@@ -1176,13 +1178,13 @@ public class ControllerInput
             {
                 if(navigate == Navigate.UP || navigate == Navigate.DOWN)
                 {
-                    points.add(new ListEntryNavigationPoint(list, entry, i));
+                    points.add(new ListEntryNavigationPoint(list, entry, i, dir));
                 }
                 this.gatherNavigationPointsFromListener(entry, navigate, mouseX, mouseY, points, list, entry);
             }
             else if(list.isMouseOver(mouseX, mouseY))
             {
-                points.add(new ListEntryNavigationPoint(list, entry, i));
+                points.add(new ListEntryNavigationPoint(list, entry, i, dir));
             }
         }
     }

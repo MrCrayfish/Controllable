@@ -4,6 +4,8 @@ import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
+import java.util.List;
+
 /**
  * Author: MrCrayfish
  */
@@ -14,14 +16,18 @@ public class ListEntryNavigationPoint extends NavigationPoint
     private final GuiEventListener listEntry;
     private final int index;
     private final int itemHeight;
+    private final int dir;
+    private int itemY;
 
-    public ListEntryNavigationPoint(AbstractSelectionList<?> list, GuiEventListener listEntry, int index)
+    public ListEntryNavigationPoint(AbstractSelectionList<?> list, GuiEventListener listEntry, int index, int dir)
     {
         super(0, 0, Type.BASIC);
         this.list = list;
         this.listEntry = listEntry;
         this.index = index;
         this.itemHeight = ClientServices.CLIENT.getListItemHeight(this.list);
+        this.dir = dir;
+        this.itemY = ClientServices.CLIENT.getAbstractListRowTop(this.list, index) + this.itemHeight / 2 - 2;
     }
 
     @Override
@@ -39,26 +45,38 @@ public class ListEntryNavigationPoint extends NavigationPoint
     @Override
     public double getY()
     {
-        return ClientServices.CLIENT.getAbstractListRowTop(this.list, this.index) + this.itemHeight / 2 - 2;
+        return this.itemY;
     }
 
     @Override
     public void onNavigate()
     {
-        int index = this.list.children().indexOf(this.listEntry);
+        int index = this.index;
+        GuiEventListener entry = this.listEntry;
+        if(entry instanceof SkipItem)
+        {
+            List<? extends GuiEventListener> children = this.list.children();
+            int skipIndex = index + this.dir;
+            if(skipIndex >= 0 && skipIndex < children.size())
+            {
+                index = skipIndex;
+                entry = children.get(skipIndex);
+            }
+        }
         int rowTop = ClientServices.CLIENT.getAbstractListRowTop(this.list, index);
         int rowBottom = ClientServices.CLIENT.getAbstractListRowBottom(this.list, index);
         int listTop = ClientServices.CLIENT.getAbstractListTop(this.list);
         int listBottom = ClientServices.CLIENT.getAbstractListBottom(this.list);
         if(rowTop < listTop + this.itemHeight / 2)
         {
-            double scroll = this.list.children().indexOf(this.listEntry) * this.itemHeight - this.itemHeight / 2;
+            double scroll = this.list.children().indexOf(entry) * this.itemHeight - this.itemHeight / 2;
             this.list.setScrollAmount(scroll);
         }
         if(rowBottom > listBottom - this.itemHeight / 2) // Is not/partially visible
         {
-            double scroll = this.list.children().indexOf(this.listEntry) * this.itemHeight + this.itemHeight - (listBottom - listTop) + 4 + this.itemHeight / 2;
+            double scroll = this.list.children().indexOf(entry) * this.itemHeight + this.itemHeight - (listBottom - listTop) + 4 + this.itemHeight / 2;
             this.list.setScrollAmount(scroll);
         }
+        this.itemY = ClientServices.CLIENT.getAbstractListRowTop(this.list, index) + this.itemHeight / 2 - 2;
     }
 }
