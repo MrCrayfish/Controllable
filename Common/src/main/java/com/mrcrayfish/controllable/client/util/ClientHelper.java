@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
+import com.mrcrayfish.controllable.client.Icons;
 import com.mrcrayfish.controllable.client.RenderEvents;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.ChatFormatting;
@@ -27,7 +28,15 @@ import java.util.List;
  */
 public class ClientHelper
 {
+    public static final ResourceLocation ICON_FONT = new ResourceLocation(Constants.MOD_ID, "icons");
     public static final ResourceLocation BUTTON_FONT = new ResourceLocation(Constants.MOD_ID, "buttons");
+
+    public static MutableComponent getIcon(Icons icon)
+    {
+        MutableComponent component = Component.literal(String.valueOf((char) (33 + icon.ordinal())));
+        component.setStyle(component.getStyle().withColor(ChatFormatting.WHITE).withFont(ClientHelper.ICON_FONT));
+        return component;
+    }
 
     public static MutableComponent getButtonComponent(int button)
     {

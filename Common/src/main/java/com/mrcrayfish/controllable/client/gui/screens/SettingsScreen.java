@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
+import com.mrcrayfish.controllable.client.Icons;
 import com.mrcrayfish.controllable.client.SneakMode;
 import com.mrcrayfish.controllable.client.SprintMode;
 import com.mrcrayfish.controllable.client.gui.components.ButtonBindingList;
@@ -16,6 +17,7 @@ import com.mrcrayfish.controllable.client.gui.components.TabOptionTitleItem;
 import com.mrcrayfish.controllable.client.gui.components.TabOptionToggleItem;
 import com.mrcrayfish.controllable.client.gui.components.TabSelectionList;
 import com.mrcrayfish.controllable.client.gui.widget.TabListWidget;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -168,7 +170,7 @@ public class SettingsScreen extends Screen
 
     public class ControllerTab extends GridLayoutTab
     {
-        private static final Component TITLE = Component.translatable("controllable.settings.tab.controller.title");
+        private static final Component TITLE = Component.empty().append(ClientHelper.getIcon(Icons.CONTROLLER)).append(" ").append(Component.translatable("controllable.settings.tab.controller.title"));
 
         private final ControllerList list;
 
@@ -189,7 +191,7 @@ public class SettingsScreen extends Screen
 
     public class SettingsTab extends GridLayoutTab
     {
-        private static final Component TITLE = Component.translatable("controllable.settings.tab.settings.title");
+        private static final Component TITLE = Component.empty().append(ClientHelper.getIcon(Icons.SETTINGS)).append(" ").append(Component.translatable("controllable.settings.tab.settings.title"));
 
         public SettingsTab()
         {
@@ -251,7 +253,7 @@ public class SettingsScreen extends Screen
 
     public class BindingsTab extends GridLayoutTab
     {
-        private static final Component TITLE = Component.translatable("controllable.settings.tab.bindings.title");
+        private static final Component TITLE = Component.empty().append(ClientHelper.getIcon(Icons.BINDINGS)).append(" ").append(Component.translatable("controllable.settings.tab.bindings.title"));
 
         public BindingsTab()
         {
