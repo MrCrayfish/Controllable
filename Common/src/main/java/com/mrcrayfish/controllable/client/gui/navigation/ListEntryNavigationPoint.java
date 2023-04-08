@@ -53,9 +53,11 @@ public class ListEntryNavigationPoint extends NavigationPoint
     {
         int index = this.index;
         GuiEventListener entry = this.listEntry;
+        List<? extends GuiEventListener> children = this.list.children();
+
+        // Make the navigation skip to the next item in the list. Used to skip "title" items.
         if(entry instanceof SkipItem)
         {
-            List<? extends GuiEventListener> children = this.list.children();
             int skipIndex = index + this.dir;
             if(skipIndex >= 0 && skipIndex < children.size())
             {
@@ -63,6 +65,13 @@ public class ListEntryNavigationPoint extends NavigationPoint
                 entry = children.get(skipIndex);
             }
         }
+
+        // Make list scroll to top if next item is the first item and is skippable
+        if(index + this.dir == 0 && children.size() > 0 && children.get(0) instanceof SkipItem)
+        {
+            entry = children.get(0);
+        }
+
         int rowTop = ClientServices.CLIENT.getAbstractListRowTop(this.list, index);
         int rowBottom = ClientServices.CLIENT.getAbstractListRowBottom(this.list, index);
         int listTop = ClientServices.CLIENT.getAbstractListTop(this.list);

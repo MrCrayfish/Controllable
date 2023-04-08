@@ -1178,7 +1178,10 @@ public class ControllerInput
             {
                 if(navigate == Navigate.UP || navigate == Navigate.DOWN)
                 {
-                    points.add(new ListEntryNavigationPoint(list, entry, i, dir));
+                    if(!(entry instanceof SkipItem) || i != 0)
+                    {
+                        points.add(new ListEntryNavigationPoint(list, entry, i, dir));
+                    }
                 }
                 this.gatherNavigationPointsFromListener(entry, navigate, mouseX, mouseY, points, list, entry);
             }
