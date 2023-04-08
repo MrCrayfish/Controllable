@@ -14,6 +14,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
 import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.EventHelper;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
@@ -747,6 +748,11 @@ public class ControllerInput
                 }
                 else if(mc.player != null)
                 {
+                    if(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS.isButtonPressed())
+                    {
+                        mc.setScreen(new SettingsScreen(null));
+                    }
+
                     for(int i = 0; i < 9; i++)
                     {
                         if(ButtonBindings.HOTBAR_SLOTS[i].isButtonPressed())

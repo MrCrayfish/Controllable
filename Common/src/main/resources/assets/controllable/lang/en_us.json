@@ -154,6 +154,7 @@
     "controllable.key.openInventory": "Open Inventory",
     "controllable.key.closeInventory": "Close Inventory",
     "controllable.key.toggleCraftBook": "Toggle Craft Book",
+    "controllable.key.openControllableSettings": "Open Controllable Settings",
     "controllable.tooltip.more_recipes": "Press %s to View More",
     "controllable.tooltip.craft": "Press %s to Craft Item",
     "key.categories.controllable_custom": "Custom",

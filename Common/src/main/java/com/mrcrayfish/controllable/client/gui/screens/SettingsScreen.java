@@ -51,7 +51,7 @@ public class SettingsScreen extends Screen
     private Button doneButton;
     private ButtonBinding selectedBinding;
 
-    protected SettingsScreen(@Nullable Screen parent)
+    public SettingsScreen(@Nullable Screen parent)
     {
         super(Component.translatable("controllable.settings"));
         this.parent = parent;
