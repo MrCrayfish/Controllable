@@ -8,6 +8,7 @@ import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.ISearchable;
+import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
@@ -76,6 +77,18 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
                 list.forEach(binding -> this.addEntry(new ButtonBindingItem(binding)));
             }
         });
+
+        this.addEntry(new ButtonItem(Component.translatable("controllable.gui.restoreDefaults").withStyle(ChatFormatting.GOLD), btn -> {
+            this.minecraft.setScreen(new ConfirmationScreen(this.settingsScreen, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
+                if(result) {
+                    BindingRegistry registry = BindingRegistry.getInstance();
+                    registry.getBindings().forEach(ButtonBinding::reset);
+                    registry.resetBindingHash();
+                    registry.save();
+                }
+                return true;
+            }));
+        }));
     }
 
     public class ButtonBindingItem extends TabOptionBaseItem implements ISearchable

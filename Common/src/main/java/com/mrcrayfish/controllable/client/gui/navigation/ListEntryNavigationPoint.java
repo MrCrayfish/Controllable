@@ -86,6 +86,7 @@ public class ListEntryNavigationPoint extends NavigationPoint
             double scroll = this.list.children().indexOf(entry) * this.itemHeight + this.itemHeight - (listBottom - listTop) + 4 + this.itemHeight / 2;
             this.list.setScrollAmount(scroll);
         }
+
         this.itemY = ClientServices.CLIENT.getAbstractListRowTop(this.list, index) + this.itemHeight / 2 - 2;
     }
 }

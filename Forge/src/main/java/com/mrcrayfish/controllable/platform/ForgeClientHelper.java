@@ -4,12 +4,9 @@ import com.mrcrayfish.controllable.client.Action;
 import com.mrcrayfish.controllable.client.ActionVisibility;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.Controller;
-import com.mrcrayfish.controllable.client.ControllerManager;
 import com.mrcrayfish.controllable.client.ForgeCompatBindingContext;
 import com.mrcrayfish.controllable.client.IBindingContext;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
-import com.mrcrayfish.controllable.client.gui.ForgeControllerList;
-import com.mrcrayfish.controllable.client.gui.IControllerList;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
@@ -223,12 +220,6 @@ public class ForgeClientHelper implements IClientHelper
     public List<GuiMessage.Line> getChatTrimmedMessages(ChatComponent chat)
     {
         return chat.trimmedMessages;
-    }
-
-    @Override
-    public IControllerList<?> createControllerList(ControllerManager manager, Minecraft minecraft, int width, int height)
-    {
-        return new ForgeControllerList(manager, minecraft, width, height, 45, height - 44, 22);
     }
 
     @Override

@@ -1,10 +1,7 @@
 package com.mrcrayfish.controllable.platform;
 
 import com.mrcrayfish.controllable.client.BindingContext;
-import com.mrcrayfish.controllable.client.ControllerManager;
 import com.mrcrayfish.controllable.client.IBindingContext;
-import com.mrcrayfish.controllable.client.gui.FabricControllerList;
-import com.mrcrayfish.controllable.client.gui.IControllerList;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.integration.JeiSupport;
@@ -83,12 +80,6 @@ public class FabricClientHelper implements IClientHelper
     public List<GuiMessage.Line> getChatTrimmedMessages(ChatComponent chat)
     {
         return chat.trimmedMessages;
-    }
-
-    @Override
-    public IControllerList<?> createControllerList(ControllerManager manager, Minecraft minecraft, int width, int height)
-    {
-        return new FabricControllerList(manager, minecraft, width, height, 45, height - 44, 22);
     }
 
     @Override

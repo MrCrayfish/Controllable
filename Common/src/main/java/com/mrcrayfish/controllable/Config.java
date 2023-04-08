@@ -9,12 +9,15 @@ import com.mrcrayfish.framework.api.config.ConfigProperty;
 import com.mrcrayfish.framework.api.config.DoubleProperty;
 import com.mrcrayfish.framework.api.config.EnumProperty;
 import com.mrcrayfish.framework.api.config.FrameworkConfig;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Author: MrCrayfish
  */
 public class Config
 {
+    public static final ResourceLocation CLIENT_CONFIG_ID = new ResourceLocation(Constants.MOD_ID, "client");
+
     @FrameworkConfig(id = Constants.MOD_ID, name = "client", separator = '-')
     public static final ClientWrapper CLIENT = new ClientWrapper();
 

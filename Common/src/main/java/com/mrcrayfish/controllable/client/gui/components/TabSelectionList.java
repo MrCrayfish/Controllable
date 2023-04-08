@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.gui.components;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.ChatFormatting;
@@ -9,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -187,6 +189,12 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         {
             super(label);
         }
+
+        @Override
+        public void render(PoseStack poseStack, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
+        {
+
+        }
     }
 
     public class TitleItem extends BaseItem implements SkipItem
@@ -218,6 +226,38 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
 
         @Override
         public List<? extends GuiEventListener> children()
+        {
+            return Collections.emptyList();
+        }
+    }
+
+    public static class ButtonItem extends BaseItem implements Navigatable
+    {
+        private final Button button;
+
+        public ButtonItem(Component label, Button.OnPress onPress)
+        {
+            super(label);
+            this.button = Button.builder(label, onPress).build();
+        }
+
+        @Override
+        public void render(PoseStack poseStack, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
+        {
+            this.button.setWidth(120);
+            this.button.setX(left + (width - 120) / 2);
+            this.button.setY(top);
+            this.button.render(poseStack, mouseX, mouseY, partialTick);
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children()
+        {
+            return ImmutableList.of(this.button);
+        }
+
+        @Override
+        public List<GuiEventListener> elements()
         {
             return Collections.emptyList();
         }

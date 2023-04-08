@@ -4,12 +4,9 @@ import com.mrcrayfish.controllable.client.Action;
 import com.mrcrayfish.controllable.client.ActionVisibility;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.Controller;
-import com.mrcrayfish.controllable.client.ControllerManager;
 import com.mrcrayfish.controllable.client.IBindingContext;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
-import com.mrcrayfish.controllable.client.gui.IControllerList;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
-import com.mrcrayfish.controllable.client.gui.widget.TabNavigationHint;
 import com.mrcrayfish.controllable.event.Value;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
@@ -95,8 +92,6 @@ public interface IClientHelper
     void sendScreenMouseReleasedPre(Screen screen, double mouseX, double mouseY, int button);
 
     List<GuiMessage.Line> getChatTrimmedMessages(ChatComponent chat);
-
-    IControllerList<?> createControllerList(ControllerManager manager, Minecraft minecraft, int width, int height);
 
     List<NavigationPoint> getJeiNavigationPoints();
 

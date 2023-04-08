@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mrcrayfish.controllable.client.gui.screens.ControllerSelectionScreen;
+import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
 import com.mrcrayfish.framework.api.event.ScreenEvents;
 import net.minecraft.client.Minecraft;
@@ -104,7 +104,7 @@ public class ControllerEvents
         {
             int y = screen.height / 6 + 72 - 6;
             add.accept(new ControllerButton((screen.width / 2) + 5 + 150 + 4, y, button -> {
-                Minecraft.getInstance().setScreen(new ControllerSelectionScreen(screen));
+                Minecraft.getInstance().setScreen(new SettingsScreen(screen));
             }));
         }
     }

@@ -750,7 +750,7 @@ public class ControllerInput
                 {
                     if(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS.isButtonPressed())
                     {
-                        mc.setScreen(new SettingsScreen(null));
+                        mc.setScreen(new SettingsScreen(null, 1));
                     }
 
                     for(int i = 0; i < 9; i++)
@@ -1184,7 +1184,7 @@ public class ControllerInput
             {
                 if(navigate == Navigate.UP || navigate == Navigate.DOWN)
                 {
-                    if(!(entry instanceof SkipItem) || i != 0)
+                    if(!(entry instanceof SkipItem) || (i != 0 && i != children.size() - 1))
                     {
                         points.add(new ListEntryNavigationPoint(list, entry, i, dir));
                     }

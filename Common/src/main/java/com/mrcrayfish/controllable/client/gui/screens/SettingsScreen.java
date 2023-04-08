@@ -10,7 +10,6 @@ import com.mrcrayfish.controllable.client.SneakMode;
 import com.mrcrayfish.controllable.client.SprintMode;
 import com.mrcrayfish.controllable.client.gui.components.ButtonBindingList;
 import com.mrcrayfish.controllable.client.gui.components.ControllerList;
-import com.mrcrayfish.controllable.client.gui.components.TabOptionBaseItem;
 import com.mrcrayfish.controllable.client.gui.components.TabOptionEnumItem;
 import com.mrcrayfish.controllable.client.gui.components.TabOptionSliderItem;
 import com.mrcrayfish.controllable.client.gui.components.TabOptionTitleItem;
@@ -18,6 +17,8 @@ import com.mrcrayfish.controllable.client.gui.components.TabOptionToggleItem;
 import com.mrcrayfish.controllable.client.gui.components.TabSelectionList;
 import com.mrcrayfish.controllable.client.gui.widget.TabListWidget;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.framework.api.config.AbstractProperty;
+import com.mrcrayfish.framework.config.FrameworkConfigManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -50,6 +51,7 @@ public class SettingsScreen extends Screen
     private TabNavigationBar navigationBar;
     private Button doneButton;
     private ButtonBinding selectedBinding;
+    private int initialTab = 0;
 
     public SettingsScreen(@Nullable Screen parent)
     {
@@ -57,12 +59,19 @@ public class SettingsScreen extends Screen
         this.parent = parent;
     }
 
+    public SettingsScreen(@Nullable Screen parent, int initialTab)
+    {
+        super(Component.translatable("controllable.settings"));
+        this.parent = parent;
+        this.initialTab = initialTab;
+    }
+
     @Override
     protected void init()
     {
         this.navigationBar = TabNavigationBar.builder(this.tabManager, this.width).addTabs(new ControllerTab(), new SettingsTab(), new BindingsTab()).build();
         this.addRenderableWidget(this.navigationBar);
-        this.navigationBar.selectTab(0, false);
+        this.navigationBar.selectTab(this.initialTab, false);
         this.doneButton = this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (btn) -> this.minecraft.setScreen(this.parent)).pos((this.width - 200) / 2, this.height - 25).width(200).build());
         this.repositionElements();
     }
@@ -110,7 +119,7 @@ public class SettingsScreen extends Screen
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick)
     {
-        this.renderBackground(poseStack);
+        this.renderDirtBackground(poseStack);
         boolean waitingForInput = this.isWaitingForButtonInput();
         super.render(poseStack, !waitingForInput ? mouseX : -1, !waitingForInput ? mouseY : -1, partialTick);
         if(waitingForInput)
@@ -247,6 +256,21 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.other").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.uiSounds));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.fpsPollingFix));
+
+            optionsList.addEntry(new TabSelectionList.ButtonItem(Component.translatable("controllable.gui.restoreDefaults").withStyle(ChatFormatting.GOLD), btn -> {
+                mc.setScreen(new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.restore_default_buttons"), result -> {
+                    if(result) {
+                        FrameworkConfigManager.FrameworkConfigImpl config = FrameworkConfigManager.getInstance().getConfig(Config.CLIENT_CONFIG_ID);
+                        if(config != null) {
+                            config.getAllProperties().forEach(AbstractProperty::restoreDefault);
+                            mc.setScreen(new SettingsScreen(SettingsScreen.this.parent, 1));
+                            return false;
+                        }
+                    }
+                    return true;
+                }));
+            }));
+
             rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, optionsList));
         }
     }
