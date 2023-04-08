@@ -8,11 +8,15 @@ import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.SneakMode;
 import com.mrcrayfish.controllable.client.SprintMode;
 import com.mrcrayfish.controllable.client.gui.components.ButtonBindingList;
+import com.mrcrayfish.controllable.client.gui.components.ControllerList;
+import com.mrcrayfish.controllable.client.gui.components.TabOptionBaseItem;
 import com.mrcrayfish.controllable.client.gui.components.TabOptionEnumItem;
 import com.mrcrayfish.controllable.client.gui.components.TabOptionSliderItem;
+import com.mrcrayfish.controllable.client.gui.components.TabOptionTitleItem;
 import com.mrcrayfish.controllable.client.gui.components.TabOptionToggleItem;
 import com.mrcrayfish.controllable.client.gui.components.TabSelectionList;
 import com.mrcrayfish.controllable.client.gui.widget.TabListWidget;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -20,7 +24,6 @@ import net.minecraft.client.gui.components.tabs.GridLayoutTab;
 import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
-import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
@@ -55,7 +58,7 @@ public class SettingsScreen extends Screen
     @Override
     protected void init()
     {
-        this.navigationBar = TabNavigationBar.builder(this.tabManager, this.width).addTabs(new GeneralTab(), new GameplayTab(), new BindingsTab()).build();
+        this.navigationBar = TabNavigationBar.builder(this.tabManager, this.width).addTabs(new ControllerTab(), new SettingsTab(), new BindingsTab()).build();
         this.addRenderableWidget(this.navigationBar);
         this.navigationBar.selectTab(0, false);
         this.doneButton = this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (btn) -> this.minecraft.setScreen(this.parent)).pos((this.width - 200) / 2, this.height - 25).width(200).build());
@@ -94,6 +97,12 @@ public class SettingsScreen extends Screen
         List<AbstractWidget> widgets = new ArrayList<>();
         currentTab.visitChildren(widgets::add);
         return widgets.stream().filter(widget -> widget.isMouseOver(mouseX, mouseY) && widget.mouseScrolled(mouseX, mouseY, scroll)).count() > 0;
+    }
+
+    @Override
+    public void tick()
+    {
+        this.tabManager.tickCurrent();
     }
 
     @Override
@@ -157,45 +166,40 @@ public class SettingsScreen extends Screen
         return false;
     }
 
-    public class GeneralTab extends GridLayoutTab
+    public class ControllerTab extends GridLayoutTab
     {
-        private static final Component TITLE = Component.translatable("controllable.settings.tab.general.title");
+        private static final Component TITLE = Component.translatable("controllable.settings.tab.controller.title");
 
-        public GeneralTab()
+        private final ControllerList list;
+
+        public ControllerTab()
         {
             super(TITLE);
             GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
-            TabSelectionList optionsList = new TabSelectionList(SettingsScreen.this.minecraft, 24);
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.autoSelect));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.virtualCursor));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.thumbstickDeadZone, 0.01));
-            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.controllerIcons));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.cursorSpeed, 1.0));
-            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.cursorThumbstick));
-            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.cursorType));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.listScrollSpeed, 1.0));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.hoverModifier, 0.05));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.uiSounds));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.fpsPollingFix));
-            rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, optionsList));
+            this.list = new ControllerList(SettingsScreen.this.minecraft, 24);
+            rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, this.list));
+        }
+
+        @Override
+        public void tick()
+        {
+            this.list.tick();
         }
     }
 
-    public class GameplayTab extends GridLayoutTab
+    public class SettingsTab extends GridLayoutTab
     {
-        private static final Component TITLE = Component.translatable("controllable.settings.tab.gameplay.title");
+        private static final Component TITLE = Component.translatable("controllable.settings.tab.settings.title");
 
-        public GameplayTab()
+        public SettingsTab()
         {
             super(TITLE);
             Minecraft mc = Objects.requireNonNull(SettingsScreen.this.minecraft);
             GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
-            TabSelectionList optionsList = new TabSelectionList(mc, 24);
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.rotationSpeed, 1.0));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.pitchSensitivity, 0.01));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.yawSensitivity, 0.01));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.invertLook));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.invertRotation));
+            TabSelectionList<TabSelectionList.BaseItem> optionsList = new TabSelectionList<>(SettingsScreen.this.minecraft, 24);
+
+            // Gameplay options
+            optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.gameplay").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionEnumItem<>(Component.translatable("controllable.gui.sneak_mode"), Component.translatable("controllable.gui.sneak_mode.desc"), () -> {
                 return mc.options.toggleCrouch().get() ? SneakMode.TOGGLE : SneakMode.HOLD;
             }, sneakMode -> {
@@ -209,11 +213,38 @@ public class SettingsScreen extends Screen
                 mc.options.save();
             }));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.quickCraft));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.radialThumbstick));
+
+            // Camera options
+            optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.camera").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.rotationSpeed, 1.0));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.pitchSensitivity, 0.01));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.yawSensitivity, 0.01));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.invertLook));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.invertRotation));
+
+            // Display options
+            optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.display").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.controllerIcons));
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.showButtonHints));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.drawHintBackground));
-            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.radialThumbstick));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.consoleHotbar));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.renderMiniPlayer));
+
+            // Controller options
+            optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.controller").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.autoSelect));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.virtualCursor));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.thumbstickDeadZone, 0.01));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.cursorSpeed, 1.0));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.cursorThumbstick));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.cursorType));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.listScrollSpeed, 1.0));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.hoverModifier, 0.05));
+
+            optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.other").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.uiSounds));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.fpsPollingFix));
             rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, optionsList));
         }
     }

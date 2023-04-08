@@ -3,8 +3,6 @@ package com.mrcrayfish.controllable.client.gui.widget;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.gui.components.TabSelectionList;
-import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;

@@ -8,6 +8,7 @@ import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -19,7 +20,7 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-public abstract class TabOptionBaseItem extends TabSelectionList.Item
+public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem
 {
     private int labelColor = 0xFFFFFFFF;
 

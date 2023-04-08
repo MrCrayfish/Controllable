@@ -15,16 +15,12 @@ import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -36,7 +32,7 @@ import java.util.Map;
 /**
  * Author: MrCrayfish
  */
-public class ButtonBindingList extends TabSelectionList
+public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseItem>
 {
     private final SettingsScreen settingsScreen;
     protected Map<String, List<ButtonBinding>> categories = new LinkedHashMap<>();

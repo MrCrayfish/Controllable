@@ -1,16 +1,19 @@
 package com.mrcrayfish.controllable.client.gui.components;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
+import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
@@ -24,12 +27,27 @@ import java.util.function.Consumer;
 /**
  * Author: MrCrayfish
  */
-public class TabSelectionList extends ContainerObjectSelectionList<TabSelectionList.Item> implements LayoutElement
+public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> extends ContainerObjectSelectionList<E> implements LayoutElement
 {
+    protected Component headerText;
+    protected Component footerText;
+
     public TabSelectionList(Minecraft mc, int itemHeight)
     {
         super(mc, 0, 0, 0, 0, itemHeight);
         this.setRenderTopAndBottom(false);
+    }
+
+    public TabSelectionList<E> setHeaderText(Component headerText)
+    {
+        this.headerText = headerText;
+        return this;
+    }
+
+    public TabSelectionList<E> setFooterText(Component footerText)
+    {
+        this.footerText = footerText;
+        return this;
     }
 
     @Override
@@ -45,7 +63,7 @@ public class TabSelectionList extends ContainerObjectSelectionList<TabSelectionL
     }
 
     @Override
-    public int addEntry(TabSelectionList.Item entry)
+    public int addEntry(E entry)
     {
         return super.addEntry(entry);
     }
@@ -90,16 +108,29 @@ public class TabSelectionList extends ContainerObjectSelectionList<TabSelectionL
 
     public void updateDimensions(ScreenRectangle rectangle)
     {
+        boolean header = this.headerText != null;
+        boolean footer = this.footerText != null;
         this.width = rectangle.width();
-        this.height = rectangle.height() - 15;
+        this.height = rectangle.height() - 15 + (header ? -10 : 0) + (footer ? -20 : 0);
         this.setX(rectangle.left());
-        this.setY(rectangle.top() + 15);
+        this.setY(rectangle.top() + 15 + (header ? 10 : 0));
     }
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick)
     {
         super.render(poseStack, mouseX, mouseY, partialTick);
+        if(this.headerText != null)
+        {
+            GuiComponent.drawCenteredString(poseStack, TabSelectionList.this.minecraft.font, this.headerText, this.x0 + this.width / 2, this.y0 - 15, 0xFFFFFF);
+        }
+        if(this.footerText != null)
+        {
+            Font font = TabSelectionList.this.minecraft.font;
+            int footerWidth = font.width(this.footerText);
+            ScreenUtil.drawRoundedBox(poseStack, this.x0 + (this.width - footerWidth) / 2, this.y1 + 4, footerWidth, 14, 0x55000000);
+            GuiComponent.drawCenteredString(poseStack, font, this.footerText, this.x0 + this.width / 2, this.y1 + 7, 0xFFFFFF);
+        }
         fillGradient(poseStack, this.x0, this.y0, this.x1, this.y0 + 4, 0xFF000000, 0);
         fillGradient(poseStack, this.x0, this.y1 - 4, this.x1, this.y1, 0, 0xFF000000);
     }
@@ -110,7 +141,7 @@ public class TabSelectionList extends ContainerObjectSelectionList<TabSelectionL
     @Override
     public void updateNarration(NarrationElementOutput output) {}
 
-    public abstract static class Item extends ContainerObjectSelectionList.Entry<Item>
+    public abstract static class Item<T extends ContainerObjectSelectionList.Entry<T>> extends ContainerObjectSelectionList.Entry<T>
     {
         protected Component label;
 
@@ -123,9 +154,42 @@ public class TabSelectionList extends ContainerObjectSelectionList<TabSelectionL
         {
             return this.label;
         }
+
+        @Override
+        public List<? extends NarratableEntry> narratables()
+        {
+            return ImmutableList.of(new NarratableEntry()
+            {
+                @Override
+                public NarratableEntry.NarrationPriority narrationPriority()
+                {
+                    return NarratableEntry.NarrationPriority.HOVERED;
+                }
+
+                @Override
+                public void updateNarration(NarrationElementOutput output)
+                {
+                    output.add(NarratedElementType.TITLE, Item.this.label);
+                }
+            });
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children()
+        {
+            return Collections.emptyList();
+        }
     }
 
-    public class TitleItem extends Item
+    public abstract static class BaseItem extends Item<BaseItem>
+    {
+        public BaseItem(Component label)
+        {
+            super(label);
+        }
+    }
+
+    public class TitleItem extends BaseItem implements SkipItem
     {
         public TitleItem(Component title)
         {
