@@ -244,8 +244,8 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         @Override
         public void render(PoseStack poseStack, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
         {
-            this.button.setWidth(120);
-            this.button.setX(left + (width - 120) / 2);
+            this.button.setWidth(width / 2);
+            this.button.setX(left + width / 4);
             this.button.setY(top);
             this.button.render(poseStack, mouseX, mouseY, partialTick);
         }

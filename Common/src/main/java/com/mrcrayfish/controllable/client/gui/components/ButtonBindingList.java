@@ -8,19 +8,23 @@ import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.ISearchable;
+import com.mrcrayfish.controllable.client.Icons;
 import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.gui.screens.SelectKeyBindingScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
@@ -50,11 +54,31 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         this.categories.put("key.categories.ui", new ArrayList<>());
         this.categories.put("key.categories.misc", new ArrayList<>());
         this.categories.put("key.categories.controllable_custom", new ArrayList<>());
-        this.populate(false);
+        this.repopulateBindings(false);
     }
 
-    private void populate(boolean showUnbound)
+    private void repopulateBindings(boolean showUnbound)
     {
+        this.clearEntries();
+
+        Component addKeybind = Component.empty().append(ClientHelper.getIcon(Icons.ADD)).append(" ").append(Component.translatable("controllable.gui.add_key_bind"));
+        Component restoreDefaults = Component.empty().append(ClientHelper.getIcon(Icons.RESET)).append(" ").append(Component.translatable("controllable.gui.restoreDefaults"));
+        this.addEntry(new TwoWidgetItem(Button.builder(addKeybind, btn -> {
+            this.minecraft.setScreen(new SelectKeyBindingScreen(this.settingsScreen, () -> {
+                this.repopulateBindings(false);
+            }));
+        }).build(), Button.builder(restoreDefaults, btn -> {
+            this.minecraft.setScreen(new ConfirmationScreen(this.settingsScreen, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
+                if(result) {
+                    BindingRegistry registry = BindingRegistry.getInstance();
+                    registry.getBindings().forEach(ButtonBinding::reset);
+                    registry.resetBindingHash();
+                    registry.save();
+                }
+                return true;
+            }));
+        }).build()));
+
         // Clear the list of bindings for each category
         this.categories.forEach((category, list) -> list.clear());
 
@@ -77,18 +101,6 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
                 list.forEach(binding -> this.addEntry(new ButtonBindingItem(binding)));
             }
         });
-
-        this.addEntry(new ButtonItem(Component.translatable("controllable.gui.restoreDefaults").withStyle(ChatFormatting.GOLD), btn -> {
-            this.minecraft.setScreen(new ConfirmationScreen(this.settingsScreen, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
-                if(result) {
-                    BindingRegistry registry = BindingRegistry.getInstance();
-                    registry.getBindings().forEach(ButtonBinding::reset);
-                    registry.resetBindingHash();
-                    registry.save();
-                }
-                return true;
-            }));
-        }));
     }
 
     public class ButtonBindingItem extends TabOptionBaseItem implements ISearchable
@@ -197,6 +209,38 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
                     output.add(NarratedElementType.TITLE, ButtonBindingItem.this.label);
                 }
             });
+        }
+    }
+
+    public static class TwoWidgetItem extends BaseItem
+    {
+        private final AbstractWidget leftWidget;
+        private final AbstractWidget rightWidget;
+
+        public TwoWidgetItem(AbstractWidget leftWidget, AbstractWidget rightWidget)
+        {
+            super(CommonComponents.EMPTY);
+            this.leftWidget = leftWidget;
+            this.rightWidget = rightWidget;
+        }
+
+        @Override
+        public void render(PoseStack poseStack, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
+        {
+            this.leftWidget.setWidth(width / 2 - 10);
+            this.leftWidget.setX(left + 5);
+            this.leftWidget.setY(top);
+            this.leftWidget.render(poseStack, mouseX, mouseY, partialTick);
+            this.rightWidget.setWidth(width / 2 - 10);
+            this.rightWidget.setX(left + width / 2 + 5);
+            this.rightWidget.setY(top);
+            this.rightWidget.render(poseStack, mouseX, mouseY, partialTick);
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children()
+        {
+            return ImmutableList.of(this.leftWidget, this.rightWidget);
         }
     }
 }

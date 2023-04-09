@@ -7,5 +7,7 @@ public enum Icons
 {
     CONTROLLER,
     SETTINGS,
-    BINDINGS
+    BINDINGS,
+    ADD,
+    RESET
 }

@@ -72,7 +72,7 @@ public class ButtonBindingScreen extends ButtonBindingListMenuScreen
         this.buttonReset.active = BindingRegistry.getInstance().getBindings().stream().noneMatch(ButtonBinding::isDefault);
 
         this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 50, this.height - 32, 100, 20, Component.translatable("controllable.gui.add_key_bind"), button -> {
-            Objects.requireNonNull(this.minecraft).setScreen(new SelectKeyBindingScreen(this));
+            Objects.requireNonNull(this.minecraft).setScreen(new SelectKeyBindingScreen(this, () -> {}));
         }));
 
         this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 55, this.height - 32, 100, 20, CommonComponents.GUI_DONE, (button) -> {

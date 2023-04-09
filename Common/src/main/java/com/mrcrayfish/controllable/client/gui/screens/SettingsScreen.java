@@ -66,6 +66,12 @@ public class SettingsScreen extends Screen
         this.initialTab = initialTab;
     }
 
+    @Nullable
+    public Screen getParent()
+    {
+        return this.parent;
+    }
+
     @Override
     protected void init()
     {
@@ -209,6 +215,22 @@ public class SettingsScreen extends Screen
             GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
             TabSelectionList<TabSelectionList.BaseItem> optionsList = new TabSelectionList<>(SettingsScreen.this.minecraft, 24);
 
+            // Restore button
+            Component restoreDefaults = Component.empty().append(ClientHelper.getIcon(Icons.RESET)).append(" ").append(Component.translatable("controllable.gui.restoreDefaults"));
+            optionsList.addEntry(new TabSelectionList.ButtonItem(restoreDefaults, btn -> {
+                mc.setScreen(new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.restore_default_buttons"), result -> {
+                    if(result) {
+                        FrameworkConfigManager.FrameworkConfigImpl config = FrameworkConfigManager.getInstance().getConfig(Config.CLIENT_CONFIG_ID);
+                        if(config != null) {
+                            config.getAllProperties().forEach(AbstractProperty::restoreDefault);
+                            mc.setScreen(new SettingsScreen(SettingsScreen.this.parent, 1));
+                            return false;
+                        }
+                    }
+                    return true;
+                }));
+            }));
+
             // Gameplay options
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.gameplay").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionEnumItem<>(Component.translatable("controllable.gui.sneak_mode"), Component.translatable("controllable.gui.sneak_mode.desc"), () -> {
@@ -256,20 +278,6 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.other").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.uiSounds));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.fpsPollingFix));
-
-            optionsList.addEntry(new TabSelectionList.ButtonItem(Component.translatable("controllable.gui.restoreDefaults").withStyle(ChatFormatting.GOLD), btn -> {
-                mc.setScreen(new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.restore_default_buttons"), result -> {
-                    if(result) {
-                        FrameworkConfigManager.FrameworkConfigImpl config = FrameworkConfigManager.getInstance().getConfig(Config.CLIENT_CONFIG_ID);
-                        if(config != null) {
-                            config.getAllProperties().forEach(AbstractProperty::restoreDefault);
-                            mc.setScreen(new SettingsScreen(SettingsScreen.this.parent, 1));
-                            return false;
-                        }
-                    }
-                    return true;
-                }));
-            }));
 
             rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, optionsList));
         }
