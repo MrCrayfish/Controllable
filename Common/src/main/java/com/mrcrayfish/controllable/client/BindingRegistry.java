@@ -194,7 +194,11 @@ public class BindingRegistry
         // Load key adapters
         try(BufferedReader reader = Files.newReader(new File(Controllable.getConfigFolder(), "controllable/key_adapters.properties"), Charsets.UTF_8))
         {
-            Map<String, KeyMapping> bindings = Arrays.stream(Minecraft.getInstance().options.keyMappings).collect(Collectors.toMap(KeyMapping::getName, v -> v, (t1, t2) -> t2));
+            Map<String, KeyMapping> bindings = new HashMap<>();
+            for(KeyMapping mapping : Minecraft.getInstance().options.keyMappings)
+            {
+                bindings.put(mapping.getName(), mapping);
+            }
             Properties properties = new Properties();
             properties.load(reader);
             properties.forEach((key, value) ->
