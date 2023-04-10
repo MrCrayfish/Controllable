@@ -17,6 +17,7 @@ import com.mrcrayfish.controllable.client.gui.components.TabOptionToggleItem;
 import com.mrcrayfish.controllable.client.gui.components.TabSelectionList;
 import com.mrcrayfish.controllable.client.gui.widget.TabListWidget;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.framework.api.config.AbstractProperty;
 import com.mrcrayfish.framework.config.FrameworkConfigManager;
 import net.minecraft.ChatFormatting;
@@ -51,6 +52,7 @@ public class SettingsScreen extends Screen
     private TabNavigationBar navigationBar;
     private Button doneButton;
     private ButtonBinding selectedBinding;
+    private int remainingTime;
     private int initialTab = 0;
 
     public SettingsScreen(@Nullable Screen parent)
@@ -120,6 +122,15 @@ public class SettingsScreen extends Screen
     public void tick()
     {
         this.tabManager.tickCurrent();
+
+        if(this.isWaitingForButtonInput())
+        {
+            this.remainingTime--;
+            if(this.remainingTime <= 0)
+            {
+                this.selectedBinding = null;
+            }
+        }
     }
 
     @Override
@@ -131,8 +142,13 @@ public class SettingsScreen extends Screen
         if(waitingForInput)
         {
             RenderSystem.disableDepthTest();
-            fillGradient(poseStack, 0, 0, this.width, this.height, 0xC0101010, 0xD0101010);
-            drawCenteredString(poseStack, this.font, Component.translatable("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
+            fillGradient(poseStack, 0, 0, this.width, this.height, 0xE0101010, 0xF0101010);
+            ScreenUtil.drawRoundedBox(poseStack, (int) (this.width * 0.125), this.height / 4, (int) (this.width * 0.75), this.height / 2, 0x99000000);
+            Component pressButtonLabel = Component.translatable("controllable.gui.waiting_for_input").withStyle(ChatFormatting.YELLOW);
+            drawCenteredString(poseStack, this.font, pressButtonLabel, this.width / 2, this.height / 2 - 10, 0xFFFFFFFF);
+            Component time = Component.literal(Integer.toString((int) Math.ceil(this.remainingTime / 20.0)));
+            Component inputCancelLabel = Component.translatable("controllable.gui.input_cancel", time);
+            drawCenteredString(poseStack, this.font, inputCancelLabel, this.width / 2, this.height / 2 + 3, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
         }
     }
@@ -157,6 +173,7 @@ public class SettingsScreen extends Screen
         if(this.tabManager.getCurrentTab() instanceof BindingsTab)
         {
             this.selectedBinding = binding;
+            this.remainingTime = 100;
         }
     }
 
