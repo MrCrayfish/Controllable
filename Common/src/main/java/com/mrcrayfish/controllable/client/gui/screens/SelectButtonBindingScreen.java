@@ -36,7 +36,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
     protected void init()
     {
         super.init();
-        this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 155, this.height - 29, 150, 20, Component.translatable("controllable.gui.restoreDefaults"), (button) -> {
+        this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 155, this.height - 29, 150, 20, Component.translatable("controllable.gui.restore_defaults"), (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     ((RadialMenuConfigureScreen) this.parent).getBindings().clear();

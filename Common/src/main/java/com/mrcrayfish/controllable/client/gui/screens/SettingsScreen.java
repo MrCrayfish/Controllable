@@ -233,7 +233,7 @@ public class SettingsScreen extends Screen
             TabSelectionList<TabSelectionList.BaseItem> optionsList = new TabSelectionList<>(SettingsScreen.this.minecraft, 24);
 
             // Restore button
-            Component restoreDefaults = Component.empty().append(ClientHelper.getIcon(Icons.RESET)).append(" ").append(Component.translatable("controllable.gui.restoreDefaults"));
+            Component restoreDefaults = Component.empty().append(ClientHelper.getIcon(Icons.RESET)).append(" ").append(Component.translatable("controllable.gui.restore_defaults"));
             optionsList.addEntry(new TabSelectionList.ButtonItem(restoreDefaults, btn -> {
                 mc.setScreen(new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.restore_default_buttons"), result -> {
                     if(result) {

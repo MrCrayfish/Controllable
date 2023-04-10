@@ -7,9 +7,9 @@ import com.mrcrayfish.controllable.client.settings.SettingEnum;
  */
 public enum ActionVisibility implements SettingEnum
 {
-    ALL("controllable.actionVisibility.all"),
-    MINIMAL("controllable.actionVisibility.minimal"),
-    NONE("controllable.actionVisibility.none");
+    ALL("controllable.action_visibility.all"),
+    MINIMAL("controllable.action_visibility.minimal"),
+    NONE("controllable.action_visibility.none");
 
     private final String key;
 

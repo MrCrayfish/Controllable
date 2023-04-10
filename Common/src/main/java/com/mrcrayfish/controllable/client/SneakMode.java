@@ -7,8 +7,8 @@ import com.mrcrayfish.controllable.client.settings.SettingEnum;
  */
 public enum SneakMode implements SettingEnum
 {
-    TOGGLE("controllable.sneakMode.toggle"),
-    HOLD("controllable.sneakMode.hold");
+    TOGGLE("controllable.sneak_mode.toggle"),
+    HOLD("controllable.sneak_mode.hold");
 
     private final String key;
 
