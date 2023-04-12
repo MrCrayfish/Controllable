@@ -768,10 +768,10 @@ public class ControllerInput
                         {
                             ClientServices.CLIENT.startAttack(mc);
                         }
-                        else if(ButtonBindings.USE_ITEM.isButtonPressed())
+                        /*else if(ButtonBindings.USE_ITEM.isButtonPressed())
                         {
                             ClientServices.CLIENT.startUseItem(mc);
-                        }
+                        }*/
                         else if(ButtonBindings.PICK_BLOCK.isButtonPressed())
                         {
                             ClientServices.CLIENT.pickBlock(mc);

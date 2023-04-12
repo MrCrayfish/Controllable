@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.InputProcessor;
+import com.mrcrayfish.controllable.client.KeyUseOverride;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -37,22 +38,13 @@ public class MinecraftMixin
         return original || isLeftClicking();
     }
 
-    @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"), slice = @Slice(
+    /*@Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"), slice = @Slice(
             from = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z"),
             to = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;releaseUsingItem(Lnet/minecraft/world/entity/player/Player;)V")))
     private boolean controllableOnKeyDown(KeyMapping mapping)
     {
-        return mapping.isDown() || isRightClicking();
-    }
-
-    /**
-     * Checks if a controller is connected and if the use item button is down.
-     */
-    private static boolean isRightClicking()
-    {
-        Controller controller = Controllable.getController();
-        return controller != null && ButtonBindings.USE_ITEM.isButtonDown();
-    }
+        return mapping.isDown() || KeyUseOverride.isRightClicking();
+    }*/
 
     /**
      * Checks if a controller is connected and if the attack button is down. A special except is
