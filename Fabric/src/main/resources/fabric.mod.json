@@ -22,6 +22,7 @@
         "controllable.common.mixins.json",
         "controllable.mixins.json"
     ],
+    "accessWidener": "controllable.accesswidener",
     "depends": {
         "fabricloader": ">=${fabric_loader_version}",
         "fabric": "*",
