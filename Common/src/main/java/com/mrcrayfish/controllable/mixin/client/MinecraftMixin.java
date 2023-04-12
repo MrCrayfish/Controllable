@@ -75,7 +75,8 @@ public class MinecraftMixin
     @Inject(method = "isWindowActive", at = @At(value = "HEAD"), cancellable = true)
     private void controllableIsWindowActiveHead(CallbackInfoReturnable<Boolean> cir)
     {
-        if(Controllable.getController() != null)
+        // Only apply when in game
+        if(this.player != null && Controllable.getController() != null)
         {
             cir.setReturnValue(true);
         }
