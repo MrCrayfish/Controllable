@@ -59,16 +59,10 @@ public class RenderEvents
         TickEvents.START_CLIENT.register(RenderEvents::onClientTickStart);
         ScreenEvents.AFTER_DRAW_CONTAINER_BACKGROUND.register(RenderEvents::onRenderBackground);
         TickEvents.END_RENDER.register((partialTick) -> RenderEvents.onRenderEnd());
-
-        // Adds a hint overlay renderable to screen that have a navigation bar
-        ScreenEvents.INIT.register(screen -> navigationBarCheck = false);
-        ScreenEvents.BEFORE_DRAW.register((screen, poseStack, i, i1, v) -> {
-            if(!navigationBarCheck) {
-                navigationBarCheck = true;
-                screen.children().stream().filter(e -> e instanceof TabNavigationBar).map(e -> (TabNavigationBar) e).findFirst().ifPresent(bar -> {
-                    ClientServices.CLIENT.addRenderableToScreen(screen, new TabNavigationHint(bar.children()));
-                });
-            }
+        ScreenEvents.MODIFY_WIDGETS.register((screen, widgets, add, remove) -> {
+            screen.children().stream().filter(e -> e instanceof TabNavigationBar).map(e -> (TabNavigationBar) e).findFirst().ifPresent(bar -> {
+                ClientServices.CLIENT.addRenderableToScreen(screen, new TabNavigationHint(bar.children()));
+            });
         });
     }
 
