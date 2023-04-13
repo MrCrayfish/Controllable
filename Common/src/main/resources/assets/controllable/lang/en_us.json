@@ -158,6 +158,8 @@
     "framework_config.controllable.client.client.options.cursorType.tooltip": "The image to use for the cursor. This only applies if virtual mouse is enabled!",
     "framework_config.controllable.client.client.options.deadZone": "Thumbstick Dead Zone",
     "framework_config.controllable.client.client.options.deadZone.tooltip": "The distance you have to move the thumbstick before it's input is registered. This fixes drifting as some thumbsticks don't center to zero.",
+    "framework_config.controllable.client.client.options.triggerDeadZone": "Trigger Dead Zone",
+    "framework_config.controllable.client.client.options.triggerDeadZone.tooltip": "How much the trigger has to be pressed before it's input is registered. This fixes issues with triggers not being completely released to zero.",
     "framework_config.controllable.client.client.options.flipLeftThumbstickX": "Flip Left X-Axis",
     "framework_config.controllable.client.client.options.flipLeftThumbstickY": "Flip Left Y-Axis",
     "framework_config.controllable.client.client.options.flipRightThumbstickX": "Flip Right X-Axis",

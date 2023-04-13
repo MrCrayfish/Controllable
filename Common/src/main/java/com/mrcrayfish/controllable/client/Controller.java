@@ -143,7 +143,8 @@ public class Controller
      */
     public float getLTriggerValue()
     {
-        return SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) / (float) SDL_JOYSTICK_AXIS_MAX;
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) / (float) SDL_JOYSTICK_AXIS_MAX, 0, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.client.options.triggerDeadZone.get().floatValue());
     }
 
     /**
@@ -153,7 +154,8 @@ public class Controller
      */
     public float getRTriggerValue()
     {
-        return SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / (float) SDL_JOYSTICK_AXIS_MAX;
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / (float) SDL_JOYSTICK_AXIS_MAX, 0, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.client.options.triggerDeadZone.get().floatValue());
     }
 
     /**

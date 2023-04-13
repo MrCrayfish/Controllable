@@ -286,6 +286,7 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.autoSelect));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.virtualCursor));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.thumbstickDeadZone, 0.01));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.triggerDeadZone, 0.01));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.cursorSpeed, 1.0));
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.cursorThumbstick));
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.cursorType));

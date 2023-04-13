@@ -175,7 +175,8 @@ public class ControllerInput
         if(controller == null)
             return;
 
-        if((Math.abs(controller.getLTriggerValue()) >= 0.2F || Math.abs(controller.getRTriggerValue()) >= 0.2F) && !(Minecraft.getInstance().screen instanceof ControllerLayoutScreen))
+        /* If the player is mining a block, actively mark the controller as "in use" */
+        if((Math.abs(controller.getLTriggerValue()) > 0.0F || Math.abs(controller.getRTriggerValue()) > 0.0F) && !(Minecraft.getInstance().screen instanceof ControllerLayoutScreen))
         {
             this.setControllerInUse();
         }
