@@ -264,6 +264,7 @@ public class SettingsScreen extends Screen
             }));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.quickCraft));
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.radialThumbstick));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.spyglassSensitivity, 0.05));
 
             // Camera options
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.camera").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));

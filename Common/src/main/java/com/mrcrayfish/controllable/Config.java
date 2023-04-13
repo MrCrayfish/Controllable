@@ -105,6 +105,9 @@ public class Config
 
             @ConfigProperty(name = "listScrollSpeed", comment = "The speed that lists scroll")
             public final DoubleProperty listScrollSpeed = DoubleProperty.create(10.0, 1.0, 30.0);
+
+            @ConfigProperty(name = "spyglassSensitivity", comment = "Adjusts the camera sensitivity when looking through a spyglass")
+            public final DoubleProperty spyglassSensitivity = DoubleProperty.create(0.2, 0.0, 1.0);
         }
     }
 }

@@ -199,5 +199,7 @@
     "framework_config.controllable.client.client.options.virtualMouse.tooltip": "If enabled, the game will use a virtual cursor instead of the real cursor. This must be turned on to be able to run multiple instances!",
     "framework_config.controllable.client.client.options.yawSensitivity": "Yaw Sensitivity",
     "framework_config.controllable.client.client.options.yawSensitivity.tooltip": "The sensitivity of the camera's yaw rotation when applying the rotation speed. Setting to 1.0 would mean applying 100% of the rotation speed to the yaw.",
+    "framework_config.controllable.client.client.options.spyglassSensitivity": "Spyglass Sensitivity",
+    "framework_config.controllable.client.client.options.spyglassSensitivity.tooltip": "Adjusts the sensitivity of the camera when looking through a spyglass",
     "key.categories.controllable_custom": "Custom"
 }

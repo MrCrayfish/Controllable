@@ -451,14 +451,17 @@ public class ControllerInput
         if(mc.screen == null)
         {
             float deadZone = Config.CLIENT.client.options.thumbstickDeadZone.get().floatValue();
-            float pitchSensitivity = Config.CLIENT.client.options.pitchSensitivity.get().floatValue();
-            float yawSensitivity = Config.CLIENT.client.options.yawSensitivity.get().floatValue();
-            double rotationSpeed = Config.CLIENT.client.options.rotationSpeed.get();
             boolean rightXThumbstickMoved = Math.abs(controller.getRThumbStickXValue()) >= deadZone;
             boolean rightYThumbstickMoved = Math.abs(controller.getRThumbStickYValue()) >= deadZone;
             if(rightXThumbstickMoved || rightYThumbstickMoved)
             {
-                this.setControllerInUse();
+                float pitchSensitivity = Config.CLIENT.client.options.pitchSensitivity.get().floatValue();
+                float yawSensitivity = Config.CLIENT.client.options.yawSensitivity.get().floatValue();
+                double rotationSpeed = Config.CLIENT.client.options.rotationSpeed.get();
+                if(player.isScoping())
+                {
+                    rotationSpeed *= Config.CLIENT.client.options.spyglassSensitivity.get();
+                }
                 Value<Float> yawSpeed = new Value<>((float) rotationSpeed * yawSensitivity);
                 Value<Float> pitchSpeed = new Value<>((float) rotationSpeed * pitchSensitivity);
                 boolean cancelled = ControllerEvents.UPDATE_CAMERA.post().handle(yawSpeed, pitchSpeed);
@@ -479,6 +482,9 @@ public class ControllerInput
                         this.targetPitch = (pitchSpeed.get() * (controller.getRThumbStickYValue() - deadZoneTrimY) / (1.0F - deadZone)) * 0.33F;
                     }
                 }
+
+                /* Mark the controller as in use because the camera is turning */
+                this.setControllerInUse();
             }
         }
 
