@@ -90,7 +90,7 @@ public class ControllerManager
     {
         int connectedCount = 0;
         int joysticksCount = SDL_NumJoysticks();
-        for(int jid = 0; jid <= joysticksCount; jid++)
+        for(int jid = 0; jid < joysticksCount; jid++)
         {
             if(SDL_IsGameController(jid))
             {
