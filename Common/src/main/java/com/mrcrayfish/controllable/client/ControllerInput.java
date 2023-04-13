@@ -450,9 +450,10 @@ public class ControllerInput
 
         if(mc.screen == null)
         {
-            float deadZone = Config.CLIENT.client.options.thumbstickDeadZone.get().floatValue();
-            boolean rightXThumbstickMoved = Math.abs(controller.getRThumbStickXValue()) >= deadZone;
-            boolean rightYThumbstickMoved = Math.abs(controller.getRThumbStickYValue()) >= deadZone;
+            float inputX = controller.getRThumbStickXValue();
+            float inputY = controller.getRThumbStickYValue();
+            boolean rightXThumbstickMoved = Math.abs(inputX) > 0;
+            boolean rightYThumbstickMoved = Math.abs(inputY) > 0;
             if(rightXThumbstickMoved || rightYThumbstickMoved)
             {
                 float pitchSensitivity = Config.CLIENT.client.options.pitchSensitivity.get().floatValue();
@@ -473,13 +474,11 @@ public class ControllerInput
                 {
                     if(rightXThumbstickMoved)
                     {
-                        float deadZoneTrimX = (controller.getRThumbStickXValue() > 0 ? 1 : -1) * deadZone;
-                        this.targetYaw = (yawSpeed.get() * (controller.getRThumbStickXValue() - deadZoneTrimX) / (1.0F - deadZone)) * 0.33F;
+                        this.targetYaw = yawSpeed.get() * inputX * 0.33F;
                     }
                     if(rightYThumbstickMoved)
                     {
-                        float deadZoneTrimY = (controller.getRThumbStickYValue() > 0 ? 1 : -1) * deadZone;
-                        this.targetPitch = (pitchSpeed.get() * (controller.getRThumbStickYValue() - deadZoneTrimY) / (1.0F - deadZone)) * 0.33F;
+                        this.targetPitch = pitchSpeed.get() * inputY * 0.33F;
                     }
                 }
 
