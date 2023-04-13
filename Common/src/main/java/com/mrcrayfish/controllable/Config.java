@@ -62,7 +62,7 @@ public class Config
             public final BoolProperty invertRotation = BoolProperty.create(false); //TODO rename
 
             @ConfigProperty(name = "deadZone", comment = "The distance you have to move the thumbstick before it's input is registered. This fixes drifting as some thumbsticks don't center to zero.")
-            public final DoubleProperty thumbstickDeadZone = DoubleProperty.create(0.15, 0.0, 1.0);
+            public final DoubleProperty thumbstickDeadZone = DoubleProperty.create(0.1, 0.0, 1.0);
 
             @ConfigProperty(name = "triggerDeadZone", comment = "How much the trigger has to be pressed before it's input is registered. This fixes issues with triggers not being completely released to zero")
             public final DoubleProperty triggerDeadZone = DoubleProperty.create(0.05, 0.0, 1.0);
