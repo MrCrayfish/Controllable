@@ -15,7 +15,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 
@@ -28,7 +27,6 @@ import java.util.Objects;
  */
 public class ControllerList extends TabSelectionList<ControllerList.ControllerEntry>
 {
-    private final ControllerManager manager = InputProcessor.get().getManager();
     private final MutableComponent footerSubText;
     private int controllerCount;
 
@@ -45,7 +43,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
     private void reloadControllers()
     {
         this.clearEntries();
-        Map<Integer, String> controllers = this.manager.getControllers();
+        Map<Integer, String> controllers = ControllerManager.instance().getControllers();
         controllers.forEach((jid, name) -> this.addEntry(new ControllerEntry(jid, name)));
         this.updateSelected();
     }
@@ -78,9 +76,9 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
 
     public void tick()
     {
-        if(this.controllerCount != this.manager.getControllerCount())
+        if(this.controllerCount != ControllerManager.instance().getControllerCount())
         {
-            this.controllerCount = this.manager.getControllerCount();
+            this.controllerCount = ControllerManager.instance().getControllerCount();
             this.reloadControllers();
         }
         this.updateSelected();

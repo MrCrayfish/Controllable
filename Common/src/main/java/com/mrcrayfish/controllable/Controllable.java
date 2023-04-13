@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable;
 
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.ControllerInput;
+import com.mrcrayfish.controllable.client.ControllerManager;
 import com.mrcrayfish.controllable.client.ControllerProperties;
 import com.mrcrayfish.controllable.client.InputProcessor;
 
@@ -22,7 +23,7 @@ public class Controllable
 
     public static ControllerInput getInput()
     {
-        return InputProcessor.get().getInput();
+        return InputProcessor.instance().getInput();
     }
 
     public static File getConfigFolder()
@@ -38,11 +39,11 @@ public class Controllable
     @Nullable
     public static Controller getController()
     {
-        return InputProcessor.get().getController();
+        return ControllerManager.instance().getActiveController();
     }
 
     public static void setController(@Nullable Controller controller)
     {
-        InputProcessor.get().setController(controller);
+        ControllerManager.instance().setActiveController(controller);
     }
 }

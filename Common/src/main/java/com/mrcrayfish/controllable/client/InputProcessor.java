@@ -1,25 +1,16 @@
 package com.mrcrayfish.controllable.client;
 
-import com.google.common.io.ByteStreams;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.MemoryUtil;
 
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.Optional;
 import java.util.Queue;
+
+import static io.github.libsdl4j.api.gamecontroller.SDL_GameControllerButton.*;
 
 /**
  * Author: MrCrayfish
@@ -28,7 +19,7 @@ public class InputProcessor
 {
     private static InputProcessor instance;
 
-    public static InputProcessor get()
+    public static InputProcessor instance()
     {
         if(instance == null)
         {
@@ -40,102 +31,15 @@ public class InputProcessor
     private final Queue<ButtonStates> inputQueue = new ArrayDeque<>();
     private final ControllerInput input;
     private final ControllerManager manager;
-    private Controller controller;
 
     private InputProcessor()
     {
         this.input = new ControllerInput();
-        this.manager = InputProcessor.createManager();
+        this.manager = ControllerManager.instance();
         TickEvents.START_RENDER.register((partialTick) -> this.pollControllerInput(false));
         TickEvents.END_RENDER.register((partialTick) -> this.pollControllerInput(false));
         TickEvents.START_CLIENT.register(() -> this.pollControllerInput(true));
         TickEvents.END_CLIENT.register(() -> this.pollControllerInput(false));
-    }
-
-    private static ControllerManager createManager()
-    {
-        /* Loads up the controller manager and adds a listener */
-        ControllerManager manager = new ControllerManager();
-        manager.addControllerListener(new IControllerListener()
-        {
-            @Override
-            public void connected(int jid)
-            {
-                Minecraft.getInstance().doRunTask(() ->
-                {
-                    Controller controller = InputProcessor.get().getController();
-                    if(controller != null)
-                        return;
-
-                    if(Config.CLIENT.client.options.autoSelect.get())
-                    {
-                        InputProcessor.get().setController(controller = new Controller(jid));
-                    }
-
-                    Minecraft mc = Minecraft.getInstance();
-                    if(mc.player != null && controller != null)
-                    {
-                        mc.getToasts().addToast(new ControllerToast(true, controller.getName()));
-                    }
-                });
-            }
-
-            @Override
-            public void disconnected(int jid)
-            {
-                Minecraft.getInstance().doRunTask(() ->
-                {
-                    Controller controller = InputProcessor.get().getController();
-                    if(controller == null || controller.getJid() != jid)
-                        return;
-
-                    InputProcessor.get().setController(null);
-
-                    if(Config.CLIENT.client.options.autoSelect.get() && manager.getControllerCount() > 0)
-                    {
-                        Optional<Integer> optional = manager.getControllers().keySet().stream().min(Comparator.comparing(i -> i));
-                        optional.ifPresent(minJid -> InputProcessor.get().setController(new Controller(minJid)));
-                    }
-
-                    Minecraft mc = Minecraft.getInstance();
-                    if(mc.player != null)
-                    {
-                        Minecraft.getInstance().getToasts().addToast(new ControllerToast(false, controller.getName()));
-                    }
-                });
-            }
-        });
-        return manager;
-    }
-
-    public static void onFinishedClientLoad()
-    {
-        /* Update gamepad mappings */
-        try(InputStream is = Mappings.class.getResourceAsStream("/gamecontrollerdb.txt"))
-        {
-            if(is != null)
-            {
-                byte[] bytes = ByteStreams.toByteArray(is);
-                ByteBuffer buffer = MemoryUtil.memASCIISafe(new String(bytes));
-                if(GLFW.glfwUpdateGamepadMappings(buffer))
-                {
-                    Constants.LOG.info("Successfully updated gamepad mappings");
-                }
-            }
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        /* Attempts to load the first controller connected if auto select is enabled */
-        if(Config.CLIENT.client.options.autoSelect.get())
-        {
-            if(GLFW.glfwJoystickPresent(GLFW.GLFW_JOYSTICK_1) && GLFW.glfwJoystickIsGamepad(GLFW.GLFW_JOYSTICK_1))
-            {
-                InputProcessor.get().setController(new Controller(GLFW.GLFW_JOYSTICK_1));
-            }
-        }
     }
 
     private void pollControllerInput(boolean process)
@@ -149,46 +53,43 @@ public class InputProcessor
 
     private void gatherAndQueueControllerInput()
     {
-        // Updates the manager, which handles hot swapping
-        if(this.manager != null)
-        {
-            this.manager.update();
-        }
+        if(this.manager == null)
+            return;
 
-        // Don't process if no controller is selected
-        Controller currentController = this.controller;
+        this.manager.tick();
+
+        Controller currentController = this.manager.getActiveController();
         if(currentController == null)
             return;
 
-        // Updates the internal GLFW gamepad state
         if(!currentController.updateGamepadState())
             return;
 
         // Capture all inputs and queue
         ButtonStates states = new ButtonStates();
-        states.setState(Buttons.A, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_A));
-        states.setState(Buttons.B, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_B));
-        states.setState(Buttons.X, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_X));
-        states.setState(Buttons.Y, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_Y));
-        states.setState(Buttons.SELECT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_BACK));
-        states.setState(Buttons.HOME, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_GUIDE));
-        states.setState(Buttons.START, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_START));
-        states.setState(Buttons.LEFT_THUMB_STICK, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB));
-        states.setState(Buttons.RIGHT_THUMB_STICK, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB));
-        states.setState(Buttons.LEFT_BUMPER, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER));
-        states.setState(Buttons.RIGHT_BUMPER, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER));
+        states.setState(Buttons.A, this.getButtonState(SDL_CONTROLLER_BUTTON_A));
+        states.setState(Buttons.B, this.getButtonState(SDL_CONTROLLER_BUTTON_B));
+        states.setState(Buttons.X, this.getButtonState(SDL_CONTROLLER_BUTTON_X));
+        states.setState(Buttons.Y, this.getButtonState(SDL_CONTROLLER_BUTTON_Y));
+        states.setState(Buttons.SELECT, this.getButtonState(SDL_CONTROLLER_BUTTON_BACK));
+        states.setState(Buttons.HOME, this.getButtonState(SDL_CONTROLLER_BUTTON_GUIDE));
+        states.setState(Buttons.START, this.getButtonState(SDL_CONTROLLER_BUTTON_START));
+        states.setState(Buttons.LEFT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSTICK));
+        states.setState(Buttons.RIGHT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
+        states.setState(Buttons.LEFT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+        states.setState(Buttons.RIGHT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
         states.setState(Buttons.LEFT_TRIGGER, currentController.getLTriggerValue() >= 0.5F);
         states.setState(Buttons.RIGHT_TRIGGER, currentController.getRTriggerValue() >= 0.5F);
-        states.setState(Buttons.DPAD_UP, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP));
-        states.setState(Buttons.DPAD_DOWN, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
-        states.setState(Buttons.DPAD_LEFT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
-        states.setState(Buttons.DPAD_RIGHT, this.getButtonState(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+        states.setState(Buttons.DPAD_UP, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
+        states.setState(Buttons.DPAD_DOWN, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
+        states.setState(Buttons.DPAD_LEFT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
+        states.setState(Buttons.DPAD_RIGHT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
         this.inputQueue.offer(states);
     }
 
     private boolean getButtonState(int buttonCode)
     {
-        return this.controller != null && this.controller.getGamepadState().buttons(buttonCode) == GLFW.GLFW_PRESS;
+        return this.manager.getActiveController() != null && this.manager.getActiveController().getGamepadState()[buttonCode] == 1;
     }
 
     private void processButtonStates()
@@ -215,7 +116,7 @@ public class InputProcessor
             return;
         }
 
-        Controller controller = this.controller;
+        Controller controller = this.manager.getActiveController();
         if(controller == null)
             return;
 
@@ -262,36 +163,12 @@ public class InputProcessor
         for(int i = 0; i < captureCount; i++)
         {
             RenderSystem.limitDisplayFPS(fps * captureCount);
-            InputProcessor.get().gatherAndQueueControllerInput();
+            InputProcessor.instance().gatherAndQueueControllerInput();
         }
-    }
-
-    public ControllerManager getManager()
-    {
-        return this.manager;
     }
 
     public ControllerInput getInput()
     {
         return this.input;
-    }
-
-    @Nullable
-    public Controller getController()
-    {
-        return this.controller;
-    }
-
-    public void setController(@Nullable Controller controller)
-    {
-        if(controller != null)
-        {
-            this.controller = controller;
-            Mappings.updateControllerMappings(controller);
-        }
-        else
-        {
-            this.controller = null;
-        }
     }
 }

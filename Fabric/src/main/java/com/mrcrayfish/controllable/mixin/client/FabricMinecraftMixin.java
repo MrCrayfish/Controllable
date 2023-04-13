@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.mixin.client;
 
 import com.mrcrayfish.controllable.client.BindingRegistry;
-import com.mrcrayfish.controllable.client.InputProcessor;
+import com.mrcrayfish.controllable.client.ControllerManager;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,6 +18,6 @@ public class FabricMinecraftMixin
     private void controllableOnFinishedLoading(CallbackInfo ci)
     {
         BindingRegistry.getInstance().load();
-        InputProcessor.onFinishedClientLoad();
+        ControllerManager.instance().onClientFinishedLoading();
     }
 }

@@ -1,3 +1,5 @@
+import net.fabricmc.loom.task.RemapJarTask
+
 plugins {
     id 'fabric-loom' version '1.0-SNAPSHOT'
     id 'maven-publish'
@@ -27,6 +29,9 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     modImplementation "com.mrcrayfish:framework-fabric:${minecraft_version}-${framework_version}"
     modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
+    library include("io.github.libsdl4j:libsdl4j:2.26.4-1.2") {
+        transitive(false)
+    }
     implementation "com.google.code.findbugs:jsr305:3.0.2"
     implementation project(":Common")
     testModImplementation sourceSets.main.output
@@ -67,6 +72,19 @@ processResources {
         expand project.properties
     }
 }
+
+remapJar {
+    addNestedDependencies = false
+}
+
+task releaseJar(type: RemapJarTask) {
+    dependsOn tasks.jar
+    input = tasks.jar.archiveFile
+    addNestedDependencies = true
+    classifier 'release'
+}
+
+build.finalizedBy(releaseJar)
 
 tasks.withType(JavaCompile) {
     source(project(":Common").sourceSets.main.allSource)

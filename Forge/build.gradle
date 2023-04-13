@@ -9,6 +9,8 @@ plugins {
 archivesBaseName = "${mod_id}-forge"
 version = "${minecraft_version}-${mod_version}"
 
+jarJar.enable()
+
 mixin {
     add sourceSets.main, "controllable.refmap.json"
     config 'controllable.common.mixins.json'
@@ -76,7 +78,7 @@ minecraft {
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 configurations {
-    implementation.extendsFrom library
+    minecraftLibrary.extendsFrom library
 }
 
 dependencies {
@@ -84,6 +86,10 @@ dependencies {
     implementation fg.deobf("com.mrcrayfish:framework-forge:${minecraft_version}-${framework_version}")
     implementation "mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}"
     compileOnly fg.deobf("mezz.jei:jei-${jei_minecraft_version}-forge:${jei_version}")
+    library jarJar("io.github.libsdl4j:libsdl4j:2.26.4-1.2") {
+        jarJar.ranged(it, "[2.26.4-1.2,)")
+        transitive(false)
+    }
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly project(":Common")
     testCompileOnly project(":Common")
@@ -99,6 +105,14 @@ processResources {
 
     filesMatching("META-INF/mods.toml") {
         expand project.properties
+    }
+}
+
+tasks.jarJar.configure {
+    classifier 'release'
+    from(rootProject.file("LICENSE_LibSDL4J"))
+    from(rootProject.file("LICENSE")) {
+        rename { "${it}_${mod_name}" }
     }
 }
 

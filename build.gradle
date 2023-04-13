@@ -21,6 +21,7 @@ subprojects {
         from(rootProject.file("LICENSE")) {
             rename { "${it}_${mod_name}" }
         }
+        from(rootProject.file("LICENSE_LibSDL4J"))
         manifest {
             attributes([
                     'Specification-Title'     : mod_name,
@@ -41,6 +42,7 @@ subprojects {
         from(rootProject.file("LICENSE")) {
             rename { "${it}_${mod_name}" }
         }
+        from(rootProject.file("LICENSE_LibSDL4J"))
     }
 
     repositories {
