@@ -39,4 +39,24 @@ public class EventHelper
         }
         return cancelled;
     }
+
+    public static boolean postUpdateCameraEvent(Controller controller, Value<Float> yawSpeed, Value<Float> pitchSpeed)
+    {
+        boolean cancelled = ControllerEvents.UPDATE_CAMERA.post().handle(yawSpeed, pitchSpeed);
+        if(!cancelled)
+        {
+            cancelled = ClientServices.CLIENT.sendLegacyControllerEventTurn(controller, yawSpeed, pitchSpeed);
+        }
+        return cancelled;
+    }
+
+    public static boolean postRenderMiniPlayer()
+    {
+        boolean cancelled = ControllerEvents.RENDER_MINI_PLAYER.post().handle();
+        if(!cancelled)
+        {
+            cancelled = ClientServices.CLIENT.sendLegacyRenderPlayerPreviewEvent();
+        }
+        return cancelled;
+    }
 }

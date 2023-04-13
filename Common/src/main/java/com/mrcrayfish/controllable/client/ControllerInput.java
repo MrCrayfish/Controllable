@@ -452,31 +452,24 @@ public class ControllerInput
         {
             float inputX = controller.getRThumbStickXValue();
             float inputY = controller.getRThumbStickYValue();
-            boolean rightXThumbstickMoved = Math.abs(inputX) > 0;
-            boolean rightYThumbstickMoved = Math.abs(inputY) > 0;
-            if(rightXThumbstickMoved || rightYThumbstickMoved)
+            boolean canMoveHorizontally = Math.abs(inputX) > 0;
+            boolean canMoveVertically = Math.abs(inputY) > 0;
+            if(canMoveHorizontally || canMoveVertically)
             {
                 float pitchSensitivity = Config.CLIENT.client.options.pitchSensitivity.get().floatValue();
                 float yawSensitivity = Config.CLIENT.client.options.yawSensitivity.get().floatValue();
-                double rotationSpeed = Config.CLIENT.client.options.rotationSpeed.get();
-                if(player.isScoping())
+                float rotationSpeed = Config.CLIENT.client.options.rotationSpeed.get().floatValue();
+                float spyglassSensitivity = player.isScoping() ? Config.CLIENT.client.options.spyglassSensitivity.get().floatValue() : 1.0F;
+
+                Value<Float> yawSpeed = new Value<>(rotationSpeed * yawSensitivity * spyglassSensitivity);
+                Value<Float> pitchSpeed = new Value<>(rotationSpeed * pitchSensitivity * spyglassSensitivity);
+                if(!EventHelper.postUpdateCameraEvent(controller, yawSpeed, pitchSpeed))
                 {
-                    rotationSpeed *= Config.CLIENT.client.options.spyglassSensitivity.get();
-                }
-                Value<Float> yawSpeed = new Value<>((float) rotationSpeed * yawSensitivity);
-                Value<Float> pitchSpeed = new Value<>((float) rotationSpeed * pitchSensitivity);
-                boolean cancelled = ControllerEvents.UPDATE_CAMERA.post().handle(yawSpeed, pitchSpeed);
-                if(!cancelled)
-                {
-                    cancelled = ClientServices.CLIENT.sendLegacyControllerEventTurn(controller, yawSpeed, pitchSpeed);
-                }
-                if(!cancelled)
-                {
-                    if(rightXThumbstickMoved)
+                    if(canMoveHorizontally)
                     {
                         this.targetYaw = yawSpeed.get() * inputX * 0.33F;
                     }
-                    if(rightYThumbstickMoved)
+                    if(canMoveVertically)
                     {
                         this.targetPitch = pitchSpeed.get() * inputY * 0.33F;
                     }

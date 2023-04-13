@@ -8,6 +8,7 @@ import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.widget.TabNavigationHint;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.client.util.EventHelper;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
@@ -355,12 +356,7 @@ public class RenderEvents
         Minecraft mc = Minecraft.getInstance();
         if(mc.player != null && mc.screen == null && Config.CLIENT.client.options.renderMiniPlayer.get())
         {
-            boolean cancelled = ControllerEvents.RENDER_MINI_PLAYER.post().handle();
-            if(!cancelled)
-            {
-                cancelled = ClientServices.CLIENT.sendLegacyRenderPlayerPreviewEvent();
-            }
-            if(!cancelled)
+            if(!EventHelper.postRenderMiniPlayer())
             {
                 InventoryScreen.renderEntityInInventoryFollowsMouse(poseStack, 20, 45, 20, 0, 0, mc.player);
             }
