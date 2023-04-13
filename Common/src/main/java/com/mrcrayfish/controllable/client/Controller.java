@@ -1,8 +1,11 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import io.github.libsdl4j.api.gamecontroller.SDL_GameController;
 
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
 
@@ -160,7 +163,8 @@ public class Controller
      */
     public float getLThumbStickXValue()
     {
-        return SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_LEFTX) / (float) SDL_JOYSTICK_AXIS_MAX;
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_LEFTX) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.client.options.thumbstickDeadZone.get().floatValue());
     }
 
     /**
@@ -170,7 +174,8 @@ public class Controller
      */
     public float getLThumbStickYValue()
     {
-        return SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_LEFTY) / (float) SDL_JOYSTICK_AXIS_MAX;
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_LEFTY) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.client.options.thumbstickDeadZone.get().floatValue());
     }
 
     /**
@@ -180,7 +185,8 @@ public class Controller
      */
     public float getRThumbStickXValue()
     {
-        return SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_RIGHTX) / (float) SDL_JOYSTICK_AXIS_MAX;
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_RIGHTX) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.client.options.thumbstickDeadZone.get().floatValue());
     }
 
     /**
@@ -190,7 +196,8 @@ public class Controller
      */
     public float getRThumbStickYValue()
     {
-        return SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_RIGHTY) / (float) SDL_JOYSTICK_AXIS_MAX;
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_RIGHTY) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.client.options.thumbstickDeadZone.get().floatValue());
     }
 
     /**

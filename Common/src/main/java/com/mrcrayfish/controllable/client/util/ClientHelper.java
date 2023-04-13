@@ -20,6 +20,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 
 import java.util.List;
 
@@ -79,5 +80,10 @@ public class ClientHelper
     public static Tooltip getOptionTooltip(OptionInstance<Boolean> option)
     {
         return ClientServices.CLIENT.getOptionInstanceTooltip(option);
+    }
+
+    public static float applyDeadzone(float input, float deadZone)
+    {
+        return Mth.sign(input) * Math.max(Mth.abs(input) - deadZone, 0) / (1 - deadZone);
     }
 }

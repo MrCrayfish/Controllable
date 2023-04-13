@@ -184,13 +184,12 @@ public class ControllerInput
         if(mc.screen == null || mc.screen instanceof ControllerLayoutScreen)
             return;
 
-        float deadZone = (float) Math.min(1.0F, Config.CLIENT.client.options.thumbstickDeadZone.get() + 0.25F);
-
         /* Only need to run code if left thumb stick has input */
+        float threshold = 0.35F;
         boolean lastMoving = this.moving;
-        float xAxis = Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickXValue() : controller.getRThumbStickXValue();
-        float yAxis = Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickYValue() : controller.getRThumbStickYValue();
-        this.moving = Math.abs(xAxis) >= deadZone || Math.abs(yAxis) >= deadZone;
+        float inputX = Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickXValue() : controller.getRThumbStickXValue();
+        float inputY = Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickYValue() : controller.getRThumbStickYValue();
+        this.moving = Math.abs(inputX) >= threshold || Math.abs(inputY) >= threshold;
         if(this.moving)
         {
             /* Updates the target mouse position when the initial thumb stick movement is
@@ -209,8 +208,11 @@ public class ControllerInput
                 this.prevMouseY = this.mouseY = (int) mouseY;
             }
 
-            this.mouseSpeedX = Math.abs(xAxis) >= deadZone ? Math.signum(xAxis) * (Math.abs(xAxis) - deadZone) / (1.0F - deadZone) : 0.0F;
-            this.mouseSpeedY = Math.abs(yAxis) >= deadZone ? Math.signum(yAxis) * (Math.abs(yAxis) - deadZone) / (1.0F - deadZone) : 0.0F;
+            /* Update the speed of the cursor */
+            this.mouseSpeedX = Math.abs(inputX) >= threshold ? ClientHelper.applyDeadzone(inputX, threshold) : 0.0F;
+            this.mouseSpeedY = Math.abs(inputY) >= threshold ? ClientHelper.applyDeadzone(inputY, threshold) : 0.0F;
+
+            /* Mark the controller as in use because the cursor is moving */
             this.setControllerInUse();
         }
 
@@ -555,32 +557,27 @@ public class ControllerInput
         {
             if((!RadialMenuHandler.instance().isVisible() || Config.CLIENT.client.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent(controller))
             {
-                float deadZone = Config.CLIENT.client.options.thumbstickDeadZone.get().floatValue();
                 float sneakBonus = player.isMovingSlowly() ? Mth.clamp(0.3F + EnchantmentHelper.getSneakingSpeedBonus(player), 0.0F, 1.0F) : 1.0F;
+                float inputX = controller.getLThumbStickXValue();
+                float inputY = controller.getLThumbStickYValue();
 
-                if(Math.abs(controller.getLThumbStickYValue()) >= deadZone)
+                if(Math.abs(inputY) > 0)
                 {
-                    this.setControllerInUse();
-                    int dir = controller.getLThumbStickYValue() > 0.0F ? -1 : 1;
-                    input.up = dir > 0;
-                    input.down = dir < 0;
-                    input.forwardImpulse = dir * Mth.clamp((Math.abs(controller.getLThumbStickYValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
+                    input.up = inputY < 0;
+                    input.down = inputY > 0;
+                    input.forwardImpulse = -inputY;
                     input.forwardImpulse *= sneakBonus;
-                }
-
-                if(player.getVehicle() instanceof Boat)
-                {
-                    deadZone = 0.5F;
-                }
-
-                if(Math.abs(controller.getLThumbStickXValue()) >= deadZone)
-                {
                     this.setControllerInUse();
-                    int dir = controller.getLThumbStickXValue() > 0.0F ? -1 : 1;
-                    input.right = dir < 0;
-                    input.left = dir > 0;
-                    input.leftImpulse = dir * Mth.clamp((Math.abs(controller.getLThumbStickXValue()) - deadZone) / (1.0F - deadZone), 0.0F, 1.0F);
+                }
+
+                float threshold = player.getVehicle() instanceof Boat ? 0.5F : 0.0F;
+                if(Math.abs(inputX) > threshold)
+                {
+                    input.right = inputX > 0;
+                    input.left = inputX < 0;
+                    input.leftImpulse = -inputX;
                     input.leftImpulse *= sneakBonus;
+                    this.setControllerInUse();
                 }
             }
 

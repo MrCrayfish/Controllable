@@ -379,15 +379,16 @@ public class RadialMenuHandler
         if(controller == null)
             return;
 
-        float xValue = Config.CLIENT.client.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickXValue() : controller.getLThumbStickXValue();
-        float yValue = Config.CLIENT.client.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
+        float threshold = 0.5F;
+        float inputX = Config.CLIENT.client.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickXValue() : controller.getLThumbStickXValue();
+        float inputY = Config.CLIENT.client.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
 
         // Don't update selected if thumbstick is not above a certain threshold
-        if(Math.abs(xValue) <= 0.5F && Math.abs(yValue) <= 0.5F)
+        if(Math.abs(inputX) <= threshold && Math.abs(inputY) <= threshold)
             return;
 
         // Finds the closest radial item based on the direction of the right controller thumbstick
-        float selectedAngle = (float) (Mth.wrapDegrees(Math.toDegrees(Math.atan2(yValue, xValue)) - 90) + 180);
+        float selectedAngle = (float) (Mth.wrapDegrees(Math.toDegrees(Math.atan2(inputY, inputX)) - 90) + 180);
         Optional<AbstractRadialItem> closest = this.allItems.stream().min((o1, o2) -> Mth.degreesDifferenceAbs(o1.angle, selectedAngle) > Mth.degreesDifferenceAbs(o2.angle, selectedAngle) ? 1 : 0);
         if(closest.isEmpty())
             return;
