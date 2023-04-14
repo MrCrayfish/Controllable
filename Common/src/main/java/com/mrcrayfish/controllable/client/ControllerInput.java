@@ -96,19 +96,18 @@ public class ControllerInput
     private boolean moving = false;
     private boolean preventReset;
     private boolean ignoreInput;
-    private double virtualMouseX;
-    private double virtualMouseY;
-    private int prevMouseX;
-    private int prevMouseY;
-    private int mouseX;
-    private int mouseY;
-    private double mouseSpeedX;
-    private double mouseSpeedY;
+    private double virtualCursorX;
+    private double virtualCursorY;
+    private int prevCursorX;
+    private int prevCursorY;
+    private int cursorX;
+    private int cursorY;
+    private double cursorSpeedX;
+    private double cursorSpeedY;
     private boolean moved;
     private float targetPitch;
     private float targetYaw;
     private long lastMerchantScroll;
-
     private int dropCounter = -1;
 
     public ControllerInput()
@@ -122,14 +121,14 @@ public class ControllerInput
         ClientEvents.PLAYER_INPUT_UPDATE.register(this::onInputUpdate);
     }
 
-    public double getVirtualMouseX()
+    public double getVirtualCursorX()
     {
-        return this.virtualMouseX;
+        return this.virtualCursorX;
     }
 
-    public double getVirtualMouseY()
+    public double getVirtualCursorY()
     {
-        return this.virtualMouseY;
+        return this.virtualCursorY;
     }
 
     private void setControllerInUse()
@@ -163,8 +162,8 @@ public class ControllerInput
 
     private void onClientTick()
     {
-        this.prevMouseX = this.mouseX;
-        this.prevMouseY = this.mouseY;
+        this.prevCursorX = this.cursorX;
+        this.prevCursorY = this.cursorY;
 
         if(this.lastUse > 0)
         {
@@ -198,20 +197,20 @@ public class ControllerInput
              * switching back to controller, the cursor would jump to old target mouse position. */
             if(!lastMoving)
             {
-                double mouseX = mc.mouseHandler.xpos();
-                double mouseY = mc.mouseHandler.ypos();
+                double cursorX = mc.mouseHandler.xpos();
+                double cursorY = mc.mouseHandler.ypos();
                 if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get())
                 {
-                    mouseX = this.virtualMouseX;
-                    mouseY = this.virtualMouseY;
+                    cursorX = this.virtualCursorX;
+                    cursorY = this.virtualCursorY;
                 }
-                this.prevMouseX = this.mouseX = (int) mouseX;
-                this.prevMouseY = this.mouseY = (int) mouseY;
+                this.prevCursorX = this.cursorX = (int) cursorX;
+                this.prevCursorY = this.cursorY = (int) cursorY;
             }
 
             /* Update the speed of the cursor */
-            this.mouseSpeedX = Math.abs(inputX) >= threshold ? ClientHelper.applyDeadzone(inputX, threshold) : 0.0F;
-            this.mouseSpeedY = Math.abs(inputY) >= threshold ? ClientHelper.applyDeadzone(inputY, threshold) : 0.0F;
+            this.cursorSpeedX = Math.abs(inputX) >= threshold ? ClientHelper.applyDeadzone(inputX, threshold) : 0.0F;
+            this.cursorSpeedY = Math.abs(inputY) >= threshold ? ClientHelper.applyDeadzone(inputY, threshold) : 0.0F;
 
             /* Mark the controller as in use because the cursor is moving */
             this.setControllerInUse();
@@ -219,26 +218,26 @@ public class ControllerInput
 
         if(this.lastUse <= 0)
         {
-            this.mouseSpeedX = 0F;
-            this.mouseSpeedY = 0F;
+            this.cursorSpeedX = 0F;
+            this.cursorSpeedY = 0F;
             return;
         }
 
-        if(Math.abs(this.mouseSpeedX) > 0F || Math.abs(this.mouseSpeedY) > 0F)
+        if(Math.abs(this.cursorSpeedX) > 0F || Math.abs(this.cursorSpeedY) > 0F)
         {
-            double mouseSpeed = Config.CLIENT.client.options.cursorSpeed.get() * mc.getWindow().getGuiScale();
+            double cursorSpeed = Config.CLIENT.client.options.cursorSpeed.get() * mc.getWindow().getGuiScale();
 
             // When hovering over slots, slows down the mouse speed to make it easier
             if(mc.screen instanceof AbstractContainerScreen<?> screen)
             {
                 if(ClientServices.CLIENT.getSlotUnderMouse(screen) != null)
                 {
-                    mouseSpeed *= Config.CLIENT.client.options.hoverModifier.get();
+                    cursorSpeed *= Config.CLIENT.client.options.hoverModifier.get();
                 }
             }
 
-            double mouseX = this.virtualMouseX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
-            double mouseY = this.virtualMouseY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
+            double cursorX = this.virtualCursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
+            double cursorY = this.virtualCursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
             List<GuiEventListener> eventListeners = new ArrayList<>(mc.screen.children());
             if(mc.screen instanceof RecipeUpdateListener)
             {
@@ -254,7 +253,7 @@ public class ControllerInput
                 }
             }
 
-            GuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+            GuiEventListener hoveredListener = eventListeners.stream().filter(o -> o != null && o.isMouseOver(cursorX, cursorY)).findFirst().orElse(null);
             if(hoveredListener instanceof AbstractSelectionList<?> list)
             {
                 hoveredListener = null;
@@ -272,7 +271,7 @@ public class ControllerInput
                     if(!(entry instanceof ContainerEventHandler handler))
                         continue;
 
-                    GuiEventListener hovered = handler.children().stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst().orElse(null);
+                    GuiEventListener hovered = handler.children().stream().filter(o -> o != null && o.isMouseOver(cursorX, cursorY)).findFirst().orElse(null);
                     if(hovered == null)
                         continue;
 
@@ -282,27 +281,27 @@ public class ControllerInput
             }
             if(hoveredListener != null)
             {
-                mouseSpeed *= Config.CLIENT.client.options.hoverModifier.get();
+                cursorSpeed *= Config.CLIENT.client.options.hoverModifier.get();
             }
 
-            this.mouseX += mouseSpeed * this.mouseSpeedX;
-            this.mouseX = Mth.clamp(this.mouseX, 0, mc.getWindow().getWidth());
-            this.mouseY += mouseSpeed * this.mouseSpeedY;
-            this.mouseY = Mth.clamp(this.mouseY, 0, mc.getWindow().getHeight());
+            this.cursorX += cursorSpeed * this.cursorSpeedX;
+            this.cursorX = Mth.clamp(this.cursorX, 0, mc.getWindow().getWidth());
+            this.cursorY += cursorSpeed * this.cursorSpeedY;
+            this.cursorY = Mth.clamp(this.cursorY, 0, mc.getWindow().getHeight());
             this.setControllerInUse();
             this.moved = true;
         }
 
-        this.moveMouseToClosestSlot(this.moving, mc.screen);
+        this.moveCursorToClosestSlot(this.moving, mc.screen);
 
         if(mc.screen instanceof CreativeModeInventoryScreen)
         {
             this.handleCreativeScrolling((CreativeModeInventoryScreen) mc.screen, controller);
         }
 
-        if(Config.CLIENT.client.options.virtualCursor.get() && (this.mouseX != this.prevMouseX || this.mouseY != this.prevMouseY))
+        if(Config.CLIENT.client.options.virtualCursor.get() && (this.cursorX != this.prevCursorX || this.cursorY != this.prevCursorY))
         {
-            this.performMouseDrag(this.virtualMouseX, this.virtualMouseY, this.mouseX - this.prevMouseX, this.mouseY - this.prevMouseY);
+            this.performMouseDrag(this.virtualCursorX, this.virtualCursorY, this.cursorX - this.prevCursorX, this.cursorY - this.prevCursorY);
         }
     }
 
@@ -313,10 +312,10 @@ public class ControllerInput
         {
             this.nearSlot = false;
             this.moved = false;
-            this.mouseSpeedX = 0.0;
-            this.mouseSpeedY = 0.0;
-            this.virtualMouseX = this.mouseX = this.prevMouseX = (int) (mc.getWindow().getWidth() / 2F);
-            this.virtualMouseY = this.mouseY = this.prevMouseY = (int) (mc.getWindow().getHeight() / 2F);
+            this.cursorSpeedX = 0.0;
+            this.cursorSpeedY = 0.0;
+            this.virtualCursorX = this.cursorX = this.prevCursorX = (int) (mc.getWindow().getWidth() / 2F);
+            this.virtualCursorY = this.cursorY = this.prevCursorY = (int) (mc.getWindow().getHeight() / 2F);
         }
     }
 
@@ -326,19 +325,19 @@ public class ControllerInput
          * mouse position is different to the previous tick's position. This allows for the mouse
          * to still be used as input. */
         Minecraft mc = Minecraft.getInstance();
-        if(mc.screen != null && (this.mouseX != this.prevMouseX || this.mouseY != this.prevMouseY))
+        if(mc.screen != null && (this.cursorX != this.prevCursorX || this.cursorY != this.prevCursorY))
         {
             if(!(mc.screen instanceof ControllerLayoutScreen))
             {
                 float partialTicks = Minecraft.getInstance().getFrameTime();
-                double mX = (this.prevMouseX + (this.mouseX - this.prevMouseX) * partialTicks + 0.5);
-                double mY = (this.prevMouseY + (this.mouseY - this.prevMouseY) * partialTicks + 0.5);
-                this.setMousePosition(mX, mY);
+                double renderCursorX = (this.prevCursorX + (this.cursorX - this.prevCursorX) * partialTicks + 0.5);
+                double renderCursorY = (this.prevCursorY + (this.cursorY - this.prevCursorY) * partialTicks + 0.5);
+                this.setCursorPosition(renderCursorX, renderCursorY);
             }
         }
     }
 
-    private void performMouseDrag(double mouseX, double mouseY, double dragX, double dragY)
+    private void performMouseDrag(double cursorX, double cursorY, double dragX, double dragY)
     {
         if(Controllable.getController() != null)
         {
@@ -348,14 +347,14 @@ public class ControllerInput
             {
                 if(mc.getOverlay() == null)
                 {
-                    double finalMouseX = mouseX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
-                    double finalMouseY = mouseY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
-                    Screen.wrapScreenError(() -> screen.mouseMoved(finalMouseX, finalMouseY), "mouseMoved event handler", ((GuiEventListener) screen).getClass().getCanonicalName());
+                    double finalCursorX = cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
+                    double finalCursorY = cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
+                    Screen.wrapScreenError(() -> screen.mouseMoved(finalCursorX, finalCursorY), "mouseMoved event handler", ((GuiEventListener) screen).getClass().getCanonicalName());
                     int activeMouseButton = ClientServices.CLIENT.getActiveMouseButton();
                     double lastMouseEventTime = ClientServices.CLIENT.getLastMouseEventTime();
                     if(activeMouseButton != -1 && lastMouseEventTime > 0.0D)
                     {
-                        ClientServices.CLIENT.sendMouseDrag(screen, dragX, dragY, finalMouseX, finalMouseY, activeMouseButton);
+                        ClientServices.CLIENT.sendMouseDrag(screen, dragX, dragY, finalCursorX, finalCursorY, activeMouseButton);
                     }
                 }
             }
@@ -372,8 +371,8 @@ public class ControllerInput
             if(mc.player == null || (mc.player.inventoryMenu.getCarried().isEmpty() || type == CursorType.CONSOLE))
             {
                 double guiScale = mc.getWindow().getGuiScale();
-                double virtualCursorX = (this.prevMouseX + (this.mouseX - this.prevMouseX) * mc.getFrameTime());
-                double virtualCursorY = (this.prevMouseY + (this.mouseY - this.prevMouseY) * mc.getFrameTime());
+                double virtualCursorX = (this.prevCursorX + (this.cursorX - this.prevCursorX) * mc.getFrameTime());
+                double virtualCursorY = (this.prevCursorY + (this.cursorY - this.prevCursorY) * mc.getFrameTime());
                 double zIndex = Services.PLATFORM.isForge() ? 500 : 3000; // Hack until I make Forge/Fabric calls the same
                 poseStack.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, zIndex);
                 RenderSystem.setShaderTexture(0, CURSOR_TEXTURE);
@@ -395,8 +394,8 @@ public class ControllerInput
             return;
 
         Minecraft mc = Minecraft.getInstance();
-        double mouseX = this.virtualMouseX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
-        double mouseY = this.virtualMouseY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
+        double cursorX = this.virtualCursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
+        double cursorY = this.virtualCursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
         if(mc.screen != null && this.lastUse > 0)
         {
             if(mc.screen instanceof MerchantScreen screen)
@@ -408,7 +407,7 @@ public class ControllerInput
             float yValue = Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
             if(Math.abs(yValue) >= 0.2F)
             {
-                GuiEventListener hoveredListener = ScreenUtil.findHoveredListener(mc.screen, mouseX, mouseY, listener -> listener instanceof AbstractSelectionList<?>).orElse(null);
+                GuiEventListener hoveredListener = ScreenUtil.findHoveredListener(mc.screen, cursorX, cursorY, listener -> listener instanceof AbstractSelectionList<?>).orElse(null);
                 if(hoveredListener instanceof AbstractSelectionList<?> selectionList)
                 {
                     this.handleListScrolling(selectionList, controller);
@@ -711,7 +710,7 @@ public class ControllerInput
                 }
                 else if(ButtonBindings.TOGGLE_PERSPECTIVE.isButtonPressed())
                 {
-                    cycleThirdPersonView();
+                    this.cycleThirdPersonView();
                 }
                 else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
                 {
@@ -858,23 +857,23 @@ public class ControllerInput
                 }
                 else if(ButtonBindings.NAVIGATE_UP.isButtonPressed())
                 {
-                    this.navigateMouse(mc.screen, Navigate.UP);
+                    this.navigateCursor(mc.screen, Navigate.UP);
                 }
                 else if(ButtonBindings.NAVIGATE_DOWN.isButtonPressed())
                 {
-                    this.navigateMouse(mc.screen, Navigate.DOWN);
+                    this.navigateCursor(mc.screen, Navigate.DOWN);
                 }
                 else if(ButtonBindings.NAVIGATE_LEFT.isButtonPressed())
                 {
-                    this.navigateMouse(mc.screen, Navigate.LEFT);
+                    this.navigateCursor(mc.screen, Navigate.LEFT);
                 }
                 else if(ButtonBindings.NAVIGATE_RIGHT.isButtonPressed())
                 {
-                    this.navigateMouse(mc.screen, Navigate.RIGHT);
+                    this.navigateCursor(mc.screen, Navigate.RIGHT);
                 }
                 else if(button == ButtonBindings.PICKUP_ITEM.getButton())
                 {
-                    invokeMouseClick(mc.screen, 0);
+                    this.invokeMouseClick(mc.screen, 0);
 
                     if(mc.screen == null)
                     {
@@ -888,17 +887,17 @@ public class ControllerInput
                 }
                 else if(button == ButtonBindings.SPLIT_STACK.getButton())
                 {
-                    invokeMouseClick(mc.screen, 1);
+                    this.invokeMouseClick(mc.screen, 1);
                 }
                 else if(button == ButtonBindings.QUICK_MOVE.getButton() && mc.player != null)
                 {
                     if(mc.player.inventoryMenu.getCarried().isEmpty())
                     {
-                        invokeMouseClick(mc.screen, 0);
+                        this.invokeMouseClick(mc.screen, 0);
                     }
                     else
                     {
-                        invokeMouseReleased(mc.screen, 1);
+                        this.invokeMouseReleased(mc.screen, 1);
                     }
                 }
             }
@@ -913,11 +912,11 @@ public class ControllerInput
             {
                 if(button == ButtonBindings.PICKUP_ITEM.getButton())
                 {
-                    invokeMouseReleased(mc.screen, 0);
+                    this.invokeMouseReleased(mc.screen, 0);
                 }
                 else if(button == ButtonBindings.SPLIT_STACK.getButton())
                 {
-                    invokeMouseReleased(mc.screen, 1);
+                    this.invokeMouseReleased(mc.screen, 1);
                 }
             }
         }
@@ -1001,54 +1000,54 @@ public class ControllerInput
         }
     }
 
-    private void navigateMouse(Screen screen, Navigate navigate)
+    private void navigateCursor(Screen screen, Navigate navigate)
     {
         Minecraft mc = Minecraft.getInstance();
-        int mouseX = (int) (this.mouseX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth());
-        int mouseY = (int) (this.mouseY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight());
+        int cursorX = (int) (this.cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth());
+        int cursorY = (int) (this.cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight());
 
-        List<NavigationPoint> points = this.gatherNavigationPoints(screen, navigate, mouseX, mouseY);
+        List<NavigationPoint> points = this.gatherNavigationPoints(screen, navigate, cursorX, cursorY);
 
         // Gather any extra navigation points from event
         ControllerEvents.GATHER_NAVIGATION_POINTS.post().handle(points);
         points.addAll(ClientServices.CLIENT.sendLegacyGatherNavigationPoints());
 
         // Get only the points that are in the target direction
-        points.removeIf(p -> !navigate.getPredicate().test(p, mouseX, mouseY));
+        points.removeIf(p -> !navigate.getPredicate().test(p, cursorX, cursorY));
         if(points.isEmpty())
             return;
 
-        Vector3d mousePos = new Vector3d(mouseX, mouseY, 0);
-        Optional<NavigationPoint> minimumPointOptional = points.stream().min(navigate.getMinComparator(mouseX, mouseY));
+        Vector3d cursorVec = new Vector3d(cursorX, cursorY, 0);
+        Optional<NavigationPoint> minimumPointOptional = points.stream().min(navigate.getMinComparator(cursorX, cursorY));
         if(minimumPointOptional.isEmpty())
             return;
 
-        double minimumDelta = navigate.getKeyExtractor().apply(minimumPointOptional.get(), mousePos) + 10;
-        Optional<NavigationPoint> targetPointOptional = points.stream().filter(point -> navigate.getKeyExtractor().apply(point, mousePos) <= minimumDelta).min(Comparator.comparing(p -> p.distanceTo(mouseX, mouseY)));
+        double minimumDelta = navigate.getKeyExtractor().apply(minimumPointOptional.get(), cursorVec) + 10;
+        Optional<NavigationPoint> targetPointOptional = points.stream().filter(point -> navigate.getKeyExtractor().apply(point, cursorVec) <= minimumDelta).min(Comparator.comparing(p -> p.distanceTo(cursorX, cursorY)));
         if(targetPointOptional.isPresent())
         {
             NavigationPoint targetPoint = targetPointOptional.get();
             targetPoint.onNavigate();
             mc.tell(() -> // Run next frame to allow lists to update widget positions
             {
-                this.performMouseDrag(this.mouseX, this.mouseY, 0, 0);
+                this.performMouseDrag(this.cursorX, this.cursorY, 0, 0);
                 int screenX = (int) (targetPoint.getX() / ((double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth()));
                 int screenY = (int) (targetPoint.getY() / ((double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight()));
-                double lastTargetX = this.mouseX;
-                double lastTargetY = this.mouseY;
-                this.mouseX = this.prevMouseX = screenX;
-                this.mouseY = this.prevMouseY = screenY;
-                this.setMousePosition(screenX, screenY);
+                double lastTargetX = this.cursorX;
+                double lastTargetY = this.cursorY;
+                this.cursorX = this.prevCursorX = screenX;
+                this.cursorY = this.prevCursorY = screenY;
+                this.setCursorPosition(screenX, screenY);
                 if(Config.CLIENT.client.options.uiSounds.get())
                 {
                     mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, 2.0F));
                 }
-                this.performMouseDrag(this.mouseX, this.mouseY, screenX - lastTargetX, screenY - lastTargetY);
+                this.performMouseDrag(this.cursorX, this.cursorY, screenX - lastTargetX, screenY - lastTargetY);
             });
         }
     }
 
-    private List<NavigationPoint> gatherNavigationPoints(Screen screen, Navigate navigate, int mouseX, int mouseY)
+    private List<NavigationPoint> gatherNavigationPoints(Screen screen, Navigate navigate, int cursorX, int cursorY)
     {
         List<NavigationPoint> points = new ArrayList<>();
         List<AbstractWidget> widgets = new ArrayList<>();
@@ -1069,7 +1068,7 @@ public class ControllerInput
 
         for(GuiEventListener listener : screen.children())
         {
-            this.gatherNavigationPointsFromListener(listener, navigate, mouseX, mouseY, points, null, null);
+            this.gatherNavigationPointsFromListener(listener, navigate, cursorX, cursorY, points, null, null);
         }
 
         if(screen instanceof RecipeUpdateListener)
@@ -1118,18 +1117,18 @@ public class ControllerInput
         return points;
     }
 
-    private void gatherNavigationPointsFromListener(GuiEventListener listener, Navigate navigate, int mouseX, int mouseY, List<NavigationPoint> points, @Nullable AbstractSelectionList<?> list, @Nullable GuiEventListener entry)
+    private void gatherNavigationPointsFromListener(GuiEventListener listener, Navigate navigate, int cursorX, int cursorY, List<NavigationPoint> points, @Nullable AbstractSelectionList<?> list, @Nullable GuiEventListener entry)
     {
         if(listener instanceof Navigatable navigatable)
         {
             navigatable.elements().forEach(child ->
             {
-                this.gatherNavigationPointsFromListener(child, navigate, mouseX, mouseY, points, list, entry);
+                this.gatherNavigationPointsFromListener(child, navigate, cursorX, cursorY, points, list, entry);
             });
         }
         else if(listener instanceof AbstractSelectionList<?> selectionList)
         {
-            this.gatherNavigationPointsFromAbstractList(selectionList, navigate, mouseX, mouseY, points);
+            this.gatherNavigationPointsFromAbstractList(selectionList, navigate, cursorX, cursorY, points);
         }
         else if(listener instanceof TabNavigationBar navigationBar)
         {
@@ -1145,7 +1144,7 @@ public class ControllerInput
         {
             handler.children().forEach(child ->
             {
-                this.gatherNavigationPointsFromListener(child, navigate, mouseX, mouseY, points, list, entry);
+                this.gatherNavigationPointsFromListener(child, navigate, cursorX, cursorY, points, list, entry);
             });
         }
         else if(listener instanceof AbstractWidget widget && widget.active && widget.visible)
@@ -1170,7 +1169,7 @@ public class ControllerInput
         }
     }
 
-    private void gatherNavigationPointsFromAbstractList(AbstractSelectionList<?> list, Navigate navigate, int mouseX, int mouseY, List<NavigationPoint> points)
+    private void gatherNavigationPointsFromAbstractList(AbstractSelectionList<?> list, Navigate navigate, int cursorX, int cursorY, List<NavigationPoint> points)
     {
         List<? extends GuiEventListener> children = list.children();
         int dir = navigate == Navigate.UP ? -1 : 1;
@@ -1191,9 +1190,9 @@ public class ControllerInput
                         points.add(new ListEntryNavigationPoint(list, entry, i, dir));
                     }
                 }
-                this.gatherNavigationPointsFromListener(entry, navigate, mouseX, mouseY, points, list, entry);
+                this.gatherNavigationPointsFromListener(entry, navigate, cursorX, cursorY, points, list, entry);
             }
-            else if(list.isMouseOver(mouseX, mouseY))
+            else if(list.isMouseOver(cursorX, cursorY))
             {
                 points.add(new ListEntryNavigationPoint(list, entry, i, dir));
             }
@@ -1234,7 +1233,7 @@ public class ControllerInput
         }
     }
 
-    private void moveMouseToClosestSlot(boolean moving, Screen screen)
+    private void moveCursorToClosestSlot(boolean moving, Screen screen)
     {
         this.nearSlot = false;
 
@@ -1249,8 +1248,8 @@ public class ControllerInput
             Minecraft mc = Minecraft.getInstance();
             int guiLeft = ClientServices.CLIENT.getScreenLeft(containerScreen);
             int guiTop = ClientServices.CLIENT.getScreenTop(containerScreen);
-            int mouseX = (int) (this.mouseX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth());
-            int mouseY = (int) (this.mouseY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight());
+            int cursorX = (int) (this.cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth());
+            int cursorY = (int) (this.cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight());
 
             /* Finds the closest slot in the GUI within 14 pixels (inclusive) */
             Slot closestSlot = null;
@@ -1260,7 +1259,7 @@ public class ControllerInput
                 int posX = guiLeft + slot.x + 8;
                 int posY = guiTop + slot.y + 8;
 
-                double distance = Math.sqrt(Math.pow(posX - mouseX, 2) + Math.pow(posY - mouseY, 2));
+                double distance = Math.sqrt(Math.pow(posX - cursorX, 2) + Math.pow(posY - cursorY, 2));
                 if((closestDistance == -1.0 || distance < closestDistance) && distance <= 14.0)
                 {
                     closestSlot = slot;
@@ -1275,50 +1274,50 @@ public class ControllerInput
                 int slotCenterYScaled = guiTop + closestSlot.y + 8;
                 int slotCenterX = (int) (slotCenterXScaled / ((double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth()));
                 int slotCenterY = (int) (slotCenterYScaled / ((double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight()));
-                double deltaX = slotCenterX - this.mouseX;
-                double deltaY = slotCenterY - this.mouseY;
+                double deltaX = slotCenterX - this.cursorX;
+                double deltaY = slotCenterY - this.cursorY;
 
                 if(!moving)
                 {
-                    if(mouseX != slotCenterXScaled || mouseY != slotCenterYScaled)
+                    if(cursorX != slotCenterXScaled || cursorY != slotCenterYScaled)
                     {
-                        this.mouseX += deltaX * 0.75;
-                        this.mouseY += deltaY * 0.75;
+                        this.cursorX += deltaX * 0.75;
+                        this.cursorY += deltaY * 0.75;
                     }
                     else
                     {
-                        this.mouseSpeedX = 0.0F;
-                        this.mouseSpeedY = 0.0F;
+                        this.cursorSpeedX = 0.0F;
+                        this.cursorSpeedY = 0.0F;
                     }
                 }
 
-                this.mouseSpeedX *= 0.75F;
-                this.mouseSpeedY *= 0.75F;
+                this.cursorSpeedX *= 0.75F;
+                this.cursorSpeedY *= 0.75F;
             }
             else
             {
-                this.mouseSpeedX = 0.0F;
-                this.mouseSpeedY = 0.0F;
+                this.cursorSpeedX = 0.0F;
+                this.cursorSpeedY = 0.0F;
             }
         }
         else
         {
-            this.mouseSpeedX = 0.0F;
-            this.mouseSpeedY = 0.0F;
+            this.cursorSpeedX = 0.0F;
+            this.cursorSpeedY = 0.0F;
         }
     }
 
-    private void setMousePosition(double mouseX, double mouseY)
+    private void setCursorPosition(double cursorX, double cursorY)
     {
         if(Config.CLIENT.client.options.virtualCursor.get())
         {
-            this.virtualMouseX = mouseX;
-            this.virtualMouseY = mouseY;
+            this.virtualCursorX = cursorX;
+            this.virtualCursorY = cursorY;
         }
         else
         {
             Minecraft mc = Minecraft.getInstance();
-            GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), mouseX, mouseY);
+            GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), cursorX, cursorY);
             this.preventReset = true;
         }
     }
@@ -1374,31 +1373,31 @@ public class ControllerInput
         long scrollTime = Util.getMillis();
         if(dir != 0 && scrollTime - this.lastMerchantScroll >= 150)
         {
-            screen.mouseScrolled(this.getMouseX(), this.getMouseY(), Math.signum(dir));
+            screen.mouseScrolled(this.getCursorX(), this.getCursorY(), Math.signum(dir));
             this.lastMerchantScroll = scrollTime;
         }
     }
 
-    private double getMouseX()
+    private double getCursorX()
     {
         Minecraft mc = Minecraft.getInstance();
-        double mouseX = mc.mouseHandler.xpos();
+        double cursorX = mc.mouseHandler.xpos();
         if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && this.lastUse > 0)
         {
-            mouseX = this.virtualMouseX;
+            cursorX = this.virtualCursorX;
         }
-        return mouseX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
+        return cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
     }
 
-    private double getMouseY()
+    private double getCursorY()
     {
         Minecraft mc = Minecraft.getInstance();
-        double mouseY = mc.mouseHandler.ypos();
+        double cursorY = mc.mouseHandler.ypos();
         if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && this.lastUse > 0)
         {
-            mouseY = this.virtualMouseY;
+            cursorY = this.virtualCursorY;
         }
-        return mouseY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
+        return cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
     }
 
     /**
@@ -1412,19 +1411,19 @@ public class ControllerInput
     {
         if(screen != null)
         {
-            double mouseX = this.getMouseX();
-            double mouseY = this.getMouseY();
-            this.invokeMouseClick(screen, button, mouseX, mouseY);
+            double cursorX = this.getCursorX();
+            double cursorY = this.getCursorY();
+            this.invokeMouseClick(screen, button, cursorX, cursorY);
         }
     }
 
-    private void invokeMouseClick(Screen screen, int button, double mouseX, double mouseY)
+    private void invokeMouseClick(Screen screen, int button, double cursorX, double cursorY)
     {
         if(screen != null)
         {
             ClientServices.CLIENT.setActiveMouseButton(button);
             ClientServices.CLIENT.setLastMouseEventTime(Blaze3D.getTime());
-            ClientServices.CLIENT.sendScreenMouseClickPre(screen, mouseX, mouseY, button);
+            ClientServices.CLIENT.sendScreenMouseClickPre(screen, cursorX, cursorY, button);
         }
     }
 
@@ -1439,18 +1438,18 @@ public class ControllerInput
     {
         if(screen != null)
         {
-            double mouseX = this.getMouseX();
-            double mouseY = this.getMouseY();
-            this.invokeMouseReleased(screen, button, mouseX, mouseY);
+            double cursorX = this.getCursorX();
+            double cursorY = this.getCursorY();
+            this.invokeMouseReleased(screen, button, cursorX, cursorY);
         }
     }
 
-    private void invokeMouseReleased(Screen screen, int button, double mouseX, double mouseY)
+    private void invokeMouseReleased(Screen screen, int button, double cursorX, double cursorY)
     {
         if(screen != null)
         {
             ClientServices.CLIENT.setActiveMouseButton(-1);
-            ClientServices.CLIENT.sendScreenMouseReleasedPre(screen, mouseX, mouseY, button);
+            ClientServices.CLIENT.sendScreenMouseReleasedPre(screen, cursorX, cursorY, button);
         }
     }
 
@@ -1480,14 +1479,14 @@ public class ControllerInput
             return this.keyExtractor;
         }
 
-        public Comparator<NavigationPoint> getMinComparator(int mouseX, int mouseY)
+        public Comparator<NavigationPoint> getMinComparator(int cursorX, int cursorY)
         {
-            return Comparator.comparing(p -> this.keyExtractor.apply(p, new Vector3d(mouseX, mouseY, 0)));
+            return Comparator.comparing(p -> this.keyExtractor.apply(p, new Vector3d(cursorX, cursorY, 0)));
         }
     }
 
     private interface NavigatePredicate
     {
-        boolean test(NavigationPoint point, int mouseX, int mouseY);
+        boolean test(NavigationPoint point, int cursorX, int cursorY);
     }
 }

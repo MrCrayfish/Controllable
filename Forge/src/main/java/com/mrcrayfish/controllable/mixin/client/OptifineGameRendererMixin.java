@@ -26,8 +26,8 @@ public class OptifineGameRendererMixin
         if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && input.getLastUse() > 0)
         {
             Minecraft minecraft = Minecraft.getInstance();
-            int mouseX = (int) (input.getVirtualMouseX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getWidth());
-            int mouseY = (int) (input.getVirtualMouseY() * (double) minecraft.getWindow().getGuiScaledHeight() / (double) minecraft.getWindow().getHeight());
+            int mouseX = (int) (input.getVirtualCursorX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getWidth());
+            int mouseY = (int) (input.getVirtualCursorY() * (double) minecraft.getWindow().getGuiScaledHeight() / (double) minecraft.getWindow().getHeight());
             args[2] = mouseX;
             args[3] = mouseY;
         }
