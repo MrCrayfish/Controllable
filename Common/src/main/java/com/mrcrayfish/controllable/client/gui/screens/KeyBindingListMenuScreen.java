@@ -63,6 +63,7 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
         bindings.add(options.keyLoadHotbarActivator);
         bindings.add(options.keyAdvancements);
         bindings.addAll(Arrays.asList(options.keyHotbarSlots));
+        bindings.add(options.keySocialInteractions);
         return ImmutableList.copyOf(bindings);
     });
 
