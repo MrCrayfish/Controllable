@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.platform;
 
 import com.mrcrayfish.controllable.client.BindingContext;
 import com.mrcrayfish.controllable.client.IBindingContext;
+import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.integration.JeiSupport;
@@ -9,6 +10,8 @@ import com.mrcrayfish.controllable.platform.services.IClientHelper;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
+import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
+import net.fabricmc.fabric.impl.itemgroup.ItemGroupHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
@@ -28,6 +31,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -181,10 +186,18 @@ public class FabricClientHelper implements IClientHelper
     }
 
     @Override
+    @SuppressWarnings("UnstableApiUsage")
     public void gatherCreativeTabNavigationPoints(CreativeModeInventoryScreen screen, List<NavigationPoint> points)
     {
-        //TODO finish this
-        //screen.get
+        CreativeGuiExtensions extensions = (CreativeGuiExtensions) screen;
+        CreativeModeTabs.tabs().forEach(creativeModeTab ->
+        {
+            FabricItemGroup group = (FabricItemGroup) creativeModeTab;
+            if(group.getPage() == extensions.fabric_currentPage())
+            {
+                points.add(this.getCreativeTabPoint(screen, creativeModeTab));
+            }
+        });
     }
 
     @Override
@@ -295,5 +308,23 @@ public class FabricClientHelper implements IClientHelper
     public Tooltip getOptionInstanceTooltip(OptionInstance<Boolean> option)
     {
         return option.tooltip.apply(true);
+    }
+
+    private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeModeTab tab)
+    {
+        int guiLeft = ClientServices.CLIENT.getScreenLeft(screen);
+        int guiTop = ClientServices.CLIENT.getScreenTop(screen);
+        int column = tab.column();
+        int width = 27;
+        int height = 32;
+        int x = guiLeft + width * column;
+        int y = guiTop + (screen.imageHeight - 4);
+        if(tab.isAlignedRight()) {
+            x = guiLeft + screen.imageWidth - width * (7 - column) + 1;
+        }
+        if(tab.row() == CreativeModeTab.Row.TOP) {
+            y = guiTop - width;
+        }
+        return new BasicNavigationPoint(x + width / 2.0, y + height / 2.0);
     }
 }
