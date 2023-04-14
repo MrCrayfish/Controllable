@@ -137,6 +137,21 @@ public class Controller
     }
 
     /**
+     * Rumbles the controller if supported
+     *
+     * @param lowFrequency  the low frequency rumble
+     * @param highFrequency the high frequency rumble
+     * @param timeInMs      the time length in milliseconds
+     * @return false if the controller doesn't support rumbling
+     */
+    public boolean rumble(float lowFrequency, float highFrequency, int timeInMs)
+    {
+        lowFrequency = Mth.clamp(lowFrequency, 0.0F, 1.0F);
+        highFrequency = Mth.clamp(highFrequency, 0.0F, 1.0F);
+        return SDL_GameControllerRumble(this.controller, (short) (0xFFFF * lowFrequency), (short) (0xFFFF * highFrequency), timeInMs) == 0;
+    }
+
+    /**
      * Gets the value of the left trigger
      *
      * @return the left trigger value

@@ -34,8 +34,8 @@ public class Config
 
         public static class Options
         {
-            @ConfigProperty(name = "forceFeedback", comment = "If enabled, some actions will cause the controller to vibrate")
-            public final BoolProperty forceFeedback = BoolProperty.create(true);
+            @ConfigProperty(name = "rumble", comment = "If enabled, some gameplay elements will cause the controller to rumble")
+            public final BoolProperty rumble = BoolProperty.create(true);
 
             @ConfigProperty(name = "autoSelect", comment = "If enabled, controller will be automatically selected on start up or when plugged in")
             public final BoolProperty autoSelect = BoolProperty.create(true);
