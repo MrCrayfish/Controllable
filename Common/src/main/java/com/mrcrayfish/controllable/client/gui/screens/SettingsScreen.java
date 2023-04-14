@@ -293,6 +293,7 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.cursorType));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.listScrollSpeed, 1.0));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.hoverModifier, 0.05));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.rumble));
 
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.other").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.uiSounds));
