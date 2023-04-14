@@ -49,8 +49,8 @@ import java.util.Map;
 public class RenderEvents
 {
     public static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Constants.MOD_ID, "textures/gui/buttons.png");
-    public static final int CONTROLLER_BUTTONS_WIDTH = 221;
-    public static final int CONTROLLER_BUTTONS_HEIGHT = 130;
+    public static final int CONTROLLER_BUTTONS_WIDTH = Buttons.LENGTH * 13;
+    public static final int CONTROLLER_BUTTONS_HEIGHT = ControllerIcons.values().length * 13;
 
     private static final Map<Integer, Action> actions = new HashMap<>();
     private static boolean navigationBarCheck;

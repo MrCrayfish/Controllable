@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
+import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.Icons;
 import com.mrcrayfish.controllable.client.RenderEvents;
 import com.mrcrayfish.controllable.platform.ClientServices;
@@ -41,7 +42,7 @@ public class ClientHelper
 
     public static MutableComponent getButtonComponent(int button)
     {
-        MutableComponent component = Component.literal(String.valueOf((char) (32 + (Config.CLIENT.client.options.controllerIcons.get().ordinal() * 17 + button))));
+        MutableComponent component = Component.literal(String.valueOf((char) (33 + (Config.CLIENT.client.options.controllerIcons.get().ordinal() * Buttons.LENGTH + button))));
         component.setStyle(component.getStyle().withColor(ChatFormatting.WHITE).withFont(ClientHelper.BUTTON_FONT));
         return component;
     }

@@ -26,8 +26,14 @@ public class Buttons
     public static final int DPAD_DOWN = 14;
     public static final int DPAD_LEFT = 15;
     public static final int DPAD_RIGHT = 16;
-    public static final int LENGTH = 17;
-    public static final int[] BUTTONS = {A, B, X, Y, SELECT, HOME, START, LEFT_THUMB_STICK, RIGHT_THUMB_STICK, LEFT_BUMPER, RIGHT_BUMPER, LEFT_TRIGGER, RIGHT_TRIGGER, DPAD_UP, DPAD_DOWN, DPAD_LEFT, DPAD_RIGHT};
+    public static final int MISC = 17;
+    public static final int PADDLE_ONE = 18;
+    public static final int PADDLE_TWO = 19;
+    public static final int PADDLE_THREE = 20;
+    public static final int PADDLE_FOUR = 21;
+    public static final int TOUCHPAD = 22;
+    public static final int LENGTH = 23;
+    public static final int[] BUTTONS = {A, B, X, Y, SELECT, HOME, START, LEFT_THUMB_STICK, RIGHT_THUMB_STICK, LEFT_BUMPER, RIGHT_BUMPER, LEFT_TRIGGER, RIGHT_TRIGGER, DPAD_UP, DPAD_DOWN, DPAD_LEFT, DPAD_RIGHT, MISC, PADDLE_ONE, PADDLE_TWO, PADDLE_THREE, PADDLE_FOUR, TOUCHPAD};
     public static final String[] NAMES = {
         "controllable.button.a",
         "controllable.button.b",
@@ -45,7 +51,13 @@ public class Buttons
         "controllable.button.dpad_up",
         "controllable.button.dpad_down",
         "controllable.button.dpad_left",
-        "controllable.button.dpad_right"
+        "controllable.button.dpad_right",
+        "controllable.button.misc",
+        "controllable.button.paddle_one",
+        "controllable.button.paddle_two",
+        "controllable.button.paddle_three",
+        "controllable.button.paddle_four",
+        "controllable.button.touchpad"
     };
 
     @Nullable

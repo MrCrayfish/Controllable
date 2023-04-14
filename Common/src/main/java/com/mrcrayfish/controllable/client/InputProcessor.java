@@ -84,6 +84,12 @@ public class InputProcessor
         states.setState(Buttons.DPAD_DOWN, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
         states.setState(Buttons.DPAD_LEFT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
         states.setState(Buttons.DPAD_RIGHT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+        states.setState(Buttons.MISC, this.getButtonState(SDL_CONTROLLER_BUTTON_MISC1));
+        states.setState(Buttons.PADDLE_ONE, this.getButtonState(SDL_CONTROLLER_BUTTON_PADDLE1));
+        states.setState(Buttons.PADDLE_TWO, this.getButtonState(SDL_CONTROLLER_BUTTON_PADDLE2));
+        states.setState(Buttons.PADDLE_THREE, this.getButtonState(SDL_CONTROLLER_BUTTON_PADDLE3));
+        states.setState(Buttons.PADDLE_FOUR, this.getButtonState(SDL_CONTROLLER_BUTTON_PADDLE4));
+        states.setState(Buttons.TOUCHPAD, this.getButtonState(SDL_CONTROLLER_BUTTON_TOUCHPAD));
         this.inputQueue.offer(states);
     }
 
