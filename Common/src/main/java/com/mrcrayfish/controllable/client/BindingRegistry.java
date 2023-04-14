@@ -69,6 +69,7 @@ public class BindingRegistry
         Stream.of(ButtonBindings.HOTBAR_SLOTS).forEach(binding -> getInstance().register(binding));
         getInstance().register(ButtonBindings.TOGGLE_CRAFT_BOOK);
         getInstance().register(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS);
+        getInstance().register(ButtonBindings.OPEN_CHAT);
     }
 
     private static BindingRegistry instance;

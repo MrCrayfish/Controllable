@@ -747,6 +747,12 @@ public class ControllerInput
                     if(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS.isButtonPressed())
                     {
                         mc.setScreen(new SettingsScreen(null, 1));
+                        return;
+                    }
+                    else if(ButtonBindings.OPEN_CHAT.isButtonPressed())
+                    {
+                        ClientServices.CLIENT.openChatScreen("");
+                        return;
                     }
 
                     for(int i = 0; i < 9; i++)

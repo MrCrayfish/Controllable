@@ -310,6 +310,12 @@ public class FabricClientHelper implements IClientHelper
         return option.tooltip.apply(true);
     }
 
+    @Override
+    public void openChatScreen(String s)
+    {
+        Minecraft.getInstance().openChatScreen(s);
+    }
+
     private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeModeTab tab)
     {
         int guiLeft = ClientServices.CLIENT.getScreenLeft(screen);

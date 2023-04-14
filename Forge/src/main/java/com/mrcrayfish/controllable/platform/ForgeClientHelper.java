@@ -448,6 +448,12 @@ public class ForgeClientHelper implements IClientHelper
         return option.tooltip.apply(true);
     }
 
+    @Override
+    public void openChatScreen(String s)
+    {
+        Minecraft.getInstance().openChatScreen(s);
+    }
+
     private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeTabsScreenPage page, CreativeModeTab tab)
     {
         int guiLeft = ClientServices.CLIENT.getScreenLeft(screen);

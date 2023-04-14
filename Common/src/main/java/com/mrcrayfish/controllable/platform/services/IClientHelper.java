@@ -160,4 +160,6 @@ public interface IClientHelper
     Component getOptionInstanceName(OptionInstance<Boolean> option);
 
     Tooltip getOptionInstanceTooltip(OptionInstance<Boolean> option);
+
+    void openChatScreen(String s);
 }
