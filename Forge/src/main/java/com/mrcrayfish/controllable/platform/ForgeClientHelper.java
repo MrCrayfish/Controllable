@@ -33,6 +33,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -459,6 +460,12 @@ public class ForgeClientHelper implements IClientHelper
     public int getStonecutterStartIndex(StonecutterScreen screen)
     {
         return ReflectUtil.getStonecutterStartIndex(screen);
+    }
+
+    @Override
+    public int getLoomStartRow(LoomScreen screen)
+    {
+        return ReflectUtil.getLoomStartRow(screen);
     }
 
     private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeTabsScreenPage page, CreativeModeTab tab)

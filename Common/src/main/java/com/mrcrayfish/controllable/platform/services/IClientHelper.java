@@ -20,6 +20,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -165,4 +166,6 @@ public interface IClientHelper
     void openChatScreen(String s);
 
     int getStonecutterStartIndex(StonecutterScreen stonecutter);
+
+    int getLoomStartRow(LoomScreen loom);
 }

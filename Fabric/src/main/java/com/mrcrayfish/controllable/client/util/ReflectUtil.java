@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -37,6 +38,7 @@ public class ReflectUtil
     private static final Field KEY_MAPPING_PRESS_TIME = ReflectUtil.findField(KeyMapping.class, "net.minecraft.class_304", "field_1661", "I");
     private static final Field TOOLTIP_LINES = ReflectUtil.findField(Tooltip.class, "net.minecraft.class_7919", "field_41103", "Ljava/util/List;");
     private static final Field STONE_CUTTER_INDEX = ReflectUtil.findField(StonecutterScreen.class, "net.minecraft.class_3979", "field_17671", "I");
+    private static final Field LOOM_START_ROW = ReflectUtil.findField(LoomScreen.class, "net.minecraft.class_494", "field_39190", "I");
 
     private static Method findMethod(Class<?> targetClass, String className, String methodName, String methodDesc, Class<?>... types)
     {
@@ -197,6 +199,18 @@ public class ReflectUtil
         try
         {
             return (int) STONE_CUTTER_INDEX.get(screen);
+        }
+        catch(IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int getLoomStartRow(LoomScreen screen)
+    {
+        try
+        {
+            return (int) LOOM_START_ROW.get(screen);
         }
         catch(IllegalAccessException e)
         {

@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -32,6 +33,7 @@ public class ReflectUtil
     private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ObfuscationReflectionHelper.findField(CreativeModeInventoryScreen.class, "f_98508_");
     private static final Field KEY_MAPPING_PRESS_TIME = ObfuscationReflectionHelper.findField(KeyMapping.class, "f_90818_");
     private static final Field STONE_CUTTER_INDEX = ObfuscationReflectionHelper.findField(StonecutterScreen.class, "f_99306_");
+    private static final Field LOOM_START_ROW = ObfuscationReflectionHelper.findField(LoomScreen.class, "f_232823_");
 
     public static int getAbstractListRowTop(AbstractSelectionList<?> list, int index)
     {
@@ -144,6 +146,19 @@ public class ReflectUtil
         try
         {
             return (int) STONE_CUTTER_INDEX.get(screen);
+        }
+        catch(IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public static int getLoomStartRow(LoomScreen screen)
+    {
+        try
+        {
+            return (int) LOOM_START_ROW.get(screen);
         }
         catch(IllegalAccessException e)
         {

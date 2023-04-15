@@ -48,6 +48,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
@@ -61,6 +62,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -72,6 +74,7 @@ import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.StonecutterMenu;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.block.entity.BannerPattern;
 import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
@@ -1129,6 +1132,28 @@ public class ControllerInput
                 int buttonX = startX + buttonIndex % 4 * buttonWidth;
                 int buttonY = startY + buttonIndex / 4 * buttonHeight + 2;
                 points.add(new BasicNavigationPoint(buttonX + buttonWidth / 2.0, buttonY + buttonHeight / 2.0));
+            }
+        }
+
+        if(screen instanceof LoomScreen loom)
+        {
+            List<Holder<BannerPattern>> patterns = loom.getMenu().getSelectablePatterns();
+            int startX = ClientServices.CLIENT.getScreenLeft(loom) + 60;
+            int startY = ClientServices.CLIENT.getScreenTop(loom) + 13;
+            int buttonWidth = 14;
+            int buttonHeight = 14;
+            int offsetRow = ClientServices.CLIENT.getLoomStartRow(loom);
+            for(int i = 0; i < 4; i++)
+            {
+                for(int j = 0; j < 4; j++)
+                {
+                    int buttonIndex = (i + offsetRow) * 4 + j;
+                    if(buttonIndex >= patterns.size())
+                        break;
+                    int buttonX = startX + j * buttonWidth;
+                    int buttonY = startY + i * buttonHeight;
+                    points.add(new BasicNavigationPoint(buttonX + buttonWidth / 2.0, buttonY + buttonHeight / 2.0));
+                }
             }
         }
 
