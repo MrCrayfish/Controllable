@@ -33,6 +33,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -452,6 +453,12 @@ public class ForgeClientHelper implements IClientHelper
     public void openChatScreen(String s)
     {
         Minecraft.getInstance().openChatScreen(s);
+    }
+
+    @Override
+    public int getStonecutterStartIndex(StonecutterScreen screen)
+    {
+        return ReflectUtil.getStonecutterStartIndex(screen);
     }
 
     private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeTabsScreenPage page, CreativeModeTab tab)

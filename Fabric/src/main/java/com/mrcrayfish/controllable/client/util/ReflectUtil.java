@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.ClickType;
@@ -35,6 +36,7 @@ public class ReflectUtil
     private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ReflectUtil.findField(CreativeModeInventoryScreen.class, "net.minecraft.class_481", "field_2890", "F");
     private static final Field KEY_MAPPING_PRESS_TIME = ReflectUtil.findField(KeyMapping.class, "net.minecraft.class_304", "field_1661", "I");
     private static final Field TOOLTIP_LINES = ReflectUtil.findField(Tooltip.class, "net.minecraft.class_7919", "field_41103", "Ljava/util/List;");
+    private static final Field STONE_CUTTER_INDEX = ReflectUtil.findField(StonecutterScreen.class, "net.minecraft.class_3979", "field_17671", "I");
 
     private static Method findMethod(Class<?> targetClass, String className, String methodName, String methodDesc, Class<?>... types)
     {
@@ -185,6 +187,18 @@ public class ReflectUtil
             SCREEN_ADD_RENDER_WIDGET.invoke(screen, renderable);
         }
         catch(InvocationTargetException | IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int getStonecutterStartIndex(StonecutterScreen screen)
+    {
+        try
+        {
+            return (int) STONE_CUTTER_INDEX.get(screen);
+        }
+        catch(IllegalAccessException e)
         {
             throw new RuntimeException(e);
         }
