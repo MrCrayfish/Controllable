@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,6 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MouseHandler.class)
 public abstract class MouseHelperMixin
 {
+    @Shadow
+    @Final
+    private Minecraft minecraft;
+
     @Shadow
     public abstract void releaseMouse();
 
@@ -37,6 +42,15 @@ public abstract class MouseHelperMixin
     {
         ControllerInput input = Controllable.getInput();
         if(input.isControllerInUse())
+        {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "turnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;isMouseGrabbed()Z"), cancellable = true)
+    private void controllableTurn(CallbackInfo ci)
+    {
+        if(this.minecraft.player == null)
         {
             ci.cancel();
         }
