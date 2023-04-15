@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.ListEntryNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.ListWidgetNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
@@ -45,6 +46,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
@@ -1092,6 +1094,22 @@ public class ControllerInput
                     widgets.add(((RecipeBookPageAccessor) recipeBookPage).controllableGetForwardButton());
                     widgets.add(((RecipeBookPageAccessor) recipeBookPage).controllableGetBackButton());
                 }
+            }
+        }
+
+        // TODO should I look into abstracting this?
+
+        if(screen instanceof EnchantmentScreen enchantmentScreen)
+        {
+            int startX = ClientServices.CLIENT.getScreenLeft(enchantmentScreen) + 60;
+            int startY = ClientServices.CLIENT.getScreenTop(enchantmentScreen) + 14;
+            int itemWidth = 108;
+            int itemHeight = 19;
+            for(int i = 0; i < 3; i++)
+            {
+                double itemX = startX + itemWidth / 2.0;
+                double itemY = startY + itemHeight * i + itemHeight / 2.0;
+                points.add(new BasicNavigationPoint(itemX, itemY));
             }
         }
 
