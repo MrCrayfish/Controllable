@@ -1029,7 +1029,8 @@ public class ControllerInput
         if(minimumPointOptional.isEmpty())
             return;
 
-        double minimumDelta = navigate.getKeyExtractor().apply(minimumPointOptional.get(), cursorVec) + 10;
+        double maxOffset = 18;
+        double minimumDelta = navigate.getKeyExtractor().apply(minimumPointOptional.get(), cursorVec) + maxOffset;
         Optional<NavigationPoint> targetPointOptional = points.stream().filter(point -> navigate.getKeyExtractor().apply(point, cursorVec) <= minimumDelta).min(Comparator.comparing(p -> p.distanceTo(cursorX, cursorY)));
         if(targetPointOptional.isPresent())
         {
