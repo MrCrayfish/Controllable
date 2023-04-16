@@ -41,9 +41,4 @@ public class Controllable
     {
         return ControllerManager.instance().getActiveController();
     }
-
-    public static void setController(@Nullable Controller controller)
-    {
-        ControllerManager.instance().setActiveController(controller);
-    }
 }

@@ -4,16 +4,16 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import io.github.libsdl4j.api.gamecontroller.SDL_GameController;
 
+import io.github.libsdl4j.api.joystick.SDL_JoystickID;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.util.Mth;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWGamepadState;
 
 import javax.annotation.Nullable;
 
 import static io.github.libsdl4j.api.gamecontroller.SdlGamecontroller.*;
 import static io.github.libsdl4j.api.gamecontroller.SDL_GameControllerButton.*;
 import static io.github.libsdl4j.api.gamecontroller.SDL_GameControllerAxis.*;
+import static io.github.libsdl4j.api.joystick.SdlJoystick.SDL_JoystickGetDeviceInstanceID;
 import static io.github.libsdl4j.api.joystick.SdlJoystickConst.*;
 
 /**
@@ -23,29 +23,71 @@ import static io.github.libsdl4j.api.joystick.SdlJoystickConst.*;
  */
 public class Controller
 {
-    private final SDL_GameController controller;
-    private final int jid;
+    private final int deviceIndex;
+    private final SDL_JoystickID jid;
     private final byte[] rawStates;
     private final ButtonStates states;
+    private SDL_GameController controller;
     private String cachedName;
     private Mappings.Entry mapping;
 
-    public Controller(int jid)
+    public Controller(int deviceIndex)
     {
-        this.controller = SDL_GameControllerOpen(jid);
-        this.jid = jid;
+        this.deviceIndex = deviceIndex;
+        this.jid = SDL_JoystickGetDeviceInstanceID(deviceIndex);
         this.rawStates = new byte[SDL_CONTROLLER_BUTTON_MAX];
         this.states = new ButtonStates();
         this.getName(); //cache the name straight away
     }
 
-    public int getJid()
+    /**
+     * Opens the controller for use. Must be closed with {@link #close} when finished.
+     *
+     * @return true if the controller was opened successfully
+     */
+    public boolean open()
+    {
+        this.controller = SDL_GameControllerOpen(this.deviceIndex);
+        return this.controller != null;
+    }
+
+    /**
+     * Closes the controller and can no longer be used.
+     */
+    public void close()
+    {
+        if(SDL_GameControllerGetAttached(this.controller))
+        {
+            SDL_GameControllerClose(this.controller);
+        }
+    }
+
+    /**
+     * @return The device index of the controller. This should not be used to determine the controller.
+     */
+    public int getDeviceIndex()
+    {
+        return this.deviceIndex;
+    }
+
+    /**
+     * @return The unique joystick id of this controller for the time it is connected
+     */
+    public SDL_JoystickID getJid()
     {
         return this.jid;
     }
 
     /**
-     * Gets the underlying {@link GLFWGamepadState} of this this controller instance.
+     * @return True if this controller is open and connected
+     */
+    public boolean isOpen()
+    {
+        return SDL_GameControllerGetAttached(this.controller);
+    }
+
+    /**
+     * Gets the raw states of this this controller instance.
      * This is gives you direct access to the controller state.
      *
      * @return the sdl2controller controller instance
@@ -107,20 +149,15 @@ public class Controller
      */
     public String getName()
     {
-        if(GLFW.glfwJoystickPresent(this.jid))
+        if(SDL_IsGameController(this.deviceIndex))
         {
             if(this.cachedName == null)
             {
-                this.cachedName = GLFW.glfwGetGamepadName(this.jid);
+                this.cachedName = SDL_GameControllerNameForIndex(this.deviceIndex);
             }
             return this.cachedName;
         }
         return I18n.get("controllable.toast.controller");
-    }
-
-    public void dispose()
-    {
-        SDL_GameControllerClose(this.controller);
     }
 
     /**

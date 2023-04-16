@@ -4,21 +4,23 @@ import com.google.common.io.ByteStreams;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.sun.jna.Memory;
+import io.github.libsdl4j.api.joystick.SDL_JoystickID;
 import io.github.libsdl4j.api.rwops.SDL_RWops;
 import net.minecraft.client.Minecraft;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 
 import static io.github.libsdl4j.api.Sdl.SDL_Init;
 import static io.github.libsdl4j.api.Sdl.SDL_Quit;
 import static io.github.libsdl4j.api.SdlSubSystemConst.*;
 import static io.github.libsdl4j.api.gamecontroller.SdlGamecontroller.*;
+import static io.github.libsdl4j.api.joystick.SdlJoystick.SDL_JoystickGetDeviceInstanceID;
 import static io.github.libsdl4j.api.joystick.SdlJoystick.SDL_NumJoysticks;
 import static io.github.libsdl4j.api.rwops.SdlRWops.SDL_RWFromConstMem;
 
@@ -39,7 +41,7 @@ public class ControllerManager
     }
 
     private Controller activeController;
-    private Map<Integer, String> controllers = new HashMap<>();
+    private Map<SDL_JoystickID, Pair<Integer, String>> controllers = new HashMap<>();
 
     private ControllerManager() {}
 
@@ -59,14 +61,17 @@ public class ControllerManager
         return this.activeController;
     }
 
-    public void setActiveController(Controller controller)
+    public boolean setActiveController(Controller controller)
     {
         if(this.activeController != null)
         {
-            this.activeController.dispose();
+            this.activeController.close();
         }
         if(controller != null)
         {
+            if(!controller.open())
+                return false;
+
             this.activeController = controller;
             Mappings.updateControllerMappings(controller);
         }
@@ -74,9 +79,10 @@ public class ControllerManager
         {
             this.activeController = null;
         }
+        return true;
     }
 
-    public Map<Integer, String> getControllers()
+    public Map<SDL_JoystickID, Pair<Integer, String>> getControllers()
     {
         return this.controllers;
     }
@@ -88,82 +94,57 @@ public class ControllerManager
 
     public void tick()
     {
-        int connectedCount = 0;
+        int controllerCount = 0;
         int joysticksCount = SDL_NumJoysticks();
-        for(int jid = 0; jid < joysticksCount; jid++)
+        for(int deviceIndex = 0; deviceIndex < joysticksCount; deviceIndex++)
         {
-            if(SDL_IsGameController(jid))
+            if(SDL_IsGameController(deviceIndex))
             {
-                connectedCount++;
+                controllerCount++;
             }
         }
 
-        if(connectedCount == this.controllers.size())
+        if(controllerCount == this.controllers.size())
             return;
 
-        Map<Integer, String> oldControllers = this.controllers;
-        Map<Integer, String> newControllers = new HashMap<>();
-        for(int jid = 0; jid <= joysticksCount; jid++)
+        Map<SDL_JoystickID, Pair<Integer, String>> oldControllers = this.controllers;
+        this.controllers = new HashMap<>();
+        for(int deviceIndex = 0; deviceIndex < joysticksCount; deviceIndex++)
         {
-            if(SDL_IsGameController(jid))
+            if(SDL_IsGameController(deviceIndex))
             {
-                String controllerName = SDL_GameControllerNameForIndex(jid);
-                newControllers.put(jid, controllerName);
+                SDL_JoystickID jid = SDL_JoystickGetDeviceInstanceID(deviceIndex);
+                String controllerName = SDL_GameControllerNameForIndex(deviceIndex);
+                this.controllers.put(jid, Pair.of(deviceIndex, controllerName));
             }
         }
 
-        this.controllers = newControllers;
+        // Removes all connected from the old map of connected controllers
+        oldControllers.keySet().removeIf(this.controllers::containsKey);
 
-        newControllers.forEach((jid, name) ->
+        // If no controller is active and auto select is enabled, connect to the first controller
+        Controller controller = this.getActiveController();
+        if(controller != null && oldControllers.containsKey(controller.getJid()))
         {
-            if(!oldControllers.containsKey(jid))
-            {
-                Minecraft.getInstance().doRunTask(() ->
-                {
-                    Controller controller = this.getActiveController();
-                    if(controller != null)
-                        return;
+            this.sendControllerToast(false, controller);
+            this.setActiveController(null);
+            controller = null;
+        }
 
-                    if(Config.CLIENT.client.options.autoSelect.get())
-                    {
-                        this.setActiveController(controller = new Controller(jid));
-                    }
-
-                    Minecraft mc = Minecraft.getInstance();
-                    if(mc.player != null && controller != null)
-                    {
-                        mc.getToasts().addToast(new ControllerToast(true, controller.getName()));
-                    }
-                });
-            }
-        });
-
-        oldControllers.forEach((jid, name) ->
+        if(controller == null && Config.CLIENT.client.options.autoSelect.get())
         {
-            if(!newControllers.containsKey(jid))
-            {
-                Minecraft.getInstance().doRunTask(() ->
-                {
-                    Controller controller = this.getActiveController();
-                    if(controller == null || controller.getJid() != jid)
-                        return;
+            controller = this.connectToFirstGameController();
+            this.sendControllerToast(true, controller);
+        }
+    }
 
-                    this.setActiveController(null);
-
-                    if(Config.CLIENT.client.options.autoSelect.get() && this.getControllerCount() > 0)
-                    {
-                        Optional<Integer> optional = this.getControllers().keySet().stream().min(Comparator.comparing(i -> i));
-                        optional.ifPresent(minJid -> this.setActiveController(new Controller(minJid)));
-                    }
-
-                    Minecraft mc = Minecraft.getInstance();
-                    if(mc.player != null)
-                    {
-                        Minecraft.getInstance().getToasts().addToast(new ControllerToast(false, controller.getName()));
-                    }
-                });
-            }
-        });
+    private void sendControllerToast(boolean connected, @Nullable Controller controller)
+    {
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.player != null && controller != null)
+        {
+            mc.getToasts().addToast(new ControllerToast(connected, controller.getName()));
+        }
     }
 
     public void onClientFinishedLoading()
@@ -191,13 +172,28 @@ public class ControllerManager
             e.printStackTrace();
         }
 
-        /* Attempts to load the first controller connected if auto select is enabled */
+        /* Attempts to load the first game controller connected if auto select is enabled */
         if(Config.CLIENT.client.options.autoSelect.get())
         {
-            if(SDL_IsGameController(0))
+            this.connectToFirstGameController();
+        }
+    }
+
+    @Nullable
+    private Controller connectToFirstGameController()
+    {
+        int joysticksCount = SDL_NumJoysticks();
+        for(int deviceIndex = 0; deviceIndex < joysticksCount; deviceIndex++)
+        {
+            if(SDL_IsGameController(deviceIndex))
             {
-                this.setActiveController(new Controller(0));
+                Controller controller = new Controller(deviceIndex);
+                if(this.setActiveController(controller))
+                {
+                    return controller;
+                }
             }
         }
+        return null;
     }
 }
