@@ -35,7 +35,7 @@ public class RecipeBookPageMixin
     @Shadow
     private Minecraft minecraft;
 
-    @ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderComponentTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Ljava/util/List;IILnet/minecraft/world/item/ItemStack;)V"), index = 1)
+    @ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderComponentTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Ljava/util/List;IILnet/minecraft/world/item/ItemStack;)V"), index = 1, remap = false)
     private List<Component> modifyRenderToolTip(List<Component> components)
     {
         if(Controllable.getInput().isControllerInUse() && Config.CLIENT.options.quickCraft.get())
