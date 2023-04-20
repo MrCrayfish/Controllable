@@ -1,12 +1,10 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.lwjgl.glfw.GLFW;
-
-import java.lang.reflect.Field;
 
 /**
  * A special binding that translates button presses to key presses. This binding does not need to be
@@ -16,15 +14,14 @@ import java.lang.reflect.Field;
  */
 public final class KeyAdapterBinding extends ButtonBinding
 {
-    private static Field pressedTimeField;
     private final KeyMapping keyMapping;
     private final String labelKey;
 
-    public KeyAdapterBinding(int button, KeyMapping keyMapping)
+    public KeyAdapterBinding(int button, KeyMapping mapping)
     {
-        super(button, keyMapping.getName() + ".custom", "key.categories.controllable_custom", keyMapping.getKeyConflictContext());
-        this.keyMapping = keyMapping;
-        this.labelKey = keyMapping.getName();
+        super(button, mapping.getName() + ".custom", "key.categories.controllable_custom", new ForgeCompatBindingContext(mapping.getKeyConflictContext()));
+        this.keyMapping = mapping;
+        this.labelKey = mapping.getName();
     }
 
     @Override
@@ -44,7 +41,8 @@ public final class KeyAdapterBinding extends ButtonBinding
         super.setPressed(pressed);
         this.keyMapping.setDown(pressed);
         if(pressed) this.updateKeyBindPressTime();
-        this.handlePressed(pressed ? GLFW.GLFW_PRESS : GLFW.GLFW_RELEASE, this.keyMapping.getKey().getValue(), 0);
+        int key = this.keyMapping.getKey().getValue();
+        this.handlePressed(pressed ? GLFW.GLFW_PRESS : GLFW.GLFW_RELEASE, key, 0);
     }
 
     @Override
@@ -55,18 +53,7 @@ public final class KeyAdapterBinding extends ButtonBinding
 
     private void updateKeyBindPressTime()
     {
-        if(pressedTimeField == null)
-        {
-            pressedTimeField = ObfuscationReflectionHelper.findField(KeyMapping.class, "f_90818_");
-        }
-        try
-        {
-            pressedTimeField.set(this.keyMapping, 1);
-        }
-        catch(IllegalAccessException e)
-        {
-            e.printStackTrace();
-        }
+        ReflectUtil.setKeyPressTime(this.keyMapping, 1);
     }
 
     @SuppressWarnings("UnstableApiUsage")

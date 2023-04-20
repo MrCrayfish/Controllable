@@ -19,11 +19,13 @@ import java.util.Objects;
  */
 public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
 {
+    private final Runnable callback;
     private Button resetButton;
 
-    public SelectKeyBindingScreen(Screen parent)
+    public SelectKeyBindingScreen(Screen parent, Runnable callback)
     {
         super(parent, Component.translatable("controllable.gui.title.select_key_bindings"), 22);
+        this.callback = callback;
         this.setSubTitle(Component.translatable("controllable.gui.note").withStyle(ChatFormatting.RED).append(Component.translatable("controllable.gui.key_bind_note").withStyle(ChatFormatting.GRAY)));
     }
 
@@ -46,6 +48,7 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
             }));
         }));
         this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 5, this.height - 32, 150, 20, CommonComponents.GUI_DONE, (button) -> {
+            this.callback.run();
             Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));
         this.updateButtons();

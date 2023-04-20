@@ -7,10 +7,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.Reference;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.screens.RadialMenuConfigureScreen;
 import com.mrcrayfish.controllable.event.GatherRadialMenuItemsEvent;
@@ -29,18 +34,28 @@ import net.minecraft.util.Mth;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Author: MrCrayfish
  */
 public class RadialMenuHandler
 {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/controller.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/controller.png");
     private static final int ANIMATE_DURATION = 5;
 
     private static RadialMenuHandler instance;
@@ -66,7 +81,12 @@ public class RadialMenuHandler
     private List<AbstractRadialItem> rightItems = new ArrayList<>();
     private AbstractRadialItem selected;
 
-    private RadialMenuHandler() {}
+    private RadialMenuHandler()
+    {
+        //MinecraftForge.EVENT_BUS.register(this::onClientTickStart);
+        MinecraftForge.EVENT_BUS.addListener(this::onClientTickEnd);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, this::onRenderEnd);
+    }
 
     private void load()
     {
@@ -135,12 +155,10 @@ public class RadialMenuHandler
     public List<ButtonBindingData> getDefaults()
     {
         List<ButtonBindingData> defaults = new ArrayList<>();
+        defaults.add(new ButtonBindingData(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS, ChatFormatting.BLUE));
         defaults.add(new ButtonBindingData(ButtonBindings.ADVANCEMENTS, ChatFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.DEBUG_INFO, ChatFormatting.AQUA));
-        defaults.add(new ButtonBindingData(ButtonBindings.SCREENSHOT, ChatFormatting.GOLD));
+        defaults.add(new ButtonBindingData(ButtonBindings.SCREENSHOT, ChatFormatting.YELLOW));
         defaults.add(new ButtonBindingData(ButtonBindings.FULLSCREEN, ChatFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.CINEMATIC_CAMERA, ChatFormatting.GREEN));
-        defaults.add(new ButtonBindingData(ButtonBindings.HIGHLIGHT_PLAYERS, ChatFormatting.GREEN));
         return defaults;
     }
 
@@ -207,7 +225,7 @@ public class RadialMenuHandler
 
         List<AbstractRadialItem> items = new ArrayList<>();
         this.bindings.forEach(binding -> items.add(new ButtonBindingItem(binding)));
-        GatherRadialMenuItemsEvent event = new GatherRadialMenuItemsEvent();
+        var event = new GatherRadialMenuItemsEvent();
         MinecraftForge.EVENT_BUS.post(event);
         items.addAll(event.getItems());
         //while(this.items.size() < MIN_ITEMS - 1) this.items.add(new EmptyRadialItem());
@@ -249,24 +267,16 @@ public class RadialMenuHandler
         return this.visible;
     }
 
-    @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event)
+    /*private void onClientTickStart()
     {
-        if(event.phase == TickEvent.Phase.START)
+        if(this.visible && !Controllable.getInput().isControllerInUse())
         {
-            if(this.visible && !Controllable.getInput().isControllerInUse())
-            {
-                //this.setVisibility(false);
-            }
+            //this.setVisibility(false);
         }
-    }
+    }*/
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onRenderScreen(TickEvent.RenderTickEvent event)
+    public void onRenderEnd(TickEvent.RenderTickEvent event)
     {
-        if(event.phase != TickEvent.Phase.END)
-            return;
-
         Minecraft mc = Minecraft.getInstance();
         if(mc.options.hideGui || mc.screen != null)
             return;
@@ -283,8 +293,7 @@ public class RadialMenuHandler
         }
     }
 
-    @SubscribeEvent
-    public void onRenderScreen(TickEvent.ClientTickEvent event)
+    private void onClientTickEnd(TickEvent.ClientTickEvent event)
     {
         if(event.phase != TickEvent.Phase.END)
             return;
@@ -305,19 +314,19 @@ public class RadialMenuHandler
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private void renderRadialMenu(float partialTicks)
+    private void renderRadialMenu(float partialTick)
     {
         this.updateSelected();
         
         PoseStack modelStack = RenderSystem.getModelViewStack();
         modelStack.pushPose();
         modelStack.setIdentity();
-        modelStack.translate(0, 0, 1000F - net.minecraftforge.client.ForgeHooksClient.getGuiFarPlane());
+        modelStack.translate(0, 0, 1000F -  net.minecraftforge.client.ForgeHooksClient.getGuiFarPlane());
         RenderSystem.applyModelViewMatrix();
         Lighting.setupFor3DItems();
         PoseStack poseStack = new PoseStack();
 
-        float animation = Mth.lerp(partialTicks, this.prevAnimateTicks, this.animateTicks) / 5F;
+        float animation = Mth.lerp(partialTick, this.prevAnimateTicks, this.animateTicks) / 5F;
         float c1 = 1.70158F;
         float c3 = c1 + 1;
         animation = (float) (1 + c3 * Math.pow(animation - 1, 3) + c1 * Math.pow(animation - 1, 2));
@@ -378,15 +387,16 @@ public class RadialMenuHandler
         if(controller == null)
             return;
 
-        float xValue = Config.CLIENT.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickXValue() : controller.getLThumbStickXValue();
-        float yValue = Config.CLIENT.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
+        float threshold = 0.5F;
+        float inputX = Config.CLIENT.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickXValue() : controller.getLThumbStickXValue();
+        float inputY = Config.CLIENT.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
 
         // Don't update selected if thumbstick is not above a certain threshold
-        if(Math.abs(xValue) <= 0.5F && Math.abs(yValue) <= 0.5F)
+        if(Math.abs(inputX) <= threshold && Math.abs(inputY) <= threshold)
             return;
 
         // Finds the closest radial item based on the direction of the right controller thumbstick
-        float selectedAngle = (float) (Mth.wrapDegrees(Math.toDegrees(Math.atan2(yValue, xValue)) - 90) + 180);
+        float selectedAngle = (float) (Mth.wrapDegrees(Math.toDegrees(Math.atan2(inputY, inputX)) - 90) + 180);
         Optional<AbstractRadialItem> closest = this.allItems.stream().min((o1, o2) -> Mth.degreesDifferenceAbs(o1.angle, selectedAngle) > Mth.degreesDifferenceAbs(o2.angle, selectedAngle) ? 1 : 0);
         if(closest.isEmpty())
             return;
@@ -654,7 +664,6 @@ public class RadialMenuHandler
 
             poseStack.translate((1.0F - animation) * (left ? -20 : 20), 0, 0);
 
-            //RenderSystem.disableTexture(); TODO test
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
@@ -685,19 +694,18 @@ public class RadialMenuHandler
             BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
-            //RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
             if(this.label != null)
             {
                 int offset = !left ? 5 : -mc.font.width(this.label) - 5;
-                Screen.drawString(poseStack, mc.font, this.label, offset, -10, 0xFFFFFF);
+                mc.font.draw(poseStack, this.label, offset, -10, 0xFFFFFFFF);
             }
 
             if(this.description != null)
             {
                 int offset = !left ? 5 : -mc.font.width(this.description) - 5;
-                Screen.drawString(poseStack, mc.font, this.description, offset, 2, 0xFFFFFF);
+                mc.font.draw(poseStack, this.description, offset, 2, 0xFFFFFFFF);
             }
 
             poseStack.popPose();

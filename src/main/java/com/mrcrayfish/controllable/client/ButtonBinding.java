@@ -2,7 +2,6 @@ package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraftforge.client.settings.IKeyConflictContext;
 
 import java.util.List;
 
@@ -14,19 +13,19 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     private final int defaultButton;
     private final String descriptionKey;
     private final String category;
-    private final IKeyConflictContext context;
+    private final IBindingContext context;
     private final boolean reserved;
     private int button;
     private boolean pressed;
     private int pressedTime;
     private boolean active;
 
-    public ButtonBinding(int button, String descriptionKey, String category, IKeyConflictContext context)
+    public ButtonBinding(int button, String descriptionKey, String category, IBindingContext context)
     {
         this(button, descriptionKey, category, context, false);
     }
 
-    ButtonBinding(int button, String descriptionKey, String category, IKeyConflictContext context, boolean reserved)
+    ButtonBinding(int button, String descriptionKey, String category, IBindingContext context, boolean reserved)
     {
         this.button = button;
         this.defaultButton = button;

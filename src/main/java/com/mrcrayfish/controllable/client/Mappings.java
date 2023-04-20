@@ -1,10 +1,17 @@
 package com.mrcrayfish.controllable.client;
 
 import com.google.gson.*;
+import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.Minecraft;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Locale;
@@ -37,7 +44,7 @@ public class Mappings
         File folder = new File(configFolder, "controllable/mappings");
         if(folder.mkdirs())
         {
-            Controllable.LOGGER.info("Successfully created Controllable config folder");
+            Constants.LOG.info("Successfully created Controllable config folder");
         }
 
         File[] files = folder.listFiles();

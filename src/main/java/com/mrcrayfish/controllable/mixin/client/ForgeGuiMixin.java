@@ -13,13 +13,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * Author: MrCrayfish
  */
 @Mixin(ForgeGui.class)
-public class ForgeIngameGuiMixin
+public class ForgeGuiMixin
 {
     /**
      * Fixes record name rendering not being offset by console hotbar
      */
     @Redirect(method = "renderPlayerList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"))
-    private boolean renderPlayerList(KeyMapping mapping)
+    private boolean controllableRenderPlayerList(KeyMapping mapping)
     {
         return mapping.isDown() || canShowPlayerList();
     }

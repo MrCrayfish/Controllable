@@ -1,6 +1,4 @@
-package com.mrcrayfish.controllable;
-
-import com.mrcrayfish.controllable.client.Buttons;
+package com.mrcrayfish.controllable.client;
 
 /**
  * Author: MrCrayfish

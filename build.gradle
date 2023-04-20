@@ -7,12 +7,12 @@ buildscript {
 plugins {
     id 'eclipse'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '5.+'
+    id 'net.minecraftforge.gradle' version '5.1.+'
 }
 
 apply plugin: 'org.spongepowered.mixin'
 
-version = "0.18.1-1.19.4"
+version = "0.19.0-1.19.4"
 group = "com.mrcrayfish"
 archivesBaseName = "controllable"
 
@@ -99,11 +99,15 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.4-45.0.9'
-    compileOnly fg.deobf('curse.maven:configured-457570:4166861')
-    compileOnly fg.deobf('curse.maven:catalogue-459701:4171025')
-    compileOnly fg.deobf('mezz.jei:jei-1.19.2-forge:11.5.0.297')
+    minecraft 'net.minecraftforge:forge:1.19.4-45.0.43'
+    compileOnly fg.deobf('curse.maven:configured-457570:4462894')
+    compileOnly fg.deobf('curse.maven:catalogue-459701:4496718')
+    compileOnly fg.deobf('mezz.jei:jei-1.19.4-forge:13.1.0.6')
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    minecraftLibrary jarJar("io.github.libsdl4j:libsdl4j:2.26.4-1.2") {
+        jarJar.ranged(it, "[2.26.4-1.2,)")
+        transitive(false)
+    }
 }
 
 jar {

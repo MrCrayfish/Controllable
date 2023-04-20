@@ -20,7 +20,14 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -56,6 +63,7 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
         bindings.add(options.keyLoadHotbarActivator);
         bindings.add(options.keyAdvancements);
         bindings.addAll(Arrays.asList(options.keyHotbarSlots));
+        bindings.add(options.keySocialInteractions);
         return ImmutableList.copyOf(bindings);
     });
 
@@ -138,9 +146,9 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
         }
 
         @Override
-        public String getLabel()
+        public Component getLabel()
         {
-            return this.label.plainCopy().getString();
+            return this.label;
         }
 
         public void updateButtons()
@@ -175,9 +183,9 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
             return ImmutableList.of(new NarratableEntry()
             {
                 @Override
-                public NarratableEntry.NarrationPriority narrationPriority()
+                public NarrationPriority narrationPriority()
                 {
-                    return NarratableEntry.NarrationPriority.HOVERED;
+                    return NarrationPriority.HOVERED;
                 }
 
                 @Override

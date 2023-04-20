@@ -10,8 +10,6 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.List;
 
-//TODO just use reflection
-
 /**
  * Author: MrCrayfish
  */
@@ -19,23 +17,23 @@ import java.util.List;
 public interface RecipeBookComponentAccessor
 {
     @Accessor("filterButton")
-    StateSwitchingButton getFilterButton();
+    StateSwitchingButton controllableGetFilterButton();
 
     @Accessor("tabButtons")
-    List<RecipeBookTabButton> getRecipeTabs();
+    List<RecipeBookTabButton> controllableGetRecipeTabs();
 
     @Accessor("recipeBookPage")
-    RecipeBookPage getRecipeBookPage();
+    RecipeBookPage controllableGetRecipeBookPage();
 
     @Accessor("selectedTab")
-    RecipeBookTabButton getCurrentTab();
+    RecipeBookTabButton controllableGetCurrentTab();
 
     @Accessor("selectedTab")
-    void setCurrentTab(RecipeBookTabButton tab);
+    void controllableSetCurrentTab(RecipeBookTabButton tab);
 
     @Invoker("updateCollections")
-    void invokeUpdateCollections(boolean resetPages);
+    void controllableUpdateCollections(boolean resetPages);
 
     @Accessor("tabButtons")
-    List<RecipeBookTabButton> getTabButtons();
+    List<RecipeBookTabButton> controllableGetTabButtons();
 }

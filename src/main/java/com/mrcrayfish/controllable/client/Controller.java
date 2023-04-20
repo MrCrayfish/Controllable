@@ -1,11 +1,20 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mrcrayfish.controllable.ButtonStates;
+import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
+import io.github.libsdl4j.api.gamecontroller.SDL_GameController;
+
+import io.github.libsdl4j.api.joystick.SDL_JoystickID;
 import net.minecraft.client.resources.language.I18n;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWGamepadState;
+import net.minecraft.util.Mth;
 
 import javax.annotation.Nullable;
+
+import static io.github.libsdl4j.api.gamecontroller.SdlGamecontroller.*;
+import static io.github.libsdl4j.api.gamecontroller.SDL_GameControllerButton.*;
+import static io.github.libsdl4j.api.gamecontroller.SDL_GameControllerAxis.*;
+import static io.github.libsdl4j.api.joystick.SdlJoystick.SDL_JoystickGetDeviceInstanceID;
+import static io.github.libsdl4j.api.joystick.SdlJoystickConst.*;
 
 /**
  *  A wrapper class that aims to reduce the exposure to the underlying controller library. This class
@@ -14,34 +23,78 @@ import javax.annotation.Nullable;
  */
 public class Controller
 {
-    private final int jid;
-    private GLFWGamepadState controller;
-    private ButtonStates states;
+    private final int deviceIndex;
+    private final SDL_JoystickID jid;
+    private final byte[] rawStates;
+    private final ButtonStates states;
+    private SDL_GameController controller;
     private String cachedName;
     private Mappings.Entry mapping;
 
-    public Controller(int jid)
+    public Controller(int deviceIndex)
     {
-        this.jid = jid;
-        this.controller = GLFWGamepadState.create();
+        this.deviceIndex = deviceIndex;
+        this.jid = SDL_JoystickGetDeviceInstanceID(deviceIndex);
+        this.rawStates = new byte[SDL_CONTROLLER_BUTTON_MAX];
         this.states = new ButtonStates();
         this.getName(); //cache the name straight away
     }
 
-    public int getJid()
+    /**
+     * Opens the controller for use. Must be closed with {@link #close} when finished.
+     *
+     * @return true if the controller was opened successfully
+     */
+    public boolean open()
+    {
+        this.controller = SDL_GameControllerOpen(this.deviceIndex);
+        return this.controller != null;
+    }
+
+    /**
+     * Closes the controller and can no longer be used.
+     */
+    public void close()
+    {
+        if(SDL_GameControllerGetAttached(this.controller))
+        {
+            SDL_GameControllerClose(this.controller);
+        }
+    }
+
+    /**
+     * @return The device index of the controller. This should not be used to determine the controller.
+     */
+    public int getDeviceIndex()
+    {
+        return this.deviceIndex;
+    }
+
+    /**
+     * @return The unique joystick id of this controller for the time it is connected
+     */
+    public SDL_JoystickID getJid()
     {
         return this.jid;
     }
 
     /**
-     * Gets the underlying {@link GLFWGamepadState} of this this controller instance.
+     * @return True if this controller is open and connected
+     */
+    public boolean isOpen()
+    {
+        return SDL_GameControllerGetAttached(this.controller);
+    }
+
+    /**
+     * Gets the raw states of this this controller instance.
      * This is gives you direct access to the controller state.
      *
      * @return the sdl2controller controller instance
      */
-    public GLFWGamepadState getGamepadState()
+    public byte[] getGamepadState()
     {
-        return this.controller;
+        return this.rawStates;
     }
 
     /**
@@ -51,7 +104,34 @@ public class Controller
      */
     public boolean updateGamepadState()
     {
-        return GLFW.glfwGetGamepadState(this.jid, this.controller);
+        SDL_GameControllerUpdate();
+        this.readButton(SDL_CONTROLLER_BUTTON_A);
+        this.readButton(SDL_CONTROLLER_BUTTON_B);
+        this.readButton(SDL_CONTROLLER_BUTTON_X);
+        this.readButton(SDL_CONTROLLER_BUTTON_Y);
+        this.readButton(SDL_CONTROLLER_BUTTON_BACK);
+        this.readButton(SDL_CONTROLLER_BUTTON_GUIDE);
+        this.readButton(SDL_CONTROLLER_BUTTON_START);
+        this.readButton(SDL_CONTROLLER_BUTTON_LEFTSTICK);
+        this.readButton(SDL_CONTROLLER_BUTTON_RIGHTSTICK);
+        this.readButton(SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+        this.readButton(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+        this.readButton(SDL_CONTROLLER_BUTTON_DPAD_UP);
+        this.readButton(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+        this.readButton(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+        this.readButton(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+        this.readButton(SDL_CONTROLLER_BUTTON_MISC1);
+        this.readButton(SDL_CONTROLLER_BUTTON_PADDLE1);
+        this.readButton(SDL_CONTROLLER_BUTTON_PADDLE2);
+        this.readButton(SDL_CONTROLLER_BUTTON_PADDLE3);
+        this.readButton(SDL_CONTROLLER_BUTTON_PADDLE4);
+        this.readButton(SDL_CONTROLLER_BUTTON_TOUCHPAD);
+        return SDL_GameControllerGetAttached(this.controller);
+    }
+
+    private void readButton(int button)
+    {
+        this.rawStates[button] = SDL_GameControllerGetButton(this.controller, button);
     }
 
     /**
@@ -69,11 +149,11 @@ public class Controller
      */
     public String getName()
     {
-        if(GLFW.glfwJoystickPresent(this.jid))
+        if(SDL_IsGameController(this.deviceIndex))
         {
             if(this.cachedName == null)
             {
-                this.cachedName = GLFW.glfwGetGamepadName(this.jid);
+                this.cachedName = SDL_GameControllerNameForIndex(this.deviceIndex);
             }
             return this.cachedName;
         }
@@ -94,13 +174,29 @@ public class Controller
     }
 
     /**
+     * Rumbles the controller if supported
+     *
+     * @param lowFrequency  the low frequency rumble
+     * @param highFrequency the high frequency rumble
+     * @param timeInMs      the time length in milliseconds
+     * @return false if the controller doesn't support rumbling
+     */
+    public boolean rumble(float lowFrequency, float highFrequency, int timeInMs)
+    {
+        lowFrequency = Mth.clamp(lowFrequency, 0.0F, 1.0F);
+        highFrequency = Mth.clamp(highFrequency, 0.0F, 1.0F);
+        return SDL_GameControllerRumble(this.controller, (short) (0xFFFF * lowFrequency), (short) (0xFFFF * highFrequency), timeInMs) == 0;
+    }
+
+    /**
      * Gets the value of the left trigger
      *
      * @return the left trigger value
      */
     public float getLTriggerValue()
     {
-        return (this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) + 1.0F) / 2.0F;
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) / (float) SDL_JOYSTICK_AXIS_MAX, 0, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.triggerDeadZone.get().floatValue());
     }
 
     /**
@@ -110,7 +206,8 @@ public class Controller
      */
     public float getRTriggerValue()
     {
-        return (this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER) + 1.0F) / 2.0F;
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / (float) SDL_JOYSTICK_AXIS_MAX, 0, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.triggerDeadZone.get().floatValue());
     }
 
     /**
@@ -120,8 +217,8 @@ public class Controller
      */
     public float getLThumbStickXValue()
     {
-        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X : GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
-        return this.controller.axes(axis) * (this.isFlipLeftX() ? -1 : 1);
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_LEFTX) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
     }
 
     /**
@@ -131,8 +228,8 @@ public class Controller
      */
     public float getLThumbStickYValue()
     {
-        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y : GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
-        return this.controller.axes(axis) * (this.isFlipLeftY() ? -1 : 1);
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_LEFTY) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
     }
 
     /**
@@ -142,8 +239,8 @@ public class Controller
      */
     public float getRThumbStickXValue()
     {
-        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_LEFT_X : GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
-        return this.controller.axes(axis) * (this.isFlipRightX() ? -1 : 1);
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_RIGHTX) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
     }
 
     /**
@@ -153,8 +250,8 @@ public class Controller
      */
     public float getRThumbStickYValue()
     {
-        int axis = this.isThumbsticksSwitched() ? GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y : GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y ;
-        return this.controller.axes(axis) * (this.isFlipRightY() ? -1 : 1);
+        float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_RIGHTY) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
+        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
     }
 
     /**

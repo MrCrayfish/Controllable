@@ -4,14 +4,24 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
+import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,6 +68,8 @@ public class BindingRegistry
         getInstance().register(ButtonBindings.RADIAL_MENU);
         Stream.of(ButtonBindings.HOTBAR_SLOTS).forEach(binding -> getInstance().register(binding));
         getInstance().register(ButtonBindings.TOGGLE_CRAFT_BOOK);
+        getInstance().register(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS);
+        getInstance().register(ButtonBindings.OPEN_CHAT);
     }
 
     private static BindingRegistry instance;
@@ -173,7 +185,7 @@ public class BindingRegistry
         }
         catch(FileNotFoundException e)
         {
-            Controllable.LOGGER.info("Skipped loading bindings.properties since it doesn't exist");
+            Constants.LOG.info("Skipped loading bindings.properties since it doesn't exist");
         }
         catch(IOException e)
         {
@@ -183,7 +195,11 @@ public class BindingRegistry
         // Load key adapters
         try(BufferedReader reader = Files.newReader(new File(Controllable.getConfigFolder(), "controllable/key_adapters.properties"), Charsets.UTF_8))
         {
-            Map<String, KeyMapping> bindings = Arrays.stream(Minecraft.getInstance().options.keyMappings).collect(Collectors.toMap(KeyMapping::getName, v -> v, (t1, t2) -> t2));
+            Map<String, KeyMapping> bindings = new HashMap<>();
+            for(KeyMapping mapping : Minecraft.getInstance().options.keyMappings)
+            {
+                bindings.put(mapping.getName(), mapping);
+            }
             Properties properties = new Properties();
             properties.load(reader);
             properties.forEach((key, value) ->
@@ -206,7 +222,7 @@ public class BindingRegistry
         }
         catch(FileNotFoundException e)
         {
-            Controllable.LOGGER.info("Skipped loading key_adapters.properties since it doesn't exist");
+            Constants.LOG.info("Skipped loading key_adapters.properties since it doesn't exist");
         }
         catch(IOException e)
         {

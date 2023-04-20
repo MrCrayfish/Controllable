@@ -2,6 +2,9 @@ package com.mrcrayfish.controllable.client.gui.navigation;
 
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+
+import java.util.List;
 
 /**
  * Author: MrCrayfish
@@ -10,17 +13,21 @@ import net.minecraft.client.gui.components.AbstractSelectionList;
 public class ListEntryNavigationPoint extends NavigationPoint
 {
     private final AbstractSelectionList<?> list;
-    private final AbstractSelectionList.Entry<?> entry;
+    private final GuiEventListener listEntry;
     private final int index;
     private final int itemHeight;
+    private final int dir;
+    private int itemY;
 
-    public ListEntryNavigationPoint(AbstractSelectionList<?> list, AbstractSelectionList.Entry<?> entry, int index)
+    public ListEntryNavigationPoint(AbstractSelectionList<?> list, GuiEventListener listEntry, int index, int dir)
     {
         super(0, 0, Type.BASIC);
         this.list = list;
-        this.entry = entry;
+        this.listEntry = listEntry;
         this.index = index;
-        this.itemHeight = ReflectUtil.getListItemHeight(this.list);
+        this.itemHeight = ReflectUtil.getAbstractListItemHeight(this.list);
+        this.dir = dir;
+        this.itemY = ReflectUtil.getAbstractListRowTop(this.list, index) + this.itemHeight / 2 - 2;
     }
 
     @Override
@@ -38,26 +45,48 @@ public class ListEntryNavigationPoint extends NavigationPoint
     @Override
     public double getY()
     {
-        return ReflectUtil.getAbstractListRowTop(this.list, this.index) + this.itemHeight / 2 - 2;
+        return this.itemY;
     }
 
     @Override
     public void onNavigate()
     {
-        int y1 = ListWidgetNavigationPoint.getListY1(this.list);
-        int y0 = ListWidgetNavigationPoint.getListY0(this.list);
-        int index = this.list.children().indexOf(this.entry);
+        int index = this.index;
+        GuiEventListener entry = this.listEntry;
+        List<? extends GuiEventListener> children = this.list.children();
+
+        // Make the navigation skip to the next item in the list. Used to skip "title" items.
+        if(entry instanceof SkipItem)
+        {
+            int skipIndex = index + this.dir;
+            if(skipIndex >= 0 && skipIndex < children.size())
+            {
+                index = skipIndex;
+                entry = children.get(skipIndex);
+            }
+        }
+
+        // Make list scroll to top if next item is the first item and is skippable
+        if(index + this.dir == 0 && children.size() > 0 && children.get(0) instanceof SkipItem)
+        {
+            entry = children.get(0);
+        }
+
         int rowTop = ReflectUtil.getAbstractListRowTop(this.list, index);
         int rowBottom = ReflectUtil.getAbstractListRowBottom(this.list, index);
-        if(rowTop < this.list.getTop() + this.itemHeight / 2)
+        int listTop = this.list.getTop();
+        int listBottom = this.list.getBottom();
+        if(rowTop < listTop + this.itemHeight / 2)
         {
-            double scroll = this.list.children().indexOf(this.entry) * this.itemHeight - this.itemHeight / 2;
+            double scroll = this.list.children().indexOf(entry) * this.itemHeight - this.itemHeight / 2;
             this.list.setScrollAmount(scroll);
         }
-        if(rowBottom > this.list.getBottom() - this.itemHeight / 2) // Is not/partially visible
+        if(rowBottom > listBottom - this.itemHeight / 2) // Is not/partially visible
         {
-            double scroll = this.list.children().indexOf(this.entry) * this.itemHeight + this.itemHeight - (y1 - y0) + 4 + this.itemHeight / 2;
+            double scroll = this.list.children().indexOf(entry) * this.itemHeight + this.itemHeight - (listBottom - listTop) + 4 + this.itemHeight / 2;
             this.list.setScrollAmount(scroll);
         }
+
+        this.itemY = ReflectUtil.getAbstractListRowTop(this.list, index) + this.itemHeight / 2 - 2;
     }
 }

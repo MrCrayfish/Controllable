@@ -34,10 +34,10 @@ public enum ControllerIcons implements SettingEnum
     public static void main(String[] args)
     {
         System.out.print("\"");
-        for(int i = 0; i < values().length * 17; i++)
+        for(int i = 0; i < values().length * Buttons.LENGTH; i++)
         {
-            System.out.print("\\u" + Integer.toHexString((32 + i) | 0x10000).substring(1));
-            if(i > 0 && (i + 1) % 17 == 0)
+            System.out.print("\\u" + Integer.toHexString((33 + i) | 0x10000).substring(1));
+            if(i > 0 && (i + 1) % Buttons.LENGTH == 0)
             {
                 System.out.print("\",");
                 System.out.println();

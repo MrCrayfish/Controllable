@@ -35,8 +35,28 @@ public class RecipeBookPageMixin
     @Shadow
     private Minecraft minecraft;
 
-    @ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderComponentTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Ljava/util/List;IILnet/minecraft/world/item/ItemStack;)V"), index = 1, remap = false)
-    private List<Component> modifyRenderToolTip(List<Component> components)
+    @Inject(method = "renderTooltip", at = @At(value = "TAIL"))
+    private void controllableRenderTooltipTail(PoseStack stack, int mouseX, int mouseY, CallbackInfo ci)
+    {
+        if(Controllable.getInput().isControllerInUse() && Config.CLIENT.options.quickCraft.get())
+        {
+            if(this.minecraft.screen != null && this.overlay.isVisible())
+            {
+                List<AbstractWidget> recipeButtons = ((OverlayRecipeComponentAccessor) this.overlay).controllableGetRecipeButtons();
+                recipeButtons.stream().filter(AbstractWidget::isHoveredOrFocused).findFirst().ifPresent(btn ->
+                {
+                    if(((OverlayRecipeButtonAccessor) btn).controllableIsCraftable())
+                    {
+                        Component craftText = Component.translatable("controllable.tooltip.craft", ClientHelper.getButtonComponent(ButtonBindings.PICKUP_ITEM.getButton())).withStyle(ChatFormatting.YELLOW);
+                        this.minecraft.screen.renderTooltip(stack, craftText, mouseX, mouseY);
+                    }
+                });
+            }
+        }
+    }
+
+    @ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderComponentTooltip(Lcom/mojang/blaze3d/vertex/PoseStack;Ljava/util/List;IILnet/minecraft/world/item/ItemStack;)V"), index = 1)
+    private List<Component> controllableModifyRenderToolTip(List<Component> components)
     {
         if(Controllable.getInput().isControllerInUse() && Config.CLIENT.options.quickCraft.get())
         {
@@ -47,25 +67,5 @@ public class RecipeBookPageMixin
             components.add(Component.translatable("controllable.tooltip.craft", ClientHelper.getButtonComponent(ButtonBindings.PICKUP_ITEM.getButton())).withStyle(ChatFormatting.YELLOW));
         }
         return components;
-    }
-
-    @Inject(method = "renderTooltip", at = @At(value = "TAIL"))
-    private void controllableRenderTooltipTail(PoseStack stack, int mouseX, int mouseY, CallbackInfo ci)
-    {
-        if(Controllable.getInput().isControllerInUse() && Config.CLIENT.options.quickCraft.get())
-        {
-            if(this.minecraft.screen != null && this.overlay.isVisible())
-            {
-                List<OverlayRecipeComponent.OverlayRecipeButton> recipeButtons = ((OverlayRecipeComponentAccessor) this.overlay).getRecipeButtons();
-                recipeButtons.stream().filter(AbstractWidget::isHoveredOrFocused).findFirst().ifPresent(btn ->
-                {
-                    if(((OverlayRecipeButtonAccessor) btn).isCraftable())
-                    {
-                        Component craftText = Component.translatable("controllable.tooltip.craft", ClientHelper.getButtonComponent(ButtonBindings.PICKUP_ITEM.getButton())).withStyle(ChatFormatting.YELLOW);
-                        this.minecraft.screen.renderTooltip(stack, craftText, mouseX, mouseY);
-                    }
-                });
-            }
-        }
     }
 }

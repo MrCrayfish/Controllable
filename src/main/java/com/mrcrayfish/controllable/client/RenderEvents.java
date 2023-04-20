@@ -4,19 +4,22 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.Reference;
+import com.mrcrayfish.controllable.client.gui.widget.TabNavigationHint;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.client.util.EventHelper;
+import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.controllable.event.GatherActionsEvent;
 import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
-import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
-import net.minecraft.ChatFormatting;
+import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.StateSwitchingButton;
+import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -24,7 +27,6 @@ import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
@@ -34,9 +36,9 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.event.ContainerScreenEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -48,23 +50,37 @@ import java.util.Map;
  */
 public class RenderEvents
 {
-    public static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Reference.MOD_ID, "textures/gui/buttons.png");
-    public static final int CONTROLLER_BUTTONS_WIDTH = 221;
-    public static final int CONTROLLER_BUTTONS_HEIGHT = 130;
+    public static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Constants.MOD_ID, "textures/gui/buttons.png");
+    public static final int CONTROLLER_BUTTONS_WIDTH = Buttons.LENGTH * 13;
+    public static final int CONTROLLER_BUTTONS_HEIGHT = ControllerIcons.values().length * 13;
 
-    private final Map<Integer, Action> actions = new HashMap<>();
+    private static final Map<Integer, Action> actions = new HashMap<>();
 
-    @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event)
+    public static void init()
+    {
+        MinecraftForge.EVENT_BUS.addListener(RenderEvents::onClientTickStart);
+        MinecraftForge.EVENT_BUS.addListener(RenderEvents::onRenderBackground);
+        MinecraftForge.EVENT_BUS.addListener(RenderEvents::onRenderEnd);
+        MinecraftForge.EVENT_BUS.addListener(RenderEvents::onScreenInit);
+    }
+
+    private static void onScreenInit(ScreenEvent.Init event)
+    {
+        event.getListenersList().stream().filter(e -> e instanceof TabNavigationBar).map(e -> (TabNavigationBar) e).findFirst().ifPresent(bar -> {
+            event.getScreen().renderables.add(new TabNavigationHint(bar.children()));
+        });
+    }
+
+    private static void onClientTickStart(TickEvent.ClientTickEvent event)
     {
         Minecraft mc = Minecraft.getInstance();
         if(event.phase == TickEvent.Phase.START && mc.player != null && !mc.options.hideGui)
         {
-            this.actions.clear();
+            actions.clear();
 
             Map<ButtonBinding, Action> actionMap = new LinkedHashMap<>();
 
-            ActionVisibility visibility = Config.CLIENT.options.showActions.get();
+            ActionVisibility visibility = Config.CLIENT.options.showButtonHints.get();
             if(visibility == ActionVisibility.NONE) return;
 
             boolean verbose = visibility == ActionVisibility.ALL;
@@ -73,15 +89,12 @@ public class RenderEvents
             {
                 if(mc.player.inventoryMenu.getCarried().isEmpty())
                 {
-                    if(containerScreen.getSlotUnderMouse() != null)
+                    Slot slot = containerScreen.getSlotUnderMouse();
+                    if(slot != null && slot.hasItem())
                     {
-                        Slot slot = containerScreen.getSlotUnderMouse();
-                        if(slot.hasItem())
-                        {
-                            actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(ActionDescriptions.PICKUP_STACK, Action.Side.LEFT));
-                            actionMap.put(ButtonBindings.SPLIT_STACK, new Action(ActionDescriptions.SPLIT_STACK, Action.Side.LEFT));
-                            actionMap.put(ButtonBindings.QUICK_MOVE, new Action(ActionDescriptions.QUICK_MOVE, Action.Side.LEFT));
-                        }
+                        actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(ActionDescriptions.PICKUP_STACK, Action.Side.LEFT));
+                        actionMap.put(ButtonBindings.SPLIT_STACK, new Action(ActionDescriptions.SPLIT_STACK, Action.Side.LEFT));
+                        actionMap.put(ButtonBindings.QUICK_MOVE, new Action(ActionDescriptions.QUICK_MOVE, Action.Side.LEFT));
                     }
                 }
                 else
@@ -89,14 +102,10 @@ public class RenderEvents
                     actionMap.put(ButtonBindings.PICKUP_ITEM, new Action(ActionDescriptions.PLACE_STACK, Action.Side.LEFT));
                     actionMap.put(ButtonBindings.SPLIT_STACK, new Action(ActionDescriptions.PLACE_ITEM, Action.Side.LEFT));
 
-                    // You can still quick move items if holding one with cursor
-                    if(containerScreen.getSlotUnderMouse() != null)
+                    Slot slot = containerScreen.getSlotUnderMouse();
+                    if(slot != null && slot.hasItem())
                     {
-                        Slot slot = containerScreen.getSlotUnderMouse();
-                        if(slot.hasItem())
-                        {
-                            actionMap.put(ButtonBindings.QUICK_MOVE, new Action(ActionDescriptions.QUICK_MOVE, Action.Side.LEFT));
-                        }
+                        actionMap.put(ButtonBindings.QUICK_MOVE, new Action(ActionDescriptions.QUICK_MOVE, Action.Side.LEFT));
                     }
                 }
 
@@ -242,13 +251,12 @@ public class RenderEvents
             }
 
             MinecraftForge.EVENT_BUS.post(new GatherActionsEvent(actionMap, visibility));
-            actionMap.forEach((binding, action) -> this.actions.put(binding.getButton(), action));
+            actionMap.forEach((binding, action) -> actions.put(binding.getButton(), action));
         }
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    @SubscribeEvent
-    public void onRenderScreen(TickEvent.RenderTickEvent event)
+    private static void onRenderEnd(TickEvent.RenderTickEvent event)
     {
         if(event.phase != TickEvent.Phase.END)
             return;
@@ -269,38 +277,29 @@ public class RenderEvents
         {
             if(Controllable.getInput().getLastUse() > 0)
             {
-                this.renderHints(poseStack);
-                this.renderMiniPlayer(poseStack);
+                renderHints(poseStack);
+                renderMiniPlayer(poseStack);
             }
-        }
-        else if(mc.screen == null && Config.SERVER.restrictToController.get())
-        {
-            RenderSystem.disableDepthTest();
-            int width = mc.getWindow().getScreenWidth();
-            int height = mc.getWindow().getScreenHeight(); //TODO test
-            Screen.fill(new PoseStack(), 0, 0, width, height, -1072689136);
-            Screen.drawCenteredString(new PoseStack(), mc.font, Component.translatable("controllable.gui.controller_only").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.YELLOW), width / 2, height / 2 - 15, 0xFFFFFFFF);
-            Screen.drawCenteredString(new PoseStack(), mc.font, Component.translatable("controllable.gui.plug_in_controller"), width / 2, height / 2, 0xFFFFFFFF);
-            RenderSystem.enableDepthTest();
         }
 
         modelStack.popPose();
         RenderSystem.applyModelViewMatrix();
     }
 
-    private void renderHints(PoseStack poseStack)
+    private static void renderHints(PoseStack poseStack)
     {
         if(!MinecraftForge.EVENT_BUS.post(new RenderAvailableActionsEvent()))
         {
             Minecraft mc = Minecraft.getInstance();
             Gui guiIngame = mc.gui;
-            boolean isChatVisible = mc.screen == null && guiIngame.getChat().trimmedMessages.stream().anyMatch(chatLine -> guiIngame.getGuiTicks() - chatLine.addedTime() < 200);
+            List<GuiMessage.Line> messages = guiIngame.getChat().trimmedMessages;
+            boolean isChatVisible = mc.screen == null && messages.stream().anyMatch(chatLine -> guiIngame.getGuiTicks() - chatLine.addedTime() < 200);
 
             int leftIndex = 0;
             int rightIndex = 0;
-            for(int button : this.actions.keySet())
+            for(int button : actions.keySet())
             {
-                Action action = this.actions.get(button);
+                Action action = actions.get(button);
                 Action.Side side = action.getSide();
 
                 if(mc.options.showSubtitles().get() && mc.screen == null)
@@ -336,14 +335,14 @@ public class RenderEvents
                 if(side == Action.Side.LEFT)
                 {
                     int textWidth = mc.font.width(action.getDescription());
-                    this.drawHintBackground(poseStack, x + 18, y, textWidth, 13);
+                    drawHintBackground(poseStack, x + 18, y, textWidth, 13);
                     mc.font.draw(poseStack, action.getDescription(), x + 18, y + 3, 0xFFFFFFFF);
                     leftIndex++;
                 }
                 else
                 {
                     int textWidth = mc.font.width(action.getDescription());
-                    this.drawHintBackground(poseStack, x - 5 - textWidth, y, textWidth, 13);
+                    drawHintBackground(poseStack, x - 5 - textWidth, y, textWidth, 13);
                     mc.font.draw(poseStack, action.getDescription(), x - 5 - textWidth, y + 3, 0xFFFFFFFF);
                     rightIndex++;
                 }
@@ -351,31 +350,28 @@ public class RenderEvents
         }
     }
 
-    private void drawHintBackground(PoseStack poseStack, int x, int y, int width, int height)
+    private static void drawHintBackground(PoseStack poseStack, int x, int y, int width, int height)
     {
-        if(!Config.CLIENT.options.hintBackground.get()) return;
-
+        if(!Config.CLIENT.options.drawHintBackground.get())
+            return;
         Minecraft mc = Minecraft.getInstance();
         int backgroundColor = mc.options.getBackgroundColor(0.5F);
-        Screen.fill(poseStack, x - 3 + 1, y, x + width + 2 - 1, y + 1, backgroundColor);
-        Screen.fill(poseStack, x - 3, y + 1, x + width + 2, y + height - 1, backgroundColor);
-        Screen.fill(poseStack, x - 3 + 1, y + height - 1, x + width + 2 - 1, y + height, backgroundColor);
+        ScreenUtil.drawRoundedBox(poseStack, x, y, width, height, backgroundColor);
     }
 
-    private void renderMiniPlayer(PoseStack poseStack)
+    private static void renderMiniPlayer(PoseStack poseStack)
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.player != null && mc.screen == null && Config.CLIENT.options.renderMiniPlayer.get())
         {
-            if(!MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent()))
+            if(!EventHelper.postRenderMiniPlayer())
             {
-                InventoryScreen.renderEntityInInventoryFollowsAngle(poseStack, 20, 45, 20, 0, 0, mc.player);
+                InventoryScreen.renderEntityInInventoryFollowsMouse(poseStack, 20, 45, 20, 0, 0, mc.player);
             }
         }
     }
 
-    @SubscribeEvent
-    public void onRenderBackground(ContainerScreenEvent.Render.Background event)
+    private static void onRenderBackground(ContainerScreenEvent.Render.Background event)
     {
         if(!Controllable.getInput().isControllerInUse())
             return;
@@ -388,22 +384,33 @@ public class RenderEvents
 
             Font font = Minecraft.getInstance().font;
 
-            List<RecipeBookTabButton> tabButtons = ((RecipeBookComponentAccessor) recipeBook).getTabButtons();
+            List<RecipeBookTabButton> tabButtons = ((RecipeBookComponentAccessor) recipeBook).controllableGetTabButtons();
             if(!tabButtons.isEmpty())
             {
                 RecipeBookTabButton first = tabButtons.get(0);
-                RecipeBookTabButton last = tabButtons.get(tabButtons.size() - 1);
-                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.NEXT_RECIPE_TAB.getButton()), first.getX() + 15 - 5, first.getY() - 13, 0xFFFFFF);
-                font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.getX() + 15 - 5, last.getY() + last.getHeight() + 13 - 9, 0xFFFFFF);
+                RecipeBookTabButton last = null;
+                for(int i = tabButtons.size() - 1; i >= 0; i--)
+                {
+                    if(tabButtons.get(i).visible)
+                    {
+                        last = tabButtons.get(i);
+                        break;
+                    }
+                }
+                if(last != null)
+                {
+                    font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.NEXT_RECIPE_TAB.getButton()), first.getX() + 15 - 5, first.getY() - 13, 0xFFFFFF);
+                    font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.getX() + 15 - 5, last.getY() + last.getHeight() + 13 - 9, 0xFFFFFF);
+                }
             }
 
-            RecipeBookPage page = ((RecipeBookComponentAccessor) recipeBook).getRecipeBookPage();
-            StateSwitchingButton forwardButton = ((RecipeBookPageAccessor) page).getForwardButton();
+            RecipeBookPage page = ((RecipeBookComponentAccessor) recipeBook).controllableGetRecipeBookPage();
+            StateSwitchingButton forwardButton = ((RecipeBookPageAccessor) page).controllableGetForwardButton();
             if(forwardButton.visible)
             {
                 font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.getX() + 24 - 5, forwardButton.getY() + 4, 0xFFFFFF);
             }
-            StateSwitchingButton backButton = ((RecipeBookPageAccessor) page).getBackButton();
+            StateSwitchingButton backButton = ((RecipeBookPageAccessor) page).controllableGetBackButton();
             if(backButton.visible)
             {
                 font.draw(event.getPoseStack(), ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.getX() - 24 + 12 - 5, backButton.getY() + 4, 0xFFFFFF);

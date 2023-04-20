@@ -2,11 +2,8 @@ package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.Buttons;
 import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWGamepadState;
 
 /**
  * Author: MrCrayfish
@@ -25,7 +22,7 @@ public class ControllerAxis extends ControllerButton
         Controller controller = Controllable.getController();
         if(controller != null)
         {
-            GLFWGamepadState gamepad = controller.getGamepadState();
+            /*GLFWGamepadState gamepad = controller.getGamepadState();
             switch(this.button)
             {
                 case Buttons.LEFT_THUMB_STICK ->
@@ -44,7 +41,7 @@ public class ControllerAxis extends ControllerButton
                     rightY *= this.screen.getEntry().isFlipRightY() ? -1 : 1;
                     poseStack.translate(rightX * 5, rightY * 5, 0);
                 }
-            }
+            }*/
 
             if(!this.screen.isButtonPressed(this.button))
             {

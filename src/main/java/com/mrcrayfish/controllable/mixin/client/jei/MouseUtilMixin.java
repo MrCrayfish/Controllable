@@ -23,31 +23,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MouseUtilMixin
 {
     @Inject(method = "getX", at = @At(value = "TAIL"), remap = false, cancellable = true)
-    private static void getX(CallbackInfoReturnable<Double> cir)
+    private static void controllableGetX(CallbackInfoReturnable<Double> cir)
     {
         ControllerInput input = Controllable.getInput();
         if(isVirtualMouseActive(input))
         {
             Minecraft minecraft = Minecraft.getInstance();
-            double mouseX = input.getVirtualMouseX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getScreenWidth();
+            double mouseX = input.getVirtualCursorX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getScreenWidth();
             cir.setReturnValue(mouseX);
         }
     }
 
     @Inject(method = "getY", at = @At(value = "TAIL"), remap = false, cancellable = true)
-    private static void getY(CallbackInfoReturnable<Double> cir)
+    private static void controllableGetY(CallbackInfoReturnable<Double> cir)
     {
         ControllerInput input = Controllable.getInput();
         if(isVirtualMouseActive(input))
         {
             Minecraft minecraft = Minecraft.getInstance();
-            double mouseY = input.getVirtualMouseY() * (double) minecraft.getWindow().getGuiScaledHeight() / (double) minecraft.getWindow().getScreenHeight();
+            double mouseY = input.getVirtualCursorY() * (double) minecraft.getWindow().getGuiScaledHeight() / (double) minecraft.getWindow().getScreenHeight();
             cir.setReturnValue(mouseY);
         }
     }
 
     private static boolean isVirtualMouseActive(ControllerInput input)
     {
-        return Controllable.getController() != null && Config.CLIENT.options.virtualMouse.get() && input.getLastUse() > 0;
+        return Controllable.getController() != null && Config.CLIENT.options.virtualCursor.get() && input.getLastUse() > 0;
     }
 }

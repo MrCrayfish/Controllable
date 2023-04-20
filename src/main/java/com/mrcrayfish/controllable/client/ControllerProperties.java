@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.Constants;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,12 +23,14 @@ public class ControllerProperties
         if(!loaded)
         {
             Properties properties = new Properties();
-            file = new File(configFolder, "controllable/controller.properties");
+            File folder = new File(configFolder, "controllable");
+            folder.mkdirs();
+            file = new File(folder, "controller.properties");
             try
             {
                 if(file.createNewFile())
                 {
-                    Controllable.LOGGER.info("Successfully created controller properties");
+                    Constants.LOG.info("Successfully created controller properties");
                 }
                 if(file.exists())
                 {

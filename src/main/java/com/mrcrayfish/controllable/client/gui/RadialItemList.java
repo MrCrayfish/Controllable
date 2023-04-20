@@ -56,11 +56,12 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
         return 260;
     }
 
-    @Override
+    //TODO figure why I needed this
+    /*@Override
     public int getLeft()
     {
         return super.getLeft();
-    }
+    }*/
 
     @Override
     public int getRowLeft()
@@ -161,9 +162,9 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
             return ImmutableList.of(new NarratableEntry()
             {
                 @Override
-                public NarratableEntry.NarrationPriority narrationPriority()
+                public NarrationPriority narrationPriority()
                 {
-                    return NarratableEntry.NarrationPriority.HOVERED;
+                    return NarrationPriority.HOVERED;
                 }
 
                 @Override
