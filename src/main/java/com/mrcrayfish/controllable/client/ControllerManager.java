@@ -164,7 +164,7 @@ public class ControllerManager
                 {
                     memory.write(0, bytes, 0, bytes.length);
                     SDL_RWops wops = SDL_RWFromConstMem(memory, (int) memory.size());
-                    int count = SDL_GameControllerAddMappingsFromRW(wops, 0);
+                    int count = SDL_GameControllerAddMappingsFromRW(wops, 1);
                     if(count > 0)
                     {
                         Constants.LOG.info("Successfully updated {} gamepad mappings", count);
