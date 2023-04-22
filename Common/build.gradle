@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
     id 'maven-publish'
+    id 'de.undercouch.download' version '5.4.0'
 }
 
 archivesBaseName = "${mod_id}-common"
@@ -34,7 +35,13 @@ dependencies {
     library "io.github.libsdl4j:libsdl4j:2.26.4-1.2"
 }
 
+task downloadMappings(type: Download) {
+    src 'https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt'
+    dest 'src/main/resources/gamecontrollerdb.txt'
+}
+
 processResources {
+    dependsOn downloadMappings
     def buildProps = project.properties.clone()
     filesMatching(['pack.mcmeta']) {
         expand buildProps
