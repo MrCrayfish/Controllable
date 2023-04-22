@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
+import com.mrcrayfish.controllable.client.ControllerManager;
 import com.mrcrayfish.controllable.client.Icons;
 import com.mrcrayfish.controllable.client.SneakMode;
 import com.mrcrayfish.controllable.client.SprintMode;
@@ -202,7 +203,7 @@ public class SettingsScreen extends Screen
 
     public class ControllerTab extends GridLayoutTab
     {
-        private static final Component TITLE = Component.empty().append(ClientHelper.getIcon(Icons.CONTROLLER)).append(" ").append(Component.translatable("controllable.settings.tab.controller.title"));
+        private static final Component TITLE = Component.empty().append(ClientHelper.getIconComponent(Icons.CONTROLLER)).append(" ").append(Component.translatable("controllable.settings.tab.controller.title"));
 
         private final ControllerList list;
 
@@ -223,7 +224,7 @@ public class SettingsScreen extends Screen
 
     public class SettingsTab extends GridLayoutTab
     {
-        private static final Component TITLE = Component.empty().append(ClientHelper.getIcon(Icons.SETTINGS)).append(" ").append(Component.translatable("controllable.settings.tab.settings.title"));
+        private static final Component TITLE = Component.empty().append(ClientHelper.getIconComponent(Icons.SETTINGS)).append(" ").append(Component.translatable("controllable.settings.tab.settings.title"));
 
         public SettingsTab()
         {
@@ -233,10 +234,24 @@ public class SettingsScreen extends Screen
             TabSelectionList<TabSelectionList.BaseItem> optionsList = new TabSelectionList<>(SettingsScreen.this.minecraft, 24);
 
             // Restore button
-            Component restoreDefaults = Component.empty().append(ClientHelper.getIcon(Icons.RESET)).append(" ").append(Component.translatable("controllable.gui.restore_defaults"));
-            optionsList.addEntry(new TabSelectionList.ButtonItem(restoreDefaults, btn -> {
-                mc.setScreen(new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.restore_default_buttons"), result -> {
+            // Update mappings and restore button
+            Component updateMappings = ClientHelper.join(Icons.WORLD, Component.translatable("controllable.gui.update_mappings"));
+            Component restoreDefaults = ClientHelper.join(Icons.RESET, Component.translatable("controllable.gui.restore_defaults"));
+            optionsList.addEntry(new ButtonBindingList.TwoWidgetItem(Button.builder(updateMappings, btn -> {
+                ConfirmationScreen updateConfirmation = new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.update_mapping_message", Component.literal(ControllerManager.MAPPINGS_URL).withStyle(ChatFormatting.YELLOW)), result -> {
                     if(result) {
+                        ControllerManager.downloadMappings(SettingsScreen.this);
+                        return false;
+                    }
+                    return true;
+                });
+                updateConfirmation.setPositiveText(ClientHelper.join(Icons.DOWNLOAD, Component.translatable("controllable.gui.download")));
+                updateConfirmation.setNegativeText(CommonComponents.GUI_CANCEL);
+                updateConfirmation.setIcon(ConfirmationScreen.Icon.INFO);
+                mc.setScreen(updateConfirmation);
+            }).build(), Button.builder(restoreDefaults, btn -> {
+                mc.setScreen(new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.restore_defaults"), result -> {
+                    if(result){
                         FrameworkConfigManager.FrameworkConfigImpl config = FrameworkConfigManager.getInstance().getConfig(Config.CLIENT_CONFIG_ID);
                         if(config != null) {
                             config.getAllProperties().forEach(AbstractProperty::restoreDefault);
@@ -246,7 +261,7 @@ public class SettingsScreen extends Screen
                     }
                     return true;
                 }));
-            }));
+            }).build()));
 
             // Gameplay options
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.gameplay").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
@@ -305,7 +320,7 @@ public class SettingsScreen extends Screen
 
     public class BindingsTab extends GridLayoutTab
     {
-        private static final Component TITLE = Component.empty().append(ClientHelper.getIcon(Icons.BINDINGS)).append(" ").append(Component.translatable("controllable.settings.tab.bindings.title"));
+        private static final Component TITLE = Component.empty().append(ClientHelper.getIconComponent(Icons.BINDINGS)).append(" ").append(Component.translatable("controllable.settings.tab.bindings.title"));
 
         public BindingsTab()
         {

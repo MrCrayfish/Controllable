@@ -37,6 +37,7 @@ public class ConfirmationScreen extends Screen
     private Component positiveText = CommonComponents.GUI_YES;
     private Component negativeText = CommonComponents.GUI_NO;
     private int startY, endY;
+    private Icon icon = Icon.WARNING;
 
     public ConfirmationScreen(Screen parent, Component message, Function<Boolean, Boolean> handler)
     {
@@ -81,7 +82,7 @@ public class ConfirmationScreen extends Screen
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.setShaderTexture(0, ControllerLayoutScreen.TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        Screen.blit(poseStack, this.width / 2 - 10, this.startY - 30, 20, 20, 0, 21, 10, 10, 256, 256);
+        Screen.blit(poseStack, this.width / 2 - 10, this.startY - 30, 20, 20, this.icon.ordinal() * 10, 21, 10, 10, 256, 256);
 
         drawListBackground(0.0, this.width, this.startY, this.endY);
 
@@ -110,6 +111,16 @@ public class ConfirmationScreen extends Screen
     public void setNegativeText(@Nullable Component negativeText)
     {
         this.negativeText = negativeText;
+    }
+
+    /**
+     * Sets the icon displayed at the top of the confirmation screen.
+     *
+     * @param icon the icon to display
+     */
+    public void setIcon(Icon icon)
+    {
+        this.icon = icon;
     }
 
     public static void drawListBackground(double startX, double endX, double startY, double endY)
@@ -142,5 +153,10 @@ public class ConfirmationScreen extends Screen
         buffer.vertex(endX, endY - FADE_LENGTH, 0.0).color(0, 0, 0, 0).endVertex();
         buffer.vertex(startX, endY - FADE_LENGTH, 0.0).color(0, 0, 0, 0).endVertex();
         tesselator.end();
+    }
+
+    public enum Icon
+    {
+        WARNING, INFO;
     }
 }

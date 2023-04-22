@@ -33,7 +33,7 @@ public class ClientHelper
     public static final ResourceLocation ICON_FONT = new ResourceLocation(Constants.MOD_ID, "icons");
     public static final ResourceLocation BUTTON_FONT = new ResourceLocation(Constants.MOD_ID, "buttons");
 
-    public static MutableComponent getIcon(Icons icon)
+    public static MutableComponent getIconComponent(Icons icon)
     {
         MutableComponent component = Component.literal(String.valueOf((char) (33 + icon.ordinal())));
         component.setStyle(component.getStyle().withColor(ChatFormatting.WHITE).withFont(ClientHelper.ICON_FONT));
@@ -45,6 +45,16 @@ public class ClientHelper
         MutableComponent component = Component.literal(String.valueOf((char) (33 + (Config.CLIENT.client.options.controllerIcons.get().ordinal() * Buttons.LENGTH + button))));
         component.setStyle(component.getStyle().withColor(ChatFormatting.WHITE).withFont(ClientHelper.BUTTON_FONT));
         return component;
+    }
+
+    public static MutableComponent join(int button, Component label)
+    {
+        return Component.empty().append(getButtonComponent(button)).append(" ").append(label);
+    }
+
+    public static MutableComponent join(Icons icon, Component label)
+    {
+        return Component.empty().append(getIconComponent(icon)).append(" ").append(label);
     }
 
     public static void drawButton(PoseStack poseStack, int x, int y, int button)

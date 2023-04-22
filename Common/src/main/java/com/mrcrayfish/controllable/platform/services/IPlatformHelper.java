@@ -1,5 +1,7 @@
 package com.mrcrayfish.controllable.platform.services;
 
+import java.nio.file.Path;
+
 /**
  * Author: MrCrayfish
  */
@@ -14,4 +16,6 @@ public interface IPlatformHelper
    {
       return false;
    }
+
+   Path getConfigPath();
 }

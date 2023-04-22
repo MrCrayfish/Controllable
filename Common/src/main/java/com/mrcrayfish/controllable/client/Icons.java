@@ -9,5 +9,7 @@ public enum Icons
     SETTINGS,
     BINDINGS,
     ADD,
-    RESET
+    RESET,
+    WORLD,
+    DOWNLOAD
 }

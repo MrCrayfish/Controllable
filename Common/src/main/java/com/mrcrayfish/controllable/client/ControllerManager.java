@@ -3,18 +3,31 @@ package com.mrcrayfish.controllable.client;
 import com.google.common.io.ByteStreams;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
+import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
+import com.mrcrayfish.controllable.client.gui.screens.PendingScreen;
+import com.mrcrayfish.controllable.platform.ClientServices;
+import com.mrcrayfish.controllable.platform.Services;
 import com.sun.jna.Memory;
 import io.github.libsdl4j.api.joystick.SDL_JoystickID;
 import io.github.libsdl4j.api.rwops.SDL_RWops;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 import static io.github.libsdl4j.api.Sdl.SDL_Init;
 import static io.github.libsdl4j.api.Sdl.SDL_Quit;
@@ -29,6 +42,8 @@ import static io.github.libsdl4j.api.rwops.SdlRWops.SDL_RWFromConstMem;
  */
 public class ControllerManager
 {
+    public static final String MAPPINGS_URL = "https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt";
+
     private static ControllerManager instance;
 
     public static ControllerManager instance()
@@ -154,22 +169,28 @@ public class ControllerManager
         {
             if(is != null)
             {
-                byte[] bytes = ByteStreams.toByteArray(is);
-                try(Memory memory = new Memory(bytes.length))
-                {
-                    memory.write(0, bytes, 0, bytes.length);
-                    SDL_RWops wops = SDL_RWFromConstMem(memory, (int) memory.size());
-                    int count = SDL_GameControllerAddMappingsFromRW(wops, 1);
-                    if(count > 0)
-                    {
-                        Constants.LOG.info("Successfully updated {} gamepad mappings", count);
-                    }
-                }
+                Constants.LOG.info("Applying gamepad mappings from internal database");
+                ControllerManager.updateMappings(is);
             }
         }
         catch(IOException e)
         {
             e.printStackTrace();
+        }
+
+        /* Apply local mappings */
+        File mappings = new File(Services.PLATFORM.getConfigPath().resolve("controllable").toFile(), "gamecontrollerdb.txt");
+        if(mappings.exists())
+        {
+            Constants.LOG.info("Applying gamepad mappings from: {}", mappings);
+            try(InputStream is = new BufferedInputStream(new FileInputStream(mappings)))
+            {
+                ControllerManager.updateMappings(is);
+            }
+            catch(IOException e)
+            {
+                throw new RuntimeException(e);
+            }
         }
 
         /* Attempts to load the first game controller connected if auto select is enabled */
@@ -195,5 +216,85 @@ public class ControllerManager
             }
         }
         return null;
+    }
+
+
+    public static void updateMappings(InputStream is) throws IOException
+    {
+        byte[] bytes = ByteStreams.toByteArray(is);
+        try(Memory memory = new Memory(bytes.length))
+        {
+            memory.write(0, bytes, 0, bytes.length);
+            SDL_RWops wops = SDL_RWFromConstMem(memory, (int) memory.size());
+            int count = SDL_GameControllerAddMappingsFromRW(wops, 1);
+            if(count > 0)
+            {
+                Constants.LOG.info("Successfully updated {} gamepad mappings", count);
+                return;
+            }
+        }
+        Constants.LOG.info("No gamepad mappings were updated");
+    }
+
+    public static void downloadMappings(@Nullable Screen parentScreen)
+    {
+        Constants.LOG.info("Downloading mappings from: {}", MAPPINGS_URL);
+        File mappings = new File(Services.PLATFORM.getConfigPath().resolve("controllable").toFile(), "gamecontrollerdb.txt");
+        CompletableFuture.supplyAsync(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            mc.executeBlocking(() -> mc.setScreen(new PendingScreen(Component.translatable("controllable.gui.downloading_mappings"))));
+
+            // Artificial delay to improve user experience.
+            try
+            {
+                Thread.sleep(1000);
+            }
+            catch(InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
+
+            try(InputStream in = new BufferedInputStream(new URL(MAPPINGS_URL).openStream()))
+            {
+                try(FileOutputStream fos = new FileOutputStream(mappings))
+                {
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while((length = in.read(buffer, 0, buffer.length)) != -1)
+                    {
+                        fos.write(buffer, 0, length);
+                    }
+                    Constants.LOG.info("Finished downloading mappings");
+                    return true;
+                }
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+            return false;
+        }).thenAcceptAsync(success -> {
+            if(success)
+            {
+                Constants.LOG.info("Updating mappings...");
+                Minecraft mc = Minecraft.getInstance();
+                mc.executeBlocking(() ->
+                {
+                    try(InputStream is = new BufferedInputStream(new FileInputStream(mappings)))
+                    {
+                        updateMappings(is);
+                        ConfirmationScreen infoScreen = new ConfirmationScreen(parentScreen, Component.translatable("controllable.gui.mappings_updated"), result -> true);
+                        infoScreen.setPositiveText(CommonComponents.GUI_BACK);
+                        infoScreen.setNegativeText(null);
+                        infoScreen.setIcon(ConfirmationScreen.Icon.INFO);
+                        mc.setScreen(infoScreen);
+                    }
+                    catch(IOException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        });
     }
 }
