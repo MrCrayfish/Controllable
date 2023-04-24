@@ -13,6 +13,7 @@
         "client.MinecraftMixin",
         "client.MouseHelperMixin",
         "client.OptifineGameRendererMixin",
+        "client.OptionsMixin",
         "client.OverlayRecipeButtonAccessor",
         "client.OverlayRecipeComponentAccessor",
         "client.RecipeBookComponentAccessor",

@@ -24,8 +24,7 @@ public class OptionsMixin
     @Mutable
     @Shadow
     public KeyMapping keyUse;
-
-    @Final
+    
     @Shadow
     public KeyMapping[] keyMappings;
 
