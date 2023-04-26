@@ -3,9 +3,9 @@ package com.mrcrayfish.controllable.event;
 import com.mrcrayfish.controllable.client.Action;
 import com.mrcrayfish.controllable.client.ActionVisibility;
 import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.framework.api.event.FrameworkEvent;
 import com.mrcrayfish.framework.api.event.IFrameworkEvent;
 
