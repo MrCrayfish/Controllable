@@ -957,10 +957,32 @@ public class ControllerInput
         RecipeBookComponentAccessor recipeBookMixin = ((RecipeBookComponentAccessor) recipeBook);
         RecipeBookTabButton currentTab = recipeBookMixin.controllableGetCurrentTab();
         List<RecipeBookTabButton> tabs = recipeBookMixin.controllableGetRecipeTabs();
-        int nextTabIndex = tabs.indexOf(currentTab) + dir;
-        if(nextTabIndex >= 0 && nextTabIndex < tabs.size())
+        int currentTabIndex = tabs.indexOf(currentTab);
+        RecipeBookTabButton newTab = null;
+        if(dir > 0)
         {
-            RecipeBookTabButton newTab = tabs.get(nextTabIndex);
+            for(int i = currentTabIndex + 1; i < tabs.size(); i++)
+            {
+                if(tabs.get(i).visible)
+                {
+                    newTab = tabs.get(i);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for(int i = currentTabIndex - 1; i >= 0; i--)
+            {
+                if(tabs.get(i).visible)
+                {
+                    newTab = tabs.get(i);
+                    break;
+                }
+            }
+        }
+        if(newTab != null)
+        {
             currentTab.setStateTriggered(false);
             recipeBookMixin.controllableSetCurrentTab(newTab);
             newTab.setStateTriggered(true);
