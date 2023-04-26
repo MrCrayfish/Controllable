@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client.util;
 
-import com.mrcrayfish.controllable.client.Controller;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.event.Value;
 import com.mrcrayfish.controllable.platform.ClientServices;

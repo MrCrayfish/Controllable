@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.framework.api.event.ScreenEvents;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.client.Minecraft;

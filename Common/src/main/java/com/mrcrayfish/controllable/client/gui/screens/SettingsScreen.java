@@ -3,9 +3,9 @@ package com.mrcrayfish.controllable.client.gui.screens;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.ControllerManager;
 import com.mrcrayfish.controllable.client.Icons;
 import com.mrcrayfish.controllable.client.SneakMode;
 import com.mrcrayfish.controllable.client.SprintMode;
@@ -17,6 +17,7 @@ import com.mrcrayfish.controllable.client.gui.components.TabOptionTitleItem;
 import com.mrcrayfish.controllable.client.gui.components.TabOptionToggleItem;
 import com.mrcrayfish.controllable.client.gui.components.TabSelectionList;
 import com.mrcrayfish.controllable.client.gui.widget.TabListWidget;
+import com.mrcrayfish.controllable.client.input.ControllerManager;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.framework.api.config.AbstractProperty;
@@ -240,7 +241,7 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new ButtonBindingList.TwoWidgetItem(Button.builder(updateMappings, btn -> {
                 ConfirmationScreen updateConfirmation = new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.update_mapping_message", Component.literal(ControllerManager.MAPPINGS_URL).withStyle(ChatFormatting.YELLOW)), result -> {
                     if(result) {
-                        ControllerManager.downloadMappings(SettingsScreen.this);
+                        Controllable.getManager().downloadMappings(SettingsScreen.this);
                         return false;
                     }
                     return true;

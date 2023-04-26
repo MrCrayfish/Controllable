@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Constants;
+import com.mrcrayfish.controllable.Controllable;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.GameShuttingDownEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -16,7 +17,7 @@ public class ClientEvents
     @SubscribeEvent
     public static void onGameShuttingDown(GameShuttingDownEvent event)
     {
-        ControllerManager.instance().close();
+        Controllable.getManager().onClientFinishedLoading();
     }
 
     @SubscribeEvent(receiveCanceled = true)

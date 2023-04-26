@@ -1,16 +1,21 @@
 package com.mrcrayfish.controllable;
 
-import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.ControllerInput;
-import com.mrcrayfish.controllable.client.ControllerManager;
 import com.mrcrayfish.controllable.client.ControllerProperties;
 import com.mrcrayfish.controllable.client.InputProcessor;
+import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.input.ControllerManager;
+import com.mrcrayfish.controllable.client.input.glfw.GLFWControllerManager;
+import com.mrcrayfish.controllable.client.input.sdl2.SDL2ControllerManager;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 
 import javax.annotation.Nullable;
 import java.io.File;
 
 public class Controllable
 {
+    private static ControllerManager manager;
     private static File configFolder;
     private static boolean jeiLoaded;
 
@@ -19,6 +24,7 @@ public class Controllable
         configFolder = com.mrcrayfish.framework.platform.Services.CONFIG.getConfigPath().toFile();
         jeiLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("jei");
         ControllerProperties.load(configFolder);
+        getManager().init();
     }
 
     public static ControllerInput getInput()
@@ -39,6 +45,27 @@ public class Controllable
     @Nullable
     public static Controller getController()
     {
-        return ControllerManager.instance().getActiveController();
+        return getManager().getActiveController();
+    }
+
+    public static ControllerManager getManager()
+    {
+        if(manager == null)
+        {
+            if(!Minecraft.ON_OSX || isLibSDL4JEnabled())
+            {
+                manager = new SDL2ControllerManager();
+            }
+            else
+            {
+                manager = new GLFWControllerManager();
+            }
+        }
+        return manager;
+    }
+
+    private static boolean isLibSDL4JEnabled()
+    {
+        return Util.getVmArguments().anyMatch(s -> s.equals("-XstartOnFirstThread"));
     }
 }

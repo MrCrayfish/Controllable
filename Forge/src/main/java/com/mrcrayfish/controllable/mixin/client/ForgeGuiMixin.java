@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.mixin.client;
 
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBindings;
-import com.mrcrayfish.controllable.client.Controller;
+import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import org.spongepowered.asm.mixin.Mixin;

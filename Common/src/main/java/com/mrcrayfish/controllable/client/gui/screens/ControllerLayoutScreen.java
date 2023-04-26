@@ -6,11 +6,10 @@ import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonStates;
 import com.mrcrayfish.controllable.client.Buttons;
-import com.mrcrayfish.controllable.client.Controller;
-import com.mrcrayfish.controllable.client.Mappings;
 import com.mrcrayfish.controllable.client.gui.ControllerAxis;
 import com.mrcrayfish.controllable.client.gui.ControllerButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -42,7 +41,6 @@ public class ControllerLayoutScreen extends Screen
     private boolean validLayout;
     private final Screen parentScreen;
     private final LayoutButtonStates states = new LayoutButtonStates();
-    private Mappings.Entry entry;
     private Button doneButton;
     private Button resetButton;
     private Button thumbstickButton;
@@ -51,20 +49,6 @@ public class ControllerLayoutScreen extends Screen
     {
         super(Component.translatable("controllable.gui.title.layout"));
         this.parentScreen = parentScreen;
-
-        Controller controller = Controllable.getController();
-        if(controller != null)
-        {
-            Mappings.Entry entry = controller.getMapping();
-            if(entry != null)
-            {
-                this.entry = entry.copy();
-            }
-            else
-            {
-                this.entry = new Mappings.Entry(controller.getName(), controller.getName(), new HashMap<>());
-            }
-        }
     }
 
     @Override
@@ -90,18 +74,8 @@ public class ControllerLayoutScreen extends Screen
         this.controllerButtons.add(new ControllerAxis(this, Buttons.RIGHT_THUMB_STICK, 22, 12, 0, 0, 7, 7, 5));
 
         this.doneButton = this.addRenderableWidget(Button.builder(Component.translatable("controllable.gui.save"), (button) -> {
-            this.updateControllerMapping();
             Objects.requireNonNull(this.minecraft).setScreen(this.parentScreen);
         }).pos(this.width / 2 - 154, this.height - 32).size(100, 20).build());
-
-        this.resetButton = this.addRenderableWidget(Button.builder(Component.translatable("controllable.gui.reset"), (button) -> {
-            this.entry.getReassignments().clear();
-            this.entry.setSwitchThumbsticks(false);
-            this.entry.setFlipLeftX(false);
-            this.entry.setFlipLeftY(false);
-            this.entry.setFlipRightX(false);
-            this.entry.setFlipRightY(false);
-        }).pos(this.width / 2 - 50, this.height - 32).size(100, 20).build());
 
         this.addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(this.parentScreen);
@@ -119,14 +93,6 @@ public class ControllerLayoutScreen extends Screen
     @Override
     public void tick()
     {
-        boolean changed = !this.entry.getReassignments().isEmpty();
-        changed |= this.entry.isThumbsticksSwitched();
-        changed |= this.entry.isFlipLeftX();
-        changed |= this.entry.isFlipLeftY();
-        changed |= this.entry.isFlipRightX();
-        changed |= this.entry.isFlipRightY();
-        this.resetButton.active = changed;
-        this.validLayout = this.entry.getReassignments().values().stream().noneMatch(b -> b == -1);
         this.doneButton.setMessage(Component.translatable("controllable.gui.save").withStyle(this.validLayout ? ChatFormatting.WHITE : ChatFormatting.RED));
     }
 
@@ -161,27 +127,6 @@ public class ControllerLayoutScreen extends Screen
         {
             List<Component> components = new ArrayList<>();
             components.add(Component.translatable("controllable.gui.layout.button", Component.translatable(Buttons.NAMES[button.getButton()]).withStyle(ChatFormatting.BLUE)));
-            if(button.isMissingMapping())
-            {
-                components.add(Component.translatable("controllable.gui.layout.missing_mapping").withStyle(ChatFormatting.RED));
-            }
-            else
-            {
-                int remappedButton = button.getButton();
-                if(!button.isMissingMapping())
-                {
-                    Map<Integer, Integer> reassignments = this.entry.getReassignments();
-                    for(Integer key : reassignments.keySet())
-                    {
-                        if(reassignments.get(key) == remappedButton)
-                        {
-                            remappedButton = key;
-                            break;
-                        }
-                    }
-                }
-                components.add(Component.translatable("controllable.gui.layout.mapped_to", Component.literal(String.valueOf(remappedButton)).withStyle(ChatFormatting.BLUE)));
-            }
             components.add(Component.translatable("controllable.gui.layout.remap").withStyle(ChatFormatting.GRAY));
             this.renderComponentTooltip(poseStack, components, mouseX, mouseY);
         }
@@ -226,77 +171,12 @@ public class ControllerLayoutScreen extends Screen
         return super.keyPressed(key, scanCode, mods);
     }
 
-    public boolean onButtonInput(int button)
-    {
-        if(this.configureButton != -1)
-        {
-            Map<Integer, Integer> reassignments = this.entry.getReassignments();
-            if(button != this.configureButton)
-            {
-                // Sets the target
-                reassignments.putIfAbsent(this.configureButton, -1);
-
-                // Reset any assignments that targets the configuration button and set to -1
-                for(Integer key : reassignments.keySet())
-                {
-                    if(reassignments.get(key) == this.configureButton)
-                    {
-                        reassignments.put(key, -1);
-                    }
-                }
-
-                // Finally set the new mapping
-                reassignments.put(button, this.configureButton);
-            }
-            else
-            {
-                // Remove reassignment because button is back to it's default mapping
-                reassignments.remove(button);
-
-                // Reset any assignments that targets the button and set to -1
-                for(Integer key : reassignments.keySet())
-                {
-                    if(reassignments.get(key) == button)
-                    {
-                        reassignments.put(key, -1);
-                    }
-                }
-            }
-            this.configureButton = -1;
-            return true;
-        }
-        return false;
-    }
-
-    private void updateControllerMapping()
-    {
-        Controller controller = Controllable.getController();
-        if(controller != null)
-        {
-            controller.setMapping(this.entry);
-            this.entry.save();
-        }
-    }
-
     public void processButton(int index, ButtonStates newStates)
     {
         boolean state = newStates.getState(index);
 
-        if(state && this.onButtonInput(index))
-        {
-            return;
-        }
-
         Controller controller = Controllable.getController();
         if(controller == null)
-        {
-            return;
-        }
-
-        index = this.remap(index);
-
-        //No binding so don't perform any action
-        if(index == -1)
         {
             return;
         }
@@ -316,24 +196,9 @@ public class ControllerLayoutScreen extends Screen
         }
     }
 
-    public int remap(int button)
-    {
-        return this.entry.remap(button);
-    }
-
     public boolean isButtonPressed(int button)
     {
         return this.states.getState(button);
-    }
-
-    public Map<Integer, Integer> getReassignments()
-    {
-        return this.entry.getReassignments();
-    }
-
-    public Mappings.Entry getEntry()
-    {
-        return this.entry;
     }
 
     private void drawMultiLineCenteredString(PoseStack matrixStack, Font font, Component component, int x, int y, int width, int color)

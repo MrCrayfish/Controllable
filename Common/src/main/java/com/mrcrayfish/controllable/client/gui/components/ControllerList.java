@@ -3,10 +3,9 @@ package com.mrcrayfish.controllable.client.gui.components;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.Controller;
-import com.mrcrayfish.controllable.client.ControllerManager;
+import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.input.ControllerManager;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
-import io.github.libsdl4j.api.joystick.SDL_JoystickID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -35,7 +34,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
     public ControllerList(Minecraft mc, int itemHeight)
     {
         super(mc, itemHeight);
-        this.manager = ControllerManager.instance();
+        this.manager = Controllable.getManager();
         this.setHeaderText(Component.translatable("controllable.gui.title.select_controller").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW));
         this.footerSubText = Component.translatable("controllable.gui.controller_missing_2").withStyle(ChatFormatting.UNDERLINE, ChatFormatting.GOLD);
         this.footerSubText.setStyle(this.footerSubText.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://mrcrayfish.gitbook.io/controllable-documentation/")));
@@ -46,7 +45,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
     private void reloadControllers()
     {
         this.clearEntries();
-        Map<SDL_JoystickID, Pair<Integer, String>> controllers = this.manager.getControllers();
+        Map<Number, Pair<Integer, String>> controllers = this.manager.getControllers();
         controllers.forEach((jid, pair) -> this.addEntry(new ControllerEntry(jid, pair.getLeft(), pair.getRight())));
         this.updateSelected();
     }
@@ -79,9 +78,9 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
 
     public void tick()
     {
-        if(this.controllerCount != ControllerManager.instance().getControllerCount())
+        if(this.controllerCount != this.manager.getControllerCount())
         {
-            this.controllerCount = ControllerManager.instance().getControllerCount();
+            this.controllerCount = this.manager.getControllerCount();
             this.reloadControllers();
         }
         this.updateSelected();
@@ -105,17 +104,17 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
 
     public class ControllerEntry extends TabSelectionList.Item<ControllerEntry>
     {
-        private final SDL_JoystickID jid;
+        private final Number jid;
         private final int deviceIndex;
 
-        public ControllerEntry(SDL_JoystickID jid, int deviceIndex, String name)
+        public ControllerEntry(Number jid, int deviceIndex, String name)
         {
             super(Component.literal(name));
             this.jid = jid;
             this.deviceIndex = deviceIndex;
         }
 
-        public SDL_JoystickID getJid()
+        public Number getJid()
         {
             return this.jid;
         }
@@ -151,12 +150,12 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
                 if(ControllerList.this.getSelected() != this)
                 {
                     ControllerList.this.setSelected(this);
-                    ControllerManager.instance().setActiveController(new Controller(this.deviceIndex));
+                    manager.setActiveController(manager.createController(this.deviceIndex, this.jid));
                 }
                 else
                 {
                     ControllerList.this.setSelected(null);
-                    ControllerManager.instance().setActiveController(null);
+                    manager.setActiveController(null);
                 }
             }
             return false;
