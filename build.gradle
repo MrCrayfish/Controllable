@@ -8,6 +8,7 @@ plugins {
     id 'eclipse'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'de.undercouch.download' version '5.4.0'
 }
 
 apply plugin: 'org.spongepowered.mixin'
@@ -108,6 +109,15 @@ dependencies {
         jarJar.ranged(it, "[2.26.4-1.2,)")
         transitive(false)
     }
+}
+
+task downloadMappings(type: Download) {
+    src 'https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt'
+    dest 'src/main/resources/gamecontrollerdb.txt'
+}
+
+processResources {
+    dependsOn downloadMappings
 }
 
 jar {
