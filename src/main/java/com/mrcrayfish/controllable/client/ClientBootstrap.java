@@ -10,7 +10,6 @@ public class ClientBootstrap
 {
     public static void init()
     {
-        ControllerManager.instance().init();
         InputProcessor.instance();
         RadialMenuHandler.instance();
         Controllable.init();

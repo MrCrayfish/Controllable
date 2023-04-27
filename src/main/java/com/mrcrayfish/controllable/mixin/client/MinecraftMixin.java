@@ -4,9 +4,8 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBindings;
-import com.mrcrayfish.controllable.client.Controller;
-import com.mrcrayfish.controllable.client.ControllerManager;
 import com.mrcrayfish.controllable.client.InputProcessor;
+import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
@@ -112,6 +111,6 @@ public class MinecraftMixin
     private void controllableOnFinishedLoading(CallbackInfo ci)
     {
         BindingRegistry.getInstance().load();
-        ControllerManager.instance().onClientFinishedLoading();
+        Controllable.getManager().onClientFinishedLoading();
     }
 }

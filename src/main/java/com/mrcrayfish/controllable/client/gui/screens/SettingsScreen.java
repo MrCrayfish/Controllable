@@ -3,9 +3,9 @@ package com.mrcrayfish.controllable.client.gui.screens;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.BindingRegistry;
 import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.ControllerManager;
 import com.mrcrayfish.controllable.client.Icons;
 import com.mrcrayfish.controllable.client.SneakMode;
 import com.mrcrayfish.controllable.client.SprintMode;
@@ -237,7 +237,7 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new ButtonBindingList.TwoWidgetItem(Button.builder(updateMappings, btn -> {
                 ConfirmationScreen updateConfirmation = new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.updateMappingMessage", Component.literal(ClientHelper.MAPPINGS_URL).withStyle(ChatFormatting.YELLOW)), result -> {
                     if(result) {
-                        ControllerManager.downloadMappings(SettingsScreen.this);
+                        Controllable.getManager().downloadMappings(SettingsScreen.this);
                         return false;
                     }
                     return true;
@@ -300,7 +300,10 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new TabOptionEnumItem<>("controllable.options.cursorType", Config.CLIENT.options.cursorType));
             optionsList.addEntry(new TabOptionSliderItem("controllable.options.listScrollSpeed", Config.CLIENT.options.listScrollSpeed, 1.0, 1.0, 30.0));
             optionsList.addEntry(new TabOptionSliderItem("controllable.options.hoverModifier", Config.CLIENT.options.hoverModifier, 0.05, 0.0, 1.0));
-            optionsList.addEntry(new TabOptionToggleItem("controllable.options.forceFeedback", Config.CLIENT.options.rumble));
+            if(!Minecraft.ON_OSX)
+            {
+                optionsList.addEntry(new TabOptionToggleItem("controllable.options.forceFeedback", Config.CLIENT.options.rumble));
+            }
 
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.other").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionToggleItem("controllable.options.uiSounds", Config.CLIENT.options.uiSounds));

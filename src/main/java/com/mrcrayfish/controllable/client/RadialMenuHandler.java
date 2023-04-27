@@ -18,6 +18,7 @@ import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.screens.RadialMenuConfigureScreen;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.event.GatherRadialMenuItemsEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;

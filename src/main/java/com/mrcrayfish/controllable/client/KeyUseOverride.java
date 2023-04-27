@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.client.KeyMapping;
 
 /**

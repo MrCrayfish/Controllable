@@ -3,8 +3,8 @@ package com.mrcrayfish.controllable.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.client.gui.GuiComponent;
 
 /**
@@ -56,14 +56,6 @@ public class ControllerButton extends GuiComponent
         }
         blit(poseStack, buttonX, buttonY, this.width * this.scale, this.height * this.scale, buttonU, buttonV, this.width, this.height, 256, 256);
         RenderSystem.disableBlend();
-
-        // Draws an exclamation if the button has no button assigned to it!
-        if(this.isMissingMapping())
-        {
-            RenderSystem.setShaderTexture(0, ControllerLayoutScreen.TEXTURE);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            blit(poseStack, buttonX + (buttonWidth - 4) / 2, buttonY + (buttonHeight - 15) / 2, 4, 15, 88, 0, 4, 15, 256, 256);
-        }
     }
 
     public int getButton()
@@ -74,10 +66,5 @@ public class ControllerButton extends GuiComponent
     public boolean isHovered()
     {
         return this.hovered;
-    }
-
-    public boolean isMissingMapping()
-    {
-        return !this.screen.getReassignments().containsValue(this.button) && this.screen.remap(this.button) != this.button;
     }
 }

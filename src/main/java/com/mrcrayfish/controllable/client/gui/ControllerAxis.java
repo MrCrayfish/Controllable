@@ -2,8 +2,8 @@ package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.Controller;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.input.Controller;
 
 /**
  * Author: MrCrayfish

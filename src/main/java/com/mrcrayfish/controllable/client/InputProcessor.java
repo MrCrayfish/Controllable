@@ -1,8 +1,11 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
+import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.input.ControllerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.common.MinecraftForge;
@@ -10,8 +13,6 @@ import net.minecraftforge.event.TickEvent;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
-
-import static io.github.libsdl4j.api.gamecontroller.SDL_GameControllerButton.*;
 
 /**
  * Author: MrCrayfish
@@ -36,7 +37,7 @@ public class InputProcessor
     private InputProcessor()
     {
         this.input = new ControllerInput();
-        this.manager = ControllerManager.instance();
+        this.manager = Controllable.getManager();
         MinecraftForge.EVENT_BUS.addListener(this::onRenderTick);
         MinecraftForge.EVENT_BUS.addListener(this::onClientTick);
     }
@@ -71,40 +72,7 @@ public class InputProcessor
         if(currentController == null)
             return;
 
-        if(!currentController.updateGamepadState())
-            return;
-
-        // Capture all inputs and queue
-        ButtonStates states = new ButtonStates();
-        states.setState(Buttons.A, this.getButtonState(SDL_CONTROLLER_BUTTON_A));
-        states.setState(Buttons.B, this.getButtonState(SDL_CONTROLLER_BUTTON_B));
-        states.setState(Buttons.X, this.getButtonState(SDL_CONTROLLER_BUTTON_X));
-        states.setState(Buttons.Y, this.getButtonState(SDL_CONTROLLER_BUTTON_Y));
-        states.setState(Buttons.SELECT, this.getButtonState(SDL_CONTROLLER_BUTTON_BACK));
-        states.setState(Buttons.HOME, this.getButtonState(SDL_CONTROLLER_BUTTON_GUIDE));
-        states.setState(Buttons.START, this.getButtonState(SDL_CONTROLLER_BUTTON_START));
-        states.setState(Buttons.LEFT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSTICK));
-        states.setState(Buttons.RIGHT_THUMB_STICK, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
-        states.setState(Buttons.LEFT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
-        states.setState(Buttons.RIGHT_BUMPER, this.getButtonState(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
-        states.setState(Buttons.LEFT_TRIGGER, currentController.getLTriggerValue() >= 0.5F);
-        states.setState(Buttons.RIGHT_TRIGGER, currentController.getRTriggerValue() >= 0.5F);
-        states.setState(Buttons.DPAD_UP, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_UP));
-        states.setState(Buttons.DPAD_DOWN, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
-        states.setState(Buttons.DPAD_LEFT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
-        states.setState(Buttons.DPAD_RIGHT, this.getButtonState(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
-        states.setState(Buttons.MISC, this.getButtonState(SDL_CONTROLLER_BUTTON_MISC1));
-        states.setState(Buttons.PADDLE_ONE, this.getButtonState(SDL_CONTROLLER_BUTTON_PADDLE1));
-        states.setState(Buttons.PADDLE_TWO, this.getButtonState(SDL_CONTROLLER_BUTTON_PADDLE2));
-        states.setState(Buttons.PADDLE_THREE, this.getButtonState(SDL_CONTROLLER_BUTTON_PADDLE3));
-        states.setState(Buttons.PADDLE_FOUR, this.getButtonState(SDL_CONTROLLER_BUTTON_PADDLE4));
-        states.setState(Buttons.TOUCHPAD, this.getButtonState(SDL_CONTROLLER_BUTTON_TOUCHPAD));
-        this.inputQueue.offer(states);
-    }
-
-    private boolean getButtonState(int buttonCode)
-    {
-        return this.manager.getActiveController() != null && this.manager.getActiveController().getGamepadState()[buttonCode] == 1;
+        this.inputQueue.offer(currentController.createButtonsStates());
     }
 
     private void processButtonStates()
@@ -134,11 +102,6 @@ public class InputProcessor
         Controller controller = this.manager.getActiveController();
         if(controller == null)
             return;
-
-        if(controller.getMapping() != null)
-        {
-            index = controller.getMapping().remap(index);
-        }
 
         //No binding so don't perform any action
         if(index == -1)

@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.event;
 
-import com.mrcrayfish.controllable.client.Controller;
+import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 
