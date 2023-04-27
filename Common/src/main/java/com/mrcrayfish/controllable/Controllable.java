@@ -52,7 +52,7 @@ public class Controllable
     {
         if(manager == null)
         {
-            if(!Minecraft.ON_OSX || isLibSDL4JEnabled())
+            if(!Minecraft.ON_OSX)
             {
                 manager = new SDL2ControllerManager();
             }
@@ -62,10 +62,5 @@ public class Controllable
             }
         }
         return manager;
-    }
-
-    private static boolean isLibSDL4JEnabled()
-    {
-        return Util.getVmArguments().anyMatch(s -> s.equals("-XstartOnFirstThread"));
     }
 }
