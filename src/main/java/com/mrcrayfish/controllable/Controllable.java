@@ -51,6 +51,7 @@ public class Controllable
         configFolder = FMLPaths.CONFIGDIR.get().toFile();
         jeiLoaded = ModList.get().isLoaded("jei");
         ControllerProperties.load(configFolder);
+        getManager().init();
     }
 
     public static ControllerInput getInput()
