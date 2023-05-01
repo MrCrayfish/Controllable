@@ -171,4 +171,11 @@ public class ControllerOptions
         double mouseSpeed = Config.CLIENT.options.hoverModifier.get();
         return new TranslationTextComponent("controllable.options.hoverModifier.format", FORMAT.format(mouseSpeed));
     });
+
+    public static final BooleanOption FPS_POLLING_FIX = new ControllableBooleanOption("controllable.options.fpsPollingFix", gameSettings -> {
+        return Config.CLIENT.options.fpsPollingFix.get();
+    }, (gameSettings, value) -> {
+        Config.CLIENT.options.fpsPollingFix.set(value);
+        Config.save();
+    });
 }
