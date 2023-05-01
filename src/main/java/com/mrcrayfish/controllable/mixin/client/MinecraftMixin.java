@@ -89,7 +89,7 @@ public class MinecraftMixin
     private int controllableModifyFramerate(int originalFps)
     {
         Minecraft mc = (Minecraft) (Object) this;
-        if(mc.getOverlay() == null)
+        if(mc.loadingGui == null)
         {
             if(Config.CLIENT.options.fpsPollingFix.get())
             {
@@ -103,7 +103,7 @@ public class MinecraftMixin
     private void controllableWaitEvents(boolean outOfMemory, CallbackInfo ci)
     {
         Minecraft mc = (Minecraft) (Object) this;
-        if(mc.getOverlay() == null)
+        if(mc.loadingGui == null)
         {
             if(Config.CLIENT.options.fpsPollingFix.get())
             {
