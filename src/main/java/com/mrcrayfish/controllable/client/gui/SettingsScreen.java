@@ -40,8 +40,7 @@ public class SettingsScreen extends ListMenuScreen
             ControllerOptions.RADIAL_THUMBSTICK,
             ControllerOptions.SNEAK_MODE,
             ControllerOptions.CURSOR_THUMBSTICK,
-            ControllerOptions.HOVER_MODIFIER,
-            ControllerOptions.FPS_POLLING_FIX
+            ControllerOptions.HOVER_MODIFIER
     };
     private IToolTip hoveredTooltip;
     private int hoveredCounter;
