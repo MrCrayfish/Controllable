@@ -1,10 +1,9 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.RadialItemList;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -34,14 +33,14 @@ public class RadialMenuConfigureScreen extends Screen
     {
         this.list = new RadialItemList(this.minecraft, this.width, this.height, 45, this.height - 44, this.bindings);
         this.addWidget(this.list);
-        this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 155, this.height - 29, 100, 20, CommonComponents.GUI_DONE, buttons -> {
+        this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 100, 20, CommonComponents.GUI_DONE, buttons -> {
             RadialMenuHandler.instance().setBindings(new LinkedHashSet<>(this.bindings));
             Objects.requireNonNull(this.minecraft).setScreen(null);
         }));
-        this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 50, this.height - 29, 100, 20, Component.translatable("controllable.gui.add_binding"), buttons -> {
+        this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 50, this.height - 29, 100, 20, Component.translatable("controllable.gui.add_binding"), buttons -> {
             Objects.requireNonNull(this.minecraft).setScreen(new SelectButtonBindingScreen(this));
         }));
-        this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 55, this.height - 29, 100, 20, CommonComponents.GUI_CANCEL, buttons -> {
+        this.addRenderableWidget(ScreenHelper.button(this.width / 2 + 55, this.height - 29, 100, 20, CommonComponents.GUI_CANCEL, buttons -> {
             Objects.requireNonNull(this.minecraft).setScreen(null);
         }));
     }

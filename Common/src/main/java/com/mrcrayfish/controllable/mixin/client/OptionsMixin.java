@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.mixin.client;
 
-import com.mrcrayfish.controllable.client.KeyUseOverride;
+import com.mrcrayfish.controllable.client.binding.KeyUseOverride;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;

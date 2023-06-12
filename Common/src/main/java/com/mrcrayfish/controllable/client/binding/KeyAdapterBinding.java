@@ -1,5 +1,6 @@
-package com.mrcrayfish.controllable.client;
+package com.mrcrayfish.controllable.client.binding;
 
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;

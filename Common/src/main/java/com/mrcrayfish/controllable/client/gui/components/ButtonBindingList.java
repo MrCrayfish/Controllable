@@ -2,12 +2,11 @@ package com.mrcrayfish.controllable.client.gui.components;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.BindingRegistry;
-import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.Buttons;
-import com.mrcrayfish.controllable.client.ISearchable;
+import com.mrcrayfish.controllable.client.binding.BindingRegistry;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.input.Buttons;
+import com.mrcrayfish.controllable.client.gui.ISearchable;
 import com.mrcrayfish.controllable.client.Icons;
 import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;

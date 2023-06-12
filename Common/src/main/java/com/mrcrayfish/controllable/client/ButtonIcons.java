@@ -1,11 +1,14 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.Constants;
+import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.settings.SettingEnum;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Author: MrCrayfish
  */
-public enum ControllerIcons implements SettingEnum
+public enum ButtonIcons implements SettingEnum
 {
     DEFAULT("controllable.controller.default"),
     PLAYSTATION_5("controllable.controller.playstation_5"),
@@ -18,9 +21,13 @@ public enum ControllerIcons implements SettingEnum
     GAMECUBE("controllable.controller.gamecube"),
     STEAM("controllable.controller.steam");
 
+    public static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/buttons.png");
+    public static final int TEXTURE_WIDTH = Buttons.LENGTH * 13;
+    public static final int TEXTURE_HEIGHT = values().length * 13;
+
     private final String key;
 
-    ControllerIcons(String key)
+    ButtonIcons(String key)
     {
         this.key = key;
     }

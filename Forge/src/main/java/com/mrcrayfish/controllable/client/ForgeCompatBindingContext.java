@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.client.binding.IBindingContext;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 
 /**

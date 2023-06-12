@@ -1,22 +1,10 @@
 package com.mrcrayfish.controllable.platform;
 
-import com.mrcrayfish.controllable.client.Action;
-import com.mrcrayfish.controllable.client.ActionVisibility;
-import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.ForgeCompatBindingContext;
-import com.mrcrayfish.controllable.client.IBindingContext;
-import com.mrcrayfish.controllable.client.RadialMenuHandler;
+import com.mrcrayfish.controllable.client.binding.IBindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
-import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
-import com.mrcrayfish.controllable.event.ControllerEvent;
-import com.mrcrayfish.controllable.event.GatherActionsEvent;
-import com.mrcrayfish.controllable.event.GatherNavigationPointsEvent;
-import com.mrcrayfish.controllable.event.GatherRadialMenuItemsEvent;
-import com.mrcrayfish.controllable.event.RenderAvailableActionsEvent;
-import com.mrcrayfish.controllable.event.RenderPlayerPreviewEvent;
-import com.mrcrayfish.controllable.event.Value;
 import com.mrcrayfish.controllable.integration.JeiSupport;
 import com.mrcrayfish.controllable.platform.services.IClientHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -45,7 +33,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.gui.CreativeTabsScreenPage;
 import net.minecraftforge.client.settings.IKeyConflictContext;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.lwjgl.glfw.GLFW;
@@ -60,81 +47,6 @@ import java.util.Map;
 public class ForgeClientHelper implements IClientHelper
 {
     public final Map<IKeyConflictContext, IBindingContext> keyContextMap = new Object2ObjectOpenHashMap<>();
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public List<RadialMenuHandler.AbstractRadialItem> sendLegacyGatherRadialMenuItemsEvent()
-    {
-        GatherRadialMenuItemsEvent event = new GatherRadialMenuItemsEvent();
-        MinecraftForge.EVENT_BUS.post(event);
-        return event.getItems();
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void sendLegacyGatherActionsEvent(Map<ButtonBinding, Action> actionMap, ActionVisibility visibility)
-    {
-        MinecraftForge.EVENT_BUS.post(new GatherActionsEvent(actionMap, visibility));
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public boolean sendLegacyRenderAvailableActionsEvent()
-    {
-        return MinecraftForge.EVENT_BUS.post(new RenderAvailableActionsEvent());
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public boolean sendLegacyRenderPlayerPreviewEvent()
-    {
-        return MinecraftForge.EVENT_BUS.post(new RenderPlayerPreviewEvent());
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public boolean sendLegacyControllerEventTurn(Controller controller, Value<Float> yawSpeed, Value<Float> pitchSpeed)
-    {
-        var event = new ControllerEvent.Turn(controller, yawSpeed.get(), pitchSpeed.get());
-        if(MinecraftForge.EVENT_BUS.post(event))
-            return true;
-        yawSpeed.set(event.getYawSpeed());
-        pitchSpeed.set(event.getPitchSpeed());
-        return false;
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public boolean sendLegacyControllerEventButtonInput(Controller controller, Value<Integer> newButton, int button, boolean state)
-    {
-        var event = new ControllerEvent.ButtonInput(controller, button, state);
-        if(MinecraftForge.EVENT_BUS.post(event))
-            return true;
-        newButton.set(event.getModifiedButton());
-        return false;
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public boolean sendLegacyControllerEventButton(Controller controller)
-    {
-        return MinecraftForge.EVENT_BUS.post(new ControllerEvent.Button(controller));
-    }
-
-    @Override
-    public boolean sendLegacyControllerEventMove(Controller controller)
-    {
-        return MinecraftForge.EVENT_BUS.post(new ControllerEvent.Move(controller));
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public List<NavigationPoint> sendLegacyGatherNavigationPoints()
-    {
-        GatherNavigationPointsEvent event = new GatherNavigationPointsEvent();
-        MinecraftForge.EVENT_BUS.post(event);
-        return event.getPoints();
-    }
 
     @Override
     @SuppressWarnings("UnstableApiUsage")

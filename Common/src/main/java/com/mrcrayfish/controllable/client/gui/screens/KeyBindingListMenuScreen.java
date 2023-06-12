@@ -1,10 +1,9 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.controllable.client.BindingRegistry;
-import com.mrcrayfish.controllable.client.ISearchable;
-import com.mrcrayfish.controllable.client.KeyAdapterBinding;
+import com.mrcrayfish.controllable.client.binding.BindingRegistry;
+import com.mrcrayfish.controllable.client.gui.ISearchable;
+import com.mrcrayfish.controllable.client.binding.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import net.minecraft.ChatFormatting;

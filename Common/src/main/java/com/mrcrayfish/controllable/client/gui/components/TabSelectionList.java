@@ -3,7 +3,7 @@ package com.mrcrayfish.controllable.client.gui.components;
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -128,7 +128,7 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         {
             Font font = TabSelectionList.this.minecraft.font;
             int footerWidth = font.width(this.footerText);
-            ScreenUtil.drawRoundedBox(graphics, this.x0 + (this.width - footerWidth) / 2, this.y1 + 4, footerWidth, 14, 0x55000000);
+            ScreenHelper.drawRoundedBox(graphics, this.x0 + (this.width - footerWidth) / 2, this.y1 + 4, footerWidth, 14, 0x55000000);
             graphics.drawCenteredString(font, this.footerText, this.x0 + this.width / 2, this.y1 + 7, 0xFFFFFF);
         }
         graphics.fillGradient(this.x0, this.y0, this.x1, this.y0 + 4, 0xFF000000, 0);
@@ -212,7 +212,7 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         {
             Font font = Objects.requireNonNull(TabSelectionList.this.minecraft).font;
             int labelWidth = font.width(this.label) + 2;
-            ScreenUtil.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
+            ScreenHelper.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
             graphics.drawCenteredString(font, this.label, left + width / 2, top + 5, 0xFFFFFF);
         }
 

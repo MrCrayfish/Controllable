@@ -3,11 +3,12 @@ package com.mrcrayfish.controllable.client.util;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
-import com.mrcrayfish.controllable.client.Buttons;
+import com.mrcrayfish.controllable.client.input.Buttons;
+import com.mrcrayfish.controllable.client.ButtonIcons;
 import com.mrcrayfish.controllable.client.Icons;
-import com.mrcrayfish.controllable.client.RenderEvents;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.GuiGraphics;
@@ -61,7 +62,7 @@ public class ClientHelper
         int texV = Config.CLIENT.client.options.controllerIcons.get().ordinal() * 13;
         int size = 13;
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        graphics.blit(RenderEvents.CONTROLLER_BUTTONS, x, y, texU, texV, size, size, RenderEvents.CONTROLLER_BUTTONS_WIDTH, RenderEvents.CONTROLLER_BUTTONS_HEIGHT);
+        graphics.blit(ButtonIcons.TEXTURE, x, y, texU, texV, size, size, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
     }
 
     public static boolean isPlayingGame()
@@ -92,5 +93,18 @@ public class ClientHelper
     public static float applyDeadzone(float input, float deadZone)
     {
         return Mth.sign(input) * Math.max(Mth.abs(input) - deadZone, 0) / (1 - deadZone);
+    }
+
+    public static boolean isChatVisible()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        List<GuiMessage.Line> messages = ClientServices.CLIENT.getChatTrimmedMessages(mc.gui.getChat());
+        return mc.screen == null && messages.stream().anyMatch(chatLine -> mc.gui.getGuiTicks() - chatLine.addedTime() < 200);
+    }
+
+    public static boolean isSubtitleShowing()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.options.showSubtitles().get() && mc.screen == null;
     }
 }

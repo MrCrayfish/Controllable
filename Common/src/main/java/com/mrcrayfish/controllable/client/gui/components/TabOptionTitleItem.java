@@ -1,14 +1,12 @@
 package com.mrcrayfish.controllable.client.gui.components;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 import java.util.Collections;
@@ -29,7 +27,7 @@ public class TabOptionTitleItem extends TabOptionBaseItem implements SkipItem
     {
         Font font = Minecraft.getInstance().font;
         int labelWidth = font.width(this.label) + 2;
-        ScreenUtil.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
+        ScreenHelper.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
         graphics.drawCenteredString(font, this.label, left + width / 2, top + 5, 0xFFFFFF);
     }
 

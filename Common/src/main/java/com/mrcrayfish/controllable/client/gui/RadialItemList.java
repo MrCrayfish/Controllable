@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.google.common.collect.ImmutableList;
-import com.mrcrayfish.controllable.client.ButtonBinding;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ColorButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;

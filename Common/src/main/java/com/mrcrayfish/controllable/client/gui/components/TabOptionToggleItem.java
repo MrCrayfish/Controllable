@@ -1,12 +1,11 @@
 package com.mrcrayfish.controllable.client.gui.components;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.Buttons;
+import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.config.BoolProperty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -77,7 +76,7 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
         this.toggle.setY(top);
         this.toggle.render(graphics, mouseX, mouseY, partialTick);
 
-        if(Controllable.getInput().isControllerInUse() && ScreenUtil.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
+        if(Controllable.getInput().isControllerInUse() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
         {
             ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, Buttons.A);
         }

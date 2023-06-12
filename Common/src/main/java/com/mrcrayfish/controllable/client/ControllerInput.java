@@ -6,6 +6,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.ListEntryNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.ListWidgetNavigationPoint;
@@ -19,7 +21,7 @@ import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.EventHelper;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.event.Value;
 import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
@@ -416,7 +418,7 @@ public class ControllerInput
             float yValue = Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
             if(Math.abs(yValue) >= 0.2F)
             {
-                GuiEventListener hoveredListener = ScreenUtil.findHoveredListener(mc.screen, cursorX, cursorY, listener -> listener instanceof AbstractSelectionList<?>).orElse(null);
+                GuiEventListener hoveredListener = ScreenHelper.findHoveredListener(mc.screen, cursorX, cursorY, listener -> listener instanceof AbstractSelectionList<?>).orElse(null);
                 if(hoveredListener instanceof AbstractSelectionList<?> selectionList)
                 {
                     this.handleListScrolling(selectionList, controller);
@@ -471,7 +473,7 @@ public class ControllerInput
 
                 Value<Float> yawSpeed = new Value<>(rotationSpeed * yawSensitivity * spyglassSensitivity);
                 Value<Float> pitchSpeed = new Value<>(rotationSpeed * pitchSensitivity * spyglassSensitivity);
-                if(!EventHelper.postUpdateCameraEvent(controller, yawSpeed, pitchSpeed))
+                if(!EventHelper.postUpdateCameraEvent(yawSpeed, pitchSpeed))
                 {
                     if(canMoveHorizontally)
                     {
@@ -562,7 +564,7 @@ public class ControllerInput
 
         if(mc.screen == null)
         {
-            if((!RadialMenuHandler.instance().isVisible() || Config.CLIENT.client.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent(controller))
+            if((!RadialMenuHandler.instance().isVisible() || Config.CLIENT.client.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent())
             {
                 float sneakBonus = player.isMovingSlowly() ? Mth.clamp(0.3F + EnchantmentHelper.getSneakingSpeedBonus(player), 0.0F, 1.0F) : 1.0F;
                 float inputX = controller.getLThumbStickXValue();
@@ -1041,7 +1043,6 @@ public class ControllerInput
 
         // Gather any extra navigation points from event
         ControllerEvents.GATHER_NAVIGATION_POINTS.post().handle(points);
-        points.addAll(ClientServices.CLIENT.sendLegacyGatherNavigationPoints());
 
         // Get only the points that are in the target direction
         points.removeIf(p -> !navigate.getPredicate().test(p, cursorX, cursorY));

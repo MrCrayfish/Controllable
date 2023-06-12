@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client;
+package com.mrcrayfish.controllable.client.binding;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.input.Buttons;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.lang3.StringUtils;

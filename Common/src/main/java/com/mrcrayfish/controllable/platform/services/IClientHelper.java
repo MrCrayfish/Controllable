@@ -1,13 +1,7 @@
 package com.mrcrayfish.controllable.platform.services;
 
-import com.mrcrayfish.controllable.client.Action;
-import com.mrcrayfish.controllable.client.ActionVisibility;
-import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.IBindingContext;
-import com.mrcrayfish.controllable.client.RadialMenuHandler;
+import com.mrcrayfish.controllable.client.binding.IBindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
-import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.event.Value;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -29,57 +23,13 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Author: MrCrayfish
  */
 public interface IClientHelper
 {
-    default List<RadialMenuHandler.AbstractRadialItem> sendLegacyGatherRadialMenuItemsEvent()
-    {
-        return Collections.emptyList();
-    }
-
-    default void sendLegacyGatherActionsEvent(Map<ButtonBinding, Action> actionMap, ActionVisibility visibility) {}
-
-    default boolean sendLegacyRenderAvailableActionsEvent()
-    {
-        return false;
-    }
-
-    default boolean sendLegacyRenderPlayerPreviewEvent()
-    {
-        return false;
-    }
-
-    default boolean sendLegacyControllerEventTurn(Controller controller, Value<Float> yawSpeed, Value<Float> pitchSpeed)
-    {
-        return false;
-    }
-
-    default boolean sendLegacyControllerEventButtonInput(Controller controller, Value<Integer> newButton, int button, boolean state)
-    {
-        return false;
-    }
-
-    default boolean sendLegacyControllerEventButton(Controller controller)
-    {
-        return false;
-    }
-
-    default boolean sendLegacyControllerEventMove(Controller controller)
-    {
-        return false;
-    }
-
-    default List<NavigationPoint> sendLegacyGatherNavigationPoints()
-    {
-        return Collections.emptyList();
-    }
-
     default float getGuiFarPlane()
     {
         return 2000F;

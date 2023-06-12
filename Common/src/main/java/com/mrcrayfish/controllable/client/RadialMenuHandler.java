@@ -16,6 +16,9 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.binding.BindingRegistry;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.screens.RadialMenuConfigureScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
@@ -24,7 +27,6 @@ import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -225,7 +227,6 @@ public class RadialMenuHandler
 
         List<AbstractRadialItem> items = new ArrayList<>();
         this.bindings.forEach(binding -> items.add(new ButtonBindingItem(binding)));
-        items.addAll(ClientServices.CLIENT.sendLegacyGatherRadialMenuItemsEvent());
         //while(this.items.size() < MIN_ITEMS - 1) this.items.add(new EmptyRadialItem());
         //this.items.add(new RadialSettingsItem());
 

@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerInput;
-import com.mrcrayfish.controllable.client.RenderEvents;
+import com.mrcrayfish.controllable.client.OverlayHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
@@ -55,8 +55,8 @@ public class FabricGameRendererMixin
 
     @SuppressWarnings("InvalidInjectorMethodSignature")
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void controllableLastRender(float p_109094_, long p_109095_, boolean running, CallbackInfo ci, int i, int j, Window window, Matrix4f matrix4f, PoseStack posestack, GuiGraphics graphics)
+    private void controllableLastRender(float partialTick, long p_109095_, boolean running, CallbackInfo ci, int mouseX, int mouseY, Window window, Matrix4f matrix4f, PoseStack posestack, GuiGraphics graphics)
     {
-        RenderEvents.onLastRenderGui(graphics);
+        OverlayHandler.draw(graphics, mouseX, mouseY, partialTick);
     }
 }

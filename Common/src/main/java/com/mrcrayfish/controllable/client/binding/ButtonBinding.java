@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client;
+package com.mrcrayfish.controllable.client.binding;
 
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.resources.language.I18n;
@@ -190,7 +190,7 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     /**
      * Sets the binding as active and will use the radial menu button to determine it's state
      */
-    void setActiveAndPressed()
+    public void setActiveAndPressed()
     {
         this.active = true;
         this.setPressed(true);

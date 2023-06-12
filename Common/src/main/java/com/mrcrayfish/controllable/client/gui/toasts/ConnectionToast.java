@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client;
+package com.mrcrayfish.controllable.client.gui.toasts;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
@@ -11,12 +11,12 @@ import net.minecraft.network.chat.Component;
 /**
  * Author: MrCrayfish
  */
-public class ControllerToast implements Toast
+public class ConnectionToast implements Toast
 {
     private final boolean connected;
     private final Component controllerName;
 
-    public ControllerToast(boolean connected, String controllerName)
+    public ConnectionToast(boolean connected, String controllerName)
     {
         this.connected = connected;
         this.controllerName = Component.literal(controllerName);

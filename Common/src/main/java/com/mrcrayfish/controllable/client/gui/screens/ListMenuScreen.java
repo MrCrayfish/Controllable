@@ -1,10 +1,9 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.controllable.client.ISearchable;
+import com.mrcrayfish.controllable.client.gui.ISearchable;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -135,7 +134,7 @@ public abstract class ListMenuScreen extends Screen
 
     protected void updateTooltip(int mouseX, int mouseY)
     {
-        if(ScreenUtil.isMouseWithin(10, 13, 23, 23, mouseX, mouseY))
+        if(ScreenHelper.isMouseWithin(10, 13, 23, 23, mouseX, mouseY))
         {
             this.setActiveTooltip(Objects.requireNonNull(this.minecraft).font.split(Component.translatable("configured.gui.info"), 200));
         }
@@ -170,7 +169,7 @@ public abstract class ListMenuScreen extends Screen
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        if(ScreenUtil.isMouseWithin(10, 13, 23, 23, (int) mouseX, (int) mouseY))
+        if(ScreenHelper.isMouseWithin(10, 13, 23, 23, (int) mouseX, (int) mouseY))
         {
             Style style = Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.curseforge.com/minecraft/mc-mods/configured"));
             this.handleComponentClicked(style);

@@ -1,13 +1,12 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.ISearchable;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.gui.ISearchable;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -38,7 +37,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
     protected void init()
     {
         super.init();
-        this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 155, this.height - 29, 150, 20, Component.translatable("controllable.gui.restore_defaults"), (button) -> {
+        this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 150, 20, Component.translatable("controllable.gui.restore_defaults"), (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     ((RadialMenuConfigureScreen) this.parent).getBindings().clear();
@@ -48,7 +47,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
                 return true;
             }));
         }));
-        this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_DONE, (button) -> {
+        this.addRenderableWidget(ScreenHelper.button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_DONE, (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));
     }

@@ -3,60 +3,34 @@ package com.mrcrayfish.controllable.client.util;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.event.Value;
-import com.mrcrayfish.controllable.platform.ClientServices;
 
 /**
  * Author: MrCrayfish
  */
 public class EventHelper
 {
-    public static boolean postMoveEvent(Controller controller)
+    public static boolean postMoveEvent()
     {
-        boolean cancelled = ControllerEvents.UPDATE_MOVEMENT.post().handle();
-        if(!cancelled)
-        {
-            cancelled = ClientServices.CLIENT.sendLegacyControllerEventMove(controller);
-        }
-        return cancelled;
+        return ControllerEvents.UPDATE_MOVEMENT.post().handle();
     }
 
     public static boolean postInputEvent(Controller controller, Value<Integer> newButton, int button, boolean state)
     {
-        boolean cancelled = ControllerEvents.INPUT.post().handle(controller, newButton, button, state);
-        if(!cancelled)
-        {
-            cancelled = ClientServices.CLIENT.sendLegacyControllerEventButtonInput(controller, newButton, button, state);
-        }
-        return cancelled;
+        return ControllerEvents.INPUT.post().handle(controller, newButton, button, state);
     }
 
     public static boolean postButtonEvent(Controller controller)
     {
-        boolean cancelled = ControllerEvents.BUTTON.post().handle(controller);
-        if(!cancelled)
-        {
-            cancelled = ClientServices.CLIENT.sendLegacyControllerEventButton(controller);
-        }
-        return cancelled;
+        return ControllerEvents.BUTTON.post().handle(controller);
     }
 
-    public static boolean postUpdateCameraEvent(Controller controller, Value<Float> yawSpeed, Value<Float> pitchSpeed)
+    public static boolean postUpdateCameraEvent(Value<Float> yawSpeed, Value<Float> pitchSpeed)
     {
-        boolean cancelled = ControllerEvents.UPDATE_CAMERA.post().handle(yawSpeed, pitchSpeed);
-        if(!cancelled)
-        {
-            cancelled = ClientServices.CLIENT.sendLegacyControllerEventTurn(controller, yawSpeed, pitchSpeed);
-        }
-        return cancelled;
+        return ControllerEvents.UPDATE_CAMERA.post().handle(yawSpeed, pitchSpeed);
     }
 
     public static boolean postRenderMiniPlayer()
     {
-        boolean cancelled = ControllerEvents.RENDER_MINI_PLAYER.post().handle();
-        if(!cancelled)
-        {
-            cancelled = ClientServices.CLIENT.sendLegacyRenderPlayerPreviewEvent();
-        }
-        return cancelled;
+        return ControllerEvents.RENDER_MINI_PLAYER.post().handle();
     }
 }

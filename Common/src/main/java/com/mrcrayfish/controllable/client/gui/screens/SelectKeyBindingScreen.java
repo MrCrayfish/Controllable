@@ -1,9 +1,9 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
-import com.mrcrayfish.controllable.client.BindingRegistry;
-import com.mrcrayfish.controllable.client.KeyAdapterBinding;
+import com.mrcrayfish.controllable.client.binding.BindingRegistry;
+import com.mrcrayfish.controllable.client.binding.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -33,7 +33,7 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
     protected void init()
     {
         super.init();
-        this.resetButton = this.addRenderableWidget(ScreenUtil.button(this.width / 2 - 155, this.height - 32, 150, 20, Component.translatable("controllable.gui.reset"), (button) -> {
+        this.resetButton = this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 155, this.height - 32, 150, 20, Component.translatable("controllable.gui.reset"), (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_keybinds"), result -> {
                 if(result) {
                     List<KeyAdapterBinding> copy = new ArrayList<>(BindingRegistry.getInstance().getKeyAdapters().values());
@@ -47,7 +47,7 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
                 return true;
             }));
         }));
-        this.addRenderableWidget(ScreenUtil.button(this.width / 2 + 5, this.height - 32, 150, 20, CommonComponents.GUI_DONE, (button) -> {
+        this.addRenderableWidget(ScreenHelper.button(this.width / 2 + 5, this.height - 32, 150, 20, CommonComponents.GUI_DONE, (button) -> {
             this.callback.run();
             Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));

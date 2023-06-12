@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 /**
  * Author: MrCrayfish
  */
-public class ScreenUtil
+public class ScreenHelper
 {
     public static boolean isMouseWithin(int x, int y, int width, int height, int mouseX, int mouseY)
     {

@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client;
+package com.mrcrayfish.controllable.client.input;
 
 import org.apache.commons.lang3.ArrayUtils;
 

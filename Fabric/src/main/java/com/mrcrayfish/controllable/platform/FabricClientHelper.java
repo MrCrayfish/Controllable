@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.platform;
 
-import com.mrcrayfish.controllable.client.BindingContext;
-import com.mrcrayfish.controllable.client.IBindingContext;
+import com.mrcrayfish.controllable.client.binding.BindingContext;
+import com.mrcrayfish.controllable.client.binding.IBindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;

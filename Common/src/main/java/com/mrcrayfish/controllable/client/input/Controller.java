@@ -1,7 +1,6 @@
 package com.mrcrayfish.controllable.client.input;
 
-import com.mrcrayfish.controllable.client.ButtonBinding;
-import com.mrcrayfish.controllable.client.ButtonStates;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 
 /**
  * Author: MrCrayfish

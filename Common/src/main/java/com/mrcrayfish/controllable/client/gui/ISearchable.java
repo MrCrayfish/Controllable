@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client;
+package com.mrcrayfish.controllable.client.gui;
 
 import net.minecraft.network.chat.Component;
 

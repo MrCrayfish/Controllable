@@ -1,14 +1,13 @@
 package com.mrcrayfish.controllable.client.gui.components;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.ButtonBindings;
-import com.mrcrayfish.controllable.client.Buttons;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
+import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.gui.widget.LazySlider;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.config.DoubleProperty;
 import com.mrcrayfish.framework.api.config.validate.NumberRange;
 import net.minecraft.client.Minecraft;
@@ -62,7 +61,7 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
         this.slider.setY(top);
         this.slider.render(graphics, mouseX, mouseY, partialTick);
 
-        if(Controllable.getInput().isControllerInUse() && ScreenUtil.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
+        if(Controllable.getInput().isControllerInUse() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
         {
             ClientHelper.drawButton(graphics, left + listWidth - this.slider.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, Buttons.LEFT_TRIGGER);
             ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, Buttons.RIGHT_TRIGGER);

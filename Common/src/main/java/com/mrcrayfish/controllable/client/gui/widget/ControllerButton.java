@@ -1,12 +1,10 @@
 package com.mrcrayfish.controllable.client.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Constants;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 
@@ -26,7 +24,7 @@ public class ControllerButton extends Button
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
         super.renderWidget(graphics, mouseX, mouseY, partialTicks);
-        boolean mouseOver = ScreenUtil.isMouseWithin(mouseX, mouseY, this.getX(), this.getY(), this.width, this.height);
+        boolean mouseOver = ScreenHelper.isMouseWithin(mouseX, mouseY, this.getX(), this.getY(), this.width, this.height);
         int textureV = 43;
         if(mouseOver)
         {

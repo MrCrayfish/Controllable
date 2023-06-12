@@ -13,6 +13,7 @@ public class ClientBootstrap
         RadialMenuHandler.instance();
         Controllable.init();
         ControllerEvents.init();
-        RenderEvents.init();
+        OverlayHandler.init();
+        RumbleHandler.init();
     }
 }

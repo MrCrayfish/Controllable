@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.client.input;
 
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
-import com.mrcrayfish.controllable.client.ControllerToast;
+import com.mrcrayfish.controllable.client.gui.toasts.ConnectionToast;
 import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
 import com.mrcrayfish.controllable.client.gui.screens.PendingScreen;
 import com.mrcrayfish.controllable.platform.Services;
@@ -81,7 +81,7 @@ public abstract class ControllerManager
         Minecraft mc = Minecraft.getInstance();
         if(mc.player != null && controller != null)
         {
-            mc.getToasts().addToast(new ControllerToast(connected, controller.getName()));
+            mc.getToasts().addToast(new ConnectionToast(connected, controller.getName()));
         }
     }
 

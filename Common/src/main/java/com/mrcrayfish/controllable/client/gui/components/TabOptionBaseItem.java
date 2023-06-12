@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.client.gui.components;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -44,9 +44,9 @@ public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem
         {
             graphics.fill(left - 2, top - 2, left + listWidth + 2, top + slotHeight + 2, 0x55000000);
         }
-        if(Controllable.getInput().isControllerInUse() && ScreenUtil.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
+        if(Controllable.getInput().isControllerInUse() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
         {
-            ScreenUtil.drawOutlinedBox(graphics, left - 2, top - 2, listWidth + 4, slotHeight + 4, 0xAAFFFFFF);
+            ScreenHelper.drawOutlinedBox(graphics, left - 2, top - 2, listWidth + 4, slotHeight + 4, 0xAAFFFFFF);
         }
         Font font = Minecraft.getInstance().font;
         graphics.drawString(font, this.label, left + 5, top + (slotHeight - font.lineHeight) / 2 + 1, this.labelColor);

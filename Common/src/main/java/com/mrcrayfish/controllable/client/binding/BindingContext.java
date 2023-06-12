@@ -1,4 +1,4 @@
-package com.mrcrayfish.controllable.client;
+package com.mrcrayfish.controllable.client.binding;
 
 import net.minecraft.client.Minecraft;
 

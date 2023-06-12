@@ -1,8 +1,8 @@
 package com.mrcrayfish.controllable.client.input.glfw;
 
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.client.ButtonStates;
-import com.mrcrayfish.controllable.client.Buttons;
+import com.mrcrayfish.controllable.client.input.ButtonStates;
+import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.client.resources.language.I18n;

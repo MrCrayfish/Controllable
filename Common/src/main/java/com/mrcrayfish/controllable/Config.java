@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable;
 
 import com.mrcrayfish.controllable.client.ActionVisibility;
-import com.mrcrayfish.controllable.client.ControllerIcons;
+import com.mrcrayfish.controllable.client.ButtonIcons;
 import com.mrcrayfish.controllable.client.CursorType;
 import com.mrcrayfish.controllable.client.Thumbstick;
 import com.mrcrayfish.framework.api.config.BoolProperty;
@@ -53,7 +53,7 @@ public class Config
             public final EnumProperty<CursorType> cursorType = EnumProperty.create(CursorType.CONSOLE);
 
             @ConfigProperty(name = "controllerIcons", comment = "The controller icons to use in game to display actions")
-            public final EnumProperty<ControllerIcons> controllerIcons = EnumProperty.create(ControllerIcons.DEFAULT);
+            public final EnumProperty<ButtonIcons> controllerIcons = EnumProperty.create(ButtonIcons.DEFAULT);
 
             @ConfigProperty(name = "invertLook", comment = "If enabled, inverts the controls on the Y axis for the camera")
             public final BoolProperty invertLook = BoolProperty.create(false); //TODO rename
