@@ -1,10 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mojang.blaze3d.Blaze3D;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
@@ -28,7 +25,6 @@ import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import com.mrcrayfish.controllable.platform.ClientServices;
-import com.mrcrayfish.controllable.platform.Services;
 import com.mrcrayfish.framework.api.event.ClientEvents;
 import com.mrcrayfish.framework.api.event.ScreenEvents;
 import com.mrcrayfish.framework.api.event.TickEvents;
@@ -96,14 +92,13 @@ import java.util.function.BiFunction;
  */
 public class ControllerInput
 {
-    private static final ResourceLocation CURSOR_TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/cursor.png");
     private static final ResourceLocation RECIPE_BUTTON_LOCATION = new ResourceLocation("textures/gui/recipe_button.png");
 
     private int lastUse = 0;
     private boolean keyboardSneaking = false;
     private boolean sneaking = false;
     private boolean isFlying = false;
-    private boolean nearSlot = false;
+    private Slot nearSlot = null;
     private boolean moving = false;
     private boolean preventReset;
     private boolean ignoreInput;
@@ -124,13 +119,11 @@ public class ControllerInput
 
     public ControllerInput()
     {
-
         TickEvents.START_CLIENT.register(this::onClientTick);
         TickEvents.START_CLIENT.register(this::onClientTickStart);
         TickEvents.END_RENDER.register(this::onRenderTickEnd);
         ScreenEvents.OPENED.register(this::onScreenOpened);
         ScreenEvents.BEFORE_DRAW.register(this::onScreenRenderPre);
-        ScreenEvents.AFTER_DRAW.register(this::drawVirtualCursor);
         ClientEvents.PLAYER_INPUT_UPDATE.register(this::onInputUpdate);
     }
 
@@ -171,6 +164,26 @@ public class ControllerInput
     public boolean isMovingCursor()
     {
         return this.moving;
+    }
+
+    public boolean isVirtualCursorHidden()
+    {
+        return this.hideVirtualCursor;
+    }
+
+    public double getVirtualCursorX(float partialTick)
+    {
+        return this.prevCursorX + (this.cursorX - this.prevCursorX) * partialTick;
+    }
+
+    public double getVirtualCursorY(float partialTick)
+    {
+        return this.prevCursorY + (this.cursorY - this.prevCursorY) * partialTick;
+    }
+
+    public Slot getNearSlot()
+    {
+        return this.nearSlot;
     }
 
     private void onClientTick()
@@ -324,7 +337,7 @@ public class ControllerInput
         Minecraft mc = Minecraft.getInstance();
         if(mc.screen == null)
         {
-            this.nearSlot = false;
+            this.nearSlot = null;
             this.moved = false;
             this.cursorSpeedX = 0.0;
             this.cursorSpeedY = 0.0;
@@ -350,6 +363,36 @@ public class ControllerInput
                 this.setCursorPosition(renderCursorX, renderCursorY);
             }
         }
+
+        this.nearSlot = null;
+        if(mc.screen instanceof AbstractContainerScreen<?> containerScreen && this.moved)
+        {
+            int guiLeft = ClientServices.CLIENT.getScreenLeft(containerScreen);
+            int guiTop = ClientServices.CLIENT.getScreenTop(containerScreen);
+            double guiScale = mc.getWindow().getGuiScale();
+            int cursorX = (int) (this.cursorX / guiScale);
+            int cursorY = (int) (this.cursorY / guiScale);
+
+            /* Finds the closest slot in the GUI within 14 pixels (inclusive) */
+            Slot closestSlot = null;
+            double closestDistance = -1.0;
+            for(Slot slot : containerScreen.getMenu().slots)
+            {
+                int posX = guiLeft + slot.x + 8;
+                int posY = guiTop + slot.y + 8;
+                double distance = Math.sqrt(Math.pow(posX - cursorX, 2) + Math.pow(posY - cursorY, 2));
+                if((closestDistance == -1.0 || distance < closestDistance) && distance <= 14.0)
+                {
+                    closestSlot = slot;
+                    closestDistance = distance;
+                }
+            }
+
+            if(closestSlot != null && (closestSlot.hasItem() || !containerScreen.getMenu().getCarried().isEmpty()))
+            {
+                this.nearSlot = closestSlot;
+            }
+        }
     }
 
     private void performMouseDrag(double cursorX, double cursorY, double dragX, double dragY)
@@ -373,32 +416,6 @@ public class ControllerInput
                     }
                 }
             }
-        }
-    }
-
-    public void drawVirtualCursor(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
-    {
-        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && this.lastUse > 0 && !this.hideVirtualCursor)
-        {
-            PoseStack stack = graphics.pose();
-            stack.pushPose();
-            CursorType type = Config.CLIENT.client.options.cursorType.get();
-            Minecraft mc = Minecraft.getInstance();
-            if(mc.player == null || (mc.player.inventoryMenu.getCarried().isEmpty() || type == CursorType.CONSOLE))
-            {
-                double guiScale = mc.getWindow().getGuiScale();
-                double virtualCursorX = (this.prevCursorX + (this.cursorX - this.prevCursorX) * mc.getFrameTime());
-                double virtualCursorY = (this.prevCursorY + (this.cursorY - this.prevCursorY) * mc.getFrameTime());
-                double zIndex = Services.PLATFORM.isForge() ? 500 : 3000; // Hack until I make Forge/Fabric calls the same
-                stack.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, zIndex);
-                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-                if(type == CursorType.CONSOLE)
-                {
-                    stack.scale(0.5F, 0.5F, 0.5F);
-                }
-                graphics.blit(CURSOR_TEXTURE, -8, -8, 16, 16, this.nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
-            }
-            stack.popPose();
         }
     }
 
@@ -1068,8 +1085,9 @@ public class ControllerInput
             mc.tell(() -> // Run next frame to allow lists to update widget positions
             {
                 this.performMouseDrag(this.cursorX, this.cursorY, 0, 0);
-                int screenX = (int) (targetPoint.getX() / ((double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth()));
-                int screenY = (int) (targetPoint.getY() / ((double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight()));
+                double guiScale = mc.getWindow().getGuiScale();
+                int screenX = (int) (targetPoint.getX() * guiScale);
+                int screenY = (int) (targetPoint.getY() * guiScale);
                 double lastTargetX = this.cursorX;
                 double lastTargetY = this.cursorY;
                 this.cursorX = this.prevCursorX = screenX;
@@ -1081,6 +1099,7 @@ public class ControllerInput
                 }
                 this.performMouseDrag(this.cursorX, this.cursorY, screenX - lastTargetX, screenY - lastTargetY);
                 this.hideVirtualCursor = targetPoint.shouldHide();
+                this.moved = true;
             });
         }
     }
@@ -1328,8 +1347,6 @@ public class ControllerInput
 
     private void moveCursorToClosestSlot(boolean moving, Screen screen)
     {
-        this.nearSlot = false;
-
         /* Makes the mouse attracted to slots. This helps with selecting items when using
          * a controller. */
         if(screen instanceof AbstractContainerScreen<?> containerScreen)
@@ -1338,47 +1355,30 @@ public class ControllerInput
             if(!this.moved)
                 return;
 
-            Minecraft mc = Minecraft.getInstance();
-            int guiLeft = ClientServices.CLIENT.getScreenLeft(containerScreen);
-            int guiTop = ClientServices.CLIENT.getScreenTop(containerScreen);
-            int cursorX = (int) (this.cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth());
-            int cursorY = (int) (this.cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight());
-
-            /* Finds the closest slot in the GUI within 14 pixels (inclusive) */
-            Slot closestSlot = null;
-            double closestDistance = -1.0;
-            for(Slot slot : containerScreen.getMenu().slots)
+            if(this.nearSlot != null)
             {
-                int posX = guiLeft + slot.x + 8;
-                int posY = guiTop + slot.y + 8;
-
-                double distance = Math.sqrt(Math.pow(posX - cursorX, 2) + Math.pow(posY - cursorY, 2));
-                if((closestDistance == -1.0 || distance < closestDistance) && distance <= 14.0)
-                {
-                    closestSlot = slot;
-                    closestDistance = distance;
-                }
-            }
-
-            if(closestSlot != null && (closestSlot.hasItem() || !containerScreen.getMenu().getCarried().isEmpty()))
-            {
-                this.nearSlot = true;
-                int slotCenterXScaled = guiLeft + closestSlot.x + 8;
-                int slotCenterYScaled = guiTop + closestSlot.y + 8;
-                int slotCenterX = (int) (slotCenterXScaled / ((double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth()));
-                int slotCenterY = (int) (slotCenterYScaled / ((double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight()));
+                Minecraft mc = Minecraft.getInstance();
+                int guiLeft = ClientServices.CLIENT.getScreenLeft(containerScreen);
+                int guiTop = ClientServices.CLIENT.getScreenTop(containerScreen);
+                double guiScale = mc.getWindow().getGuiScale();
+                int slotCenterXScaled = guiLeft + this.nearSlot.x + 8;
+                int slotCenterYScaled = guiTop + this.nearSlot.y + 8;
+                int slotCenterX = (int) (slotCenterXScaled * guiScale);
+                int slotCenterY = (int) (slotCenterYScaled * guiScale);
                 double deltaX = slotCenterX - this.cursorX;
                 double deltaY = slotCenterY - this.cursorY;
 
                 if(!moving)
                 {
-                    if(cursorX != slotCenterXScaled || cursorY != slotCenterYScaled)
+                    if(deltaX > 0.05 || deltaY > 0.05)
                     {
-                        this.cursorX += deltaX * 0.75;
-                        this.cursorY += deltaY * 0.75;
+                        this.cursorX += deltaX * 0.9;
+                        this.cursorY += deltaY * 0.9;
                     }
                     else
                     {
+                        this.cursorX = slotCenterX;
+                        this.cursorY = slotCenterY;
                         this.cursorSpeedX = 0.0F;
                         this.cursorSpeedY = 0.0F;
                     }

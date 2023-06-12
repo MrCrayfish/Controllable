@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.client.overlay.ActionHintOverlay;
+import com.mrcrayfish.controllable.client.overlay.CursorOverlay;
 import com.mrcrayfish.controllable.client.overlay.IOverlay;
 import com.mrcrayfish.controllable.client.overlay.PlayerOverlay;
 import com.mrcrayfish.controllable.client.overlay.RecipeBookOverlay;
@@ -23,6 +24,7 @@ public class OverlayHandler
         builder.add(new RecipeBookOverlay());
         builder.add(new ActionHintOverlay());
         builder.add(new PlayerOverlay());
+        builder.add(new CursorOverlay());
         return builder.build();
     });
 
