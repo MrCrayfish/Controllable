@@ -9,22 +9,24 @@ import net.minecraft.resources.ResourceLocation;
  */
 public enum CursorType implements SettingEnum
 {
-    LIGHT("controllable.cursor.light", ItemHeldBehaviour.HIDE),
-    DARK("controllable.cursor.dark", ItemHeldBehaviour.HIDE),
-    CONSOLE("controllable.cursor.console", ItemHeldBehaviour.SHOW),
-    CONSOLE_PLUS("controllable.cursor.console_plus", ItemHeldBehaviour.HIDE),
-    LEGACY_LIGHT("controllable.cursor.legacy_light", ItemHeldBehaviour.HIDE),
-    LEGACY_DARK("controllable.cursor.legacy_dark", ItemHeldBehaviour.HIDE);
+    LIGHT("controllable.cursor.light", ItemHeldBehaviour.HIDE, true),
+    DARK("controllable.cursor.dark", ItemHeldBehaviour.HIDE, true),
+    CONSOLE("controllable.cursor.console", ItemHeldBehaviour.SHOW, false),
+    CONSOLE_PLUS("controllable.cursor.console_plus", ItemHeldBehaviour.HIDE, true),
+    LEGACY_LIGHT("controllable.cursor.legacy_light", ItemHeldBehaviour.HIDE, true),
+    LEGACY_DARK("controllable.cursor.legacy_dark", ItemHeldBehaviour.HIDE, true);
 
     public static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/cursor.png");
 
     private final String key;
     private final ItemHeldBehaviour behaviour;
+    private final boolean scaleHover;
 
-    CursorType(String key, ItemHeldBehaviour behaviour)
+    CursorType(String key, ItemHeldBehaviour behaviour, boolean scaleHover)
     {
         this.key = key;
         this.behaviour = behaviour;
+        this.scaleHover = scaleHover;
     }
 
     @Override
@@ -36,5 +38,10 @@ public enum CursorType implements SettingEnum
     public ItemHeldBehaviour getBehaviour()
     {
         return this.behaviour;
+    }
+
+    public boolean isScaleHover()
+    {
+        return this.scaleHover;
     }
 }

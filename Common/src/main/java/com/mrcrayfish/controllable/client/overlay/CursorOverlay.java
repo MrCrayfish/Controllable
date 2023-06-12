@@ -42,7 +42,7 @@ public class CursorOverlay implements IOverlay
             pose.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, zIndex);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             boolean isHoveringSlot = input.getNearSlot() != null;
-            if(isHoveringSlot)
+            if(isHoveringSlot && type.isScaleHover())
             {
                 pose.scale(1.33F, 1.33F, 1.33F);
             }
