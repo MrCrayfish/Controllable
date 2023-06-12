@@ -11,7 +11,8 @@ public enum CursorType implements SettingEnum
 {
     LIGHT("controllable.cursor.light", ItemHeldBehaviour.HIDE),
     DARK("controllable.cursor.dark", ItemHeldBehaviour.HIDE),
-    CONSOLE("controllable.cursor.console", ItemHeldBehaviour.HIDE),
+    CONSOLE("controllable.cursor.console", ItemHeldBehaviour.SHOW),
+    CONSOLE_PLUS("controllable.cursor.console_plus", ItemHeldBehaviour.HIDE),
     LEGACY_LIGHT("controllable.cursor.legacy_light", ItemHeldBehaviour.HIDE),
     LEGACY_DARK("controllable.cursor.legacy_dark", ItemHeldBehaviour.HIDE);
 

@@ -60,6 +60,7 @@
     "controllable.controller.xbox_360": "Xbox 360",
     "controllable.controller.xbox_one": "Xbox One",
     "controllable.cursor.console": "Console",
+    "controllable.cursor.console_plus": "Console Plus",
     "controllable.cursor.dark": "Dark",
     "controllable.cursor.legacy_dark": "Dark (Legacy)",
     "controllable.cursor.legacy_light": "Light (Legacy)",
