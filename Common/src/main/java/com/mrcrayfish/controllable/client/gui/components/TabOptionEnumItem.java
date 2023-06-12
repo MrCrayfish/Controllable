@@ -11,6 +11,7 @@ import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.framework.api.config.EnumProperty;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -66,17 +67,17 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
     }
 
     @Override
-    public void render(PoseStack poseStack, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
+    public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
-        super.render(poseStack, slotIndex, top, left, listWidth, slotHeight, mouseX, mouseY, hovered, partialTick);
+        super.render(graphics, slotIndex, top, left, listWidth, slotHeight, mouseX, mouseY, hovered, partialTick);
         this.cycle.setX(left + listWidth - this.cycle.getWidth() - 20);
         this.cycle.setY(top);
-        this.cycle.render(poseStack, mouseX, mouseY, partialTick);
+        this.cycle.render(graphics, mouseX, mouseY, partialTick);
 
         if(Controllable.getInput().isControllerInUse() && ScreenUtil.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
         {
-            ClientHelper.drawButton(poseStack, left + listWidth - this.cycle.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, Buttons.LEFT_TRIGGER);
-            ClientHelper.drawButton(poseStack, left + listWidth - 16, top + (slotHeight - 11) / 2, Buttons.RIGHT_TRIGGER);
+            ClientHelper.drawButton(graphics, left + listWidth - this.cycle.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, Buttons.LEFT_TRIGGER);
+            ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, Buttons.RIGHT_TRIGGER);
 
             if(ButtonBindings.NEXT_RECIPE_TAB.isButtonDown())
             {

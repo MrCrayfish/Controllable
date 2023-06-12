@@ -12,6 +12,7 @@ import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import com.mrcrayfish.framework.api.config.DoubleProperty;
 import com.mrcrayfish.framework.api.config.validate.NumberRange;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -54,17 +55,17 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
     }
 
     @Override
-    public void render(PoseStack poseStack, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
+    public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
-        super.render(poseStack, slotIndex, top, left, listWidth, slotHeight, mouseX, mouseY, hovered, partialTick);
+        super.render(graphics, slotIndex, top, left, listWidth, slotHeight, mouseX, mouseY, hovered, partialTick);
         this.slider.setX(left + listWidth - this.slider.getWidth() - 20);
         this.slider.setY(top);
-        this.slider.render(poseStack, mouseX, mouseY, partialTick);
+        this.slider.render(graphics, mouseX, mouseY, partialTick);
 
         if(Controllable.getInput().isControllerInUse() && ScreenUtil.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
         {
-            ClientHelper.drawButton(poseStack, left + listWidth - this.slider.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, Buttons.LEFT_TRIGGER);
-            ClientHelper.drawButton(poseStack, left + listWidth - 16, top + (slotHeight - 11) / 2, Buttons.RIGHT_TRIGGER);
+            ClientHelper.drawButton(graphics, left + listWidth - this.slider.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, Buttons.LEFT_TRIGGER);
+            ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, Buttons.RIGHT_TRIGGER);
 
             long currentTime = System.currentTimeMillis();
             if(currentTime - this.lastChange > 100)

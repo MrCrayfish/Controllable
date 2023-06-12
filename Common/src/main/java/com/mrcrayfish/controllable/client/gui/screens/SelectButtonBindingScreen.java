@@ -9,6 +9,8 @@ import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.CommonComponents;
@@ -106,16 +108,17 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void render(PoseStack matrixStack, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void render(GuiGraphics graphics, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
+            Font font = SelectButtonBindingScreen.this.minecraft.font;
             int color = this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor();
-            SelectButtonBindingScreen.this.minecraft.font.draw(matrixStack, this.label, left - 15, y + 6, color);
+            graphics.drawString(font, this.label, left - 15, y + 6, color);
             this.bindingButton.setX(left + width - 37);
             this.bindingButton.setY(y);
-            this.bindingButton.render(matrixStack, mouseX, mouseY, partialTicks);
+            this.bindingButton.render(graphics, mouseX, mouseY, partialTicks);
             this.deleteButton.setX(left + width - 15);
             this.deleteButton.setY(y);
-            this.deleteButton.render(matrixStack, mouseX, mouseY, partialTicks);
+            this.deleteButton.render(graphics, mouseX, mouseY, partialTicks);
         }
     }
 }

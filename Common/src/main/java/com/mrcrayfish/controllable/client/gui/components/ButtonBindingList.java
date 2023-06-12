@@ -18,6 +18,7 @@ import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -167,19 +168,19 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void render(PoseStack poseStack, int index, int top, int left, int width, int itemHeight, int mouseX, int mouseY, boolean selected, float partialTick)
+        public void render(GuiGraphics graphics, int index, int top, int left, int width, int itemHeight, int mouseX, int mouseY, boolean selected, float partialTick)
         {
             this.setLabelColor(this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor());
-            super.render(poseStack, index, top, left, width, itemHeight, mouseX, mouseY, selected, partialTick);
+            super.render(graphics, index, top, left, width, itemHeight, mouseX, mouseY, selected, partialTick);
             this.bindingButton.setTooltip(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
             this.bindingButton.setTooltipDelay(400);
             this.bindingButton.setX(left + width - 65);
             this.bindingButton.setY(top - 1);
-            this.bindingButton.render(poseStack, mouseX, mouseY, partialTick);
+            this.bindingButton.render(graphics, mouseX, mouseY, partialTick);
             this.resetButton.setX(left + width - 24);
             this.resetButton.setY(top - 1);
             this.resetButton.active = !this.binding.isDefault();
-            this.resetButton.render(poseStack, mouseX, mouseY, partialTick);
+            this.resetButton.render(graphics, mouseX, mouseY, partialTick);
         }
 
         @Override
@@ -225,16 +226,16 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         }
 
         @Override
-        public void render(PoseStack poseStack, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
+        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
         {
             this.leftWidget.setWidth(width / 2 - 10);
             this.leftWidget.setX(left + 5);
             this.leftWidget.setY(top);
-            this.leftWidget.render(poseStack, mouseX, mouseY, partialTick);
+            this.leftWidget.render(graphics, mouseX, mouseY, partialTick);
             this.rightWidget.setWidth(width / 2 - 10);
             this.rightWidget.setX(left + width / 2 + 5);
             this.rightWidget.setY(top);
-            this.rightWidget.render(poseStack, mouseX, mouseY, partialTick);
+            this.rightWidget.render(graphics, mouseX, mouseY, partialTick);
         }
 
         @Override

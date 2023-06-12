@@ -1,8 +1,6 @@
 package com.mrcrayfish.controllable.client.util;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.TabButton;
@@ -31,20 +29,19 @@ public class ScreenUtil
         return Button.builder(label, onPress).pos(x, y).size(width, height).build();
     }
 
-    public static void drawOutlinedBox(PoseStack poseStack, int x, int y, int width, int height, int color)
+    public static void drawOutlinedBox(GuiGraphics graphics, int x, int y, int width, int height, int color)
     {
-        GuiComponent.fill(poseStack, x, y, x + width, y + 1, color);                          // Top
-        GuiComponent.fill(poseStack, x, y + 1, x + 1, y + height - 1, color);                 // Left
-        GuiComponent.fill(poseStack, x, y + height - 1, x + width, y + height, color);        // Bottom
-        GuiComponent.fill(poseStack, x + width - 1, y + 1, x + width, y + height - 1, color); // Right
+        graphics.fill(x, y, x + width, y + 1, color);                          // Top
+        graphics.fill(x, y + 1, x + 1, y + height - 1, color);                 // Left
+        graphics.fill(x, y + height - 1, x + width, y + height, color);        // Bottom
+        graphics.fill(x + width - 1, y + 1, x + width, y + height - 1, color); // Right
     }
 
-    public static void drawRoundedBox(PoseStack poseStack, int x, int y, int width, int height, int backgroundColor)
+    public static void drawRoundedBox(GuiGraphics graphics, int x, int y, int width, int height, int backgroundColor)
     {
-        Minecraft mc = Minecraft.getInstance();
-        Screen.fill(poseStack, x - 3 + 1, y, x + width + 2 - 1, y + 1, backgroundColor);
-        Screen.fill(poseStack, x - 3, y + 1, x + width + 2, y + height - 1, backgroundColor);
-        Screen.fill(poseStack, x - 3 + 1, y + height - 1, x + width + 2 - 1, y + height, backgroundColor);
+        graphics.fill(x - 3 + 1, y, x + width + 2 - 1, y + 1, backgroundColor);
+        graphics.fill(x - 3, y + 1, x + width + 2, y + height - 1, backgroundColor);
+        graphics.fill(x - 3 + 1, y + height - 1, x + width + 2 - 1, y + height, backgroundColor);
     }
 
     public static Optional<GuiEventListener> findHoveredListener(Screen screen, double mouseX, double mouseY, Predicate<GuiEventListener> condition)

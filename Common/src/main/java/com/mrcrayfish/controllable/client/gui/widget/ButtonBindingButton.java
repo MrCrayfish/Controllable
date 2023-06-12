@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.RenderEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.CommonComponents;
@@ -31,18 +32,16 @@ public class ButtonBindingButton extends Button
     }
 
     @Override
-    public void renderWidget(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
+    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        super.renderWidget(poseStack, mouseX, mouseY, partialTicks);
+        super.renderWidget(graphics, mouseX, mouseY, partialTicks);
         if(this.binding.getButton() < 0)
             return;
         int texU = this.binding.getButton() * 13;
         int texV = Config.CLIENT.client.options.controllerIcons.get().ordinal() * 13;
         int size = 13;
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, RenderEvents.CONTROLLER_BUTTONS);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        blit(poseStack, this.getX() + (this.width - size) / 2 + 1, this.getY() + 3, texU, texV, size, size, RenderEvents.CONTROLLER_BUTTONS_WIDTH, RenderEvents.CONTROLLER_BUTTONS_HEIGHT);
+        graphics.blit(RenderEvents.CONTROLLER_BUTTONS, this.getX() + (this.width - size) / 2 + 1, this.getY() + 3, texU, texV, size, size, RenderEvents.CONTROLLER_BUTTONS_WIDTH, RenderEvents.CONTROLLER_BUTTONS_HEIGHT);
     }
 
     @Override

@@ -23,6 +23,7 @@ import com.mrcrayfish.controllable.platform.ClientServices;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -317,7 +318,9 @@ public class RadialMenuHandler
         modelStack.translate(0, 0, 1000F - ClientServices.CLIENT.getGuiFarPlane());
         RenderSystem.applyModelViewMatrix();
         Lighting.setupFor3DItems();
-        PoseStack poseStack = new PoseStack();
+        Minecraft mc = Minecraft.getInstance();
+        GuiGraphics graphics = new GuiGraphics(mc, mc.renderBuffers().bufferSource());
+        PoseStack poseStack = graphics.pose();
 
         float animation = Mth.lerp(partialTick, this.prevAnimateTicks, this.animateTicks) / 5F;
         float c1 = 1.70158F;
@@ -325,8 +328,7 @@ public class RadialMenuHandler
         animation = (float) (1 + c3 * Math.pow(animation - 1, 3) + c1 * Math.pow(animation - 1, 2));
 
         // Draw background
-        Minecraft mc = Minecraft.getInstance();
-        Screen.fill(poseStack, 0, 0, mc.getWindow().getWidth(), mc.getWindow().getHeight(), 0x78101010);
+        graphics.fill(0, 0, mc.getWindow().getWidth(), mc.getWindow().getHeight(), 0x78101010);
 
         poseStack.translate(0, -10, 0);
         poseStack.translate((int) (mc.getWindow().getGuiScaledWidth() / 2F), (int) (mc.getWindow().getGuiScaledHeight() / 2F), 0);
@@ -334,38 +336,35 @@ public class RadialMenuHandler
         //matrixStack.scale(animation, animation, animation);
 
         poseStack.pushPose();
-        this.settingsItem.draw(poseStack, mc, false, this.selected == this.settingsItem, animation);
+        this.settingsItem.draw(graphics, mc, false, this.selected == this.settingsItem, animation);
         poseStack.popPose();
 
         poseStack.pushPose();
-        this.closeItem.draw(poseStack, mc, false, this.selected == this.closeItem, animation);
+        this.closeItem.draw(graphics, mc, false, this.selected == this.closeItem, animation);
         poseStack.popPose();
 
-        this.drawRadialItems(this.rightItems, poseStack, mc, animation);
-        this.drawRadialItems(this.leftItems, poseStack, mc, animation);
+        this.drawRadialItems(this.rightItems, graphics, mc, animation);
+        this.drawRadialItems(this.leftItems, graphics, mc, animation);
 
         modelStack.popPose();
         RenderSystem.applyModelViewMatrix();
     }
 
-    private void drawRadialItems(List<AbstractRadialItem> items, PoseStack matrixStack, Minecraft mc, float animation)
+    private void drawRadialItems(List<AbstractRadialItem> items, GuiGraphics graphics, Minecraft mc, float animation)
     {
         for(int i = 0; i < items.size(); i++)
         {
             AbstractRadialItem item = items.get(i);
-
-            matrixStack.pushPose();
-            if(i == 0) matrixStack.translate(0, -10, 0);
-            if(i == items.size() - 1) matrixStack.translate(0, 10, 0);
-
+            PoseStack poseStack = graphics.pose();
+            poseStack.pushPose();
+            if(i == 0) poseStack.translate(0, -10, 0);
+            if(i == items.size() - 1) poseStack.translate(0, 10, 0);
             boolean left = item.angle >= 180F;
             float x = (float) Math.cos(Math.toRadians(item.angle - 90F)) * 70F;
             float y = (float) Math.sin(Math.toRadians(item.angle - 90F)) * 70F;
-            matrixStack.translate((int) x, (int) y, 0);
-
-            item.draw(matrixStack, mc, left, this.selected == item, animation);
-
-            matrixStack.popPose();
+            poseStack.translate((int) x, (int) y, 0);
+            item.draw(graphics, mc, left, this.selected == item, animation);
+            poseStack.popPose();
         }
     }
 
@@ -450,7 +449,7 @@ public class RadialMenuHandler
 
         public abstract void onUseItem(RadialMenuHandler handler);
 
-        protected abstract void draw(PoseStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation);
+        protected abstract void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation);
 
         protected void playSound(SoundEvent event, float pitch)
         {
@@ -488,7 +487,7 @@ public class RadialMenuHandler
         }
 
         @Override
-        protected void draw(PoseStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation)
+        protected void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation)
         {
             int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
             float alpha = FastColor.ARGB32.alpha(color) / 255F;
@@ -496,7 +495,8 @@ public class RadialMenuHandler
             float green = FastColor.ARGB32.green(color) / 255F;
             float blue = FastColor.ARGB32.blue(color) / 255F;
 
-            matrixStack.translate(0, 90, 0);
+            PoseStack poseStack = graphics.pose();
+            poseStack.translate(0, 90, 0);
 
             //RenderSystem.disableTexture(); //TODO test this
             RenderSystem.enableBlend();
@@ -510,34 +510,32 @@ public class RadialMenuHandler
             BufferBuilder buffer = Tesselator.getInstance().getBuilder();
             buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             // Top (reduced width by 2)
-            buffer.vertex(matrixStack.last().pose(), -14, -15, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), -14, -14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 14, -14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 14, -15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -14, -15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -14, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 14, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 14, -15, 0).color(red, green, blue, alpha).endVertex();
             // Middle
-            buffer.vertex(matrixStack.last().pose(), -15, -14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), -15, 14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 15, 14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 15, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -15, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -15, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 15, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 15, -14, 0).color(red, green, blue, alpha).endVertex();
             // Bottom (reduced width by 2)
-            buffer.vertex(matrixStack.last().pose(), -14, 14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), -14, 15, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 14, 15, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 14, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -14, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -14, 15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 14, 15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 14, 14, 0).color(red, green, blue, alpha).endVertex();
             BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
             //RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderTexture(0, TEXTURE);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            Screen.blit(matrixStack, -10, -10, 20, 20, 98, 15, 10, 10, 256, 256);
+            graphics.blit(TEXTURE, -10, -10, 20, 20, 98, 15, 10, 10, 256, 256);
 
             if(selected)
             {
-                Screen.drawCenteredString(matrixStack, mc.font, LABEL, 0, -30, 0xFFFFFF);
+                graphics.drawCenteredString(mc.font, LABEL, 0, -30, 0xFFFFFF);
             }
         }
     }
@@ -563,7 +561,7 @@ public class RadialMenuHandler
         }
 
         @Override
-        protected void draw(PoseStack matrixStack, Minecraft mc, boolean left, boolean selected, float animation)
+        protected void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation)
         {
             int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
             float alpha = FastColor.ARGB32.alpha(color) / 255F;
@@ -571,7 +569,8 @@ public class RadialMenuHandler
             float green = FastColor.ARGB32.green(color) / 255F;
             float blue = FastColor.ARGB32.blue(color) / 255F;
 
-            matrixStack.translate(0, -90, 0);
+            PoseStack poseStack = graphics.pose();
+            poseStack.translate(0, -90, 0);
 
             //RenderSystem.disableTexture(); //TODO test
             RenderSystem.enableBlend();
@@ -585,34 +584,32 @@ public class RadialMenuHandler
             BufferBuilder buffer = Tesselator.getInstance().getBuilder();
             buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             // Top (reduced width by 2)
-            buffer.vertex(matrixStack.last().pose(), -14, -15, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), -14, -14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 14, -14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 14, -15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -14, -15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -14, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 14, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 14, -15, 0).color(red, green, blue, alpha).endVertex();
             // Middle
-            buffer.vertex(matrixStack.last().pose(), -15, -14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), -15, 14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 15, 14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 15, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -15, -14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -15, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 15, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 15, -14, 0).color(red, green, blue, alpha).endVertex();
             // Bottom (reduced width by 2)
-            buffer.vertex(matrixStack.last().pose(), -14, 14, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), -14, 15, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 14, 15, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrixStack.last().pose(), 14, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -14, 14, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), -14, 15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 14, 15, 0).color(red, green, blue, alpha).endVertex();
+            buffer.vertex(poseStack.last().pose(), 14, 14, 0).color(red, green, blue, alpha).endVertex();
             BufferUploader.drawWithShader(buffer.end());
 
             RenderSystem.disableBlend();
             //RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderTexture(0, TEXTURE);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            Screen.blit(matrixStack, -10, -10, 20, 20, 88, 15, 10, 10, 256, 256);
+            graphics.blit(TEXTURE, -10, -10, 20, 20, 88, 15, 10, 10, 256, 256);
 
             if(selected)
             {
-                Screen.drawCenteredString(matrixStack, mc.font, LABEL, 0, 21, 0xFFFFFF);
+                graphics.drawCenteredString(mc.font, LABEL, 0, 21, 0xFFFFFF);
             }
         }
     }
@@ -642,8 +639,9 @@ public class RadialMenuHandler
         }
 
         @Override
-        protected void draw(PoseStack poseStack, Minecraft mc, boolean left, boolean selected, float animation)
+        protected void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation)
         {
+            PoseStack poseStack = graphics.pose();
             poseStack.pushPose();
 
             int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
@@ -692,13 +690,13 @@ public class RadialMenuHandler
             if(this.label != null)
             {
                 int offset = !left ? 5 : -mc.font.width(this.label) - 5;
-                mc.font.draw(poseStack, this.label, offset, -10, 0xFFFFFFFF);
+                graphics.drawString(mc.font, this.label, offset, -10, 0xFFFFFFFF);
             }
 
             if(this.description != null)
             {
                 int offset = !left ? 5 : -mc.font.width(this.description) - 5;
-                mc.font.draw(poseStack, this.description, offset, 2, 0xFFFFFFFF);
+                graphics.drawString(mc.font, this.description, offset, 2, 0xFFFFFFFF);
             }
 
             poseStack.popPose();

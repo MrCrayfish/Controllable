@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
@@ -24,12 +25,12 @@ public class TabOptionTitleItem extends TabOptionBaseItem implements SkipItem
     }
 
     @Override
-    public void render(PoseStack poseStack, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
+    public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
     {
         Font font = Minecraft.getInstance().font;
         int labelWidth = font.width(this.label) + 2;
-        ScreenUtil.drawRoundedBox(poseStack, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
-        Screen.drawCenteredString(poseStack, font, this.label, left + width / 2, top + 5, 0xFFFFFF);
+        ScreenUtil.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
+        graphics.drawCenteredString(font, this.label, left + width / 2, top + 5, 0xFFFFFF);
     }
 
     @Override

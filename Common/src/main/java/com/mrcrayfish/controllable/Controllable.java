@@ -7,7 +7,6 @@ import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.ControllerManager;
 import com.mrcrayfish.controllable.client.input.glfw.GLFWControllerManager;
 import com.mrcrayfish.controllable.client.input.sdl2.SDL2ControllerManager;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 
 import javax.annotation.Nullable;

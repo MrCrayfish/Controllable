@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.CommonComponents;
@@ -22,18 +23,16 @@ public class ControllerButton extends Button
     }
 
     @Override
-    public void renderWidget(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        super.renderWidget(matrixStack, mouseX, mouseY, partialTicks);
+        super.renderWidget(graphics, mouseX, mouseY, partialTicks);
         boolean mouseOver = ScreenUtil.isMouseWithin(mouseX, mouseY, this.getX(), this.getY(), this.width, this.height);
         int textureV = 43;
         if(mouseOver)
         {
             textureV += this.height;
         }
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        blit(matrixStack, this.getX(), this.getY(), 0, textureV, this.width, this.height);
+        graphics.blit(TEXTURE, this.getX(), this.getY(), 0, textureV, this.width, this.height);
     }
 }

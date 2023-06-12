@@ -24,6 +24,7 @@ import com.mrcrayfish.framework.api.config.AbstractProperty;
 import com.mrcrayfish.framework.config.FrameworkConfigManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.tabs.GridLayoutTab;
@@ -136,21 +137,21 @@ public class SettingsScreen extends Screen
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
-        this.renderDirtBackground(poseStack);
+        this.renderDirtBackground(graphics);
         boolean waitingForInput = this.isWaitingForButtonInput();
-        super.render(poseStack, !waitingForInput ? mouseX : -1, !waitingForInput ? mouseY : -1, partialTick);
+        super.render(graphics, !waitingForInput ? mouseX : -1, !waitingForInput ? mouseY : -1, partialTick);
         if(waitingForInput)
         {
             RenderSystem.disableDepthTest();
-            fillGradient(poseStack, 0, 0, this.width, this.height, 0xE0101010, 0xF0101010);
-            ScreenUtil.drawRoundedBox(poseStack, (int) (this.width * 0.125), this.height / 4, (int) (this.width * 0.75), this.height / 2, 0x99000000);
+            graphics.fillGradient(0, 0, this.width, this.height, 0xE0101010, 0xF0101010);
+            ScreenUtil.drawRoundedBox(graphics, (int) (this.width * 0.125), this.height / 4, (int) (this.width * 0.75), this.height / 2, 0x99000000);
             Component pressButtonLabel = Component.translatable("controllable.gui.waiting_for_input").withStyle(ChatFormatting.YELLOW);
-            drawCenteredString(poseStack, this.font, pressButtonLabel, this.width / 2, this.height / 2 - 10, 0xFFFFFFFF);
+            graphics.drawCenteredString(this.font, pressButtonLabel, this.width / 2, this.height / 2 - 10, 0xFFFFFFFF);
             Component time = Component.literal(Integer.toString((int) Math.ceil(this.remainingTime / 20.0)));
             Component inputCancelLabel = Component.translatable("controllable.gui.input_cancel", time);
-            drawCenteredString(poseStack, this.font, inputCancelLabel, this.width / 2, this.height / 2 + 3, 0xFFFFFFFF);
+            graphics.drawCenteredString(this.font, inputCancelLabel, this.width / 2, this.height / 2 + 3, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
         }
     }

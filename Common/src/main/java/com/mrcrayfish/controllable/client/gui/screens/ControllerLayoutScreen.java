@@ -1,7 +1,6 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonStates;
@@ -13,6 +12,7 @@ import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -95,27 +95,26 @@ public class ControllerLayoutScreen extends Screen
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderDirtBackground(poseStack);
-        RenderSystem.setShaderTexture(0, TEXTURE);
+        this.renderDirtBackground(graphics);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         int width = 38 * 5;
         int height = 24 * 5;
         int x = this.width / 2 - width / 2;
         int y = this.height / 2 - 50 - 35;
-        blit(poseStack, x, y, width, height, 50, 0, 38, 24, 256, 256);
-        this.controllerButtons.forEach(controllerButton -> controllerButton.draw(poseStack, x, y, mouseX, mouseY, this.configureButton == controllerButton.getButton()));
-        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 0xFFFFFF);
-        this.drawMultiLineCenteredString(poseStack, this.font, Component.translatable("controllable.gui.layout.info").withStyle(ChatFormatting.GRAY), x + width / 2, y + 135, width + 190, 0xFFFFFFFF);
-        super.render(poseStack, mouseX, mouseY, partialTicks);
+        graphics.blit(TEXTURE, x, y, width, height, 50, 0, 38, 24, 256, 256);
+        this.controllerButtons.forEach(controllerButton -> controllerButton.draw(graphics, x, y, mouseX, mouseY, this.configureButton == controllerButton.getButton()));
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        this.drawMultiLineCenteredString(graphics, this.font, Component.translatable("controllable.gui.layout.info").withStyle(ChatFormatting.GRAY), x + width / 2, y + 135, width + 190, 0xFFFFFFFF);
+        super.render(graphics, mouseX, mouseY, partialTicks);
 
         if(this.configureButton != -1)
         {
             RenderSystem.disableDepthTest();
-            fillGradient(poseStack, 0, 0, this.width, this.height, -1072689136, -804253680);
-            drawCenteredString(poseStack, this.font, Component.translatable("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
+            graphics.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
+            graphics.drawCenteredString(this.font, Component.translatable("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
             RenderSystem.enableDepthTest();
             return;
         }
@@ -126,7 +125,7 @@ public class ControllerLayoutScreen extends Screen
             List<Component> components = new ArrayList<>();
             components.add(Component.translatable("controllable.gui.layout.button", Component.translatable(Buttons.NAMES[button.getButton()]).withStyle(ChatFormatting.BLUE)));
             components.add(Component.translatable("controllable.gui.layout.remap").withStyle(ChatFormatting.GRAY));
-            this.renderComponentTooltip(poseStack, components, mouseX, mouseY);
+            graphics.renderComponentTooltip(this.font, components, mouseX, mouseY);
         }
 
         if(!this.validLayout && this.doneButton.isHoveredOrFocused())
@@ -134,12 +133,12 @@ public class ControllerLayoutScreen extends Screen
             List<FormattedCharSequence> components = new ArrayList<>();
             components.add(Component.translatable("controllable.gui.layout.warning").withStyle(ChatFormatting.RED).getVisualOrderText());
             components.addAll(this.font.split(Component.translatable("controllable.gui.layout.invalid_layout").withStyle(ChatFormatting.GRAY), 180));
-            this.renderTooltip(poseStack, components, mouseX, mouseY - 50);
+            graphics.renderTooltip(this.font, components, mouseX, mouseY - 50);
         }
 
         if(this.thumbstickButton.isHoveredOrFocused())
         {
-            this.renderTooltip(poseStack, Component.translatable("controllable.gui.layout.thumbsticks"), mouseX, mouseY);
+            graphics.renderTooltip(this.font, Component.translatable("controllable.gui.layout.thumbsticks"), mouseX, mouseY);
         }
     }
 
@@ -199,11 +198,11 @@ public class ControllerLayoutScreen extends Screen
         return this.states.getState(button);
     }
 
-    private void drawMultiLineCenteredString(PoseStack matrixStack, Font font, Component component, int x, int y, int width, int color)
+    private void drawMultiLineCenteredString(GuiGraphics graphics, Font font, Component component, int x, int y, int width, int color)
     {
         for(FormattedCharSequence s : font.split(component, width))
         {
-            font.draw(matrixStack, s, (float) (x - font.width(s) / 2.0), y, color);
+            graphics.drawCenteredString(font, s, x - font.width(s) / 2, y, color);
             y += font.lineHeight;
         }
     }

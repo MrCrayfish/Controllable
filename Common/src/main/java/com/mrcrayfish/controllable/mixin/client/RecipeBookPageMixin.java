@@ -1,12 +1,12 @@
 package com.mrcrayfish.controllable.mixin.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ButtonBindings;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
@@ -34,7 +34,7 @@ public class RecipeBookPageMixin
     private Minecraft minecraft;
 
     @Inject(method = "renderTooltip", at = @At(value = "TAIL"))
-    private void controllableRenderTooltipTail(PoseStack stack, int mouseX, int mouseY, CallbackInfo ci)
+    private void controllableRenderTooltipTail(GuiGraphics graphics, int mouseX, int mouseY, CallbackInfo ci)
     {
         if(Controllable.getInput().isControllerInUse() && Config.CLIENT.client.options.quickCraft.get())
         {
@@ -46,7 +46,7 @@ public class RecipeBookPageMixin
                     if(((OverlayRecipeButtonAccessor) btn).controllableIsCraftable())
                     {
                         Component craftText = Component.translatable("controllable.tooltip.craft", ClientHelper.getButtonComponent(ButtonBindings.PICKUP_ITEM.getButton())).withStyle(ChatFormatting.YELLOW);
-                        this.minecraft.screen.renderTooltip(stack, craftText, mouseX, mouseY);
+                        graphics.renderTooltip(this.minecraft.font, craftText, mouseX, mouseY);
                     }
                 });
             }

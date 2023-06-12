@@ -39,7 +39,7 @@ public class ScreenEvents
     {
         if(Config.CLIENT.client.options.consoleHotbar.get() && INCLUDED_OVERLAYS.contains(event.getOverlay().overlay()))
         {
-            event.getPoseStack().translate(0, -20, 0);
+            event.getGuiGraphics().pose().translate(0, -20, 0);
             /*if(event.getOverlay() == VanillaGuiOverlay.HOTBAR.type())
             {
                 //RenderSystem.getModelViewStack().translate(0, -20, 0);
@@ -52,7 +52,7 @@ public class ScreenEvents
     {
         if(Config.CLIENT.client.options.consoleHotbar.get() && INCLUDED_OVERLAYS.contains(event.getOverlay().overlay()))
         {
-            event.getPoseStack().translate(0, 20, 0);
+            event.getGuiGraphics().pose().translate(0, 20, 0);
             /*if(event.getOverlay() == VanillaGuiOverlay.HOTBAR.type())
             {
                 //RenderSystem.getModelViewStack().translate(0, 20, 0);

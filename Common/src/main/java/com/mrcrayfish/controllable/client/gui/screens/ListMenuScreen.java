@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
@@ -141,26 +142,26 @@ public abstract class ListMenuScreen extends Screen
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
         // Draws the background texture (dirt or custom texture)
-        this.renderBackground(poseStack);
+        this.renderBackground(graphics);
 
         // Draws widgets manually since they are not buttons
-        this.list.render(poseStack, mouseX, mouseY, partialTicks);
-        this.searchTextField.render(poseStack, mouseX, mouseY, partialTicks);
+        this.list.render(graphics, mouseX, mouseY, partialTicks);
+        this.searchTextField.render(graphics, mouseX, mouseY, partialTicks);
 
         // Draw title
         int titleY = 7 + (!this.searchBarVisible && this.subTitle == null ? 5 : 0);
-        drawCenteredString(poseStack, this.font, this.title, this.width / 2, titleY, 0xFFFFFF);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, titleY, 0xFFFFFF);
 
         // Draw sub title
         if(this.subTitle != null)
         {
-            drawCenteredString(poseStack, this.font, this.subTitle, this.width / 2, 21, 0xFFFFFF);
+            graphics.drawCenteredString(this.font, this.subTitle, this.width / 2, 21, 0xFFFFFF);
         }
 
-        super.render(poseStack, mouseX, mouseY, partialTicks);
+        super.render(graphics, mouseX, mouseY, partialTicks);
 
         // Gives a chance for child classes to set the active tooltip
         this.updateTooltip(mouseX, mouseY);
@@ -220,13 +221,13 @@ public abstract class ListMenuScreen extends Screen
         }
 
         @Override
-        public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks)
+        public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
         {
-            super.render(poseStack, mouseX, mouseY, partialTicks);
-            this.renderToolTips(poseStack, mouseX, mouseY);
+            super.render(graphics, mouseX, mouseY, partialTicks);
+            this.renderToolTips(graphics, mouseX, mouseY);
         }
 
-        private void renderToolTips(PoseStack poseStack, int mouseX, int mouseY)
+        private void renderToolTips(GuiGraphics graphics, int mouseX, int mouseY)
         {
             if(this.isMouseOver(mouseX, mouseY) && mouseX < ListMenuScreen.this.list.getRowLeft() + ListMenuScreen.this.list.getRowWidth() - 67)
             {
@@ -321,9 +322,9 @@ public abstract class ListMenuScreen extends Screen
         }
 
         @Override
-        public void render(PoseStack poseStack, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
-            Screen.drawCenteredString(poseStack, Objects.requireNonNull(ListMenuScreen.this.minecraft).font, this.label, left + width / 2, top + 5, 0xFFFFFF);
+            graphics.drawCenteredString(Objects.requireNonNull(ListMenuScreen.this.minecraft).font, this.label, left + width / 2, top + 5, 0xFFFFFF);
         }
     }
 

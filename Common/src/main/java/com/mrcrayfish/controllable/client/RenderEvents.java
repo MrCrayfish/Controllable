@@ -19,6 +19,7 @@ import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.screens.Screen;
@@ -50,15 +51,12 @@ public class RenderEvents
     public static final ResourceLocation CONTROLLER_BUTTONS = new ResourceLocation(Constants.MOD_ID, "textures/gui/buttons.png");
     public static final int CONTROLLER_BUTTONS_WIDTH = Buttons.LENGTH * 13;
     public static final int CONTROLLER_BUTTONS_HEIGHT = ControllerIcons.values().length * 13;
-
     private static final Map<Integer, Action> actions = new HashMap<>();
-    private static boolean navigationBarCheck;
 
     public static void init()
     {
         TickEvents.START_CLIENT.register(RenderEvents::onClientTickStart);
         ScreenEvents.AFTER_DRAW_CONTAINER_BACKGROUND.register(RenderEvents::onRenderBackground);
-        TickEvents.END_RENDER.register((partialTick) -> RenderEvents.onRenderEnd());
         ScreenEvents.MODIFY_WIDGETS.register((screen, widgets, add, remove) -> {
             screen.children().stream().filter(e -> e instanceof TabNavigationBar).map(e -> (TabNavigationBar) e).findFirst().ifPresent(bar -> {
                 ClientServices.CLIENT.addRenderableToScreen(screen, new TabNavigationHint(bar.children()));
@@ -250,41 +248,29 @@ public class RenderEvents
         }
     }
 
-    private static void onRenderEnd()
+    public static void onLastRenderGui(GuiGraphics graphics)
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.options.hideGui)
             return;
 
-        PoseStack modelStack = RenderSystem.getModelViewStack();
-        modelStack.pushPose();
-        modelStack.setIdentity();
-        modelStack.translate(0, 0, 1000F - ClientServices.CLIENT.getGuiFarPlane());
-        RenderSystem.applyModelViewMatrix();
-        Lighting.setupFor3DItems();
-        PoseStack poseStack = new PoseStack();
+        if(Controllable.getController() == null)
+            return;
 
-        if(Controllable.getController() != null)
-        {
-            if(Controllable.getInput().getLastUse() > 0)
-            {
-                renderHints(poseStack);
-                renderMiniPlayer(poseStack);
-            }
-        }
+        if(Controllable.getInput().getLastUse() <= 0)
+            return;
 
-        modelStack.popPose();
-        RenderSystem.applyModelViewMatrix();
+        renderHints(graphics);
+        renderMiniPlayer(graphics);
     }
 
-    private static void renderHints(PoseStack poseStack)
+    private static void renderHints(GuiGraphics graphics)
     {
         if(!ClientServices.CLIENT.sendLegacyRenderAvailableActionsEvent())
         {
             Minecraft mc = Minecraft.getInstance();
-            Gui guiIngame = mc.gui;
-            List<GuiMessage.Line> messages = ClientServices.CLIENT.getChatTrimmedMessages(guiIngame.getChat());
-            boolean isChatVisible = mc.screen == null && messages.stream().anyMatch(chatLine -> guiIngame.getGuiTicks() - chatLine.addedTime() < 200);
+            List<GuiMessage.Line> messages = ClientServices.CLIENT.getChatTrimmedMessages(mc.gui.getChat());
+            boolean isChatVisible = mc.screen == null && messages.stream().anyMatch(chatLine -> mc.gui.getGuiTicks() - chatLine.addedTime() < 200);
 
             int leftIndex = 0;
             int rightIndex = 0;
@@ -297,15 +283,6 @@ public class RenderEvents
                 {
                     side = Action.Side.LEFT;
                 }
-/*
-                int remappedButton = button;
-                Controller controller = Controllable.getController();
-                Mappings.Entry mapping = controller.getMapping();
-                if(mapping != null)
-                {
-                    remappedButton = mapping.remap(button);
-                }
-*/
 
                 int texU = button * 13;
                 int texV = Config.CLIENT.client.options.controllerIcons.get().ordinal() * 13;
@@ -314,55 +291,61 @@ public class RenderEvents
                 int x = side == Action.Side.LEFT ? 5 : mc.getWindow().getGuiScaledWidth() - 5 - size; //TODO test
                 int y = mc.getWindow().getGuiScaledHeight() + (side == Action.Side.LEFT ? leftIndex : rightIndex) * -15 - size - 5;
 
-                RenderSystem.setShaderTexture(0, CONTROLLER_BUTTONS);
+                if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2)
+                    continue;
+
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-                if(isChatVisible && side == Action.Side.LEFT && leftIndex >= 2) continue;
-
                 /* Draw buttons icon */
-                Screen.blit(poseStack, x, y, texU, texV, size, size, CONTROLLER_BUTTONS_WIDTH, CONTROLLER_BUTTONS_HEIGHT);
+                graphics.blit(CONTROLLER_BUTTONS, x, y, texU, texV, size, size, CONTROLLER_BUTTONS_WIDTH, CONTROLLER_BUTTONS_HEIGHT);
+
+                PoseStack pose = graphics.pose();
+                pose.pushPose();
 
                 /* Draw description text */
+                int textWidth = mc.font.width(action.getDescription());
                 if(side == Action.Side.LEFT)
                 {
-                    int textWidth = mc.font.width(action.getDescription());
-                    drawHintBackground(poseStack, x + 18, y, textWidth, 13);
-                    mc.font.draw(poseStack, action.getDescription(), x + 18, y + 3, 0xFFFFFFFF);
+                    drawHintBackground(graphics, x + 18, y, textWidth, 13);
+                    graphics.drawString(mc.font, action.getDescription(), x + 18, y + 3, 0xFFFFFFFF);
                     leftIndex++;
                 }
                 else
                 {
-                    int textWidth = mc.font.width(action.getDescription());
-                    drawHintBackground(poseStack, x - 5 - textWidth, y, textWidth, 13);
-                    mc.font.draw(poseStack, action.getDescription(), x - 5 - textWidth, y + 3, 0xFFFFFFFF);
+                    drawHintBackground(graphics, x - 5 - textWidth, y, textWidth, 13);
+                    pose.translate(0, 0, 400F);
+                    graphics.drawString(mc.font, action.getDescription(), x - 5 - textWidth, y + 3, 0xFFFFFFFF);
                     rightIndex++;
                 }
+
+                pose.popPose();
             }
         }
     }
 
-    private static void drawHintBackground(PoseStack poseStack, int x, int y, int width, int height)
+    private static void drawHintBackground(GuiGraphics graphics, int x, int y, int width, int height)
     {
         if(!Config.CLIENT.client.options.drawHintBackground.get())
             return;
         Minecraft mc = Minecraft.getInstance();
         int backgroundColor = mc.options.getBackgroundColor(0.5F);
-        ScreenUtil.drawRoundedBox(poseStack, x, y, width, height, backgroundColor);
+        ScreenUtil.drawRoundedBox(graphics, x, y, width, height, backgroundColor);
+        graphics.pose().translate(0, 0, 1);
     }
 
-    private static void renderMiniPlayer(PoseStack poseStack)
+    private static void renderMiniPlayer(GuiGraphics graphics)
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.player != null && mc.screen == null && Config.CLIENT.client.options.renderMiniPlayer.get())
         {
             if(!EventHelper.postRenderMiniPlayer())
             {
-                InventoryScreen.renderEntityInInventoryFollowsMouse(poseStack, 20, 45, 20, 0, 0, mc.player);
+                InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, 20, 45, 20, 0, 0, mc.player);
             }
         }
     }
 
-    private static void onRenderBackground(AbstractContainerScreen<?> screen, PoseStack poseStack, int mouseX, int mouseY)
+    private static void onRenderBackground(AbstractContainerScreen<?> screen, GuiGraphics graphics, int mouseX, int mouseY)
     {
         if(!Controllable.getInput().isControllerInUse())
             return;
@@ -374,26 +357,25 @@ public class RenderEvents
                 return;
 
             Font font = Minecraft.getInstance().font;
-
             List<RecipeBookTabButton> tabButtons = ((RecipeBookComponentAccessor) recipeBook).controllableGetTabButtons();
             if(!tabButtons.isEmpty())
             {
                 RecipeBookTabButton first = tabButtons.get(0);
                 RecipeBookTabButton last = tabButtons.get(tabButtons.size() - 1);
-                font.draw(poseStack, ClientHelper.getButtonComponent(ButtonBindings.NEXT_RECIPE_TAB.getButton()), first.getX() + 15 - 5, first.getY() - 13, 0xFFFFFF);
-                font.draw(poseStack, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.getX() + 15 - 5, last.getY() + last.getHeight() + 13 - 9, 0xFFFFFF);
+                graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_RECIPE_TAB.getButton()), first.getX() + 15 - 5, first.getY() - 13, 0xFFFFFF);
+                graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.getX() + 15 - 5, last.getY() + last.getHeight() + 13 - 9, 0xFFFFFF);
             }
 
             RecipeBookPage page = ((RecipeBookComponentAccessor) recipeBook).controllableGetRecipeBookPage();
             StateSwitchingButton forwardButton = ((RecipeBookPageAccessor) page).controllableGetForwardButton();
             if(forwardButton.visible)
             {
-                font.draw(poseStack, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.getX() + 24 - 5, forwardButton.getY() + 4, 0xFFFFFF);
+                graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.getX() + 24 - 5, forwardButton.getY() + 4, 0xFFFFFF);
             }
             StateSwitchingButton backButton = ((RecipeBookPageAccessor) page).controllableGetBackButton();
             if(backButton.visible)
             {
-                font.draw(poseStack, ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.getX() - 24 + 12 - 5, backButton.getY() + 4, 0xFFFFFF);
+                graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.getX() - 24 + 12 - 5, backButton.getY() + 4, 0xFFFFFF);
             }
         }
     }

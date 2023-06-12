@@ -1,7 +1,6 @@
 package com.mrcrayfish.controllable.client.gui.components;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.ControllerManager;
@@ -9,8 +8,7 @@ import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -27,6 +25,8 @@ import java.util.Objects;
  */
 public class ControllerList extends TabSelectionList<ControllerList.ControllerEntry>
 {
+    private static final ResourceLocation BEACON_TEXTURE = new ResourceLocation("textures/gui/container/beacon.png");
+
     private final ControllerManager manager;
     private final MutableComponent footerSubText;
     private int controllerCount;
@@ -125,21 +125,20 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
         }
 
         @Override
-        public void render(PoseStack poseStack, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTicks)
+        public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTicks)
         {
             // Draws a transparent black background on every odd item to help match the widgets with the label
             if(ControllerList.this.getSelected() == this)
             {
-                RenderSystem.setShaderTexture(0, new ResourceLocation("textures/gui/container/beacon.png"));
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-                Screen.blit(poseStack, left + 3, top + 3, 91, 224, 14, 12, 256, 256);
+                graphics.blit(BEACON_TEXTURE, left + 3, top + 3, 91, 224, 14, 12, 256, 256);
             }
             else if(slotIndex % 2 != 0)
             {
-                Screen.fill(poseStack, left - 2, top - 2, left + listWidth + 2, top + slotHeight + 2, 0x55000000);
+                graphics.fill(left - 2, top - 2, left + listWidth + 2, top + slotHeight + 2, 0x55000000);
             }
             Font font = Minecraft.getInstance().font;
-            GuiComponent.drawString(poseStack, font, this.label, left + 22, top + (slotHeight - font.lineHeight) / 2 + 1, 0xFFFFFF);
+            graphics.drawString(font, this.label, left + 22, top + (slotHeight - font.lineHeight) / 2 + 1, 0xFFFFFF);
         }
 
         @Override

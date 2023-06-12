@@ -36,13 +36,13 @@ public class GLFWController extends Controller
     @Override
     public Number getJid()
     {
-        return null;
+        return this.deviceIndex;
     }
 
     @Override
     public boolean isOpen()
     {
-        return false;
+        return this.controller != null && GLFW.glfwJoystickPresent(this.deviceIndex);
     }
 
     @Override

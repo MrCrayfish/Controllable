@@ -1,14 +1,13 @@
 package com.mrcrayfish.controllable.client.gui.components;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
 import com.mrcrayfish.controllable.client.util.ScreenUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
@@ -18,7 +17,6 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 import java.util.Collections;
@@ -119,22 +117,22 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
-        super.render(poseStack, mouseX, mouseY, partialTick);
+        super.render(graphics, mouseX, mouseY, partialTick);
         if(this.headerText != null)
         {
-            GuiComponent.drawCenteredString(poseStack, TabSelectionList.this.minecraft.font, this.headerText, this.x0 + this.width / 2, this.y0 - 15, 0xFFFFFF);
+            graphics.drawCenteredString(TabSelectionList.this.minecraft.font, this.headerText, this.x0 + this.width / 2, this.y0 - 15, 0xFFFFFF);
         }
         if(this.footerText != null)
         {
             Font font = TabSelectionList.this.minecraft.font;
             int footerWidth = font.width(this.footerText);
-            ScreenUtil.drawRoundedBox(poseStack, this.x0 + (this.width - footerWidth) / 2, this.y1 + 4, footerWidth, 14, 0x55000000);
-            GuiComponent.drawCenteredString(poseStack, font, this.footerText, this.x0 + this.width / 2, this.y1 + 7, 0xFFFFFF);
+            ScreenUtil.drawRoundedBox(graphics, this.x0 + (this.width - footerWidth) / 2, this.y1 + 4, footerWidth, 14, 0x55000000);
+            graphics.drawCenteredString(font, this.footerText, this.x0 + this.width / 2, this.y1 + 7, 0xFFFFFF);
         }
-        fillGradient(poseStack, this.x0, this.y0, this.x1, this.y0 + 4, 0xFF000000, 0);
-        fillGradient(poseStack, this.x0, this.y1 - 4, this.x1, this.y1, 0, 0xFF000000);
+        graphics.fillGradient(this.x0, this.y0, this.x1, this.y0 + 4, 0xFF000000, 0);
+        graphics.fillGradient(this.x0, this.y1 - 4, this.x1, this.y1, 0, 0xFF000000);
     }
 
     @Override
@@ -191,7 +189,7 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         }
 
         @Override
-        public void render(PoseStack poseStack, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
 
         }
@@ -210,12 +208,12 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         }
 
         @Override
-        public void render(PoseStack poseStack, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
             Font font = Objects.requireNonNull(TabSelectionList.this.minecraft).font;
             int labelWidth = font.width(this.label) + 2;
-            ScreenUtil.drawRoundedBox(poseStack, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
-            Screen.drawCenteredString(poseStack, font, this.label, left + width / 2, top + 5, 0xFFFFFF);
+            ScreenUtil.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
+            graphics.drawCenteredString(font, this.label, left + width / 2, top + 5, 0xFFFFFF);
         }
 
         @Override
@@ -242,12 +240,12 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         }
 
         @Override
-        public void render(PoseStack poseStack, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
+        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
         {
             this.button.setWidth(width / 2);
             this.button.setX(left + width / 4);
             this.button.setY(top);
-            this.button.render(poseStack, mouseX, mouseY, partialTick);
+            this.button.render(graphics, mouseX, mouseY, partialTick);
         }
 
         @Override

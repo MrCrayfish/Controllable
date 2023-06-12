@@ -1,16 +1,15 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 
 /**
  * Author: MrCrayfish
  */
-public class ControllerButton extends GuiComponent
+public class ControllerButton
 {
     protected ControllerLayoutScreen screen;
     protected int button;
@@ -33,10 +32,9 @@ public class ControllerButton extends GuiComponent
         this.scale = scale;
     }
 
-    public void draw(PoseStack poseStack, int x, int y, int mouseX, int mouseY, boolean selected)
+    public void draw(GuiGraphics graphics, int x, int y, int mouseX, int mouseY, boolean selected)
     {
         RenderSystem.enableBlend();
-        RenderSystem.setShaderTexture(0, ControllerLayoutScreen.TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int buttonU = this.u;
         int buttonV = this.v;
@@ -54,7 +52,7 @@ public class ControllerButton extends GuiComponent
         {
             buttonV += this.height;
         }
-        blit(poseStack, buttonX, buttonY, this.width * this.scale, this.height * this.scale, buttonU, buttonV, this.width, this.height, 256, 256);
+        graphics.blit(ControllerLayoutScreen.TEXTURE, buttonX, buttonY, this.width * this.scale, this.height * this.scale, buttonU, buttonV, this.width, this.height, 256, 256);
         RenderSystem.disableBlend();
     }
 

@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.gui.widget;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.gui.components.TabSelectionList;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -30,7 +31,7 @@ public class TabListWidget extends AbstractWidget implements ContainerEventHandl
     }
 
     @Override
-    public void renderWidget(PoseStack poseStack, int mouseX, int mouseY, float partialTick)
+    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
         ScreenRectangle dimensions = this.dimensions.get();
         this.setX(dimensions.left());
@@ -38,7 +39,7 @@ public class TabListWidget extends AbstractWidget implements ContainerEventHandl
         this.width = dimensions.width();
         this.height = dimensions.height();
         this.list.updateDimensions(dimensions);
-        this.list.render(poseStack, mouseX, mouseY, partialTick);
+        this.list.render(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override

@@ -12,6 +12,8 @@ import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -166,15 +168,16 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void render(PoseStack matrixStack, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void render(GuiGraphics graphics, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
-            KeyBindingListMenuScreen.this.minecraft.font.draw(matrixStack, this.label, left, y + 6, 0xFFFFFF);
+            Font font = KeyBindingListMenuScreen.this.minecraft.font;
+            graphics.drawString(font, this.label, left, y + 6, 0xFFFFFF);
             this.addBinding.setX(left + width - 42);
             this.addBinding.setY(y);
-            this.addBinding.render(matrixStack, mouseX, mouseY, partialTicks);
+            this.addBinding.render(graphics, mouseX, mouseY, partialTicks);
             this.removeBinding.setX(left + width - 20);
             this.removeBinding.setY(y);
-            this.removeBinding.render(matrixStack, mouseX, mouseY, partialTicks);
+            this.removeBinding.render(graphics, mouseX, mouseY, partialTicks);
         }
 
         @Override

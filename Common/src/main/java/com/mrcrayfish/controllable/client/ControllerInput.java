@@ -34,6 +34,7 @@ import net.minecraft.Util;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -327,7 +328,7 @@ public class ControllerInput
         }
     }
 
-    private void onScreenRenderPre(Screen screen, PoseStack poseStack, int mouseX, int mouseY, float partialTick)
+    private void onScreenRenderPre(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
         /* Makes the cursor movement appear smooth between ticks. This will only run if the target
          * mouse position is different to the previous tick's position. This allows for the mouse
@@ -369,11 +370,12 @@ public class ControllerInput
         }
     }
 
-    public void drawVirtualCursor(Screen screen, PoseStack poseStack, int mouseX, int mouseY, float partialTick)
+    public void drawVirtualCursor(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
         if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && this.lastUse > 0)
         {
-            poseStack.pushPose();
+            PoseStack stack = graphics.pose();
+            stack.pushPose();
             CursorType type = Config.CLIENT.client.options.cursorType.get();
             Minecraft mc = Minecraft.getInstance();
             if(mc.player == null || (mc.player.inventoryMenu.getCarried().isEmpty() || type == CursorType.CONSOLE))
@@ -382,16 +384,15 @@ public class ControllerInput
                 double virtualCursorX = (this.prevCursorX + (this.cursorX - this.prevCursorX) * mc.getFrameTime());
                 double virtualCursorY = (this.prevCursorY + (this.cursorY - this.prevCursorY) * mc.getFrameTime());
                 double zIndex = Services.PLATFORM.isForge() ? 500 : 3000; // Hack until I make Forge/Fabric calls the same
-                poseStack.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, zIndex);
-                RenderSystem.setShaderTexture(0, CURSOR_TEXTURE);
+                stack.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, zIndex);
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 if(type == CursorType.CONSOLE)
                 {
-                    poseStack.scale(0.5F, 0.5F, 0.5F);
+                    stack.scale(0.5F, 0.5F, 0.5F);
                 }
-                Screen.blit(poseStack, -8, -8, 16, 16, this.nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
+                graphics.blit(CURSOR_TEXTURE, -8, -8, 16, 16, this.nearSlot ? 16 : 0, type.ordinal() * 16, 16, 16, 32, CursorType.values().length * 16);
             }
-            poseStack.popPose();
+            stack.popPose();
         }
     }
 

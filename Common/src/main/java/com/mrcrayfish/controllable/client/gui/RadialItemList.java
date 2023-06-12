@@ -1,12 +1,13 @@
 package com.mrcrayfish.controllable.client.gui;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ColorButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
@@ -130,22 +131,23 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
         }
 
         @Override
-        public void render(PoseStack poseStack, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTicks)
+        public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTicks)
         {
-            RadialItemList.this.minecraft.font.draw(poseStack, this.label, left + 5, top + 5, 0xFFFFFF);
-            RadialItemList.this.minecraft.font.draw(poseStack, this.description, left + 5, top + 18, 0xFFFFFF);
+            Font font = RadialItemList.this.minecraft.font;
+            graphics.drawString(font, this.label, left + 5, top + 5, 0xFFFFFF);
+            graphics.drawString(font, this.description, left + 5, top + 18, 0xFFFFFF);
             this.colorButton.visible = RadialItemList.this.getSelected() == this;
             this.colorButton.setX(left + RadialItemList.this.getRowWidth() - 78);
             this.colorButton.setY(top + 6);
-            this.colorButton.render(poseStack, mouseX, mouseY, partialTicks);
+            this.colorButton.render(graphics, mouseX, mouseY, partialTicks);
             this.moveUpButton.visible = RadialItemList.this.getSelected() == this;
             this.moveUpButton.setX(left + RadialItemList.this.getRowWidth() - 34);
             this.moveUpButton.setY(top + 6);
-            this.moveUpButton.render(poseStack, mouseX, mouseY, partialTicks);
+            this.moveUpButton.render(graphics, mouseX, mouseY, partialTicks);
             this.moveDownButton.visible = RadialItemList.this.getSelected() == this;
             this.moveDownButton.setX(left + RadialItemList.this.getRowWidth() - 56);
             this.moveDownButton.setY(top + 6);
-            this.moveDownButton.render(poseStack, mouseX, mouseY, partialTicks);
+            this.moveDownButton.render(graphics, mouseX, mouseY, partialTicks);
         }
 
         @Override

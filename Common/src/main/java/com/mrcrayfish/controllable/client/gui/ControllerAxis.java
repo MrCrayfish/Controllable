@@ -1,9 +1,9 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
+import net.minecraft.client.gui.GuiGraphics;
 
 /**
  * Author: MrCrayfish
@@ -16,9 +16,9 @@ public class ControllerAxis extends ControllerButton
     }
 
     @Override
-    public void draw(PoseStack poseStack, int x, int y, int mouseX, int mouseY, boolean selected)
+    public void draw(GuiGraphics graphics, int x, int y, int mouseX, int mouseY, boolean selected)
     {
-        poseStack.pushPose();
+        graphics.pose().pushPose();
         Controller controller = Controllable.getController();
         if(controller != null)
         {
@@ -45,10 +45,10 @@ public class ControllerAxis extends ControllerButton
 
             if(!this.screen.isButtonPressed(this.button))
             {
-                poseStack.translate(0, -5, 0);
+                graphics.pose().translate(0, -5, 0);
             }
         }
-        super.draw(poseStack, x, y, mouseX, mouseY, selected);
-        poseStack.popPose();
+        super.draw(graphics, x, y, mouseX, mouseY, selected);
+        graphics.pose().popPose();
     }
 }
