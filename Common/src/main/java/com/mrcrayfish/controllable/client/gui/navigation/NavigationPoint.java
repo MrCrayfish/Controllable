@@ -35,6 +35,11 @@ public abstract class NavigationPoint
         return this.type;
     }
 
+    public boolean shouldHide()
+    {
+        return false;
+    }
+
     /**
      * Called when the cursor navigates to this point
      */

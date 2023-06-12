@@ -107,6 +107,7 @@ public class ControllerInput
     private boolean moving = false;
     private boolean preventReset;
     private boolean ignoreInput;
+    private boolean hideVirtualCursor;
     private double virtualCursorX;
     private double virtualCursorY;
     private int prevCursorX;
@@ -123,6 +124,7 @@ public class ControllerInput
 
     public ControllerInput()
     {
+
         TickEvents.START_CLIENT.register(this::onClientTick);
         TickEvents.START_CLIENT.register(this::onClientTickStart);
         TickEvents.END_RENDER.register(this::onRenderTickEnd);
@@ -301,6 +303,7 @@ public class ControllerInput
             this.cursorY = Mth.clamp(this.cursorY, 0, mc.getWindow().getHeight());
             this.setControllerInUse();
             this.moved = true;
+            this.hideVirtualCursor = false;
         }
 
         this.moveCursorToClosestSlot(this.moving, mc.screen);
@@ -328,6 +331,7 @@ public class ControllerInput
             this.virtualCursorX = this.cursorX = this.prevCursorX = (int) (mc.getWindow().getWidth() / 2F);
             this.virtualCursorY = this.cursorY = this.prevCursorY = (int) (mc.getWindow().getHeight() / 2F);
         }
+        this.hideVirtualCursor = false;
     }
 
     private void onScreenRenderPre(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
@@ -374,7 +378,7 @@ public class ControllerInput
 
     public void drawVirtualCursor(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
-        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && this.lastUse > 0)
+        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && this.lastUse > 0 && !this.hideVirtualCursor)
         {
             PoseStack stack = graphics.pose();
             stack.pushPose();
@@ -1076,6 +1080,7 @@ public class ControllerInput
                     mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, 2.0F));
                 }
                 this.performMouseDrag(this.cursorX, this.cursorY, screenX - lastTargetX, screenY - lastTargetY);
+                this.hideVirtualCursor = targetPoint.shouldHide();
             });
         }
     }

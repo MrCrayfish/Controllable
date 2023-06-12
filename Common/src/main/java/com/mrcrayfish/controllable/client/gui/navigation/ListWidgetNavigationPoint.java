@@ -1,8 +1,11 @@
 package com.mrcrayfish.controllable.client.gui.navigation;
 
 import com.mrcrayfish.controllable.platform.ClientServices;
+import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.TabButton;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
 /**
@@ -60,5 +63,11 @@ public class ListWidgetNavigationPoint extends NavigationPoint
             double scroll = this.list.children().indexOf(this.listEntry) * itemHeight + itemHeight - (listBottom - listTop) + 4 + itemHeight / 2;
             this.list.setScrollAmount(scroll);
         }
+    }
+
+    @Override
+    public boolean shouldHide()
+    {
+        return this.widget instanceof AbstractButton || this.widget instanceof TabButton || this.widget instanceof HideCursor;
     }
 }

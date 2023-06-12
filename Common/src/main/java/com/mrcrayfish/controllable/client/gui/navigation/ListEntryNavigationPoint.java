@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client.gui.navigation;
 
+import com.mrcrayfish.controllable.client.gui.components.TabOptionBaseItem;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -18,6 +19,7 @@ public class ListEntryNavigationPoint extends NavigationPoint
     private final int itemHeight;
     private final int dir;
     private int itemY;
+    private boolean hideCursor;
 
     public ListEntryNavigationPoint(AbstractSelectionList<?> list, GuiEventListener listEntry, int index, int dir)
     {
@@ -72,6 +74,8 @@ public class ListEntryNavigationPoint extends NavigationPoint
             entry = children.get(0);
         }
 
+        this.hideCursor = entry instanceof HideCursor;
+
         int rowTop = ClientServices.CLIENT.getAbstractListRowTop(this.list, index);
         int rowBottom = ClientServices.CLIENT.getAbstractListRowBottom(this.list, index);
         int listTop = ClientServices.CLIENT.getAbstractListTop(this.list);
@@ -88,5 +92,11 @@ public class ListEntryNavigationPoint extends NavigationPoint
         }
 
         this.itemY = ClientServices.CLIENT.getAbstractListRowTop(this.list, index) + this.itemHeight / 2 - 2;
+    }
+
+    @Override
+    public boolean shouldHide()
+    {
+        return this.hideCursor;
     }
 }

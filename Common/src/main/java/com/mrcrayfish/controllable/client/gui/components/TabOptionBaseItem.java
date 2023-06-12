@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.gui.components;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.gui.navigation.HideCursor;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -16,7 +17,7 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem
+public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implements HideCursor
 {
     private int labelColor = 0xFFFFFFFF;
 
