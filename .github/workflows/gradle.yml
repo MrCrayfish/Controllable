@@ -42,11 +42,10 @@ jobs:
       run: |
         echo "forge=Forge/build/libs/${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}" >> "$GITHUB_OUTPUT"
         echo "fabric=Fabric/build/libs/${{ steps.mod_id.outputs.value }}-fabric-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}" >> "$GITHUB_OUTPUT"
-    - name: Load secrets
+    - name: Import GPG
       env:
         SIGNING_KEY: ${{ secrets.MRCRAYFISH_MODS_KEY }}
         PASSPHRASE: ${{ secrets.PASSPHRASE }}
-    - name: Import GPG
       if: ${{ env.SIGNING_KEY != '' && env.PASSPHRASE != '' }}
       uses: crazy-max/ghaction-import-gpg@v5.3.0
       with:
