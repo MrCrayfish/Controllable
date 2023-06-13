@@ -1,13 +1,6 @@
-def githubFile = new File(System.getenv("GITHUB_CREDENTIALS"))
-def githubProperties = new Properties()
-githubProperties.load(new FileInputStream(githubFile))
-project.ext {
-    githubCredentials = githubProperties
-}
-
 subprojects {
-
     apply plugin: 'java'
+    apply plugin: 'signing'
 
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
     java.withSourcesJar()
@@ -56,15 +49,15 @@ subprojects {
             url = 'https://maven.blamejared.com'
         }
         maven {
+            url "file://" + System.getenv("LOCAL_MAVEN")
+        }
+        maven {
             name = "MrCrayfish (GitHub)"
             url = "https://maven.pkg.github.com/MrCrayfish/Maven"
             credentials {
-                username = githubCredentials['GITHUB_USERNAME']
-                password = githubCredentials['GITHUB_TOKEN']
+                username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
+                password = project.findProperty("gpr.key") ?: System.getenv("GPR_KEY")
             }
-        }
-        maven {
-            url "file://" + System.getenv("LOCAL_MAVEN")
         }
     }
 

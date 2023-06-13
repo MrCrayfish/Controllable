@@ -80,9 +80,13 @@ publishing {
             name = "GitHubPackages"
             url = "https://maven.pkg.github.com/MrCrayfish/Maven"
             credentials {
-                username = githubCredentials['GITHUB_USERNAME']
-                password = githubCredentials['GITHUB_TOKEN']
+                username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
+                password = project.findProperty("gpr.key") ?: System.getenv("GPR_KEY")
             }
         }
     }
+}
+
+signing {
+    sign publishing.publications.mavenJava
 }
