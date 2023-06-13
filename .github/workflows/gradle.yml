@@ -20,6 +20,9 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x ./gradlew
     - name: Build
+      env:
+        GITHUB_USERNAME: ${{ secrets.PACKAGES_USERNAME }}
+        GITHUB_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
       run: ./gradlew build
     - name: Read modid from gradle.properties
       id: mod_id
