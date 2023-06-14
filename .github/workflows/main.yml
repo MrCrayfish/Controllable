@@ -24,7 +24,7 @@ jobs:
         JKS: ${{ secrets.MRCRAYFISH_JKS }}
       if: ${{ env.JKS != '' }}
       run: |
-        echo ${{ env.JKS }} | base64 --decode > ${{ env.GITHUB_WORKSPACE }}/keystore.jks
+        echo -n "${{ env.JKS }}" | base64 --decode > ${{ env.GITHUB_WORKSPACE }}/keystore.jks
         echo "KEYSTORE=${{ env.GITHUB_WORKSPACE }}/keystore.jks" >> $GITHUB_ENV 
         echo "KEYSTORE_ALIAS=${{ secrets.MRCRAYFISH_JKS_ALIAS }}" >> $GITHUB_ENV
         echo "KEYSTORE_PASS=${{ secrets.MRCRAYFISH_JKS_PASSPHRASE }}" >> $GITHUB_ENV
