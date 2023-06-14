@@ -1,5 +1,8 @@
 name: Build and Sign Mod
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - 'release_build'
 jobs:
   build:
     runs-on: ubuntu-latest
