@@ -24,8 +24,8 @@ jobs:
         JKS: ${{ secrets.MRCRAYFISH_JKS }}
       if: ${{ env.JKS != '' }}
       run: |
-        echo -n "${{ env.JKS }}" | base64 --decode > ~/keystore.jks
-        echo "KEYSTORE=~/keystore.jks" >> $GITHUB_ENV 
+        echo ${{ env.JKS }} | base64 --decode > ${{ env.GITHUB_WORKSPACE }}/keystore.jks
+        echo "KEYSTORE=${{ env.GITHUB_WORKSPACE }}/keystore.jks" >> $GITHUB_ENV 
         echo "KEYSTORE_ALIAS=${{ secrets.MRCRAYFISH_JKS_ALIAS }}" >> $GITHUB_ENV
         echo "KEYSTORE_PASS=${{ secrets.MRCRAYFISH_JKS_PASSPHRASE }}" >> $GITHUB_ENV
     - name: Make gradlew executable
