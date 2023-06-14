@@ -24,15 +24,15 @@ jobs:
         JKS: ${{ secrets.MRCRAYFISH_JKS }}
       if: ${{ env.JKS != '' }}
       run: |
-        echo -n "${{ env.JKS }}" | base64 --decode > mrcrayfish.jks
-        echo "KEYSTORE=mrcrayfish.jks" >> $GITHUB_ENV 
+        echo -n "${{ env.JKS }}" | base64 --decode > ~/keystore.jks
+        echo "KEYSTORE=~/keystore.jks" >> $GITHUB_ENV 
         echo "KEYSTORE_ALIAS=${{ secrets.MRCRAYFISH_JKS_ALIAS }}" >> $GITHUB_ENV
         echo "KEYSTORE_PASS=${{ secrets.MRCRAYFISH_JKS_PASSPHRASE }}" >> $GITHUB_ENV
     - name: Make gradlew executable
       run: chmod +x ./gradlew
     - name: Build
       env:
-        GPR_USER: ${{ secrets.GPR_USER }}
+        GPR_USER: "MrCrayfish"
         GPR_KEY: ${{ secrets.GPR_TOKEN }}
       run: ./gradlew build
     - name: Stop Gradle
