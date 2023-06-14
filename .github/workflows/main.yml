@@ -18,14 +18,19 @@ jobs:
       with:
         path: ~/.gradle/caches
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle') }}
-    - name: Load JKS
-      id: load_jks
+    - name: Load Keystore
+      id: load_keystore
       env:
         JKS: ${{ secrets.MRCRAYFISH_JKS }}
       if: ${{ env.JKS != '' }}
+      uses: timheuer/base64-to-file@v1.2
+      with:
+        fileName: 'keystore.jks'
+        encodedString: ${{ env.JKS }}
+    - name: Set Keystore Variables
+      if: ${{ steps.load_keystore.outputs.filePath != '' }}
       run: |
-        echo -n "${{ env.JKS }}" | base64 --decode > ${{ env.HOME }}/keystore.jks
-        echo "KEYSTORE=${{ env.HOME }}/keystore.jks" >> $GITHUB_ENV 
+        echo "KEYSTORE=${{ steps.load_keystore.outputs.filePath }}" >> $GITHUB_ENV 
         echo "KEYSTORE_ALIAS=${{ secrets.MRCRAYFISH_JKS_ALIAS }}" >> $GITHUB_ENV
         echo "KEYSTORE_PASS=${{ secrets.MRCRAYFISH_JKS_PASSPHRASE }}" >> $GITHUB_ENV
     - name: Make gradlew executable
