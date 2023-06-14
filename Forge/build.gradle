@@ -164,12 +164,11 @@ signing {
 
 task signJar(type: SignJar, dependsOn: jar) {
     onlyIf {
-        project.hasProperty('keyStore')
+        project.hasProperty('keyStore') || System.getenv("KEYSTORE")
     }
-    keyStore = project.findProperty('keyStore')
-    alias = project.findProperty('keyStoreAlias')
-    storePass = project.findProperty('keyStorePass')
-    keyPass = project.findProperty('keyStoreKeyPass')
+    keyStore = project.findProperty('keyStore') ?: System.getenv("KEYSTORE")
+    alias = project.findProperty('keyStoreAlias') ?: System.getenv("KEYSTORE_ALIAS")
+    storePass = project.findProperty('keyStorePass') ?: System.getenv("KEYSTORE_PASS")
     inputFile = outputFile = tasks.jarJar.archiveFile
 }
 
