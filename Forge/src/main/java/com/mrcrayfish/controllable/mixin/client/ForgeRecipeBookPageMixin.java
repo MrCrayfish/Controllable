@@ -20,7 +20,7 @@ import java.util.List;
 @Mixin(RecipeBookPage.class)
 public class ForgeRecipeBookPageMixin
 {
-    @ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;II)V"), index = 1, remap = false)
+    @ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;II)V"), index = 1)
     private List<Component> controllableModifyRenderToolTip(List<Component> components)
     {
         if(Controllable.getInput().isControllerInUse() && Config.CLIENT.client.options.quickCraft.get())
