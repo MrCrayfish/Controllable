@@ -117,21 +117,29 @@ publishing {
     }
 
     repositories {
-        maven {
-            url "file://" + System.getenv("LOCAL_MAVEN")
-        }
-        maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/MrCrayfish/Maven"
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
-                password = project.findProperty("gpr.key") ?: System.getenv("GPR_KEY")
+        if (System.getenv("CI")) {
+            maven {
+                name = "GitHubPackages"
+                url = "https://maven.pkg.github.com/MrCrayfish/Maven"
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
+                    password = project.findProperty("gpr.key") ?: System.getenv("GPR_KEY")
+                }
+            }
+        } else {
+            maven {
+                url "file://" + System.getenv("LOCAL_MAVEN")
             }
         }
     }
 }
 
 signing {
+    if (System.getenv("SIGNING_KEY")) {
+        def signingKey = System.getenv("SIGNING_KEY")
+        def signingPassword = System.getenv("SIGNING_PASSPHRASE")
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    }
     sign publishing.publications.mavenJava
 }
 

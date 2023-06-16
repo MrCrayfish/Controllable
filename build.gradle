@@ -49,14 +49,19 @@ subprojects {
             url = 'https://maven.blamejared.com'
         }
         maven {
-            url "file://" + System.getenv("LOCAL_MAVEN")
-        }
-        maven {
             name = "MrCrayfish (GitHub)"
             url = "https://maven.pkg.github.com/MrCrayfish/Maven"
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
                 password = project.findProperty("gpr.key") ?: System.getenv("GPR_KEY")
+            }
+            content {
+                includeGroup "com.mrcrayfish"
+            }
+        }
+        if (!System.getenv("CI")) {
+            maven {
+                url "file://" + System.getenv("LOCAL_MAVEN")
             }
         }
     }
