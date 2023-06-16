@@ -84,8 +84,8 @@ jobs:
         SIGNING_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       if: ${{ env.SIGNING_PASSPHRASE != '' }}
       run: |
-        gpg --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.forge }}
-        gpg --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.fabric }}
+        gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.forge }}
+        gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.fabric }}
     - name: Upload Forge Artifacts
       uses: actions/upload-artifact@v2
       with:
