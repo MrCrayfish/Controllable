@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.client.CursorType;
 import com.mrcrayfish.controllable.client.Thumbstick;
 import com.mrcrayfish.framework.api.config.BoolProperty;
 import com.mrcrayfish.framework.api.config.ConfigProperty;
+import com.mrcrayfish.framework.api.config.ConfigType;
 import com.mrcrayfish.framework.api.config.DoubleProperty;
 import com.mrcrayfish.framework.api.config.EnumProperty;
 import com.mrcrayfish.framework.api.config.FrameworkConfig;
@@ -18,7 +19,7 @@ public class Config
 {
     public static final ResourceLocation CLIENT_CONFIG_ID = new ResourceLocation(Constants.MOD_ID, "client");
 
-    @FrameworkConfig(id = Constants.MOD_ID, name = "client", separator = '-')
+    @FrameworkConfig(id = Constants.MOD_ID, name = "client", separator = '-', type = ConfigType.CLIENT)
     public static final ClientWrapper CLIENT = new ClientWrapper();
 
     public static class ClientWrapper
