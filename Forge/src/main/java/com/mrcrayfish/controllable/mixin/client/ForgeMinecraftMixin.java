@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Minecraft.class)
 public class ForgeMinecraftMixin
 {
-    @Inject(method = "lambda$new$2", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ResourceLoadStateTracker;finishReload()V", shift = At.Shift.AFTER))
+    @Inject(method = "lambda$new$2", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;shouldShowBanNotice()Z"))
     private void controllableOnFinishedLoading(CallbackInfo ci)
     {
         BindingRegistry.getInstance().load();
