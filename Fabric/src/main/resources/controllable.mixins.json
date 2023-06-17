@@ -2,6 +2,7 @@
     "required": true,
     "minVersion": "0.8",
     "package": "com.mrcrayfish.controllable.mixin",
+    "plugin": "com.mrcrayfish.controllable.mixin.ControllableMixinPlugin",
     "compatibilityLevel": "JAVA_17",
     "refmap": "controllable.refmap.json",
     "client": [

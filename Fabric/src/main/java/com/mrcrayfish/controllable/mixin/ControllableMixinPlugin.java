@@ -12,13 +12,11 @@ import java.util.Set;
  */
 public class ControllableMixinPlugin implements IMixinConfigPlugin
 {
-    private boolean optifineLoaded;
     private boolean frameworkLoaded;
 
     @Override
     public void onLoad(String mixinPackage)
     {
-        this.optifineLoaded = this.isClassAvailable("optifine.Installer");
         this.frameworkLoaded = this.isClassAvailable("com.mrcrayfish.framework.Constants");
     }
 
@@ -32,11 +30,7 @@ public class ControllableMixinPlugin implements IMixinConfigPlugin
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName)
     {
         // Prevent any loading of mixins if Framework is not installed.
-        if(!this.frameworkLoaded)
-        {
-            return false;
-        }
-        return this.optifineLoaded ? !mixinClassName.equals("com.mrcrayfish.controllable.mixin.client.GameRendererMixin") : !mixinClassName.equals("com.mrcrayfish.controllable.mixin.client.OptifineGameRendererMixin");
+        return this.frameworkLoaded;
     }
 
     @Override
