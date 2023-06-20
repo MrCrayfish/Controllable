@@ -41,7 +41,6 @@ task downloadMappings(type: Download) {
 }
 
 processResources {
-    dependsOn downloadMappings
     def buildProps = project.properties.clone()
     filesMatching(['pack.mcmeta']) {
         expand buildProps

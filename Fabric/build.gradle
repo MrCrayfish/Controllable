@@ -81,7 +81,7 @@ task releaseJar(type: RemapJarTask) {
     dependsOn tasks.jar
     input = tasks.jar.archiveFile
     addNestedDependencies = true
-    classifier 'release'
+    archiveClassifier = 'release'
 }
 
 build.finalizedBy(releaseJar)
