@@ -33,7 +33,7 @@ public class FabricGameRendererMixin
         if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && input.getLastUse() > 0)
         {
             Minecraft minecraft = Minecraft.getInstance();
-            return (int) (input.getVirtualCursorX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getScreenWidth());
+            return (int) (input.getVirtualCursorX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getWidth());
         }
         return mouseX;
     }
@@ -48,7 +48,7 @@ public class FabricGameRendererMixin
         if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && input.getLastUse() > 0)
         {
             Minecraft minecraft = Minecraft.getInstance();
-            return (int) (input.getVirtualCursorY() * (double) minecraft.getWindow().getGuiScaledHeight() / (double) minecraft.getWindow().getScreenHeight());
+            return (int) (input.getVirtualCursorY() * (double) minecraft.getWindow().getGuiScaledHeight() / (double) minecraft.getWindow().getHeight());
         }
         return mouseY;
     }
