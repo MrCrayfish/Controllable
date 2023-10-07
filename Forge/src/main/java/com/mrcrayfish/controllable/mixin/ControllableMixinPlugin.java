@@ -36,7 +36,15 @@ public class ControllableMixinPlugin implements IMixinConfigPlugin
         {
             return false;
         }
-        return this.optifineLoaded ? !mixinClassName.equals("com.mrcrayfish.controllable.mixin.client.GameRendererMixin") : !mixinClassName.equals("com.mrcrayfish.controllable.mixin.client.OptifineGameRendererMixin");
+        if(this.optifineLoaded)
+        {
+            if(mixinClassName.equals("com.mrcrayfish.controllable.mixin.client.GameRendererMixin") || mixinClassName.equals("com.mrcrayfish.controllable.mixin.client.ForgeGameRendererMixin"))
+            {
+                return false;
+            }
+            return true;
+        }
+        return !mixinClassName.equals("com.mrcrayfish.controllable.mixin.client.OptifineGameRendererMixin");
     }
 
     @Override
