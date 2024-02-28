@@ -31,6 +31,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.event.ForgeEventFactoryClient;
 import net.minecraftforge.client.gui.CreativeTabsScreenPage;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.fml.ModList;
@@ -88,7 +89,7 @@ public class ForgeClientHelper implements IClientHelper
             Minecraft mc = screen.getMinecraft();
             double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
             double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
-            if(net.minecraftforge.client.ForgeHooksClient.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
+            if(ForgeEventFactoryClient.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
             {
                 return;
             }
@@ -96,7 +97,7 @@ public class ForgeClientHelper implements IClientHelper
             {
                 return;
             }
-            net.minecraftforge.client.ForgeHooksClient.onScreenMouseDragPost(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
+            ForgeEventFactoryClient.onScreenMouseDragPost(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
         }, "mouseDragged event handler", ((GuiEventListener) screen).getClass().getCanonicalName());
     }
 
@@ -106,11 +107,11 @@ public class ForgeClientHelper implements IClientHelper
     {
         Screen.wrapScreenError(() ->
         {
-            boolean cancelled = ForgeHooksClient.onScreenMouseClickedPre(screen, mouseX, mouseY, button);
+            boolean cancelled = ForgeEventFactoryClient.onScreenMouseClickedPre(screen, mouseX, mouseY, button);
             if(!cancelled)
             {
                 cancelled = screen.mouseClicked(mouseX, mouseY, button);
-                ForgeHooksClient.onScreenMouseClickedPost(screen, mouseX, mouseY, button, cancelled);
+                ForgeEventFactoryClient.onScreenMouseClickedPost(screen, mouseX, mouseY, button, cancelled);
             }
         }, "mouseClicked event handler", screen.getClass().getCanonicalName());
     }
@@ -121,11 +122,11 @@ public class ForgeClientHelper implements IClientHelper
     {
         Screen.wrapScreenError(() ->
         {
-            boolean cancelled = ForgeHooksClient.onScreenMouseReleasedPre(screen, mouseX, mouseY, button);
+            boolean cancelled = ForgeEventFactoryClient.onScreenMouseReleasedPre(screen, mouseX, mouseY, button);
             if(!cancelled)
             {
                 cancelled = screen.mouseReleased(mouseX, mouseY, button);
-                ForgeHooksClient.onScreenMouseReleasedPost(screen, mouseX, mouseY, button, cancelled);
+                ForgeEventFactoryClient.onScreenMouseReleasedPost(screen, mouseX, mouseY, button, cancelled);
             }
         }, "mouseReleased event handler", screen.getClass().getCanonicalName());
     }
@@ -159,7 +160,7 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public int getAbstractListTop(AbstractSelectionList<?> list)
     {
-        return list.getTop();
+        return list.getY();
     }
 
     @Override

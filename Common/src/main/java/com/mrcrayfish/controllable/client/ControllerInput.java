@@ -767,7 +767,7 @@ public class ControllerInput
                 }
                 else if(ButtonBindings.DEBUG_INFO.isButtonPressed())
                 {
-                    mc.options.renderDebug = !mc.options.renderDebug;
+                    mc.getDebugOverlay().toggleOverlay();
                 }
                 else if(ButtonBindings.RADIAL_MENU.isButtonPressed() && !virtual)
                 {
@@ -1466,7 +1466,7 @@ public class ControllerInput
         long scrollTime = Util.getMillis();
         if(dir != 0 && scrollTime - this.lastMerchantScroll >= 150)
         {
-            screen.mouseScrolled(this.getCursorX(), this.getCursorY(), Math.signum(dir));
+            screen.mouseScrolled(this.getCursorX(), this.getCursorY(), Math.signum(dir), 0);
             this.lastMerchantScroll = scrollTime;
         }
     }

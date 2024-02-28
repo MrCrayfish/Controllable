@@ -32,6 +32,7 @@ public class OptionsMixin
     @Inject(method = "<init>", at = @At(value = "TAIL"))
     private void controllableInit(Minecraft minecraft, File file, CallbackInfo ci)
     {
+        // TODO: This causes an error because some casting appears to be broken in forge
         KeyMapping override = new KeyUseOverride(this.keyUse);
         for(int i = 0; i < this.keyMappings.length; i++)
         {

@@ -4,15 +4,19 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.toasts.RecipeToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Author: MrCrayfish
  */
 public class ConnectionToast implements Toast
 {
+    private static final ResourceLocation BACKGROUND_SPRITE = new ResourceLocation("toast/recipe");
+
     private final boolean connected;
     private final Component controllerName;
 
@@ -26,7 +30,7 @@ public class ConnectionToast implements Toast
     public Visibility render(GuiGraphics graphics, ToastComponent toastComponent, long delta)
     {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        graphics.blit(TEXTURE, 0, 0, 0, 32, 160, 32);
+        graphics.blitSprite(BACKGROUND_SPRITE, 0, 0, this.width(), this.height());
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         graphics.blit(ControllerLayoutScreen.TEXTURE, 8, 8, 20, 43, 20, 16);

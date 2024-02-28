@@ -26,7 +26,7 @@ public class ThumbstickSettingsScreen extends Screen
     @Override
     protected void init()
     {
-        this.optionsRowList = new OptionsList(Objects.requireNonNull(this.minecraft), this.width, this.height, 32, this.height - 32, 25);
+        this.optionsRowList = new OptionsList(Objects.requireNonNull(this.minecraft), this.width, this.height, 32, 25);
 
         /*this.optionsRowList.addBig(ControllerOptions.createOnOff("controllable.options.switchThumbsticks", gameSettings -> {
             return this.layoutScreen.getEntry().isThumbsticksSwitched();
@@ -64,7 +64,7 @@ public class ThumbstickSettingsScreen extends Screen
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(graphics);
+        this.renderBackground(graphics, mouseX, mouseY, partialTicks);
         this.optionsRowList.render(graphics, mouseX, mouseY, partialTicks);
         graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
         super.render(graphics, mouseX, mouseY, partialTicks);
