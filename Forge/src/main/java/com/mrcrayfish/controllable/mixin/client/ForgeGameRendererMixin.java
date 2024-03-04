@@ -52,7 +52,7 @@ public class ForgeGameRendererMixin
 
     @SuppressWarnings("InvalidInjectorMethodSignature")
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void controllableLastRender(float partialTick, long p_109095_, boolean running, CallbackInfo ci, int mouseX, int mouseY, Window window, Matrix4f matrix4f, PoseStack posestack, GuiGraphics graphics)
+    private void controllableLastRender(float partialTick, long p_109095_, boolean running, CallbackInfo ci, float f, boolean flag, int mouseX, int mouseY, Window window, Matrix4f matrix4f, PoseStack posestack, GuiGraphics graphics)
     {
         OverlayHandler.draw(graphics, mouseX, mouseY, partialTick);
     }
