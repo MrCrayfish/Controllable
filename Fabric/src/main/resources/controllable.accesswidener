@@ -10,9 +10,22 @@ accessible field net/minecraft/client/OptionInstance caption Lnet/minecraft/netw
 accessible field net/minecraft/client/OptionInstance tooltip Lnet/minecraft/client/OptionInstance$TooltipSupplier;
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageWidth I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageHeight I
+accessible field net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen scrollOffs F
+accessible field net/minecraft/client/gui/components/AbstractSelectionList itemHeight I
+accessible field net/minecraft/client/gui/components/Tooltip cachedTooltip Ljava/util/List;
+accessible field net/minecraft/client/KeyMapping clickCount I
+accessible field net/minecraft/client/gui/screens/Screen renderables Ljava/util/List;
+accessible field net/minecraft/client/gui/screens/inventory/StonecutterScreen startIndex I
+accessible field net/minecraft/client/gui/screens/inventory/LoomScreen startRow I
+accessible field net/minecraft/client/gui/components/ImageButton sprites Lnet/minecraft/client/gui/components/WidgetSprites;
+
 accessible method net/minecraft/client/Minecraft getFramerateLimit ()I
 accessible method net/minecraft/client/Minecraft startUseItem ()V
 accessible method net/minecraft/client/Minecraft startAttack ()Z
 accessible method net/minecraft/client/Minecraft pickBlock ()V
 accessible method net/minecraft/client/Minecraft openChatScreen (Ljava/lang/String;)V
+accessible method net/minecraft/client/gui/components/AbstractSelectionList getRowBottom (I)I
+accessible method net/minecraft/client/gui/components/AbstractSelectionList getRowTop (I)I
+accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen slotClicked (Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V
+
 accessible class net/minecraft/client/gui/components/AbstractSelectionList$Entry

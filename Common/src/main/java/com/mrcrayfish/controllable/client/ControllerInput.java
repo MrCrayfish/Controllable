@@ -35,9 +35,10 @@ import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.TabButton;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
@@ -92,7 +93,7 @@ import java.util.function.BiFunction;
  */
 public class ControllerInput
 {
-    private static final ResourceLocation RECIPE_BUTTON_LOCATION = new ResourceLocation("textures/gui/recipe_button.png");
+    private static final ResourceLocation RECIPE_BUTTON_LOCATION = new ResourceLocation("recipe_book/button");
 
     private int lastUse = 0;
     private boolean keyboardSneaking = false;
@@ -873,9 +874,19 @@ public class ControllerInput
                     if(mc.screen instanceof RecipeUpdateListener listener)
                     {
                         // Since no reference to craft book button, instead search for it and invoke press.
-                        ClientServices.CLIENT.getScreenRenderables(mc.screen).stream().filter(widget -> {
-                            return widget instanceof ImageButton btn && RECIPE_BUTTON_LOCATION.equals(ClientServices.CLIENT.getImageButtonResource(btn));
-                        }).findFirst().ifPresent(btn -> ((Button) btn).onPress());
+                        for (Renderable widget : ClientServices.CLIENT.getScreenRenderables(mc.screen))
+                        {
+                            if (!(widget instanceof ImageButton btn))
+                                continue;
+
+                            WidgetSprites sprites = ClientServices.CLIENT.getImageButtonSprites(btn);
+
+
+                            if (RECIPE_BUTTON_LOCATION.equals(sprites.enabled())) {
+                                btn.onPress();
+                                break;
+                            }
+                        }
                         boolean visible = listener.getRecipeBookComponent().isVisible();
                         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, visible ? 1.0F : 0.95F));
                     }
