@@ -4,7 +4,6 @@ import com.mrcrayfish.controllable.client.ForgeCompatBindingContext;
 import com.mrcrayfish.controllable.client.binding.IBindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
-import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.integration.JeiSupport;
 import com.mrcrayfish.controllable.platform.services.IClientHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -17,6 +16,7 @@ import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -25,12 +25,12 @@ import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.event.ForgeEventFactoryClient;
 import net.minecraftforge.client.gui.CreativeTabsScreenPage;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.fml.ModList;
@@ -88,7 +88,7 @@ public class ForgeClientHelper implements IClientHelper
             Minecraft mc = screen.getMinecraft();
             double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
             double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
-            if(net.minecraftforge.client.ForgeHooksClient.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
+            if(ForgeEventFactoryClient.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
             {
                 return;
             }
@@ -96,7 +96,7 @@ public class ForgeClientHelper implements IClientHelper
             {
                 return;
             }
-            net.minecraftforge.client.ForgeHooksClient.onScreenMouseDragPost(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
+            ForgeEventFactoryClient.onScreenMouseDragPost(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
         }, "mouseDragged event handler", ((GuiEventListener) screen).getClass().getCanonicalName());
     }
 
@@ -106,11 +106,11 @@ public class ForgeClientHelper implements IClientHelper
     {
         Screen.wrapScreenError(() ->
         {
-            boolean cancelled = ForgeHooksClient.onScreenMouseClickedPre(screen, mouseX, mouseY, button);
+            boolean cancelled = ForgeEventFactoryClient.onScreenMouseClickedPre(screen, mouseX, mouseY, button);
             if(!cancelled)
             {
                 cancelled = screen.mouseClicked(mouseX, mouseY, button);
-                ForgeHooksClient.onScreenMouseClickedPost(screen, mouseX, mouseY, button, cancelled);
+                ForgeEventFactoryClient.onScreenMouseClickedPost(screen, mouseX, mouseY, button, cancelled);
             }
         }, "mouseClicked event handler", screen.getClass().getCanonicalName());
     }
@@ -121,11 +121,11 @@ public class ForgeClientHelper implements IClientHelper
     {
         Screen.wrapScreenError(() ->
         {
-            boolean cancelled = ForgeHooksClient.onScreenMouseReleasedPre(screen, mouseX, mouseY, button);
+            boolean cancelled = ForgeEventFactoryClient.onScreenMouseReleasedPre(screen, mouseX, mouseY, button);
             if(!cancelled)
             {
                 cancelled = screen.mouseReleased(mouseX, mouseY, button);
-                ForgeHooksClient.onScreenMouseReleasedPost(screen, mouseX, mouseY, button, cancelled);
+                ForgeEventFactoryClient.onScreenMouseReleasedPost(screen, mouseX, mouseY, button, cancelled);
             }
         }, "mouseReleased event handler", screen.getClass().getCanonicalName());
     }
@@ -159,7 +159,7 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public int getAbstractListTop(AbstractSelectionList<?> list)
     {
-        return list.getTop();
+        return list.getY();
     }
 
     @Override
@@ -274,43 +274,43 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public float getCreativeScrollOffset(CreativeModeInventoryScreen screen)
     {
-        return ReflectUtil.getCreativeScrollOffset(screen);
+        return screen.scrollOffs;
     }
 
     @Override
     public void setCreativeScrollOffset(CreativeModeInventoryScreen screen, float offset)
     {
-        ReflectUtil.setCreativeScrollOffset(screen, offset);
+        screen.scrollOffs = offset;
     }
 
     @Override
     public int getAbstractListRowBottom(AbstractSelectionList<?> list, int index)
     {
-        return ReflectUtil.getAbstractListRowBottom(list, index);
+        return list.getRowBottom(index);
     }
 
     @Override
     public int getAbstractListRowTop(AbstractSelectionList<?> list, int index)
     {
-        return ReflectUtil.getAbstractListRowTop(list, index);
+        return list.getRowTop(index);
     }
 
     @Override
     public int getListItemHeight(AbstractSelectionList<?> list)
     {
-        return ReflectUtil.getAbstractListItemHeight(list);
+        return list.itemHeight;
     }
 
     @Override
-    public ResourceLocation getImageButtonResource(ImageButton btn)
+    public WidgetSprites getImageButtonSprites(ImageButton btn)
     {
-        return ReflectUtil.getImageButtonResource(btn);
+        return btn.sprites;
     }
 
     @Override
     public void pushLinesToTooltip(Tooltip blank, List<FormattedCharSequence> lines)
     {
-        ReflectUtil.pushLinesToTooltip(blank, lines);
+        blank.cachedTooltip = lines;
     }
 
     @Override
@@ -322,7 +322,7 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public void setKeyPressTime(KeyMapping mapping, int time)
     {
-        ReflectUtil.setKeyPressTime(mapping, time);
+        mapping.clickCount = time;
     }
 
     @Override
@@ -341,7 +341,7 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public void clickSlot(AbstractContainerScreen<?> screen, Slot slotIn, int slotId, int mouseButton, ClickType type)
     {
-        ReflectUtil.clickSlot(screen, slotIn, slotId, mouseButton, type);
+        screen.slotClicked(slotIn, slotId, mouseButton, type);
     }
 
     @Override
@@ -371,13 +371,13 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public int getStonecutterStartIndex(StonecutterScreen screen)
     {
-        return ReflectUtil.getStonecutterStartIndex(screen);
+        return screen.startIndex;
     }
 
     @Override
     public int getLoomStartRow(LoomScreen screen)
     {
-        return ReflectUtil.getLoomStartRow(screen);
+        return screen.startRow;
     }
 
     private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeTabsScreenPage page, CreativeModeTab tab)

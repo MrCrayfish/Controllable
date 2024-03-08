@@ -34,8 +34,7 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
 
     public TabSelectionList(Minecraft mc, int itemHeight)
     {
-        super(mc, 0, 0, 0, 0, itemHeight);
-        this.setRenderTopAndBottom(false);
+        super(mc, 0, 0, 0, itemHeight);
     }
 
     public TabSelectionList<E> setHeaderText(Component headerText)
@@ -68,44 +67,6 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         return super.addEntry(entry);
     }
 
-    @Override
-    public void setX(int x)
-    {
-        this.x0 = x;
-        this.x1 = x + this.width;
-    }
-
-    @Override
-    public void setY(int y)
-    {
-        this.y0 = y;
-        this.y1 = y + this.height;
-    }
-
-    @Override
-    public int getX()
-    {
-        return this.x0;
-    }
-
-    @Override
-    public int getY()
-    {
-        return this.y0;
-    }
-
-    @Override
-    public int getWidth()
-    {
-        return this.width;
-    }
-
-    @Override
-    public int getHeight()
-    {
-        return this.height;
-    }
-
     public void updateDimensions(ScreenRectangle rectangle)
     {
         boolean header = this.headerText != null;
@@ -117,22 +78,20 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
-        super.render(graphics, mouseX, mouseY, partialTick);
+        super.renderWidget(graphics, mouseX, mouseY, partialTick);
         if(this.headerText != null)
         {
-            graphics.drawCenteredString(TabSelectionList.this.minecraft.font, this.headerText, this.x0 + this.width / 2, this.y0 - 15, 0xFFFFFF);
+            graphics.drawCenteredString(TabSelectionList.this.minecraft.font, this.headerText, this.getX() + this.width / 2, this.getY() - 15, 0xFFFFFF);
         }
         if(this.footerText != null)
         {
             Font font = TabSelectionList.this.minecraft.font;
             int footerWidth = font.width(this.footerText);
-            ScreenHelper.drawRoundedBox(graphics, this.x0 + (this.width - footerWidth) / 2, this.y1 + 4, footerWidth, 14, 0x55000000);
-            graphics.drawCenteredString(font, this.footerText, this.x0 + this.width / 2, this.y1 + 7, 0xFFFFFF);
+            ScreenHelper.drawRoundedBox(graphics, this.getX() + (this.width - footerWidth) / 2, this.getBottom() + 4, footerWidth, 14, 0x55000000);
+            graphics.drawCenteredString(font, this.footerText, this.getX() + this.width / 2, this.getBottom() + 7, 0xFFFFFF);
         }
-        graphics.fillGradient(this.x0, this.y0, this.x1, this.y0 + 4, 0xFF000000, 0);
-        graphics.fillGradient(this.x0, this.y1 - 4, this.x1, this.y1, 0, 0xFF000000);
     }
 
     @Override

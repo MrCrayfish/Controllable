@@ -144,7 +144,7 @@ public abstract class ListMenuScreen extends Screen
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
         // Draws the background texture (dirt or custom texture)
-        this.renderBackground(graphics);
+        this.renderBackground(graphics, mouseX, mouseY, partialTicks);
 
         // Draws widgets manually since they are not buttons
         this.list.render(graphics, mouseX, mouseY, partialTicks);
@@ -182,7 +182,7 @@ public abstract class ListMenuScreen extends Screen
     {
         public EntryList(List<Item> entries, int top)
         {
-            super(Objects.requireNonNull(ListMenuScreen.this.minecraft), ListMenuScreen.this.width, ListMenuScreen.this.height, top, ListMenuScreen.this.height - 44, ListMenuScreen.this.itemHeight);
+            super(Objects.requireNonNull(ListMenuScreen.this.minecraft), ListMenuScreen.this.width, ListMenuScreen.this.height, top, ListMenuScreen.this.itemHeight);
             entries.forEach(this::addEntry);
         }
 
@@ -220,9 +220,9 @@ public abstract class ListMenuScreen extends Screen
         }
 
         @Override
-        public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
         {
-            super.render(graphics, mouseX, mouseY, partialTicks);
+            super.renderWidget(graphics, mouseX, mouseY, partialTicks);
             this.renderToolTips(graphics, mouseX, mouseY);
         }
 

@@ -28,9 +28,9 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     private final List<ButtonBindingData> bindings;
     private ButtonBinding selectedBinding;
 
-    public RadialItemList(Minecraft mc, int width, int height, int top, int bottom, List<ButtonBindingData> bindings)
+    public RadialItemList(Minecraft mc, int width, int height, int top, List<ButtonBindingData> bindings)
     {
-        super(mc, width, height, top, bottom, 36);
+        super(mc, width, height, top, 36);
         this.bindings = bindings;
         this.updateEntries();
     }
@@ -71,7 +71,7 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     }
 
     @Override
-    public void updateNarration(NarrationElementOutput output) {}
+    public void updateWidgetNarration(NarrationElementOutput output) {}
 
     class ButtonBindingEntry extends ContainerObjectSelectionList.Entry<ButtonBindingEntry>
     {

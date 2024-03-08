@@ -105,9 +105,9 @@ public class SettingsScreen extends Screen
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scroll)
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY)
     {
-        if(super.mouseScrolled(mouseX, mouseY, scroll)) {
+        if(super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
             return true;
         }
 
@@ -117,14 +117,12 @@ public class SettingsScreen extends Screen
 
         List<AbstractWidget> widgets = new ArrayList<>();
         currentTab.visitChildren(widgets::add);
-        return widgets.stream().filter(widget -> widget.isMouseOver(mouseX, mouseY) && widget.mouseScrolled(mouseX, mouseY, scroll)).count() > 0;
+        return widgets.stream().filter(widget -> widget.isMouseOver(mouseX, mouseY) && widget.mouseScrolled(mouseX, mouseY, scrollX, scrollY)).count() > 0;
     }
 
     @Override
     public void tick()
     {
-        this.tabManager.tickCurrent();
-
         if(this.isWaitingForButtonInput())
         {
             this.remainingTime--;
@@ -214,12 +212,6 @@ public class SettingsScreen extends Screen
             GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
             this.list = new ControllerList(SettingsScreen.this.minecraft, 24);
             rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, this.list));
-        }
-
-        @Override
-        public void tick()
-        {
-            this.list.tick();
         }
     }
 

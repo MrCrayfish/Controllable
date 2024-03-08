@@ -31,7 +31,7 @@ public class RadialMenuConfigureScreen extends Screen
     @Override
     protected void init()
     {
-        this.list = new RadialItemList(this.minecraft, this.width, this.height, 45, this.height - 44, this.bindings);
+        this.list = new RadialItemList(this.minecraft, this.width, this.height, 45, this.bindings);
         this.addWidget(this.list);
         this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 100, 20, CommonComponents.GUI_DONE, buttons -> {
             RadialMenuHandler.instance().setBindings(new LinkedHashSet<>(this.bindings));
@@ -48,7 +48,7 @@ public class RadialMenuConfigureScreen extends Screen
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(graphics);
+        this.renderBackground(graphics, mouseX, mouseY, partialTicks);
         this.list.render(graphics, mouseX, mouseY, partialTicks);
         graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
         super.render(graphics, mouseX, mouseY, partialTicks);

@@ -21,6 +21,8 @@ minecraft {
             }
         }
     }
+
+    accessWideners("src/main/resources/controllable.accesswidener")
 }
 
 configurations {

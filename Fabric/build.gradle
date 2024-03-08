@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id 'fabric-loom' version '1.0-SNAPSHOT'
+    id 'fabric-loom' version '1.5-SNAPSHOT'
     id 'maven-publish'
     id 'idea'
 }
@@ -39,7 +39,7 @@ dependencies {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/controllable.accesswidener")
+    accessWidenerPath = file("../Common/src/main/resources/controllable.accesswidener")
     mixin {
         defaultRefmapName = "${mod_id}.refmap.json"
     }

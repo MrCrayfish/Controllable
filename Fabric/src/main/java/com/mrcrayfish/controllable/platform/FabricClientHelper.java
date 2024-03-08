@@ -4,7 +4,6 @@ import com.mrcrayfish.controllable.client.binding.BindingContext;
 import com.mrcrayfish.controllable.client.binding.IBindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
-import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.integration.JeiSupport;
 import com.mrcrayfish.controllable.platform.services.IClientHelper;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -21,6 +20,7 @@ import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -224,43 +224,43 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public float getCreativeScrollOffset(CreativeModeInventoryScreen screen)
     {
-        return ReflectUtil.getCreativeScrollOffset(screen);
+        return screen.scrollOffs;
     }
 
     @Override
     public void setCreativeScrollOffset(CreativeModeInventoryScreen screen, float offset)
     {
-        ReflectUtil.setCreativeScrollOffset(screen, offset);
+        screen.scrollOffs = offset;
     }
 
     @Override
     public int getAbstractListRowBottom(AbstractSelectionList<?> list, int index)
     {
-        return ReflectUtil.getAbstractListRowBottom(list, index);
+        return list.getRowBottom(index);
     }
 
     @Override
     public int getAbstractListRowTop(AbstractSelectionList<?> list, int index)
     {
-        return ReflectUtil.getAbstractListRowTop(list, index);
+        return list.getRowTop(index);
     }
 
     @Override
     public int getListItemHeight(AbstractSelectionList<?> list)
     {
-        return ReflectUtil.getAbstractListItemHeight(list);
+        return list.itemHeight;
     }
 
     @Override
-    public ResourceLocation getImageButtonResource(ImageButton btn)
+    public WidgetSprites getImageButtonSprites(ImageButton btn)
     {
-        return ReflectUtil.getImageButtonResource(btn);
+        return btn.sprites;
     }
 
     @Override
     public void pushLinesToTooltip(Tooltip blank, List<FormattedCharSequence> lines)
     {
-        ReflectUtil.pushLinesToTooltip(blank, lines);
+        blank.cachedTooltip = lines;
     }
 
     @Override
@@ -272,7 +272,7 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public void setKeyPressTime(KeyMapping mapping, int time)
     {
-        ReflectUtil.setKeyPressTime(mapping, time);
+        mapping.clickCount = time;
     }
 
     @Override
@@ -290,13 +290,13 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public void clickSlot(AbstractContainerScreen<?> screen, Slot slotIn, int slotId, int mouseButton, ClickType type)
     {
-        ReflectUtil.clickSlot(screen, slotIn, slotId, mouseButton, type);
+        screen.slotClicked(slotIn, slotId, mouseButton, type);
     }
 
     @Override
     public void addRenderableToScreen(Screen screen, Renderable renderable)
     {
-        ReflectUtil.addRenderable(screen, renderable);
+        screen.renderables.add(renderable);
     }
 
     @Override
@@ -320,13 +320,13 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public int getStonecutterStartIndex(StonecutterScreen screen)
     {
-        return ReflectUtil.getStonecutterStartIndex(screen);
+        return screen.startIndex;
     }
 
     @Override
     public int getLoomStartRow(LoomScreen screen)
     {
-        return ReflectUtil.getLoomStartRow(screen);
+        return screen.startRow;
     }
 
     private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeModeTab tab)

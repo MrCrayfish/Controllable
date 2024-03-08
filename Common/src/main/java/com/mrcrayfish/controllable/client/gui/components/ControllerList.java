@@ -94,7 +94,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             Font font = this.minecraft.font;
             int footerWidth = font.width(this.footerText);
             int footerSubWidth = font.width(this.footerSubText);
-            if(ScreenHelper.isMouseWithin(this.x0 + (this.width + footerWidth) / 2 - footerSubWidth, this.y1 + 4, footerSubWidth, 14, (int) mouseX, (int) mouseY))
+            if(ScreenHelper.isMouseWithin(this.getX() + (this.width + footerWidth) / 2 - footerSubWidth, this.getBottom() + 4, footerSubWidth, 14, (int) mouseX, (int) mouseY))
             {
                 Objects.requireNonNull(Minecraft.getInstance().screen).handleComponentClicked(this.footerSubText.getStyle());
             }

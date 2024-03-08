@@ -73,9 +73,9 @@ public class TabListWidget extends AbstractWidget implements ContainerEventHandl
     }
 
     @Override
-    public boolean mouseScrolled(double $$0, double $$1, double $$2)
+    public boolean mouseScrolled(double $$0, double $$1, double $$2, double $$3)
     {
-        return this.list.mouseScrolled($$0, $$1, $$2);
+        return this.list.mouseScrolled($$0, $$1, $$2, $$3);
     }
 
     @Override
