@@ -92,8 +92,6 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
             ScreenHelper.drawRoundedBox(graphics, this.getX() + (this.width - footerWidth) / 2, this.getBottom() + 4, footerWidth, 14, 0x55000000);
             graphics.drawCenteredString(font, this.footerText, this.getX() + this.width / 2, this.getBottom() + 7, 0xFFFFFF);
         }
-        graphics.fillGradient(this.getX(), this.getY(), this.getRight(), this.getBottom() + 4, 0xFF000000, 0);
-        graphics.fillGradient(this.getX(), this.getY() - 4, this.getRight(), this.getBottom(), 0, 0xFF000000);
     }
 
     @Override
