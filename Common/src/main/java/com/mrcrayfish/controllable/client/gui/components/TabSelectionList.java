@@ -97,8 +97,8 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
     @Override
     public void visitWidgets(Consumer<AbstractWidget> consumer) {}
 
-//    @Override
-//    public void updateNarration(NarrationElementOutput output) {}
+    @Override
+    public void updateNarration(NarrationElementOutput output) {}
 
     public abstract static class Item<T extends ContainerObjectSelectionList.Entry<T>> extends ContainerObjectSelectionList.Entry<T>
     {

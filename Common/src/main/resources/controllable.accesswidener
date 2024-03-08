@@ -27,5 +27,6 @@ accessible method net/minecraft/client/Minecraft openChatScreen (Ljava/lang/Stri
 accessible method net/minecraft/client/gui/components/AbstractSelectionList getRowBottom (I)I
 accessible method net/minecraft/client/gui/components/AbstractSelectionList getRowTop (I)I
 accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen slotClicked (Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V
+extendable method net/minecraft/client/gui/components/AbstractWidget updateNarration (Lnet/minecraft/client/gui/narration/NarrationElementOutput;)V
 
 accessible class net/minecraft/client/gui/components/AbstractSelectionList$Entry
