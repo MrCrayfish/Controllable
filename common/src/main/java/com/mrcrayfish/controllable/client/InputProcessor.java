@@ -57,9 +57,6 @@ public class InputProcessor
 
     private void gatherAndQueueControllerInput()
     {
-        if(this.manager == null)
-            return;
-
         this.manager.tick();
 
         Controller currentController = this.manager.getActiveController();
