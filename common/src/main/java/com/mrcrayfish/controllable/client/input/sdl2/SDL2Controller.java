@@ -5,16 +5,16 @@ import com.mrcrayfish.controllable.client.input.ButtonStates;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
-import io.github.libsdl4j.api.gamecontroller.SDL_GameController;
-import io.github.libsdl4j.api.joystick.SDL_JoystickID;
+import com.mrcrayfish.controllable_sdl.api.gamecontroller.SDL_GameController;
+import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.util.Mth;
 
-import static io.github.libsdl4j.api.gamecontroller.SDL_GameControllerAxis.*;
-import static io.github.libsdl4j.api.gamecontroller.SDL_GameControllerButton.*;
-import static io.github.libsdl4j.api.gamecontroller.SdlGamecontroller.*;
-import static io.github.libsdl4j.api.joystick.SdlJoystick.SDL_JoystickGetDeviceInstanceID;
-import static io.github.libsdl4j.api.joystick.SdlJoystickConst.SDL_JOYSTICK_AXIS_MAX;
+import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SDL_GameControllerAxis.*;
+import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SDL_GameControllerButton.*;
+import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SdlGamecontroller.*;
+import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.SDL_JoystickGetDeviceInstanceID;
+import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystickConst.SDL_JOYSTICK_AXIS_MAX;
 
 /**
  *  A wrapper class that aims to reduce the exposure to the underlying controller library. This class
@@ -78,8 +78,8 @@ public class SDL2Controller extends Controller
         states.setState(Buttons.RIGHT_THUMB_STICK, this.readButton(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
         states.setState(Buttons.LEFT_BUMPER, this.readButton(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
         states.setState(Buttons.RIGHT_BUMPER, this.readButton(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
-        states.setState(Buttons.LEFT_TRIGGER, this.getLTriggerValue() >= 0.5F);
-        states.setState(Buttons.RIGHT_TRIGGER, this.getRTriggerValue() >= 0.5F);
+        states.setState(Buttons.LEFT_TRIGGER, this.getLTriggerValue() >= 0.5F); // TODO config option
+        states.setState(Buttons.RIGHT_TRIGGER, this.getRTriggerValue() >= 0.5F); // TODO config option
         states.setState(Buttons.DPAD_UP, this.readButton(SDL_CONTROLLER_BUTTON_DPAD_UP));
         states.setState(Buttons.DPAD_DOWN, this.readButton(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
         states.setState(Buttons.DPAD_LEFT, this.readButton(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
@@ -93,6 +93,7 @@ public class SDL2Controller extends Controller
         return states;
     }
 
+    @SuppressWarnings("MagicConstant")
     private boolean readButton(int button)
     {
         return SDL_GameControllerGetButton(this.controller, button) == 1;

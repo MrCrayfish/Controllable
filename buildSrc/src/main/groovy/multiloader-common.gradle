@@ -1,0 +1,179 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+base {
+    archivesName = "${mod_id}-${project.name}"
+}
+
+version = "${minecraft_version}-${mod_version}"
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+    withSourcesJar()
+    withJavadocJar()
+}
+
+def getGprUser() {
+    return project.findProperty('gpr.user') ?: System.getenv("GPR_USER")
+}
+
+def getGprKey() {
+    return project.findProperty('gpr.key') ?: System.getenv("GPR_KEY")
+}
+
+def getPackagesRepo() {
+    return project.findProperty('packagesRepo') ?: System.getenv("PACKAGES_REPO")
+}
+
+repositories {
+    mavenCentral()
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Sponge'
+                url = 'https://repo.spongepowered.org/repository/maven-public'
+            }
+        }
+        filter {
+            includeGroupAndSubgroups("org.spongepowered")
+        }
+    }
+    if(getGprUser() && getGprKey()) {
+        maven {
+            name = "MrCrayfish (GitHub)"
+            url = getPackagesRepo()
+            credentials {
+                username = getGprUser()
+                password = getGprKey()
+            }
+        }
+    }
+    if (System.getenv("LOCAL_MAVEN")) {
+        maven {
+            url "file://" + System.getenv("LOCAL_MAVEN")
+        }
+    }
+    maven {
+        name = 'BlameJared'
+        url = 'https://maven.blamejared.com'
+    }
+}
+
+configurations {
+    library
+    implementation.extendsFrom library
+}
+
+// Declare capabilities on the outgoing configurations.
+// Read more about capabilities here: https://docs.gradle.org/current/userguide/component_capabilities.html#sec:declaring-additional-capabilities-for-a-local-component
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    configurations."$variant".outgoing {
+        capability("$group:${base.archivesName.get()}:$version")
+        capability("$group:$mod_id-${project.name}-${minecraft_version}:$version")
+        capability("$group:$mod_id:$version")
+    }
+    publishing.publications.configureEach {
+        suppressPomMetadataWarningsFor(variant)
+    }
+}
+
+sourcesJar {
+    from(rootProject.file("LICENSE")) {
+        rename { "${it}_${mod_name}" }
+    }
+    from(rootProject.file("LICENSE_ControllableSDL"))
+}
+
+jar {
+    from(rootProject.file("LICENSE")) {
+        rename { "${it}_${mod_name}" }
+    }
+    from(rootProject.file("LICENSE_ControllableSDL"))
+    manifest {
+        attributes([
+            'Specification-Title'   : mod_name,
+            'Specification-Vendor'  : mod_author,
+            'Specification-Version' : project.jar.archiveVersion,
+            'Implementation-Title'  : project.name,
+            'Implementation-Version': project.jar.archiveVersion,
+            'Implementation-Vendor' : mod_author,
+            'Built-On-Minecraft'    : minecraft_version
+        ])
+    }
+}
+
+processResources {
+    def expandProps = [
+        "group"                        : project.group,
+        "minecraft_version"            : minecraft_version,
+        "fabric_version"               : fabric_version,
+        "fabric_loader_version"        : fabric_loader_version,
+        "neoforge_version"             : neoforge_version,
+        "neoforge_version_range"       : neoforge_version_range,
+        "neoforge_loader_version_range": neoforge_loader_version_range,
+        "framework_version"            : framework_version,
+        "jei_version"                  : jei_version,
+        "mod_name"                     : mod_name,
+        "mod_version"                  : mod_version,
+        "mod_author"                   : mod_author,
+        "mod_id"                       : mod_id,
+        "mod_license"                  : mod_license,
+        "mod_desc"                     : mod_desc,
+        "mod_homepage"                 : mod_homepage,
+        "mod_source"                   : mod_source,
+        "mod_issues"                   : mod_issues
+    ]
+    filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {
+        expand expandProps
+    }
+    inputs.properties(expandProps)
+}
+
+// Mute javadoc warnings
+tasks.withType(Javadoc).configureEach {
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+// Use the UTF-8 charset for Java compilation
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifactId base.archivesName.get()
+            from components.java
+        }
+    }
+    repositories {
+        if (System.getenv("CI") == 'true') {
+            if (getGprUser() && getGprKey()) {
+                maven {
+                    name = "GitHubPackages"
+                    url = uri(getPackagesRepo())
+                    credentials {
+                        username = getGprUser()
+                        password = getGprKey()
+                    }
+                }
+            }
+        } else if (System.getenv("LOCAL_MAVEN")) {
+            maven {
+                url "file://" + System.getenv("LOCAL_MAVEN")
+            }
+        }
+    }
+}
+
+signing {
+    if (System.getenv("SIGNING_KEY") && System.getenv("SIGNING_PASSPHRASE")) {
+        def signingKey = System.getenv("SIGNING_KEY")
+        def signingPassword = System.getenv("SIGNING_PASSPHRASE")
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications.mavenJava
+    }
+}

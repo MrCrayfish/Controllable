@@ -30,6 +30,7 @@ import com.mrcrayfish.framework.api.event.ScreenEvents;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.Util;
 import net.minecraft.client.CameraType;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.GuiGraphics;
@@ -68,6 +69,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.inventory.RecipeBookMenu;
@@ -75,10 +77,10 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.StonecutterMenu;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.entity.BannerPattern;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -92,7 +94,7 @@ import java.util.function.BiFunction;
  */
 public class ControllerInput
 {
-    private static final ResourceLocation RECIPE_BUTTON_LOCATION = new ResourceLocation("textures/gui/recipe_button.png");
+    private static final ResourceLocation RECIPE_BUTTON_LOCATION = ResourceLocation.withDefaultNamespace("textures/gui/recipe_button.png");
 
     private int lastUse = 0;
     private boolean keyboardSneaking = false;
@@ -356,7 +358,7 @@ public class ControllerInput
         {
             if(!(mc.screen instanceof ControllerLayoutScreen))
             {
-                float partialTicks = Minecraft.getInstance().getFrameTime();
+                float partialTicks = mc.getTimer().getGameTimeDeltaPartialTick(false); // TODO test
                 double renderCursorX = (this.prevCursorX + (this.cursorX - this.prevCursorX) * partialTicks + 0.5);
                 double renderCursorY = (this.prevCursorY + (this.cursorY - this.prevCursorY) * partialTicks + 0.5);
                 this.setCursorPosition(renderCursorX, renderCursorY);
@@ -418,7 +420,7 @@ public class ControllerInput
         }
     }
 
-    private void onRenderTickEnd(float partialTick)
+    private void onRenderTickEnd(DeltaTracker tracker)
     {
         Controller controller = Controllable.getController();
         if(controller == null)
@@ -452,7 +454,7 @@ public class ControllerInput
 
         if(mc.screen == null && (this.targetYaw != 0F || this.targetPitch != 0F))
         {
-            float elapsedTicks = Minecraft.getInstance().getDeltaFrameTime();
+            float elapsedTicks = tracker.getGameTimeDeltaTicks();
             if(!RadialMenuHandler.instance().isVisible())
             {
                 player.turn((this.targetYaw / 0.15) * (Config.CLIENT.client.options.invertRotation.get() ? -1 : 1) * elapsedTicks, (this.targetPitch / 0.15) * (Config.CLIENT.client.options.invertLook.get() ? -1 : 1) * elapsedTicks);
@@ -586,7 +588,8 @@ public class ControllerInput
         {
             if((!RadialMenuHandler.instance().isVisible() || Config.CLIENT.client.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent())
             {
-                float sneakBonus = player.isMovingSlowly() ? Mth.clamp(0.3F + EnchantmentHelper.getSneakingSpeedBonus(player), 0.0F, 1.0F) : 1.0F;
+                float sneakSpeed = (float) player.getAttributeValue(Attributes.SNEAKING_SPEED);
+                float sneakBonus = player.isMovingSlowly() ? sneakSpeed : 1.0F;
                 float inputX = controller.getLThumbStickXValue();
                 float inputY = controller.getLThumbStickYValue();
 
@@ -766,7 +769,7 @@ public class ControllerInput
                 }
                 else if(ButtonBindings.DEBUG_INFO.isButtonPressed())
                 {
-                    mc.options.renderDebug = !mc.options.renderDebug;
+                    mc.getDebugOverlay().toggleOverlay();
                 }
                 else if(ButtonBindings.RADIAL_MENU.isButtonPressed() && !virtual)
                 {
@@ -1322,14 +1325,14 @@ public class ControllerInput
         if(!listener.getRecipeBookComponent().isVisible())
             return;
 
-        if(!(screen.getMenu() instanceof RecipeBookMenu<?>))
+        if(!(screen.getMenu() instanceof RecipeBookMenu<?, ?>))
             return;
 
         RecipeBookPage recipeBookPage = ((RecipeBookComponentAccessor) listener.getRecipeBookComponent()).controllableGetRecipeBookPage();
         RecipeButton recipeButton = ((RecipeBookPageAccessor) recipeBookPage).controllableGetButtons().stream().filter(RecipeButton::isHoveredOrFocused).findFirst().orElse(null);
         if(recipeButton != null)
         {
-            RecipeBookMenu<?> menu = (RecipeBookMenu<?>) screen.getMenu();
+            RecipeBookMenu<?, ?> menu = (RecipeBookMenu<?, ?>) screen.getMenu();
             Slot slot = menu.getSlot(menu.getResultSlotIndex());
             int screenLeft = ClientServices.CLIENT.getScreenLeft(screen);
             int screenTop = ClientServices.CLIENT.getScreenTop(screen);
@@ -1444,7 +1447,8 @@ public class ControllerInput
             this.setControllerInUse();
             dir = yValue;
         }
-        dir *= Minecraft.getInstance().getDeltaFrameTime();
+        // TODO test list scroling
+        dir *= Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
         list.setScrollAmount(list.getScrollAmount() + dir * Config.CLIENT.client.options.listScrollSpeed.get());
     }
 
@@ -1465,7 +1469,8 @@ public class ControllerInput
         long scrollTime = Util.getMillis();
         if(dir != 0 && scrollTime - this.lastMerchantScroll >= 150)
         {
-            screen.mouseScrolled(this.getCursorX(), this.getCursorY(), Math.signum(dir));
+            // TODO test merchant scrolling
+            screen.mouseScrolled(this.getCursorX(), this.getCursorY(), 0, Math.signum(dir));
             this.lastMerchantScroll = scrollTime;
         }
     }

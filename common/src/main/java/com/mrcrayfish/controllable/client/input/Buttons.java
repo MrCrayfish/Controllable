@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.client.input;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Author: MrCrayfish

@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.integration;
 
 import com.mrcrayfish.controllable.Constants;
+import com.mrcrayfish.controllable.util.Utils;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.runtime.IJeiRuntime;
@@ -12,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 @JeiPlugin
 public class ControllableJeiPlugin implements IModPlugin
 {
-    private static final ResourceLocation ID = new ResourceLocation(Constants.MOD_ID, "jei_plugin");
+    private static final ResourceLocation ID = Utils.resource("jei_plugin");
 
     private static IJeiRuntime runtime;
 

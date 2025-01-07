@@ -48,7 +48,7 @@ public abstract class Controller
      *
      * @return the name of this controller
      */
-    public abstract String getName();
+    public abstract String getName(); // TODO convert to component
 
     /**
      * Rumbles the controller if supported

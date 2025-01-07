@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.gui.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
+import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.CommonComponents;
@@ -13,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
  */
 public class ControllerButton extends Button
 {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/controller.png");
+    private static final ResourceLocation TEXTURE = Utils.resource("textures/gui/controller.png");
 
     public ControllerButton(int x, int y, OnPress onPress)
     {

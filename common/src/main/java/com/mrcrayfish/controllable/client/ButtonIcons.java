@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.settings.SettingEnum;
+import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -21,7 +22,8 @@ public enum ButtonIcons implements SettingEnum
     GAMECUBE("controllable.controller.gamecube"),
     STEAM("controllable.controller.steam");
 
-    public static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/buttons.png");
+    // TODO convert to sprites
+    public static final ResourceLocation TEXTURE = Utils.resource("textures/gui/buttons.png");
     public static final int TEXTURE_WIDTH = Buttons.LENGTH * 13;
     public static final int TEXTURE_HEIGHT = values().length * 13;
 

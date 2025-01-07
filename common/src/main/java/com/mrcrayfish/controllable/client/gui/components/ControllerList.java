@@ -25,7 +25,7 @@ import java.util.Objects;
  */
 public class ControllerList extends TabSelectionList<ControllerList.ControllerEntry>
 {
-    private static final ResourceLocation BEACON_TEXTURE = new ResourceLocation("textures/gui/container/beacon.png");
+    private static final ResourceLocation BEACON_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/container/beacon.png");
 
     private final ControllerManager manager;
     private final MutableComponent footerSubText;
@@ -94,7 +94,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             Font font = this.minecraft.font;
             int footerWidth = font.width(this.footerText);
             int footerSubWidth = font.width(this.footerSubText);
-            if(ScreenHelper.isMouseWithin(this.x0 + (this.width + footerWidth) / 2 - footerSubWidth, this.y1 + 4, footerSubWidth, 14, (int) mouseX, (int) mouseY))
+            if(ScreenHelper.isMouseWithin(this.getX() + (this.width + footerWidth) / 2 - footerSubWidth, this.getBottom() + 4, footerSubWidth, 14, (int) mouseX, (int) mouseY))
             {
                 Objects.requireNonNull(Minecraft.getInstance().screen).handleComponentClicked(this.footerSubText.getStyle());
             }

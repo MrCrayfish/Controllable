@@ -6,15 +6,18 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Function;
 
@@ -25,6 +28,8 @@ import java.util.function.Function;
  */
 public class ConfirmationScreen extends Screen
 {
+    private static final ResourceLocation MENU_LIST_BACKGROUND = ResourceLocation.withDefaultNamespace("textures/gui/menu_list_background.png");
+    private static final ResourceLocation IN_GAME_MENU_LIST_BACKGROUND = ResourceLocation.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
     private static final int FADE_LENGTH = 4;
     private static final int BRIGHTNESS = 32;
     private static final int MESSAGE_PADDING = 10;
@@ -72,7 +77,6 @@ public class ConfirmationScreen extends Screen
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, partialTicks);
 
         List<FormattedCharSequence> lines = this.font.split(this.message, 300);
@@ -80,7 +84,7 @@ public class ConfirmationScreen extends Screen
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         graphics.blit(ControllerLayoutScreen.TEXTURE, this.width / 2 - 10, this.startY - 30, 20, 20, this.icon.ordinal() * 10, 21, 10, 10, 256, 256);
 
-        drawListBackground(0.0, this.width, this.startY, this.endY);
+        this.drawListBackground(graphics, 0, this.width, this.startY, this.endY);
 
         for(int i = 0; i < lines.size(); i++)
         {
@@ -119,36 +123,17 @@ public class ConfirmationScreen extends Screen
         this.icon = icon;
     }
 
-    public static void drawListBackground(double startX, double endX, double startY, double endY)
+    public void drawListBackground(GuiGraphics graphics, int startX, int endX, int startY, int endY)
     {
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder buffer = tesselator.getBuilder();
-
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        RenderSystem.setShaderTexture(0, Screen.BACKGROUND_LOCATION);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        buffer.vertex(startX, endY, 0.0).uv((float) startX / 32.0F, (float) endY / 32.0F).color(BRIGHTNESS, BRIGHTNESS, BRIGHTNESS, 255).endVertex();
-        buffer.vertex(endX, endY, 0.0).uv((float) endX / 32.0F, (float) endY / 32.0F).color(BRIGHTNESS, BRIGHTNESS, BRIGHTNESS, 255).endVertex();
-        buffer.vertex(endX, startY, 0.0).uv((float) endX / 32.0F, (float) startY / 32.0F).color(BRIGHTNESS, BRIGHTNESS, BRIGHTNESS, 255).endVertex();
-        buffer.vertex(startX, startY, 0.0).uv((float) startX / 32.0F, (float) startY / 32.0F).color(BRIGHTNESS, BRIGHTNESS, BRIGHTNESS, 255).endVertex();
-        tesselator.end();
-
-        RenderSystem.depthFunc(515);
-        RenderSystem.disableDepthTest();
+        boolean inGame = Minecraft.getInstance().level != null;
         RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(startX, startY + FADE_LENGTH, 0.0).color(0, 0, 0, 0).endVertex();
-        buffer.vertex(endX, startY + FADE_LENGTH, 0.0).color(0, 0, 0, 0).endVertex();
-        buffer.vertex(endX, startY, 0.0).color(0, 0, 0, 255).endVertex();
-        buffer.vertex(startX, startY, 0.0).color(0, 0, 0, 255).endVertex();
-        buffer.vertex(startX, endY, 0.0).color(0, 0, 0, 255).endVertex();
-        buffer.vertex(endX, endY, 0.0).color(0, 0, 0, 255).endVertex();
-        buffer.vertex(endX, endY - FADE_LENGTH, 0.0).color(0, 0, 0, 0).endVertex();
-        buffer.vertex(startX, endY - FADE_LENGTH, 0.0).color(0, 0, 0, 0).endVertex();
-        tesselator.end();
+        ResourceLocation backgroundTexture = !inGame ? MENU_LIST_BACKGROUND : IN_GAME_MENU_LIST_BACKGROUND;
+        ResourceLocation headerTexture = !inGame ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR;
+        ResourceLocation footerTexture = !inGame ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR;
+        graphics.blit(backgroundTexture, startX, startY, (float) endX, (float) endY, endX - startX, endY - startY, 32, 32);
+        graphics.blit(headerTexture, startX, startY - 2, 0, 0, endX - startX, 2, 32, 2);
+        graphics.blit(footerTexture, startX, endY, 0, 0, endX - startX, 2, 32, 2);
+        RenderSystem.disableBlend();
     }
 
     public enum Icon

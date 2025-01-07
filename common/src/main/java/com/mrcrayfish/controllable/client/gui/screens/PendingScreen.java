@@ -19,7 +19,6 @@ public class PendingScreen extends Screen
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
-        this.renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, partialTick);
         String loadingBar = switch((int) (Util.getMillis() / 300L % 4L)) {
             case 1, 3 -> "o O o";

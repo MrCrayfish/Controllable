@@ -1,0 +1,79 @@
+import net.neoforged.gradle.common.tasks.PotentiallySignJar
+
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.gradle.userdev' version '7.0.167'
+}
+
+def at = file('src/main/resources/META-INF/accesstransformer.cfg')
+if (at.exists()) {
+    minecraft.accessTransformers.file at
+}
+
+jarJar.enable()
+
+/*mixin {
+    add sourceSets.main, "controllable.refmap.json"
+    config 'controllable.common.mixins.json'
+    config 'controllable.neoforge.mixins.json'
+}*/
+
+runs {
+    configureEach {
+        modSource project.sourceSets.main
+        dependencies {
+            runtime project.configurations.library
+        }
+    }
+    client {
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+    server {
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        programArgument '--nogui'
+    }
+    gameTestServer {
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+    data {
+        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+dependencies {
+    // Core dependencies
+    implementation "net.neoforged:neoforge:${neoforge_version}"
+    implementation "com.mrcrayfish:framework-neoforge:${minecraft_version}-${framework_version}"
+
+    // JEI
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+
+    // Controllable SDL (https://github.com/MrCrayfish/ControllableSDL)
+    library jarJar("com.mrcrayfish:controllable-sdl:2.30.10-1.0") {
+        transitive(false)
+    }
+}
+
+tasks.jarJar.configure {
+    archiveClassifier = 'release'
+    from(rootProject.file("LICENSE_LibSDL4J"))
+    from(rootProject.file("LICENSE")) {
+        rename { "${it}_${mod_name}" }
+    }
+}
+
+tasks.register('signJar', PotentiallySignJar) {
+    dependsOn jar
+    onlyIf {
+        hasProperty('keyStore') || System.getenv("KEYSTORE")
+    }
+    keyStore = findProperty('keyStore') ?: System.getenv("KEYSTORE")
+    alias = findProperty('keyStoreAlias') ?: System.getenv("KEYSTORE_ALIAS")
+    storePass = findProperty('keyStorePass') ?: System.getenv("KEYSTORE_PASS")
+    input = jar.archiveFile
+}
+
+jar.finalizedBy 'signJar'

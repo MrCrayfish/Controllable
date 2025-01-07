@@ -12,6 +12,7 @@ import com.mrcrayfish.controllable.client.RadialMenuHandler;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.platform.ClientServices;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -42,7 +43,7 @@ public class ActionHintOverlay implements IOverlay
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
         int[] positions = new int[2];
         for(int button : this.actions.keySet())

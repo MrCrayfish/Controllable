@@ -18,6 +18,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -53,7 +54,7 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
                 .create(0, 0, 100, 20, CommonComponents.EMPTY, (button, value) -> {
                     setter.accept(value);
                 });
-        this.toggle.setTooltipDelay(500);
+        this.toggle.setTooltipDelay(Duration.ofMillis(500));
     }
 
     @Override

@@ -28,6 +28,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -172,7 +173,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             this.setLabelColor(this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor());
             super.render(graphics, index, top, left, width, itemHeight, mouseX, mouseY, selected, partialTick);
             this.bindingButton.setTooltip(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
-            this.bindingButton.setTooltipDelay(400);
+            this.bindingButton.setTooltipDelay(Duration.ofMillis(400));
             this.bindingButton.setX(left + width - 65);
             this.bindingButton.setY(top - 1);
             this.bindingButton.render(graphics, mouseX, mouseY, partialTick);

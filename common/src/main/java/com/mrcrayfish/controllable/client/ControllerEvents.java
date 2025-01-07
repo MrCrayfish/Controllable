@@ -6,10 +6,11 @@ import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
 import com.mrcrayfish.framework.api.event.ScreenEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.options.OptionsScreen;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -32,10 +33,17 @@ public class ControllerEvents
     {
         if(screen instanceof OptionsScreen)
         {
-            int y = screen.height / 6 + 72 - 6;
-            add.accept(new ControllerButton((screen.width / 2) + 5 + 150 + 4, y, button -> {
-                Minecraft.getInstance().setScreen(new SettingsScreen(screen));
-            }));
+            // OptionsScreen doesn't clear widgets on resize, so we have to manage a persistent widget and it's position
+            int buttonX = (screen.width / 2) + 5 + 150 + 4;
+            int buttonY = 115;
+            Optional<AbstractWidget> optional = widgets.stream().filter(widget -> widget instanceof ControllerButton).findFirst();
+            optional.ifPresentOrElse(widget -> {
+                widget.setPosition(buttonX, buttonY);
+            }, () -> {
+                add.accept(new ControllerButton(buttonX, buttonY, button -> {
+                    Minecraft.getInstance().setScreen(new SettingsScreen(screen));
+                }));
+            });
         }
     }
 }

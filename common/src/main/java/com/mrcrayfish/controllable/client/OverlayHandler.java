@@ -9,6 +9,7 @@ import com.mrcrayfish.controllable.client.overlay.RecipeBookOverlay;
 import com.mrcrayfish.controllable.client.overlay.TabNavigationOverlay;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.Util;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.List;
@@ -33,13 +34,13 @@ public class OverlayHandler
         TickEvents.START_CLIENT.register(() -> OVERLAYS.forEach(IOverlay::tick));
     }
 
-    public static void draw(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    public static void draw(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
         for(IOverlay overlay : OVERLAYS)
         {
             if(overlay.isVisible())
             {
-                overlay.render(graphics, mouseX, mouseY, partialTick);
+                overlay.render(graphics, mouseX, mouseY, tracker);
             }
         }
     }

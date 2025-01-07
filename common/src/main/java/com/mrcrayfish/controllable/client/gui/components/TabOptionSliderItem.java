@@ -18,6 +18,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,11 +34,11 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
     public TabOptionSliderItem(DoubleProperty property, double stepSize)
     {
         super(Component.translatable(property.getTranslationKey()));
-        if(!(property.getValidator() instanceof NumberRange<Double> range))
+        if(!(property.getValidator() instanceof NumberRange<Double>(Double minValue, Double maxValue)))
             throw new IllegalArgumentException("Double property must have a number range");
-        this.slider = new LazySlider(0, 0, 100, 20, this.label, property.get(), range.minValue(), range.maxValue(), stepSize, property::set);
-        this.slider.setTooltip(Tooltip.create(Component.literal(property.getComment())));
-        this.slider.setTooltipDelay(500);
+        this.slider = new LazySlider(0, 0, 100, 20, this.label, property.get(), minValue, maxValue, stepSize, property::set);
+        this.slider.setTooltip(Tooltip.create(Component.literal(property.getComment()))); // TODO trim valid values and whitespace
+        this.slider.setTooltipDelay(Duration.ofMillis(500));
         this.slider.valueOnly();
     }
 

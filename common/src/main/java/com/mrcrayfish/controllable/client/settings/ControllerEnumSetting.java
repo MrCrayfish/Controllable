@@ -4,6 +4,7 @@ import com.mrcrayfish.framework.api.config.EnumProperty;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.CycleButton;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
@@ -28,7 +29,7 @@ public class ControllerEnumSetting<T extends Enum<T> & SettingEnum> extends Cont
             AbstractWidget widget = CycleButton.builder(T::getLabel).withInitialValue(this.configValue.get()).withValues(this.values).withTooltip(value -> this.tooltip).create(x, y, width, height, this.label, (button, value) -> {
                 this.configValue.set(value);
             });
-            widget.setTooltipDelay(500);
+            widget.setTooltipDelay(Duration.ofMillis(500));
             return widget;
         };
     }

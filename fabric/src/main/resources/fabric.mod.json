@@ -11,7 +11,7 @@
         "issues": "${mod_issues}"
     },
     "license": "${mod_license}",
-    "icon": "${mod_id}_icon.png",
+    "icon": "assets/${mod_id}/icon.png",
     "environment": "client",
     "entrypoints": {
         "client": [
@@ -27,7 +27,7 @@
         "fabricloader": ">=${fabric_loader_version}",
         "fabric": "*",
         "minecraft": "${minecraft_version}",
-        "java": ">=17",
+        "java": ">=21",
         "framework": ">=${framework_version}"
     },
     "custom": {
@@ -41,8 +41,8 @@
             "background": "minecraft:textures/block/dirt.png"
         },
         "catalogue": {
-            "banner": "${mod_id}_banner.png",
-            "background": "${mod_id}_background.png"
+            "banner": "assets/${mod_id}/banner.png",
+            "background": "assets/${mod_id}/background.png"
         }
     }
 }

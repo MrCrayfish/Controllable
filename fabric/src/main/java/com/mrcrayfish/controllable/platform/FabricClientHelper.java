@@ -9,8 +9,6 @@ import com.mrcrayfish.controllable.integration.JeiSupport;
 import com.mrcrayfish.controllable.platform.services.IClientHelper;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
-import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
@@ -39,26 +37,23 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FabricClientHelper implements IClientHelper
 {
     @Override
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
-        boolean[] cancelled = new boolean[]{false};
-        Screen.wrapScreenError(() ->
-        {
-            if(action == GLFW.GLFW_RELEASE)
-            {
-                cancelled[0] = screen.keyReleased(key, -1, modifiers);
-            }
-            else if(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT)
-            {
+        AtomicBoolean cancelled = new AtomicBoolean();
+        Screen.wrapScreenError(() -> {
+            if(action == GLFW.GLFW_RELEASE) {
+                cancelled.set(screen.keyReleased(key, -1, modifiers));
+            } else if(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT) {
                 screen.afterKeyboardAction();
-                cancelled[0] = screen.keyPressed(key, -1, modifiers);
+                cancelled.set(screen.keyPressed(key, -1, modifiers));
             }
-        }, "keyPressed event handler", screen.getClass().getCanonicalName());
-        return cancelled[0];
+        }, "Controllable keyPressed event handler", screen.getClass().getCanonicalName());
+        return cancelled.get();
     }
 
     @Override
@@ -67,19 +62,25 @@ public class FabricClientHelper implements IClientHelper
         Minecraft mc = Minecraft.getInstance();
         double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
         double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
-        Screen.wrapScreenError(() -> screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY), "mouseDragged event handler", screen.getClass().getCanonicalName());
+        Screen.wrapScreenError(() -> {
+            screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
+        }, "Controllable mouseDragged event handler", screen.getClass().getCanonicalName());
     }
 
     @Override
     public void sendScreenMouseClickPre(Screen screen, double mouseX, double mouseY, int button)
     {
-        Screen.wrapScreenError(() -> screen.mouseClicked(mouseX, mouseY, button), "mouseClicked event handler", screen.getClass().getCanonicalName());
+        Screen.wrapScreenError(() -> {
+            screen.mouseClicked(mouseX, mouseY, button);
+        }, "Controllable mouseClicked event handler", screen.getClass().getCanonicalName());
     }
 
     @Override
     public void sendScreenMouseReleasedPre(Screen screen, double mouseX, double mouseY, int button)
     {
-        Screen.wrapScreenError(() -> screen.mouseReleased(mouseX, mouseY, button), "mouseReleased event handler", screen.getClass().getCanonicalName());
+        Screen.wrapScreenError(() -> {
+            screen.mouseReleased(mouseX, mouseY, button);
+        }, "Controllable mouseReleased event handler", screen.getClass().getCanonicalName());
     }
 
     @Override
@@ -135,13 +136,13 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public double getLastMouseEventTime()
     {
-        return Minecraft.getInstance().mouseHandler.lastMouseEventTime;
+        return Minecraft.getInstance().mouseHandler.lastHandleMovementTime;
     }
 
     @Override
     public void setLastMouseEventTime(double time)
     {
-        Minecraft.getInstance().mouseHandler.lastMouseEventTime = time;
+        Minecraft.getInstance().mouseHandler.lastHandleMovementTime = time;
     }
 
     @Override
@@ -187,15 +188,10 @@ public class FabricClientHelper implements IClientHelper
     }
 
     @Override
-    @SuppressWarnings("UnstableApiUsage")
     public void gatherCreativeTabNavigationPoints(CreativeModeInventoryScreen screen, List<NavigationPoint> points)
     {
-        CreativeGuiExtensions extensions = (CreativeGuiExtensions) screen;
-        CreativeModeTabs.tabs().forEach(creativeModeTab ->
-        {
-            FabricItemGroup group = (FabricItemGroup) creativeModeTab;
-            if(group.getPage() == extensions.fabric_currentPage())
-            {
+        CreativeModeTabs.tabs().forEach(creativeModeTab -> {
+            if(screen.getPage(creativeModeTab) == screen.getCurrentPage()) {
                 points.add(this.getCreativeTabPoint(screen, creativeModeTab));
             }
         });
@@ -208,16 +204,15 @@ public class FabricClientHelper implements IClientHelper
     }
 
     @Override
-    @SuppressWarnings("UnstableApiUsage")
     public void scrollCreativeTabs(CreativeModeInventoryScreen screen, int dir)
     {
         if(dir > 0)
         {
-            ((CreativeGuiExtensions) screen).fabric_nextPage();
+            screen.switchToNextPage();
         }
         else
         {
-            ((CreativeGuiExtensions) screen).fabric_previousPage();
+            screen.switchToPreviousPage();
         }
     }
 

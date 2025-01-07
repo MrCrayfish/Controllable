@@ -7,12 +7,10 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerInput;
 import com.mrcrayfish.controllable.client.CursorType;
 import com.mrcrayfish.controllable.client.ItemHeldBehaviour;
-import com.mrcrayfish.controllable.platform.ClientServices;
 import com.mrcrayfish.controllable.platform.Services;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.world.inventory.Slot;
 
 /**
  * Author: MrCrayfish
@@ -26,7 +24,7 @@ public class CursorOverlay implements IOverlay
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
         PoseStack pose = graphics.pose();
         pose.pushPose();
@@ -37,8 +35,8 @@ public class CursorOverlay implements IOverlay
         {
             ControllerInput input = Controllable.getInput();
             double guiScale = mc.getWindow().getGuiScale();
-            double virtualCursorX = input.getVirtualCursorX(mc.getFrameTime());
-            double virtualCursorY = input.getVirtualCursorY(mc.getFrameTime());
+            double virtualCursorX = input.getVirtualCursorX();
+            double virtualCursorY = input.getVirtualCursorY();
             double zIndex = Services.PLATFORM.isForge() ? 300 : 3000; // Hack until I make Forge/Fabric calls the same
             pose.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, zIndex);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

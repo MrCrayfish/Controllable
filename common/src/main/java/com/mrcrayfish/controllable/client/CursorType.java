@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client;
 
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.settings.SettingEnum;
+import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -16,7 +17,7 @@ public enum CursorType implements SettingEnum
     LEGACY_LIGHT("controllable.cursor.legacy_light", ItemHeldBehaviour.HIDE, true),
     LEGACY_DARK("controllable.cursor.legacy_dark", ItemHeldBehaviour.HIDE, true);
 
-    public static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/cursor.png");
+    public static final ResourceLocation TEXTURE = Utils.resource("textures/gui/cursor.png");
 
     private final String key;
     private final ItemHeldBehaviour behaviour;

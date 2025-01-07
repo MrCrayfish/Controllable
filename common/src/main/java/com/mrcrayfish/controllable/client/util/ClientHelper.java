@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.ButtonIcons;
 import com.mrcrayfish.controllable.client.Icons;
 import com.mrcrayfish.controllable.platform.ClientServices;
+import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
@@ -29,8 +30,8 @@ import java.util.List;
  */
 public class ClientHelper
 {
-    public static final ResourceLocation ICON_FONT = new ResourceLocation(Constants.MOD_ID, "icons");
-    public static final ResourceLocation BUTTON_FONT = new ResourceLocation(Constants.MOD_ID, "buttons");
+    public static final ResourceLocation ICON_FONT = Utils.resource("icons");
+    public static final ResourceLocation BUTTON_FONT = Utils.resource("buttons");
 
     public static MutableComponent getIconComponent(Icons icon)
     {

@@ -76,8 +76,8 @@ public abstract class ListMenuScreen extends Screen
         this.constructEntries(entries);
         this.entries = ImmutableList.copyOf(entries); //Should this still be immutable?
         this.list = new EntryList(this.entries, this.calculateTop());
-        this.list.setRenderBackground(!ClientHelper.isPlayingGame());
-        this.addWidget(this.list);
+        //this.list.setRenderBackground(!ClientHelper.isPlayingGame());
+        this.addRenderableWidget(this.list);
 
         // Adds a search text field to the top of the screen
         this.searchTextField = new FocusedEditBox(this.font, this.width / 2 - 110, this.calculateSearchBarY(), 220, 20, Component.literal("Search"));
@@ -92,7 +92,7 @@ public abstract class ListMenuScreen extends Screen
                 this.list.setScrollAmount(0);
             }
         });
-        this.addWidget(this.searchTextField);
+        this.addRenderableWidget(this.searchTextField);
         this.searchTextField.visible = this.searchBarVisible;
         this.updateSearchTextFieldSuggestion("");
     }
@@ -144,11 +144,13 @@ public abstract class ListMenuScreen extends Screen
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
         // Draws the background texture (dirt or custom texture)
-        this.renderBackground(graphics);
+        //this.renderBackground(graphics); // TODO test
+
+        super.render(graphics, mouseX, mouseY, partialTicks);
 
         // Draws widgets manually since they are not buttons
-        this.list.render(graphics, mouseX, mouseY, partialTicks);
-        this.searchTextField.render(graphics, mouseX, mouseY, partialTicks);
+        //this.list.render(graphics, mouseX, mouseY, partialTicks);
+        //this.searchTextField.render(graphics, mouseX, mouseY, partialTicks);
 
         // Draw title
         int titleY = 7 + (!this.searchBarVisible && this.subTitle == null ? 5 : 0);
@@ -159,8 +161,6 @@ public abstract class ListMenuScreen extends Screen
         {
             graphics.drawCenteredString(this.font, this.subTitle, this.width / 2, 21, 0xFFFFFF);
         }
-
-        super.render(graphics, mouseX, mouseY, partialTicks);
 
         // Gives a chance for child classes to set the active tooltip
         this.updateTooltip(mouseX, mouseY);
@@ -182,8 +182,15 @@ public abstract class ListMenuScreen extends Screen
     {
         public EntryList(List<Item> entries, int top)
         {
-            super(Objects.requireNonNull(ListMenuScreen.this.minecraft), ListMenuScreen.this.width, ListMenuScreen.this.height, top, ListMenuScreen.this.height - 44, ListMenuScreen.this.itemHeight);
+            // ListMenuScreen.this.height - 44 TODO test
+            super(Objects.requireNonNull(ListMenuScreen.this.minecraft), ListMenuScreen.this.width, ListMenuScreen.this.height, top, ListMenuScreen.this.itemHeight);
             entries.forEach(this::addEntry);
+        }
+
+        @Override
+        protected void setRenderHeader(boolean p_93474_, int p_93475_)
+        {
+            super.setRenderHeader(p_93474_, p_93475_);
         }
 
         @Override
@@ -220,10 +227,10 @@ public abstract class ListMenuScreen extends Screen
         }
 
         @Override
-        public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
         {
-            super.render(graphics, mouseX, mouseY, partialTicks);
-            this.renderToolTips(graphics, mouseX, mouseY);
+            super.renderWidget(graphics, mouseX, mouseY, partialTick);
+            this.renderToolTips(graphics, mouseX, mouseY); // TODO test
         }
 
         private void renderToolTips(GuiGraphics graphics, int mouseX, int mouseY)

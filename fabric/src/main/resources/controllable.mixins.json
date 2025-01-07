@@ -9,7 +9,6 @@
         "client.FabricGameRendererMixin",
         "client.FabricMinecraftMixin",
         "client.FabricRecipeBookPageMixin",
-        "client.GuiMixin",
         "client.KeyMappingMixin",
         "client.jei.GuiIconToggleButtonMixin",
         "client.jei.IngredientGridMixin",

@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.client.gui.widget.LazySlider;
 import com.mrcrayfish.framework.api.config.DoubleProperty;
 import net.minecraft.client.gui.components.AbstractWidget;
 
+import java.time.Duration;
 import java.util.function.Supplier;
 
 /**
@@ -29,7 +30,7 @@ public class ControllerSliderSetting extends ControllerSetting<Double>
         return () -> {
             AbstractWidget slider = new LazySlider(x, y, width, height, this.label, this.configValue.get(), this.min, this.max, this.stepSize, this.configValue::set);
             slider.setTooltip(this.tooltip);
-            slider.setTooltipDelay(500);
+            slider.setTooltipDelay(Duration.ofMillis(500));
             return slider;
         };
     }

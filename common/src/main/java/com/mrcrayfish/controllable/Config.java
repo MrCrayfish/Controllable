@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.client.ActionVisibility;
 import com.mrcrayfish.controllable.client.ButtonIcons;
 import com.mrcrayfish.controllable.client.CursorType;
 import com.mrcrayfish.controllable.client.Thumbstick;
+import com.mrcrayfish.controllable.util.Utils;
 import com.mrcrayfish.framework.api.config.BoolProperty;
 import com.mrcrayfish.framework.api.config.ConfigProperty;
 import com.mrcrayfish.framework.api.config.ConfigType;
@@ -17,7 +18,7 @@ import net.minecraft.resources.ResourceLocation;
  */
 public class Config
 {
-    public static final ResourceLocation CLIENT_CONFIG_ID = new ResourceLocation(Constants.MOD_ID, "client");
+    public static final ResourceLocation CLIENT_CONFIG_ID = Utils.resource("client");
 
     @FrameworkConfig(id = Constants.MOD_ID, name = "client", separator = '-', type = ConfigType.CLIENT)
     public static final ClientWrapper CLIENT = new ClientWrapper();

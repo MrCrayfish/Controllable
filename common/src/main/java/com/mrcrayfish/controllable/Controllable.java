@@ -9,7 +9,7 @@ import com.mrcrayfish.controllable.client.input.glfw.GLFWControllerManager;
 import com.mrcrayfish.controllable.client.input.sdl2.SDL2ControllerManager;
 import net.minecraft.client.Minecraft;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 public class Controllable

@@ -4,6 +4,7 @@ import com.mrcrayfish.framework.api.config.BoolProperty;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.CycleButton;
 
+import java.time.Duration;
 import java.util.function.Supplier;
 
 /**
@@ -23,7 +24,7 @@ public class ControllerToggleSetting extends ControllerSetting<Boolean>
             AbstractWidget widget = CycleButton.onOffBuilder(this.configValue.get()).withTooltip(value -> this.tooltip).create(x, y, width, height, this.label, (button, value) -> {
                 this.configValue.set(value);
             });
-            widget.setTooltipDelay(500);
+            widget.setTooltipDelay(Duration.ofMillis(500));
             return widget;
         };
     }

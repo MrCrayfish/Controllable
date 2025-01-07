@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.overlay;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -38,7 +39,7 @@ public class TabNavigationOverlay implements IOverlay
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
         List<? extends GuiEventListener> tabs = this.navigationBar.children();
         ScreenRectangle firstTab = tabs.get(0).getRectangle();

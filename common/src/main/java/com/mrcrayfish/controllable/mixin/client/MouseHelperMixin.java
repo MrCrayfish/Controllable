@@ -24,8 +24,8 @@ public abstract class MouseHelperMixin
     @Shadow
     public abstract void releaseMouse();
 
-    @Inject(method = "onMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;turnPlayer()V"))
-    private void controllableBeforeUpdateLook(long handle, double x, double y, CallbackInfo ci)
+    @Inject(method = "handleAccumulatedMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;turnPlayer(D)V"))
+    private void controllableBeforeUpdateLook(CallbackInfo ci)
     {
         Minecraft minecraft = Minecraft.getInstance();
         ControllerInput input = Controllable.getInput();
@@ -47,12 +47,13 @@ public abstract class MouseHelperMixin
         }
     }
 
-    @Inject(method = "turnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;isMouseGrabbed()Z"), cancellable = true)
+    // TODO figure out what this was
+    /*@Inject(method = "turnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;isMouseGrabbed()Z"), cancellable = true)
     private void controllableTurn(CallbackInfo ci)
     {
         if(this.minecraft.player == null)
         {
             ci.cancel();
         }
-    }
+    }*/
 }

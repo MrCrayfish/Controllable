@@ -9,6 +9,7 @@ import com.mrcrayfish.controllable.client.gui.ControllerAxis;
 import com.mrcrayfish.controllable.client.gui.ControllerButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -31,7 +32,7 @@ import java.util.Objects;
  */
 public class ControllerLayoutScreen extends Screen
 {
-    public static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/controller.png");
+    public static final ResourceLocation TEXTURE = Utils.resource("textures/gui/controller.png");
 
     private final List<ControllerButton> controllerButtons = new ArrayList<>();
 
@@ -97,7 +98,6 @@ public class ControllerLayoutScreen extends Screen
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderDirtBackground(graphics);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
         int width = 38 * 5;
