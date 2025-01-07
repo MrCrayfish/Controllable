@@ -41,7 +41,7 @@ public abstract class Controller
     /**
      * Creates a new ButtonStates instance that is filled with the current states of this controller
      */
-    public abstract ButtonStates createButtonsStates();
+    public abstract ButtonStates captureButtonStates();
 
     /**
      * Gets the name of this controller. sdl2gdx prefixes the name and this method removes it.

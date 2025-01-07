@@ -63,7 +63,7 @@ public class SDL2Controller extends Controller
     }
 
     @Override
-    public ButtonStates createButtonsStates()
+    public ButtonStates captureButtonStates()
     {
         SDL_GameControllerUpdate();
         ButtonStates states = new ButtonStates();

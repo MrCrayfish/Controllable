@@ -63,7 +63,7 @@ public class InputProcessor
         if(currentController == null)
             return;
 
-        this.inputQueue.offer(currentController.createButtonsStates());
+        this.inputQueue.offer(currentController.captureButtonStates());
     }
 
     private void processButtonStates()

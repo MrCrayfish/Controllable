@@ -46,7 +46,7 @@ public class GLFWController extends Controller
     }
 
     @Override
-    public ButtonStates createButtonsStates()
+    public ButtonStates captureButtonStates()
     {
         GLFW.glfwGetGamepadState(this.deviceIndex, this.controller);
         ButtonStates states = new ButtonStates();
