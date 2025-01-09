@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.overlay;
 
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
@@ -28,7 +29,8 @@ public class RecipeBookOverlay implements IOverlay
     @Override
     public boolean isVisible()
     {
-        return Controllable.getInput().isControllerInUse() && this.recipeBook != null && this.recipeBook.isVisible();
+        Controller controller = Controllable.getController();
+        return controller != null && controller.isBeingUsed() && this.recipeBook != null && this.recipeBook.isVisible();
     }
 
     @Override

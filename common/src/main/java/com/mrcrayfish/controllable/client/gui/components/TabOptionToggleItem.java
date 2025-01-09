@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.config.BoolProperty;
@@ -16,6 +17,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.time.Duration;
@@ -30,6 +32,7 @@ import java.util.function.Supplier;
 public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatable
 {
     private final AbstractWidget toggle;
+    private Consumer<Boolean> changeCallback;
 
     public TabOptionToggleItem(BoolProperty property)
     {
@@ -53,8 +56,17 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
                 .displayOnlyValue()
                 .create(0, 0, 100, 20, CommonComponents.EMPTY, (button, value) -> {
                     setter.accept(value);
+                    if(this.changeCallback != null) {
+                        this.changeCallback.accept(value);
+                    }
                 });
         this.toggle.setTooltipDelay(Duration.ofMillis(500));
+    }
+
+    public TabOptionToggleItem setChangeCallback(@Nullable Consumer<Boolean> changeCallback)
+    {
+        this.changeCallback = changeCallback;
+        return this;
     }
 
     @Override
@@ -77,7 +89,8 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
         this.toggle.setY(top);
         this.toggle.render(graphics, mouseX, mouseY, partialTick);
 
-        if(Controllable.getInput().isControllerInUse() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
         {
             ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, Buttons.A);
         }
@@ -86,7 +99,8 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        if(!Controllable.getInput().isControllerInUse())
+        Controller controller = Controllable.getController();
+        if(controller == null || !controller.isBeingUsed())
             return super.mouseClicked(mouseX, mouseY, button);
 
         if(button != GLFW.GLFW_MOUSE_BUTTON_1)

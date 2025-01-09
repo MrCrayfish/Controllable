@@ -1,8 +1,6 @@
-package com.mrcrayfish.controllable.client;
+package com.mrcrayfish.controllable.client.settings;
 
-import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.input.Buttons;
-import com.mrcrayfish.controllable.client.settings.SettingEnum;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.resources.ResourceLocation;
 

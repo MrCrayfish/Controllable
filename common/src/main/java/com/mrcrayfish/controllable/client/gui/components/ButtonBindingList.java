@@ -7,13 +7,14 @@ import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
-import com.mrcrayfish.controllable.client.Icons;
+import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SelectKeyBindingScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -134,7 +135,8 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
 
         private List<Component> getBindingTooltip(ButtonBinding binding)
         {
-            if(Controllable.getInput().isControllerInUse())
+            Controller controller = Controllable.getController();
+            if(controller != null && controller.isBeingUsed())
             {
                 List<Component> components = new ArrayList<>();
                 components.add(Component.translatable("controllable.gui.change_binding", ClientHelper.getButtonComponent(Buttons.A)).withStyle(ChatFormatting.YELLOW));
@@ -186,7 +188,8 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button)
         {
-            if(!this.resetButton.isHovered() && Controllable.getInput().isControllerInUse())
+            Controller controller = Controllable.getController();
+            if(!this.resetButton.isHovered() && controller != null && controller.isBeingUsed())
             {
                 this.bindingButton.mouseClicked(this.bindingButton.getX(), this.bindingButton.getY(), button);
             }

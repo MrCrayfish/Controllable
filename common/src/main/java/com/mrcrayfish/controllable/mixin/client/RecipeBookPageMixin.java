@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.mixin.client;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -36,7 +37,8 @@ public class RecipeBookPageMixin
     @Inject(method = "renderTooltip", at = @At(value = "TAIL"))
     private void controllableRenderTooltipTail(GuiGraphics graphics, int mouseX, int mouseY, CallbackInfo ci)
     {
-        if(Controllable.getInput().isControllerInUse() && Config.CLIENT.client.options.quickCraft.get())
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.isBeingUsed() && Config.CLIENT.client.options.quickCraft.get())
         {
             if(this.minecraft.screen != null && this.overlay.isVisible())
             {

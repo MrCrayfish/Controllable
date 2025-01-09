@@ -1,6 +1,4 @@
-package com.mrcrayfish.controllable.client;
-
-import com.mrcrayfish.controllable.client.settings.SettingEnum;
+package com.mrcrayfish.controllable.client.settings;
 
 /**
  * Author: MrCrayfish

@@ -1,0 +1,287 @@
+package com.mrcrayfish.controllable.client;
+
+import com.google.common.base.Preconditions;
+import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
+import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.settings.Thumbstick;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
+import com.mrcrayfish.controllable.mixin.client.TimerAccessor;
+import com.mrcrayfish.controllable.platform.ClientServices;
+import com.mrcrayfish.framework.api.event.ScreenEvents;
+import com.mrcrayfish.framework.api.event.TickEvents;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import org.jetbrains.annotations.ApiStatus;
+import org.joml.Vector2f;
+
+/**
+ * Author: MrCrayfish
+ */
+public final class VirtualCursor
+{
+    private static volatile VirtualCursor instance;
+
+    private final Vector2f inputVector = new Vector2f();
+    private int prevX;
+    private int prevY;
+    private int x;
+    private int y;
+    private double renderX;
+    private double renderY;
+    private boolean visible;
+    private boolean initialized;
+
+    @ApiStatus.Internal
+    public VirtualCursor()
+    {
+        Preconditions.checkState(instance == null, "Only one instance VirtualCursor is allowed");
+        Minecraft mc = Minecraft.getInstance();
+        this.renderX = this.x = this.prevX = mc.getWindow().getWidth() / 2;
+        this.renderY = this.y = this.prevY = mc.getWindow().getHeight() / 2;
+        instance = this;
+    }
+
+    @ApiStatus.Internal
+    public void registerEvents()
+    {
+        if(!this.initialized)
+        {
+            TickEvents.START_CLIENT.register(this::updateMovement);
+            TickEvents.START_RENDER.register(this::updateRenderPosition);
+            ScreenEvents.OPENED.register(this::onScreenOpened);
+            this.initialized = true;
+        }
+    }
+
+    public boolean isVisible()
+    {
+        return this.visible;
+    }
+
+    public void setVisible(boolean visible)
+    {
+        this.visible = visible;
+    }
+
+    /**
+     * @return The x position the cursor is moving to
+     */
+    public int getX()
+    {
+        return this.x;
+    }
+
+    /**
+     * @return The y position the cursor is moving to
+     */
+    public int getY()
+    {
+        return this.y;
+    }
+
+    public int getPrevX()
+    {
+        return this.prevX;
+    }
+
+    public int getPrevY()
+    {
+        return this.prevY;
+    }
+
+    /**
+     * @return The x position of the cursor for rendering
+     */
+    public double getRenderX()
+    {
+        return this.renderX;
+    }
+
+    /**
+     * @return The y position of the cursor for rendering
+     */
+    public double getRenderY()
+    {
+        return this.renderY;
+    }
+
+    public int getScreenX()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        return (int) (this.x * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth());
+    }
+
+    public int getScreenY()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        return (int) (this.y * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight());
+    }
+
+    /**
+     * Updates the movement of the cursor.
+     */
+    private void updateMovement()
+    {
+        this.prevX = this.x;
+        this.prevY = this.y;
+        this.inputVector.zero();
+
+        // Don't update cursor if no controller is connected
+        Controller controller = Controllable.getController();
+        if(controller == null)
+            return;
+
+        // Don't update cursor if we're not in a screen, or we are in the layout screen
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.screen == null || mc.screen instanceof ControllerLayoutScreen)
+            return;
+
+        this.updateInputVector(controller);
+
+        // If the magnitude is greater than zero, input is being given
+        if(this.inputVector.lengthSquared() > 0)
+        {
+            double cursorSpeed = Config.CLIENT.client.options.cursorSpeed.get() * Math.max(mc.getWindow().getGuiScale(), 1);
+
+            // It's very easy to miss an interactable element, like widgets and container slots, when
+            // moving at the full cursor speed. Instead, when hovering the element, the speed of the
+            // cursor is slowed down to accommodate for the reaction time of the user.
+            if(this.isHoveringContainerSlot() || this.isHoveringEventListener())
+            {
+                cursorSpeed *= Config.CLIENT.client.options.hoverModifier.get();
+            }
+
+            // Update cursor position based on movement vector and speed
+            this.x += (int) (this.inputVector.x * cursorSpeed);
+            this.y += (int) (this.inputVector.y * cursorSpeed);
+            this.clampCursorToWindowBounds();
+
+            // Make virtual cursor visible since it's being moved
+            this.setVisible(true);
+
+            // Update the last input time of this controller
+            controller.updateInputTime();
+        }
+    }
+
+    private void updateRenderPosition(DeltaTracker tracker)
+    {
+        // Skip updating if no screen
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.screen == null)
+            return;
+
+        // If position didn't change, don't update
+        if(this.x == this.prevX && this.y == this.prevY)
+            return;
+
+        float partialTick = this.getPartialTick(tracker); // The normalised time between two ticks
+        this.renderX = this.prevX + (this.x - this.prevX) * partialTick;
+        this.renderY = this.prevY + (this.y - this.prevY) * partialTick;
+    }
+
+    /**
+     * Gets the partial tick required for the virtual cursor. Unfortunately to get smooth movement
+     * of the cursor when the game is paused, direct access to the delta tick is required since none
+     * of the available methods return the correct value.
+     *
+     * @param tracker the delta tracker instance
+     * @return a float containing the partial tick (0 to 1)
+     */
+    private float getPartialTick(DeltaTracker tracker)
+    {
+        if(tracker instanceof TimerAccessor accessor)
+        {
+            return accessor.controllable$DeltaTickResidual();
+        }
+        return tracker.getGameTimeDeltaPartialTick(true);
+    }
+
+    /**
+     * Handles repositioning the cursor when a screen is opened. The cursor is moved to the center
+     * of the window and the virtual cursor is marked as visible. If there was a previous screen,
+     * updating is ignored.
+     *
+     * @param screen the screen that is about to be opened
+     */
+    private void onScreenOpened(Screen screen)
+    {
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.screen != null)
+            return;
+        this.renderX = this.x = this.prevX = mc.getWindow().getWidth() / 2;
+        this.renderY = this.y = this.prevY = mc.getWindow().getHeight() / 2;
+        this.setVisible(true);
+    }
+
+    private void updateInputVector(Controller controller)
+    {
+        float moveThreshold = 0.35F; // TODO change to config option
+        float thumbstickX = this.getCursorThumbstickX(controller);
+        float thumbstickY = this.getCursorThumbstickY(controller);
+        float cursorVectorX = Math.abs(thumbstickX) >= moveThreshold ? thumbstickX : 0;
+        float cursorVectorY = Math.abs(thumbstickY) >= moveThreshold ? thumbstickY : 0;
+        this.inputVector.x = cursorVectorX;
+        this.inputVector.y = cursorVectorY;
+    }
+
+    /**
+     * Clamps the position of the cursor to the bounds of the window
+     */
+    private void clampCursorToWindowBounds()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        this.x = Math.max(0, Math.min(this.x, mc.getWindow().getWidth()));
+        this.y = Math.max(0, Math.min(this.y, mc.getWindow().getHeight()));
+    }
+
+    private float getCursorThumbstickX(Controller controller)
+    {
+        return Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickXValue() : controller.getRThumbStickXValue();
+    }
+
+    private float getCursorThumbstickY(Controller controller)
+    {
+        return Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickYValue() : controller.getRThumbStickYValue();
+    }
+
+    private boolean isHoveringContainerSlot()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.screen instanceof AbstractContainerScreen<?> screen)
+        {
+            return ClientServices.CLIENT.getSlotUnderMouse(screen) != null;
+        }
+        return false;
+    }
+
+    private boolean isHoveringEventListener()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.screen == null)
+            return false;
+        // Convert to position to screen space
+        double scaledCursorX = this.x * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
+        double scaledCursorY = this.y * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
+        return ScreenHelper.findHoveredEventListenerExcludeList(mc.screen, scaledCursorX, scaledCursorY).isPresent();
+    }
+
+    /**
+     * Moves the cursor to the given position. The position units must be in window space.
+     *
+     * @param x the x position of the cursor in window space
+     * @param y the y position of the cursor in window space
+     */
+    public void jumpCursorTo(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+        this.clampCursorToWindowBounds();
+        this.renderX = this.prevX = this.x;
+        this.renderY = this.prevY = this.y;
+    }
+}

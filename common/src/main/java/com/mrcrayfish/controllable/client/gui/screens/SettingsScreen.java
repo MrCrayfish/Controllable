@@ -5,9 +5,9 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
-import com.mrcrayfish.controllable.client.Icons;
-import com.mrcrayfish.controllable.client.SneakMode;
-import com.mrcrayfish.controllable.client.SprintMode;
+import com.mrcrayfish.controllable.client.gui.Icons;
+import com.mrcrayfish.controllable.client.settings.SneakMode;
+import com.mrcrayfish.controllable.client.settings.SprintMode;
 import com.mrcrayfish.controllable.client.gui.components.ButtonBindingList;
 import com.mrcrayfish.controllable.client.gui.components.ControllerList;
 import com.mrcrayfish.controllable.client.gui.components.TabOptionEnumItem;
@@ -294,7 +294,6 @@ public class SettingsScreen extends Screen
             // Controller options
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.controller").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.autoSelect));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.virtualCursor));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.thumbstickDeadZone, 0.01));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.triggerDeadZone, 0.01));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.cursorSpeed, 1.0));

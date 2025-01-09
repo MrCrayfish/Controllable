@@ -1,14 +1,12 @@
-package com.mrcrayfish.controllable.client;
+package com.mrcrayfish.controllable.client.settings;
 
-import com.mrcrayfish.controllable.Constants;
-import com.mrcrayfish.controllable.client.settings.SettingEnum;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.resources.ResourceLocation;
 
 /**
  * Author: MrCrayfish
  */
-public enum CursorType implements SettingEnum
+public enum CursorStyle implements SettingEnum
 {
     LIGHT("controllable.cursor.light", ItemHeldBehaviour.HIDE, true),
     DARK("controllable.cursor.dark", ItemHeldBehaviour.HIDE, true),
@@ -23,7 +21,7 @@ public enum CursorType implements SettingEnum
     private final ItemHeldBehaviour behaviour;
     private final boolean scaleHover;
 
-    CursorType(String key, ItemHeldBehaviour behaviour, boolean scaleHover)
+    CursorStyle(String key, ItemHeldBehaviour behaviour, boolean scaleHover)
     {
         this.key = key;
         this.behaviour = behaviour;
@@ -44,5 +42,10 @@ public enum CursorType implements SettingEnum
     public boolean isScaleHover()
     {
         return this.scaleHover;
+    }
+
+    public enum ItemHeldBehaviour
+    {
+        SHOW, HIDE;
     }
 }

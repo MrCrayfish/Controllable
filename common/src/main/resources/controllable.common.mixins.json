@@ -15,7 +15,7 @@
         "client.OverlayRecipeComponentAccessor",
         "client.RecipeBookComponentAccessor",
         "client.RecipeBookPageAccessor",
-        "client.RecipeBookPageMixin"
+        "client.RecipeBookPageMixin", "client.TimerAccessor"
     ],
     "injectors": {
         "defaultRequire": 1

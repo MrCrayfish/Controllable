@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.input;
 
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import net.minecraft.Util;
 
 /**
  * Author: MrCrayfish
@@ -9,6 +10,7 @@ public abstract class Controller
 {
     protected final int deviceIndex;
     protected final ButtonStates states;
+    protected long lastInputTime;
 
     public Controller(int deviceIndex)
     {
@@ -113,7 +115,7 @@ public abstract class Controller
     /**
      * Used internally to update button states
      */
-    public ButtonStates getButtonsStates()
+    public ButtonStates getTrackedButtonStates()
     {
         return this.states;
     }
@@ -129,5 +131,29 @@ public abstract class Controller
     public boolean isButtonPressed(int button)
     {
         return this.states.getState(button);
+    }
+
+    /**
+     * @return The time which input was last received on this controller
+     */
+    public final long getLastInputTime()
+    {
+        return this.lastInputTime;
+    }
+
+    /**
+     * Updates the last input time to the current time
+     */
+    public final void updateInputTime()
+    {
+        this.lastInputTime = Util.getMillis();
+    }
+
+    /**
+     * @return True if controller input has been used recently
+     */
+    public final boolean isBeingUsed()
+    {
+        return Util.getMillis() - this.lastInputTime < 4000;
     }
 }

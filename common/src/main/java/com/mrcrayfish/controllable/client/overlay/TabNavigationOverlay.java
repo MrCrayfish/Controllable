@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.overlay;
 
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.Buttons;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -35,7 +36,8 @@ public class TabNavigationOverlay implements IOverlay
     @Override
     public boolean isVisible()
     {
-        return Controllable.getInput().isControllerInUse() && this.navigationBar != null;
+        Controller controller = Controllable.getController();
+        return controller != null && controller.isBeingUsed() && this.navigationBar != null;
     }
 
     @Override

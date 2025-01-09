@@ -2,10 +2,9 @@ package com.mrcrayfish.controllable.client.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.input.Buttons;
-import com.mrcrayfish.controllable.client.ButtonIcons;
-import com.mrcrayfish.controllable.client.Icons;
+import com.mrcrayfish.controllable.client.settings.ButtonIcons;
+import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.ChatFormatting;
@@ -93,7 +92,7 @@ public class ClientHelper
 
     public static float applyDeadzone(float input, float deadZone)
     {
-        return Mth.sign(input) * Math.max(Mth.abs(input) - deadZone, 0) / (1 - deadZone);
+        return Mth.sign(input) * Math.max(Mth.abs(input) - deadZone, 0.0F) / (1.0F - deadZone);
     }
 
     public static boolean isChatVisible()

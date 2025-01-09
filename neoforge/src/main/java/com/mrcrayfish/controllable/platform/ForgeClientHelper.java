@@ -92,7 +92,7 @@ public class ForgeClientHelper implements IClientHelper
             double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
             if(ClientHooks.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
                 return;
-            if(screen.mouseDragged(finalMouseX, finalMouseY, mc.mouseHandler.activeButton, finalDragX, finalDragY))
+            if(screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
                 return;
             ClientHooks.onScreenMouseDragPost(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
         }, "Controllable mouseDragged event handler", ((GuiEventListener) screen).getClass().getCanonicalName());

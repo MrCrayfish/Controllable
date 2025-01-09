@@ -4,11 +4,12 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Action;
 import com.mrcrayfish.controllable.client.ActionDescriptions;
-import com.mrcrayfish.controllable.client.ActionVisibility;
+import com.mrcrayfish.controllable.client.settings.ActionVisibility;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
-import com.mrcrayfish.controllable.client.ButtonIcons;
+import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.platform.ClientServices;
@@ -39,7 +40,8 @@ public class ActionHintOverlay implements IOverlay
     @Override
     public boolean isVisible()
     {
-        return !Minecraft.getInstance().options.hideGui && Controllable.getController() != null && Controllable.getInput().getLastUse() > 0;
+        Controller controller = Controllable.getController();
+        return !Minecraft.getInstance().options.hideGui && controller != null && controller.isBeingUsed();
     }
 
     @Override

@@ -1,24 +1,18 @@
 package com.mrcrayfish.controllable.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.ControllerInput;
 import com.mrcrayfish.controllable.client.OverlayHandler;
+import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 /**
  * Author: MrCrayfish
@@ -32,11 +26,12 @@ public class FabricGameRendererMixin
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderWithTooltip(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"), index = 1)
     private int controllableModifyMouseX(int mouseX)
     {
-        ControllerInput input = Controllable.getInput();
-        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && input.getLastUse() > 0)
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.isBeingUsed())
         {
-            Minecraft minecraft = Minecraft.getInstance();
-            return (int) (input.getVirtualCursorX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getScreenWidth());
+            Minecraft mc = Minecraft.getInstance();
+            double cursorX = Controllable.getCursor().getRenderX();
+            return (int) (cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth());
         }
         return mouseX;
     }
@@ -47,11 +42,12 @@ public class FabricGameRendererMixin
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderWithTooltip(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"), index = 2)
     private int controllableModifyMouseY(int mouseY)
     {
-        ControllerInput input = Controllable.getInput();
-        if(Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && input.getLastUse() > 0)
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.isBeingUsed())
         {
-            Minecraft minecraft = Minecraft.getInstance();
-            return (int) (input.getVirtualCursorY() * (double) minecraft.getWindow().getGuiScaledHeight() / (double) minecraft.getWindow().getScreenHeight());
+            Minecraft mc = Minecraft.getInstance();
+            double cursorY = Controllable.getCursor().getRenderY();
+            return (int) (cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight());
         }
         return mouseY;
     }

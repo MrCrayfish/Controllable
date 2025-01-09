@@ -1,9 +1,9 @@
 package com.mrcrayfish.controllable;
 
-import com.mrcrayfish.controllable.client.ActionVisibility;
-import com.mrcrayfish.controllable.client.ButtonIcons;
-import com.mrcrayfish.controllable.client.CursorType;
-import com.mrcrayfish.controllable.client.Thumbstick;
+import com.mrcrayfish.controllable.client.settings.ActionVisibility;
+import com.mrcrayfish.controllable.client.settings.ButtonIcons;
+import com.mrcrayfish.controllable.client.settings.CursorStyle;
+import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.util.Utils;
 import com.mrcrayfish.framework.api.config.BoolProperty;
 import com.mrcrayfish.framework.api.config.ConfigProperty;
@@ -45,14 +45,11 @@ public class Config
             @ConfigProperty(name = "renderMiniPlayer", comment = "If enabled, the player will render in the top left corner likes Bedrock Edition")
             public final BoolProperty renderMiniPlayer = BoolProperty.create(true);
 
-            @ConfigProperty(name = "virtualMouse", comment = "If enabled, the game will use a virtual cursor instead of the real cursor. This must be turned on to be able to run multiple instances!")
-            public final BoolProperty virtualCursor = BoolProperty.create(true);
-
             @ConfigProperty(name = "consoleHotbar", comment = "If enabled, hotbar will render closer to the center of the screen like on console.")
             public final BoolProperty consoleHotbar = BoolProperty.create(false);
 
             @ConfigProperty(name = "cursorType", comment = "The image to use for the cursor. This only applies if virtual mouse is enabled!")
-            public final EnumProperty<CursorType> cursorType = EnumProperty.create(CursorType.CONSOLE);
+            public final EnumProperty<CursorStyle> cursorType = EnumProperty.create(CursorStyle.CONSOLE);
 
             @ConfigProperty(name = "controllerIcons", comment = "The controller icons to use in game to display actions")
             public final EnumProperty<ButtonIcons> controllerIcons = EnumProperty.create(ButtonIcons.DEFAULT);

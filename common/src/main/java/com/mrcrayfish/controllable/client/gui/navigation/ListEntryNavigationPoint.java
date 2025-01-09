@@ -69,9 +69,9 @@ public class ListEntryNavigationPoint extends NavigationPoint
         }
 
         // Make list scroll to top if next item is the first item and is skippable
-        if(index + this.dir == 0 && children.size() > 0 && children.get(0) instanceof SkipItem)
+        if(index + this.dir == 0 && !children.isEmpty() && children.getFirst() instanceof SkipItem)
         {
-            entry = children.get(0);
+            entry = children.getFirst();
         }
 
         this.hideCursor = entry instanceof HideCursor;

@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.input.sdl2;
 import com.google.common.io.ByteStreams;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.input.ControllerManager;
+import com.mrcrayfish.controllable_sdl.api.hints.SdlHints;
 import com.sun.jna.Memory;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
 import com.mrcrayfish.controllable_sdl.api.rwops.SDL_RWops;
@@ -19,6 +20,8 @@ import static com.mrcrayfish.controllable_sdl.api.Sdl.SDL_Quit;
 import static com.mrcrayfish.controllable_sdl.api.SdlSubSystemConst.SDL_INIT_GAMECONTROLLER;
 import static com.mrcrayfish.controllable_sdl.api.SdlSubSystemConst.SDL_INIT_JOYSTICK;
 import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SdlGamecontroller.*;
+import static com.mrcrayfish.controllable_sdl.api.hints.SdlHints.SDL_SetHint;
+import static com.mrcrayfish.controllable_sdl.api.hints.SdlHintsConst.*;
 import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.SDL_JoystickGetDeviceInstanceID;
 import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.SDL_NumJoysticks;
 import static com.mrcrayfish.controllable_sdl.api.rwops.SdlRWops.SDL_RWFromConstMem;
@@ -31,6 +34,7 @@ public class SDL2ControllerManager extends ControllerManager
     @Override
     public void init()
     {
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_VERTICAL_JOY_CONS, "1");
         SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
     }
 

@@ -9,9 +9,8 @@ public class ClientBootstrap
 {
     public static void init()
     {
-        InputProcessor.instance();
-        RadialMenuHandler.instance();
         Controllable.init();
+        RadialMenuHandler.instance();
         ControllerEvents.init();
         OverlayHandler.init();
     }

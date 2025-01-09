@@ -15,7 +15,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
@@ -23,6 +22,7 @@ import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.screens.RadialMenuConfigureScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import com.mrcrayfish.controllable.util.Utils;
 import com.mrcrayfish.framework.api.event.TickEvents;
@@ -272,7 +272,7 @@ public class RadialMenuHandler
 
     private void onClientTickStart()
     {
-        if(this.visible && !Controllable.getInput().isControllerInUse())
+        //if(this.visible && !Controllable.getInput().isControllerInUse())
         {
             //this.setVisibility(false);
         }

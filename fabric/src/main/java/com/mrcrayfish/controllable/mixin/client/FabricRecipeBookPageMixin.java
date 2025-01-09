@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.mixin.client;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
@@ -23,7 +24,8 @@ public class FabricRecipeBookPageMixin
     @ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;II)V"), index = 1)
     private List<Component> controllableModifyRenderToolTip(List<Component> components)
     {
-        if(Controllable.getInput().isControllerInUse() && Config.CLIENT.client.options.quickCraft.get())
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.isBeingUsed() && Config.CLIENT.client.options.quickCraft.get())
         {
             if(components.removeIf(c -> c.getContents() instanceof TranslatableContents t && t.getKey().equals("gui.recipebook.moreRecipes")))
             {

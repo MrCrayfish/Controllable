@@ -19,31 +19,23 @@ import java.util.Queue;
 /**
  * Author: MrCrayfish
  */
-public class InputProcessor
+public class GamepadInputProcessor
 {
-    private static InputProcessor instance;
-
-    public static InputProcessor instance()
-    {
-        if(instance == null)
-        {
-            instance = new InputProcessor();
-        }
-        return instance;
-    }
-
     private final Queue<ButtonStates> inputQueue = new ArrayDeque<>();
-    private final ControllerInput input;
-    private final ControllerManager manager;
+    private final InputHandler handler = new InputHandler();
+    private final ControllerManager manager = Controllable.getManager();
+    private boolean initialized;
 
-    private InputProcessor()
+    public void registerEvents()
     {
-        this.input = new ControllerInput();
-        this.manager = Controllable.getManager();
-        TickEvents.START_RENDER.register((partialTick) -> this.pollControllerInput(false));
-        TickEvents.END_RENDER.register((partialTick) -> this.pollControllerInput(false));
-        TickEvents.START_CLIENT.register(() -> this.pollControllerInput(true));
-        TickEvents.END_CLIENT.register(() -> this.pollControllerInput(false));
+        if(!this.initialized)
+        {
+            TickEvents.START_RENDER.register((partialTick) -> this.pollControllerInput(false));
+            TickEvents.END_RENDER.register((partialTick) -> this.pollControllerInput(false));
+            TickEvents.START_CLIENT.register(() -> this.pollControllerInput(true));
+            TickEvents.END_CLIENT.register(() -> this.pollControllerInput(false));
+            this.initialized = true;
+        }
     }
 
     private void pollControllerInput(boolean process)
@@ -94,28 +86,21 @@ public class InputProcessor
         if(controller == null)
             return;
 
-        //No binding so don't perform any action
-        if(index == -1)
-            return;
-
-        ButtonStates states = controller.getButtonsStates();
-
+        ButtonStates trackedStates = controller.getTrackedButtonStates();
         if(state)
         {
-            if(!states.getState(index))
+            if(!trackedStates.getState(index))
             {
-                states.setState(index, true);
+                trackedStates.setState(index, true);
                 if(screen instanceof SettingsScreen settings && settings.isWaitingForButtonInput() && settings.processButton(index))
-                {
                     return;
-                }
-                this.input.handleButtonInput(controller, index, true, false);
+                this.handler.handleButtonInput(controller, index, true, false); // Handle on down
             }
         }
-        else if(states.getState(index))
+        else if(trackedStates.getState(index))
         {
-            states.setState(index, false);
-            this.input.handleButtonInput(controller, index, false, false);
+            trackedStates.setState(index, false);
+            this.handler.handleButtonInput(controller, index, false, false); // Handle on release
         }
     }
 
@@ -124,7 +109,7 @@ public class InputProcessor
      * overrides the wait behaviour of Minecraft and is off by default. Do not call this method, it
      * is internal only.
      */
-    public static void queueInputsWait()
+    public void queueInputsWait()
     {
         Minecraft mc = Minecraft.getInstance();
         int fps = mc.level != null || mc.screen == null && mc.getOverlay() == null ? mc.getWindow().getFramerateLimit() : 60;
@@ -132,12 +117,12 @@ public class InputProcessor
         for(int i = 0; i < captureCount; i++)
         {
             RenderSystem.limitDisplayFPS(fps * captureCount);
-            InputProcessor.instance().gatherAndQueueControllerInput();
+            this.gatherAndQueueControllerInput();
         }
     }
 
-    public ControllerInput getInput()
+    public InputHandler getHandler()
     {
-        return this.input;
+        return this.handler;
     }
 }

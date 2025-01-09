@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.gui.widget;
 
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.Buttons;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
@@ -26,7 +27,8 @@ public class TabNavigationHint implements Renderable
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
         // Don't render if tabs can't be navigated
-        if(!Controllable.getInput().isControllerInUse())
+        Controller controller = Controllable.getController();
+        if(controller == null || !controller.isBeingUsed())
             return;
 
         ScreenRectangle firstTab = this.tabs.get(0).getRectangle();

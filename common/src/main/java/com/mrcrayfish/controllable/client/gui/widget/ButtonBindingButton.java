@@ -3,7 +3,7 @@ package com.mrcrayfish.controllable.client.gui.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
-import com.mrcrayfish.controllable.client.ButtonIcons;
+import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;

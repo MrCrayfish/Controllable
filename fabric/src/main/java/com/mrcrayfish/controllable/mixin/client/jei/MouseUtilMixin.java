@@ -1,8 +1,7 @@
 package com.mrcrayfish.controllable.mixin.client.jei;
 
-import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.ControllerInput;
+import com.mrcrayfish.controllable.client.input.Controller;
 import mezz.jei.gui.input.MouseUtil;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,29 +24,24 @@ public class MouseUtilMixin
     @Inject(method = "getX", at = @At(value = "TAIL"), remap = false, cancellable = true)
     private static void controllableGetX(CallbackInfoReturnable<Double> cir)
     {
-        ControllerInput input = Controllable.getInput();
-        if(isVirtualMouseActive(input))
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.isBeingUsed())
         {
-            Minecraft minecraft = Minecraft.getInstance();
-            double mouseX = input.getVirtualCursorX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getScreenWidth();
-            cir.setReturnValue(mouseX);
+            Minecraft mc = Minecraft.getInstance();
+            double cursorX = Controllable.getCursor().getRenderX();
+            cir.setReturnValue(cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth());
         }
     }
 
     @Inject(method = "getY", at = @At(value = "TAIL"), remap = false, cancellable = true)
     private static void controllableGetY(CallbackInfoReturnable<Double> cir)
     {
-        ControllerInput input = Controllable.getInput();
-        if(isVirtualMouseActive(input))
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.isBeingUsed())
         {
-            Minecraft minecraft = Minecraft.getInstance();
-            double mouseY = input.getVirtualCursorY() * (double) minecraft.getWindow().getGuiScaledHeight() / (double) minecraft.getWindow().getScreenHeight();
-            cir.setReturnValue(mouseY);
+            Minecraft mc = Minecraft.getInstance();
+            double cursorY = Controllable.getCursor().getRenderY();
+            cir.setReturnValue(cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight());
         }
-    }
-
-    private static boolean isVirtualMouseActive(ControllerInput input)
-    {
-        return Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && input.getLastUse() > 0;
     }
 }

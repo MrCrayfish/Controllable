@@ -1,12 +1,14 @@
 package com.mrcrayfish.controllable.mixin.client;
 
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.ControllerInput;
+import com.mrcrayfish.controllable.client.InputHandler;
+import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,43 +19,54 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MouseHandler.class)
 public abstract class MouseHelperMixin
 {
+    @Unique
+    private boolean controllable$releaseBypass;
+
     @Shadow
-    @Final
-    private Minecraft minecraft;
+    private double accumulatedDX;
+
+    @Shadow
+    private double accumulatedDY;
 
     @Shadow
     public abstract void releaseMouse();
 
-    @Inject(method = "handleAccumulatedMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;turnPlayer(D)V"))
+    /*
+     * In Controllable, the mouse remains grabbed (aka hidden) when in screens like the inventory.
+     * However, this allows the player to turn the camera while in a screen, something that isn't
+     * normally possible. To fix that, as soon as we detect movement from the mouse, we make it
+     * appear again.
+     */
+    @Inject(method = "handleAccumulatedMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;turnPlayer(D)V"), cancellable = true)
     private void controllableBeforeUpdateLook(CallbackInfo ci)
     {
         Minecraft minecraft = Minecraft.getInstance();
-        ControllerInput input = Controllable.getInput();
-        if(input != null && !input.isMovingCursor() && minecraft.screen != null)
+        if(minecraft.screen != null)
         {
-            input.resetLastUse();
-            this.releaseMouse(); // Release mouse since it may be grabbed
+            if(Math.abs(this.accumulatedDX) > 0 || Math.abs(this.accumulatedDY) > 0)
+            {
+                this.controllable$releaseBypass = true;
+                this.releaseMouse(); // Release mouse since it may be grabbed
+                this.controllable$releaseBypass = false;
+                this.accumulatedDX = 0;
+                this.accumulatedDY = 0;
+                ci.cancel();
+            }
         }
     }
 
-    /* Prevents the cursor from being released when opening screens when using a controller */
+    /*
+     * Prevents the cursor from being released when opening screens when using a controller. Since
+     * Controllable uses a virtual cursor, it doesn't make sense to have the system cursor appear
+     * when opening a screen (like the inventory).
+     */
     @Inject(method = "releaseMouse", at = @At(value = "HEAD"), cancellable = true)
     private void controllableGrabCursor(CallbackInfo ci)
     {
-        ControllerInput input = Controllable.getInput();
-        if(input.isControllerInUse())
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.isBeingUsed() && !this.controllable$releaseBypass)
         {
             ci.cancel();
         }
     }
-
-    // TODO figure out what this was
-    /*@Inject(method = "turnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;isMouseGrabbed()Z"), cancellable = true)
-    private void controllableTurn(CallbackInfo ci)
-    {
-        if(this.minecraft.player == null)
-        {
-            ci.cancel();
-        }
-    }*/
 }

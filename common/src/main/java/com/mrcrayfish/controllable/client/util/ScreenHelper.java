@@ -1,12 +1,18 @@
 package com.mrcrayfish.controllable.client.util;
 
+import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
+import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
+import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.TabButton;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -66,6 +72,85 @@ public class ScreenHelper
             else if(listener instanceof ContainerEventHandler handler)
             {
                 return findHoveredListener(handler.children(), mouseX, mouseY, condition);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<GuiEventListener> findHoveredEventListenerExcludeList(ContainerEventHandler handler, double mouseX, double mouseY)
+    {
+        Optional<GuiEventListener> hovered = findHoveredEventListenerExcludeList(handler.children(), mouseX, mouseY);
+        if(hovered.isPresent())
+            return hovered;
+        return findHoveredEventListenerInRecipeBook(handler, mouseX, mouseY);
+    }
+
+    public static Optional<GuiEventListener> findHoveredEventListenerExcludeList(List<? extends GuiEventListener> listeners, double mouseX, double mouseY)
+    {
+        for(GuiEventListener listener : listeners)
+        {
+            if(!listener.isMouseOver(mouseX, mouseY))
+                continue;
+
+            switch(listener)
+            {
+                case AbstractSelectionList<?> list -> {
+                    return findHoveredEventListenerFromListEntries(list, mouseX, mouseY);
+                }
+                case TabButton button when button.isSelected() -> {
+                    List<AbstractWidget> children = new ArrayList<>();
+                    button.tab().visitChildren(children::add);
+                    return findHoveredEventListenerExcludeList(children, mouseX, mouseY);
+                }
+                case ContainerEventHandler handler -> {
+                    return findHoveredEventListenerExcludeList(handler.children(), mouseX, mouseY);
+                }
+                default -> {
+                    return Optional.of(listener);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<GuiEventListener> findHoveredEventListenerFromListEntries(AbstractSelectionList<?> list, double mouseX, double mouseY)
+    {
+        List<?> entries = list.children();
+        for(int index = 0; index < entries.size(); index++)
+        {
+            // Only consider rows that are completely visible
+            int rowTop = ClientServices.CLIENT.getAbstractListRowTop(list, index);
+            int rowBottom = ClientServices.CLIENT.getAbstractListRowBottom(list, index);
+            int listTop = ClientServices.CLIENT.getAbstractListTop(list);
+            int listBottom = ClientServices.CLIENT.getAbstractListBottom(list);
+            if(rowTop < listTop && rowBottom > listBottom)
+                continue;
+
+            Object entry = entries.get(index);
+            if(entry instanceof ContainerEventHandler handler)
+            {
+                return findHoveredEventListenerExcludeList(handler, mouseX, mouseY);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<GuiEventListener> findHoveredEventListenerInRecipeBook(ContainerEventHandler handler, double mouseX, double mouseY)
+    {
+        if(handler instanceof RecipeUpdateListener listener)
+        {
+            RecipeBookComponent recipeBook = listener.getRecipeBookComponent();
+            if(recipeBook.isVisible())
+            {
+                List<GuiEventListener> listeners = new ArrayList<>();
+                RecipeBookComponentAccessor bookAccessor = (RecipeBookComponentAccessor) recipeBook;
+                listeners.add(bookAccessor.controllableGetFilterButton());
+                listeners.addAll(bookAccessor.controllableGetRecipeTabs());
+                RecipeBookPageAccessor pageAccessor = (RecipeBookPageAccessor) bookAccessor.controllableGetRecipeBookPage();
+                listeners.addAll(pageAccessor.controllableGetButtons());
+                listeners.add(pageAccessor.controllableGetForwardButton());
+                listeners.add(pageAccessor.controllableGetBackButton());
+                return listeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst();
             }
         }
         return Optional.empty();

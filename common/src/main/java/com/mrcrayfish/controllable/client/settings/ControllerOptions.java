@@ -1,10 +1,6 @@
 package com.mrcrayfish.controllable.client.settings;
 
 import com.mrcrayfish.controllable.Config;
-import com.mrcrayfish.controllable.client.ActionVisibility;
-import com.mrcrayfish.controllable.client.ButtonIcons;
-import com.mrcrayfish.controllable.client.CursorType;
-import com.mrcrayfish.controllable.client.Thumbstick;
 import com.mrcrayfish.framework.api.config.BoolProperty;
 import com.mrcrayfish.framework.api.config.DoubleProperty;
 import com.mrcrayfish.framework.api.config.EnumProperty;
@@ -30,9 +26,8 @@ public class ControllerOptions
 
     public static final ControllerSetting<Boolean> AUTO_SELECT = createToggleSetting("controllable.options.autoSelect", Config.CLIENT.client.options.autoSelect);
     public static final ControllerSetting<Boolean> RENDER_MINI_PLAYER = createToggleSetting("controllable.options.renderMiniPlayer", Config.CLIENT.client.options.renderMiniPlayer);
-    public static final ControllerSetting<Boolean> VIRTUAL_MOUSE = createToggleSetting("controllable.options.virtualMouse", Config.CLIENT.client.options.virtualCursor);
     public static final ControllerSetting<Boolean> CONSOLE_HOTBAR = createToggleSetting("controllable.options.consoleHotbar", Config.CLIENT.client.options.consoleHotbar);
-    public static final ControllerSetting<CursorType> CURSOR_TYPE = createValuesSetting("controllable.options.cursorType", CursorType.class, Config.CLIENT.client.options.cursorType);
+    public static final ControllerSetting<CursorStyle> CURSOR_TYPE = createValuesSetting("controllable.options.cursorType", CursorStyle.class, Config.CLIENT.client.options.cursorType);
     public static final ControllerSetting<ButtonIcons> CONTROLLER_ICONS = createValuesSetting("controllable.options.controllerIcons", ButtonIcons.class, Config.CLIENT.client.options.controllerIcons);
     public static final ControllerSetting<Boolean> INVERT_LOOK = createToggleSetting("controllable.options.invertLook", Config.CLIENT.client.options.invertLook);
     public static final ControllerSetting<Boolean> INVERT_ROTATION = createToggleSetting("controllable.options.invertRotation", Config.CLIENT.client.options.invertRotation);
