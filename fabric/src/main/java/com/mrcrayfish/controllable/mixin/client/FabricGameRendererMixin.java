@@ -29,9 +29,7 @@ public class FabricGameRendererMixin
         Controller controller = Controllable.getController();
         if(controller != null && controller.isBeingUsed())
         {
-            Minecraft mc = Minecraft.getInstance();
-            double cursorX = Controllable.getCursor().getRenderX();
-            return (int) (cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth());
+            return (int) Controllable.getCursor().getRenderScreenX();
         }
         return mouseX;
     }
@@ -45,9 +43,7 @@ public class FabricGameRendererMixin
         Controller controller = Controllable.getController();
         if(controller != null && controller.isBeingUsed())
         {
-            Minecraft mc = Minecraft.getInstance();
-            double cursorY = Controllable.getCursor().getRenderY();
-            return (int) (cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight());
+            return (int) Controllable.getCursor().getRenderScreenY();
         }
         return mouseY;
     }

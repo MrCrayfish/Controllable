@@ -3,7 +3,7 @@ package com.mrcrayfish.controllable;
 import com.mrcrayfish.controllable.client.CameraHandler;
 import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.ControllerProperties;
-import com.mrcrayfish.controllable.client.GamepadInputProcessor;
+import com.mrcrayfish.controllable.client.InputProcessor;
 import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.VirtualCursor;
 import com.mrcrayfish.controllable.client.input.Controller;
@@ -18,7 +18,7 @@ import java.io.File;
 public class Controllable
 {
     private static final VirtualCursor CURSOR = new VirtualCursor();
-    private static final GamepadInputProcessor INPUT_PROCESSOR = new GamepadInputProcessor();
+    private static final InputProcessor INPUT_PROCESSOR = new InputProcessor();
     private static final CameraHandler CAMERA_HANDLER = new CameraHandler();
     private static final RadialMenu RADIAL_MENU = new RadialMenu();
 
@@ -43,7 +43,7 @@ public class Controllable
         return CURSOR;
     }
 
-    public static GamepadInputProcessor getInputProcessor()
+    public static InputProcessor getInputProcessor()
     {
         return INPUT_PROCESSOR;
     }

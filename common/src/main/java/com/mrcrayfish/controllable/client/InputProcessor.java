@@ -19,7 +19,7 @@ import java.util.Queue;
 /**
  * Author: MrCrayfish
  */
-public class GamepadInputProcessor
+public class InputProcessor
 {
     private final Queue<ButtonStates> inputQueue = new ArrayDeque<>();
     private final InputHandler handler = new InputHandler();

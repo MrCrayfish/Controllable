@@ -217,8 +217,6 @@ public class InputHandler
             return;
 
         Minecraft mc = Minecraft.getInstance();
-        double cursorX = Controllable.getCursor().getRenderX() * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
-        double cursorY = Controllable.getCursor().getRenderY() * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
         if(mc.screen != null && controller.isBeingUsed())
         {
             if(mc.screen instanceof MerchantScreen screen)
@@ -230,6 +228,8 @@ public class InputHandler
             float yValue = Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
             if(Math.abs(yValue) >= 0.2F)
             {
+                double cursorX = Controllable.getCursor().getRenderScreenX();
+                double cursorY = Controllable.getCursor().getRenderScreenY();
                 GuiEventListener hoveredListener = ScreenHelper.findHoveredListener(mc.screen, cursorX, cursorY, listener -> listener instanceof AbstractSelectionList<?>).orElse(null);
                 if(hoveredListener instanceof AbstractSelectionList<?> selectionList)
                 {

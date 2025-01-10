@@ -27,9 +27,7 @@ public class MouseUtilMixin
         Controller controller = Controllable.getController();
         if(controller != null && controller.isBeingUsed())
         {
-            Minecraft mc = Minecraft.getInstance();
-            double cursorX = Controllable.getCursor().getRenderX();
-            cir.setReturnValue(cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth());
+            cir.setReturnValue(Controllable.getCursor().getRenderScreenX());
         }
     }
 
@@ -39,9 +37,7 @@ public class MouseUtilMixin
         Controller controller = Controllable.getController();
         if(controller != null && controller.isBeingUsed())
         {
-            Minecraft mc = Minecraft.getInstance();
-            double cursorY = Controllable.getCursor().getRenderY();
-            cir.setReturnValue(cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight());
+            cir.setReturnValue(Controllable.getCursor().getRenderScreenY());
         }
     }
 }
