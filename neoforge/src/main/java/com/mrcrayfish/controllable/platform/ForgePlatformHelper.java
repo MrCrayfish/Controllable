@@ -1,9 +1,6 @@
 package com.mrcrayfish.controllable.platform;
 
 import com.mrcrayfish.controllable.platform.services.IPlatformHelper;
-import net.neoforged.fml.loading.FMLPaths;
-
-import java.nio.file.Path;
 
 /**
  * Author: MrCrayfish
@@ -11,14 +8,9 @@ import java.nio.file.Path;
 public class ForgePlatformHelper implements IPlatformHelper
 {
     @Override
-    public boolean isForge()
+    public boolean isNeoForge()
     {
         return true;
     }
 
-    @Override
-    public Path getConfigPath()
-    {
-        return FMLPaths.CONFIGDIR.get();
-    }
 }

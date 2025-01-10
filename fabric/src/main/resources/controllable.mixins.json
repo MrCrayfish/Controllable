@@ -8,7 +8,7 @@
     "client": [
         "client.FabricGameRendererMixin",
         "client.FabricRecipeBookPageMixin",
-        "client.KeyMappingMixin",
+        "client.FabricKeyMappingMixin",
         "client.jei.GuiIconToggleButtonMixin",
         "client.jei.IngredientGridMixin",
         "client.jei.IngredientGridWithNavigationMixin",

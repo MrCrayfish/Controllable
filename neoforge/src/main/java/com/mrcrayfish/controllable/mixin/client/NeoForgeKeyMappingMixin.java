@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
  * Author: MrCrayfish
  */
 @Mixin(KeyMapping.class)
-public abstract class KeyMappingMixin implements IKeyMappingExtension
+public abstract class NeoForgeKeyMappingMixin implements IKeyMappingExtension
 {
     @Shadow
     public abstract String getCategory();

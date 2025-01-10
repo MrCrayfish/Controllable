@@ -1,11 +1,13 @@
 package com.mrcrayfish.controllable.client.input;
 
+import com.google.common.io.MoreFiles;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.gui.toasts.ConnectionToast;
 import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
 import com.mrcrayfish.controllable.client.gui.screens.PendingScreen;
 import com.mrcrayfish.controllable.platform.Services;
+import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -19,7 +21,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -138,18 +145,26 @@ public abstract class AdaptiveControllerManager
         }
 
         /* Apply local mappings */
-        File mappings = new File(Services.PLATFORM.getConfigPath().resolve("controllable").toFile(), "gamecontrollerdb.txt");
-        if(mappings.exists())
+        try
         {
-            Constants.LOG.info("Applying gamepad mappings from: {}", mappings);
-            try(InputStream is = new BufferedInputStream(new FileInputStream(mappings)))
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("gamecontrollerdb.txt");
+            MoreFiles.createParentDirectories(path);
+            if(Files.exists(path))
             {
-                this.updateMappings(is);
+                Constants.LOG.info("Applying gamepad mappings from: {}", path.toAbsolutePath());
+                try(InputStream is = Files.newInputStream(path))
+                {
+                    this.updateMappings(is);
+                }
+                catch(IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
             }
-            catch(IOException e)
-            {
-                throw new RuntimeException(e);
-            }
+        }
+        catch(IOException e)
+        {
+            throw new RuntimeException(e);
         }
 
         /* Attempts to load the first game controller connected if auto select is enabled */
@@ -162,62 +177,62 @@ public abstract class AdaptiveControllerManager
     public void downloadMappings(@Nullable Screen parentScreen)
     {
         Constants.LOG.info("Downloading mappings from: {}", AdaptiveControllerManager.MAPPINGS_URL);
-        File mappings = new File(Services.PLATFORM.getConfigPath().resolve("controllable").toFile(), "gamecontrollerdb.txt");
-        CompletableFuture.supplyAsync(() -> {
-            Minecraft mc = Minecraft.getInstance();
-            mc.executeBlocking(() -> mc.setScreen(new PendingScreen(Component.translatable("controllable.gui.downloading_mappings"))));
 
-            // Artificial delay to improve user experience.
-            try
-            {
-                Thread.sleep(1000);
-            }
-            catch(InterruptedException e)
-            {
-                throw new RuntimeException(e);
-            }
-
-            try(InputStream in = new BufferedInputStream(new URL(MAPPINGS_URL).openStream()))
-            {
-                try(FileOutputStream fos = new FileOutputStream(mappings))
-                {
-                    byte[] buffer = new byte[1024];
-                    int length;
-                    while((length = in.read(buffer, 0, buffer.length)) != -1)
-                    {
-                        fos.write(buffer, 0, length);
-                    }
-                    Constants.LOG.info("Finished downloading mappings");
-                    return true;
-                }
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
-            return false;
-        }).thenAcceptAsync(success -> {
-            if(success)
-            {
-                Constants.LOG.info("Updating mappings...");
+        try
+        {
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("gamecontrollerdb.txt");
+            MoreFiles.createParentDirectories(path);
+            CompletableFuture.supplyAsync(() -> {
                 Minecraft mc = Minecraft.getInstance();
-                mc.executeBlocking(() ->
-                {
-                    try(InputStream is = new BufferedInputStream(new FileInputStream(mappings)))
-                    {
-                        this.updateMappings(is);
-                        ConfirmationScreen infoScreen = new ConfirmationScreen(parentScreen, Component.translatable("controllable.gui.mappings_updated"), result -> true);
-                        infoScreen.setPositiveText(CommonComponents.GUI_BACK);
-                        infoScreen.setNegativeText(null);
-                        infoScreen.setIcon(ConfirmationScreen.Icon.INFO);
-                        mc.setScreen(infoScreen);
+                mc.executeBlocking(() -> mc.setScreen(new PendingScreen(Component.translatable("controllable.gui.downloading_mappings"))));
+
+                // Artificial delay to improve user experience.
+                try {
+                    Thread.sleep(1000);
+                } catch(InterruptedException e){
+                    throw new RuntimeException(e);
+                }
+
+                // Download mappings from URL
+                try(InputStream in = new BufferedInputStream(new URI(MAPPINGS_URL).toURL().openStream())) {
+                    try(OutputStream fos = Files.newOutputStream(path)) {
+                        byte[] buffer = new byte[1024];
+                        int length;
+                        while((length = in.read(buffer, 0, buffer.length)) != -1) {
+                            fos.write(buffer, 0, length);
+                        }
+                        Constants.LOG.info("Finished downloading mappings");
+                        return true;
                     }
-                    catch(IOException e)
-                    {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
-        });
+                } catch(IOException e) {
+                    Constants.LOG.error("Failed to download mappings", e);
+                }
+                catch(URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+                return false;
+            }).thenAcceptAsync(success -> {
+                if(success) {
+                    Constants.LOG.info("Updating mappings...");
+                    Minecraft mc = Minecraft.getInstance();
+                    mc.executeBlocking(() -> {
+                        try(InputStream is = Files.newInputStream(path)) {
+                            this.updateMappings(is);
+                            ConfirmationScreen infoScreen = new ConfirmationScreen(parentScreen, Component.translatable("controllable.gui.mappings_updated"), result -> true);
+                            infoScreen.setPositiveText(CommonComponents.GUI_BACK);
+                            infoScreen.setNegativeText(null);
+                            infoScreen.setIcon(ConfirmationScreen.Icon.INFO);
+                            mc.setScreen(infoScreen);
+                        } catch(IOException e) {
+                            Constants.LOG.error("Failed to update mappings", e);
+                        }
+                    });
+                }
+            });
+        }
+        catch(IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

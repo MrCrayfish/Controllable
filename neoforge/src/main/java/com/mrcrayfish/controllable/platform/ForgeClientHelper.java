@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.platform;
 
-import com.mrcrayfish.controllable.client.ForgeCompatBindingContext;
+import com.mrcrayfish.controllable.client.NeoForgeBindingContext;
 import com.mrcrayfish.controllable.client.binding.IBindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
@@ -311,7 +311,7 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public IBindingContext createBindingContext(KeyMapping mapping)
     {
-        return this.keyContextMap.computeIfAbsent(mapping.getKeyConflictContext(), ForgeCompatBindingContext::new);
+        return this.keyContextMap.computeIfAbsent(mapping.getKeyConflictContext(), NeoForgeBindingContext::new);
     }
 
     @Override

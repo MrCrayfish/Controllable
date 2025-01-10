@@ -6,11 +6,11 @@ import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 /**
  * Author: MrCrayfish
  */
-public class ForgeCompatBindingContext implements IBindingContext
+public class NeoForgeBindingContext implements IBindingContext
 {
     private final IKeyConflictContext context;
 
-    public ForgeCompatBindingContext(IKeyConflictContext context)
+    public NeoForgeBindingContext(IKeyConflictContext context)
     {
         this.context = context;
     }
@@ -24,7 +24,7 @@ public class ForgeCompatBindingContext implements IBindingContext
     @Override
     public boolean conflicts(IBindingContext other)
     {
-        if(other instanceof ForgeCompatBindingContext forgeContext)
+        if(other instanceof NeoForgeBindingContext forgeContext)
         {
             return this.context.conflicts(forgeContext.context);
         }

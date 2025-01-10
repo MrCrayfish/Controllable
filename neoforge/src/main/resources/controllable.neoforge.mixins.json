@@ -6,9 +6,9 @@
     "compatibilityLevel": "JAVA_17",
     "refmap": "controllable.refmap.json",
     "client": [
-        "client.ForgeRecipeBookPageMixin",
-        "client.ForgeHooksClientMixin",
-        "client.KeyMappingMixin",
+        "client.NeoForgeRecipeBookPageMixin",
+        "client.NeoForgeClientHooksMixin",
+        "client.NeoForgeKeyMappingMixin",
         "client.jei.GuiIconToggleButtonMixin",
         "client.jei.IngredientGridMixin",
         "client.jei.IngredientGridWithNavigationMixin",

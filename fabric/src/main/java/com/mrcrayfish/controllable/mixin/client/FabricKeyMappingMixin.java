@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * Author: MrCrayfish
  */
 @Mixin(KeyMapping.class)
-public abstract class KeyMappingMixin
+public abstract class FabricKeyMappingMixin
 {
     @Shadow
     private InputConstants.Key key;
