@@ -85,7 +85,7 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         return this.pressed && this.isActiveAndValidContext();
     }
 
-    public void reset()
+    public void resetMappedButton()
     {
         this.button = this.defaultButton;
     }

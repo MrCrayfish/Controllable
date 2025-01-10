@@ -73,7 +73,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             this.minecraft.setScreen(new ConfirmationScreen(this.settingsScreen, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     BindingRegistry registry = BindingRegistry.getInstance();
-                    registry.getBindings().forEach(ButtonBinding::reset);
+                    registry.getBindings().forEach(ButtonBinding::resetMappedButton);
                     registry.resetBindingHash();
                     registry.save();
                 }
@@ -126,7 +126,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
                 return false;
             });
             this.resetButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button -> {
-                binding.reset();
+                binding.resetMappedButton();
                 BindingRegistry registry = BindingRegistry.getInstance();
                 registry.resetBindingHash();
                 registry.save();
