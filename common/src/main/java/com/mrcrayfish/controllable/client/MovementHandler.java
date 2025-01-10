@@ -95,7 +95,7 @@ public class MovementHandler
                 }
 
                 float threshold = localPlayer.getVehicle() instanceof Boat ? 0.5F : 0;
-                if(Math.abs(inputX) >= threshold)
+                if(Math.abs(inputX) > threshold)
                 {
                     input.right = inputX > 0;
                     input.left = inputX < 0;
