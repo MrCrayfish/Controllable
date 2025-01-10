@@ -1,9 +1,10 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
-import com.mrcrayfish.controllable.client.RadialMenuHandler;
+import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
@@ -41,7 +42,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
             Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     ((RadialMenuConfigureScreen) this.parent).getBindings().clear();
-                    ((RadialMenuConfigureScreen) this.parent).getBindings().addAll(RadialMenuHandler.instance().getDefaults());
+                    ((RadialMenuConfigureScreen) this.parent).getBindings().addAll(Controllable.getRadialMenu().getDefaults());
                     this.list.children().stream().filter(entry -> entry instanceof ButtonBindingItem).map(entry -> (ButtonBindingItem) entry).forEach(ButtonBindingItem::updateButtons);
                 }
                 return true;

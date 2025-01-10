@@ -324,7 +324,7 @@ public class InputHandler
 
         if(mc.screen == null)
         {
-            if((!RadialMenuHandler.instance().isVisible() || Config.CLIENT.client.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent())
+            if((!Controllable.getRadialMenu().isVisible() || Config.CLIENT.client.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent())
             {
                 float sneakSpeed = (float) player.getAttributeValue(Attributes.SNEAKING_SPEED);
                 float sneakBonus = player.isMovingSlowly() ? sneakSpeed : 1.0F;
@@ -511,7 +511,7 @@ public class InputHandler
                 }
                 else if(ButtonBindings.RADIAL_MENU.isButtonPressed() && !virtual)
                 {
-                    RadialMenuHandler.instance().interact();
+                    Controllable.getRadialMenu().interact();
                 }
                 else if(mc.player != null)
                 {

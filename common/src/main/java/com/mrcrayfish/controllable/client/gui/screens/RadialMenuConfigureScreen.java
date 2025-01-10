@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
-import com.mrcrayfish.controllable.client.RadialMenuHandler;
+import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.RadialItemList;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
@@ -34,7 +35,7 @@ public class RadialMenuConfigureScreen extends Screen
         this.list = new RadialItemList(this.minecraft, this.width, this.height, 45, this.height - 44, this.bindings);
         this.addWidget(this.list);
         this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 100, 20, CommonComponents.GUI_DONE, buttons -> {
-            RadialMenuHandler.instance().setBindings(new LinkedHashSet<>(this.bindings));
+            Controllable.getRadialMenu().setBindings(new LinkedHashSet<>(this.bindings));
             Objects.requireNonNull(this.minecraft).setScreen(null);
         }));
         this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 50, this.height - 29, 100, 20, Component.translatable("controllable.gui.add_binding"), buttons -> {

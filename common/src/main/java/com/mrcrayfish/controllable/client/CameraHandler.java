@@ -96,7 +96,7 @@ public class CameraHandler
             return;
 
         float elapsedTicks = tracker.getGameTimeDeltaTicks();
-        if(!RadialMenuHandler.instance().isVisible())
+        if(!Controllable.getRadialMenu().isVisible())
         {
             // Turn the camera based on how much time has elapsed during the frame. Turning the camera
             // at a fixed rate per frame would mean that higher frame rates would turn the camera

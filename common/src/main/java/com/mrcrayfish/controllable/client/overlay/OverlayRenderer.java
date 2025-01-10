@@ -1,12 +1,6 @@
-package com.mrcrayfish.controllable.client;
+package com.mrcrayfish.controllable.client.overlay;
 
 import com.google.common.collect.ImmutableList;
-import com.mrcrayfish.controllable.client.overlay.ActionHintOverlay;
-import com.mrcrayfish.controllable.client.overlay.VirtualCursorOverlay;
-import com.mrcrayfish.controllable.client.overlay.IOverlay;
-import com.mrcrayfish.controllable.client.overlay.PlayerOverlay;
-import com.mrcrayfish.controllable.client.overlay.RecipeBookOverlay;
-import com.mrcrayfish.controllable.client.overlay.TabNavigationOverlay;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.Util;
 import net.minecraft.client.DeltaTracker;
@@ -17,7 +11,7 @@ import java.util.List;
 /**
  * Author: MrCrayfish
  */
-public class OverlayHandler
+public class OverlayRenderer
 {
     private static final List<IOverlay> OVERLAYS = Util.make(() -> {
         ImmutableList.Builder<IOverlay> builder = new ImmutableList.Builder<>();

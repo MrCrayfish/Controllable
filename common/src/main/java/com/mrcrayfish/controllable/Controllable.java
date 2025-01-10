@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.client.CameraHandler;
 import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.ControllerProperties;
 import com.mrcrayfish.controllable.client.GamepadInputProcessor;
+import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.VirtualCursor;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.ControllerManager;
@@ -19,6 +20,7 @@ public class Controllable
     private static final VirtualCursor CURSOR = new VirtualCursor();
     private static final GamepadInputProcessor INPUT_PROCESSOR = new GamepadInputProcessor();
     private static final CameraHandler CAMERA_HANDLER = new CameraHandler();
+    private static final RadialMenu RADIAL_MENU = new RadialMenu();
 
     private static ControllerManager manager;
     private static File configFolder;
@@ -29,6 +31,7 @@ public class Controllable
         CURSOR.registerEvents();
         INPUT_PROCESSOR.registerEvents();
         CAMERA_HANDLER.registerEvents();
+        RADIAL_MENU.registerEvents();
         configFolder = com.mrcrayfish.framework.platform.Services.CONFIG.getConfigPath().toFile();
         jeiLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("jei");
         ControllerProperties.load(configFolder);
@@ -48,6 +51,11 @@ public class Controllable
     public static InputHandler getInput()
     {
         return INPUT_PROCESSOR.getHandler();
+    }
+
+    public static RadialMenu getRadialMenu()
+    {
+        return RADIAL_MENU;
     }
 
     public static File getConfigFolder()

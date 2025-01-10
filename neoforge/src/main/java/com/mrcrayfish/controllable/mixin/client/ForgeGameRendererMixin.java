@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mrcrayfish.controllable.client.OverlayHandler;
+import com.mrcrayfish.controllable.client.overlay.OverlayRenderer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
@@ -19,6 +19,6 @@ public class ForgeGameRendererMixin
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"))
     private void controllableLastRender(DeltaTracker tracker, boolean running, CallbackInfo ci, @Local(ordinal = 0) int mouseX, @Local(ordinal = 1) int mouseY, @Local GuiGraphics graphics)
     {
-        OverlayHandler.draw(graphics, mouseX, mouseY, tracker);
+        OverlayRenderer.draw(graphics, mouseX, mouseY, tracker);
     }
 }

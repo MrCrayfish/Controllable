@@ -1,8 +1,9 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.KeyAdapterBinding;
-import com.mrcrayfish.controllable.client.RadialMenuHandler;
+import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
@@ -39,7 +40,7 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
                     List<KeyAdapterBinding> copy = new ArrayList<>(BindingRegistry.getInstance().getKeyAdapters().values());
                     copy.forEach(binding -> {
                         BindingRegistry.getInstance().removeKeyAdapter(binding);
-                        RadialMenuHandler.instance().removeBinding(binding);
+                        Controllable.getRadialMenu().removeBinding(binding);
                     });
                     this.list.children().stream().filter(entry -> entry instanceof KeyBindingItem).map(entry -> (KeyBindingItem) entry).forEach(KeyBindingItem::updateButtons);
                     this.updateButtons();

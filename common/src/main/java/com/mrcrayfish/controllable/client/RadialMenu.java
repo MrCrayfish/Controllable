@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -39,6 +40,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.ApiStatus;
 import org.joml.Matrix4fStack;
 
 import org.jetbrains.annotations.Nullable;
@@ -59,22 +61,13 @@ import java.util.Set;
 /**
  * Author: MrCrayfish
  */
-public class RadialMenuHandler
+public class RadialMenu
 {
     private static final ResourceLocation TEXTURE = Utils.resource("textures/gui/controller.png");
     private static final int ANIMATE_DURATION = 5;
+    private static RadialMenu instance;
 
-    private static RadialMenuHandler instance;
-
-    public static RadialMenuHandler instance()
-    {
-        if(instance == null)
-        {
-            instance = new RadialMenuHandler();
-        }
-        return instance;
-    }
-
+    private boolean initialized;
     private boolean loaded;
     private boolean visible;
     private int animateTicks;
@@ -87,11 +80,23 @@ public class RadialMenuHandler
     private List<AbstractRadialItem> rightItems = new ArrayList<>();
     private AbstractRadialItem selected;
 
-    private RadialMenuHandler()
+    @ApiStatus.Internal
+    public RadialMenu()
     {
-        TickEvents.START_CLIENT.register(this::onClientTickStart);
-        TickEvents.END_CLIENT.register(this::onClientTickEnd);
-        TickEvents.END_RENDER.register(this::onRenderEnd);
+        Preconditions.checkState(instance == null, "Only one instance of RadialMenu is allowed");
+        instance = this;
+    }
+
+    @ApiStatus.Internal
+    public void registerEvents()
+    {
+        if(!this.initialized)
+        {
+            TickEvents.START_CLIENT.register(this::onClientTickStart);
+            TickEvents.END_CLIENT.register(this::onClientTickEnd);
+            TickEvents.END_RENDER.register(this::onRenderEnd);
+            this.initialized = true;
+        }
     }
 
     private void load()
@@ -168,6 +173,7 @@ public class RadialMenuHandler
         return defaults;
     }
 
+    @ApiStatus.Internal
     public void interact()
     {
         if(this.visible)
@@ -213,12 +219,12 @@ public class RadialMenuHandler
         }
     }
 
-    public void setVisibility(boolean visible)
+    private void setVisibility(boolean visible)
     {
         this.visible = visible;
     }
 
-    public void clearAnimation()
+    private void clearAnimation()
     {
         this.animateTicks = 0;
         this.prevAnimateTicks = 0;
@@ -278,7 +284,7 @@ public class RadialMenuHandler
         }
     }
 
-    public void onRenderEnd(DeltaTracker tracker)
+    private void onRenderEnd(DeltaTracker tracker)
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.options.hideGui || mc.screen != null)
@@ -452,7 +458,7 @@ public class RadialMenuHandler
             return false;
         }
 
-        public abstract void onUseItem(RadialMenuHandler handler);
+        public abstract void onUseItem(RadialMenu handler);
 
         protected abstract void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation);
 
@@ -484,7 +490,7 @@ public class RadialMenuHandler
         }
 
         @Override
-        public void onUseItem(RadialMenuHandler handler)
+        public void onUseItem(RadialMenu handler)
         {
             handler.setVisibility(false);
             Minecraft mc = Minecraft.getInstance();
@@ -562,7 +568,7 @@ public class RadialMenuHandler
         }
 
         @Override
-        public void onUseItem(RadialMenuHandler handler)
+        public void onUseItem(RadialMenu handler)
         {
             handler.setVisibility(false);
             handler.clearAnimation();
@@ -643,7 +649,7 @@ public class RadialMenuHandler
         }
 
         @Override
-        public void onUseItem(RadialMenuHandler radialMenu)
+        public void onUseItem(RadialMenu radialMenu)
         {
             radialMenu.setVisibility(false);
             radialMenu.clearAnimation();

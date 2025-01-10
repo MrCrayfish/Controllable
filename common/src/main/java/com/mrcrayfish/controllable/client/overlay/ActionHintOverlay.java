@@ -8,7 +8,7 @@ import com.mrcrayfish.controllable.client.settings.ActionVisibility;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.settings.ButtonIcons;
-import com.mrcrayfish.controllable.client.RadialMenuHandler;
+import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
@@ -143,9 +143,9 @@ public class ActionHintOverlay implements IOverlay
         }
         else if(mc.screen == null)
         {
-            if(RadialMenuHandler.instance().isVisible())
+            if(Controllable.getRadialMenu().isVisible())
             {
-                if(RadialMenuHandler.instance().getSelected() != null)
+                if(Controllable.getRadialMenu().getSelected() != null)
                 {
                     actionMap.put(ButtonBindings.RADIAL_MENU, new Action(ActionDescriptions.PERFORM_ACTION, Action.Side.RIGHT));
                 }
