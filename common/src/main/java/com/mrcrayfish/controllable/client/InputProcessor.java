@@ -23,7 +23,7 @@ public class InputProcessor
 {
     private final Queue<ButtonStates> inputQueue = new ArrayDeque<>();
     private final InputHandler handler = new InputHandler();
-    private final AdaptiveControllerManager manager = Controllable.getManager();
+    private final AdaptiveControllerManager manager = Controllable.getControllerManager();
     private boolean initialized;
 
     public void registerEvents()

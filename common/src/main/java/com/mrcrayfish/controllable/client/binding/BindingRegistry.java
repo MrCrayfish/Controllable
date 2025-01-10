@@ -3,10 +3,11 @@ package com.mrcrayfish.controllable.client.binding;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.Files;
+import com.google.common.io.MoreFiles;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.Buttons;
+import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -168,64 +171,76 @@ public class BindingRegistry
 
     public void load()
     {
-        // Load regular button bindings
-        try(BufferedReader reader = Files.newReader(new File(Controllable.getConfigFolder(), "controllable/bindings.properties"), Charsets.UTF_8))
+        try
         {
-            Properties properties = new Properties();
-            properties.load(reader);
-            this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
+            // Load regular button bindings
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("bindings.properties");
+            MoreFiles.createParentDirectories(path);
+            if(Files.exists(path))
             {
-                String name = properties.getProperty(binding.getDescription(), Buttons.getNameForButton(binding.getButton()));
-                if(name != null)
+                try(BufferedReader reader = Files.newBufferedReader(path))
                 {
-                    binding.setButton(Buttons.getButtonFromName(name));
+                    // TODO modernise with json
+                    Properties properties = new Properties();
+                    properties.load(reader);
+                    this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding -> {
+                        String name = properties.getProperty(binding.getDescription(), Buttons.getNameForButton(binding.getButton()));
+                        if(name != null) {
+                            binding.setButton(Buttons.getButtonFromName(name));
+                        }
+                    });
                 }
-            });
-        }
-        catch(FileNotFoundException e)
-        {
-            Constants.LOG.info("Skipped loading bindings.properties since it doesn't exist");
+            }
+            else
+            {
+                Constants.LOG.info("Skipped loading bindings.properties since it doesn't exist");
+            }
         }
         catch(IOException e)
         {
-            e.printStackTrace();
+            Constants.LOG.error("Failed to load bindings.properties", e);
         }
 
-        // Load key adapters
-        try(BufferedReader reader = Files.newReader(new File(Controllable.getConfigFolder(), "controllable/key_adapters.properties"), Charsets.UTF_8))
+        try
         {
-            Map<String, KeyMapping> bindings = new HashMap<>();
-            for(KeyMapping mapping : Minecraft.getInstance().options.keyMappings)
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("key_adapters.properties");
+            MoreFiles.createParentDirectories(path);
+            if(Files.exists(path))
             {
-                bindings.put(mapping.getName(), mapping);
-            }
-            Properties properties = new Properties();
-            properties.load(reader);
-            properties.forEach((key, value) ->
-            {
-                KeyMapping mapping = bindings.get(key.toString());
-                if(mapping != null)
+                try(BufferedReader reader = Files.newBufferedReader(path))
                 {
-                    int button = Buttons.getButtonFromName(StringUtils.defaultIfEmpty(value.toString(), ""));
-                    KeyAdapterBinding keyAdapter = new KeyAdapterBinding(button, mapping);
-                    if(this.keyAdapters.putIfAbsent(keyAdapter.getDescription(), keyAdapter) == null)
+                    Map<String, KeyMapping> bindings = new HashMap<>();
+                    for(KeyMapping mapping : Minecraft.getInstance().options.keyMappings)
                     {
-                        this.bindings.add(keyAdapter);
-                        if(keyAdapter.getButton() != -1)
-                        {
-                            this.idToButtonList.computeIfAbsent(keyAdapter.getButton(), i -> new ArrayList<>()).add(keyAdapter);
-                        }
+                        bindings.put(mapping.getName(), mapping);
                     }
+
+                    // TODO modernise with json
+                    Properties properties = new Properties();
+                    properties.load(reader);
+                    properties.forEach((key, value) -> {
+                        KeyMapping mapping = bindings.get(key.toString());
+                        if(mapping != null) {
+                            int button = Buttons.getButtonFromName(StringUtils.defaultIfEmpty(value.toString(), ""));
+                            KeyAdapterBinding keyAdapter = new KeyAdapterBinding(button, mapping);
+                            if(this.keyAdapters.putIfAbsent(keyAdapter.getDescription(), keyAdapter) == null) {
+                                this.bindings.add(keyAdapter);
+                                if(keyAdapter.getButton() != -1) {
+                                    this.idToButtonList.computeIfAbsent(keyAdapter.getButton(), i -> new ArrayList<>()).add(keyAdapter);
+                                }
+                            }
+                        }
+                    });
                 }
-            });
-        }
-        catch(FileNotFoundException e)
-        {
-            Constants.LOG.info("Skipped loading key_adapters.properties since it doesn't exist");
+            }
+            else
+            {
+                Constants.LOG.info("Skipped loading key_adapters.properties since it doesn't exist");
+            }
         }
         catch(IOException e)
         {
-            e.printStackTrace();
+            Constants.LOG.error("Failed to load key_adapters.properties", e);
         }
 
         this.resetBindingHash();
@@ -236,33 +251,33 @@ public class BindingRegistry
         try
         {
             Properties properties = new Properties();
-            this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
-            {
+            this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding -> {
                 String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
                 properties.put(binding.getDescription(), name);
             });
-            File file = new File(Controllable.getConfigFolder(), "controllable/bindings.properties");
-            properties.store(new FileOutputStream(file), "Button Bindings");
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("bindings.properties");
+            MoreFiles.createParentDirectories(path);
+            properties.store(Files.newOutputStream(path), "Button Bindings");
         }
         catch(IOException e)
         {
-            e.printStackTrace();
+            Constants.LOG.error("Failed to save bindings.properties", e);
         }
 
         try
         {
             Properties properties = new Properties();
-            this.keyAdapters.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
-            {
+            this.keyAdapters.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding -> {
                 String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
                 properties.put(binding.getKeyMapping().getName(), name);
             });
-            File file = new File(Controllable.getConfigFolder(), "controllable/key_adapters.properties");
-            properties.store(new FileOutputStream(file), "Key Adapters");
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("key_adapters.properties");
+            MoreFiles.createParentDirectories(path);
+            properties.store(Files.newOutputStream(path), "Key Adapters");
         }
         catch(IOException e)
         {
-            e.printStackTrace();
+            Constants.LOG.error("Failed to save key_adapters.properties", e);
         }
     }
 }

@@ -9,9 +9,7 @@ import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.VirtualCursor;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
-import com.mrcrayfish.controllable.client.input.glfw.GLFWControllerManager;
-import com.mrcrayfish.controllable.client.input.sdl2.SDL2ControllerManager;
-import net.minecraft.client.Minecraft;
+import com.mrcrayfish.controllable.util.Utils;
 
 import org.jetbrains.annotations.Nullable;
 import java.io.File;
@@ -20,19 +18,17 @@ import java.util.function.Supplier;
 public class Controllable
 {
     private static final Supplier<AdaptiveControllerManager> MANAGER = Suppliers.memoize(Controllable::createManager);
+    private static final ControllerProperties PROPERTIES = new ControllerProperties();
     private static final VirtualCursor CURSOR = new VirtualCursor();
     private static final InputProcessor INPUT_PROCESSOR = new InputProcessor();
     private static final CameraHandler CAMERA_HANDLER = new CameraHandler();
     private static final RadialMenu RADIAL_MENU = new RadialMenu();
 
-    private static File configFolder;
-    private static boolean jeiLoaded;
+    private static final boolean JEI_LOADED = Utils.isModLoaded("jei");
 
     public static void init()
     {
-        configFolder = com.mrcrayfish.framework.platform.Services.CONFIG.getConfigPath().toFile();
-        jeiLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("jei");
-        ControllerProperties.load(configFolder);
+        PROPERTIES.load();
         MANAGER.get().init();
         CURSOR.registerEvents();
         INPUT_PROCESSOR.registerEvents();
@@ -50,6 +46,7 @@ public class Controllable
         return INPUT_PROCESSOR;
     }
 
+    // TODO this should probably not be a thing soon
     public static InputHandler getInput()
     {
         return INPUT_PROCESSOR.getHandler();
@@ -60,14 +57,14 @@ public class Controllable
         return RADIAL_MENU;
     }
 
-    public static File getConfigFolder()
-    {
-        return configFolder;
-    }
-
     public static boolean isJeiLoaded()
     {
-        return jeiLoaded;
+        return JEI_LOADED;
+    }
+
+    public static AdaptiveControllerManager getControllerManager()
+    {
+        return MANAGER.get();
     }
 
     @Nullable

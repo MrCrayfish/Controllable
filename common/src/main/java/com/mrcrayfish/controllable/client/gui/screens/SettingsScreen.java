@@ -234,7 +234,7 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new ButtonBindingList.TwoWidgetItem(Button.builder(updateMappings, btn -> {
                 ConfirmationScreen updateConfirmation = new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.update_mapping_message", Component.literal(AdaptiveControllerManager.MAPPINGS_URL).withStyle(ChatFormatting.YELLOW)), result -> {
                     if(result) {
-                        Controllable.getManager().downloadMappings(SettingsScreen.this);
+                        Controllable.getControllerManager().downloadMappings(SettingsScreen.this);
                         return false;
                     }
                     return true;

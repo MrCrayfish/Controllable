@@ -18,6 +18,6 @@ public class ForgeMinecraftMixin
     private void controllableOnFinishedLoading(CallbackInfo ci)
     {
         BindingRegistry.getInstance().load();
-        Controllable.getManager().onClientFinishedLoading();
+        Controllable.getControllerManager().onClientFinishedLoading();
     }
 }

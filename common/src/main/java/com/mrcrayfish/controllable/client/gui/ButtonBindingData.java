@@ -8,6 +8,8 @@ import net.minecraft.ChatFormatting;
  */
 public class ButtonBindingData
 {
+
+
     private final ButtonBinding binding;
     private ChatFormatting color;
 

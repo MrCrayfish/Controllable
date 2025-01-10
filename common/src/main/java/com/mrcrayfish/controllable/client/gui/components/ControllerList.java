@@ -34,7 +34,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
     public ControllerList(Minecraft mc, int itemHeight)
     {
         super(mc, itemHeight);
-        this.manager = Controllable.getManager();
+        this.manager = Controllable.getControllerManager();
         this.setHeaderText(Component.translatable("controllable.gui.title.select_controller").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW));
         this.footerSubText = Component.translatable("controllable.gui.controller_missing_2").withStyle(ChatFormatting.UNDERLINE, ChatFormatting.GOLD);
         this.footerSubText.setStyle(this.footerSubText.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://mrcrayfish.gitbook.io/controllable-documentation/")));

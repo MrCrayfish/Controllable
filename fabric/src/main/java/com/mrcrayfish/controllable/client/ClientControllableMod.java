@@ -14,7 +14,7 @@ public class ClientControllableMod implements ClientModInitializer
     {
         ClientBootstrap.init();
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
-            Controllable.getManager().dispose();
+            Controllable.getControllerManager().dispose();
         });
     }
 }

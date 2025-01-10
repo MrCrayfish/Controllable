@@ -17,7 +17,7 @@ public class ClientEvents
     @SubscribeEvent
     public static void onGameShuttingDown(GameShuttingDownEvent event)
     {
-        Controllable.getManager().onClientFinishedLoading();
+        Controllable.getControllerManager().onClientFinishedLoading();
     }
 
     @SubscribeEvent(receiveCanceled = true)

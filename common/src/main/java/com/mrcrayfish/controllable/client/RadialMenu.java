@@ -52,6 +52,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -104,10 +109,10 @@ public class RadialMenu
         if(this.loaded)
             return;
 
-        File file = new File(Controllable.getConfigFolder(), "controllable/radial_menu_items.json");
-        if(file.exists())
+        Path path = Utils.getConfigDirectory().resolve("controllable/radial_menu_items.json");
+        if(Files.exists(path))
         {
-            try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charsets.UTF_8)))
+            try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile()), Charsets.UTF_8)))
             {
                 JsonArray bindings = new Gson().fromJson(reader, JsonArray.class);
                 bindings.forEach(element ->
@@ -150,16 +155,15 @@ public class RadialMenu
             object.addProperty("color", data.getColor().name());
             array.add(object);
         });
-
-        String json = new GsonBuilder().setPrettyPrinting().create().toJson(array);
-        File file = new File(Controllable.getConfigFolder(), "controllable/radial_menu_items.json");
-        try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file))))
+        try
         {
-            writer.write(json);
+            String json = new GsonBuilder().setPrettyPrinting().create().toJson(array);
+            Path path = Utils.getConfigDirectory().resolve("controllable/radial_menu_items.json");
+            Files.writeString(path, json, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         }
         catch(IOException e)
         {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
