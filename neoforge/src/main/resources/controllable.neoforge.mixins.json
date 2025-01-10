@@ -6,7 +6,6 @@
     "compatibilityLevel": "JAVA_17",
     "refmap": "controllable.refmap.json",
     "client": [
-        "client.ForgeGameRendererMixin",
         "client.ForgeRecipeBookPageMixin",
         "client.ForgeHooksClientMixin",
         "client.KeyMappingMixin",

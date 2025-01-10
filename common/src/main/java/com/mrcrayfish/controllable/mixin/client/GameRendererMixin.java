@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Author: MrCrayfish
  */
 @Mixin(GameRenderer.class)
-public class ForgeGameRendererMixin
+public class GameRendererMixin
 {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"))
     private void controllableLastRender(DeltaTracker tracker, boolean running, CallbackInfo ci, @Local(ordinal = 0) int mouseX, @Local(ordinal = 1) int mouseY, @Local GuiGraphics graphics)

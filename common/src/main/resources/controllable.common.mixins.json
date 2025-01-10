@@ -6,6 +6,7 @@
     "refmap": "controllable.refmap.json",
     "client": [
         "client.ContainerScreenMixin",
+        "client.GameRendererMixin",
         "client.GuiMixin",
         "client.MinecraftMixin",
         "client.MouseHelperMixin",
@@ -14,7 +15,8 @@
         "client.OverlayRecipeComponentAccessor",
         "client.RecipeBookComponentAccessor",
         "client.RecipeBookPageAccessor",
-        "client.RecipeBookPageMixin", "client.TimerAccessor"
+        "client.RecipeBookPageMixin",
+        "client.TimerAccessor"
     ],
     "injectors": {
         "defaultRequire": 1

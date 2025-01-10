@@ -1,18 +1,11 @@
 package com.mrcrayfish.controllable.mixin.client;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.overlay.OverlayRenderer;
 import com.mrcrayfish.controllable.client.input.Controller;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * Author: MrCrayfish
@@ -46,11 +39,5 @@ public class FabricGameRendererMixin
             return (int) Controllable.getCursor().getRenderScreenY();
         }
         return mouseY;
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"))
-    private void controllableLastRender(DeltaTracker tracker, boolean bl, CallbackInfo ci, @Local(ordinal = 0) int mouseX, @Local(ordinal = 1) int mouseY, @Local GuiGraphics graphics)
-    {
-        OverlayRenderer.draw(graphics, mouseX, mouseY, tracker);
     }
 }
