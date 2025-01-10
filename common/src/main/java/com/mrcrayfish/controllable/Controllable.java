@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable;
 
+import com.mrcrayfish.controllable.client.CameraHandler;
 import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.ControllerProperties;
 import com.mrcrayfish.controllable.client.GamepadInputProcessor;
@@ -17,6 +18,7 @@ public class Controllable
 {
     private static final VirtualCursor CURSOR = new VirtualCursor();
     private static final GamepadInputProcessor INPUT_PROCESSOR = new GamepadInputProcessor();
+    private static final CameraHandler CAMERA_HANDLER = new CameraHandler();
 
     private static ControllerManager manager;
     private static File configFolder;
@@ -26,6 +28,7 @@ public class Controllable
     {
         CURSOR.registerEvents();
         INPUT_PROCESSOR.registerEvents();
+        CAMERA_HANDLER.registerEvents();
         configFolder = com.mrcrayfish.framework.platform.Services.CONFIG.getConfigPath().toFile();
         jeiLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("jei");
         ControllerProperties.load(configFolder);

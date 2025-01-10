@@ -103,8 +103,7 @@ public class InputHandler
     private boolean moving = false;
     private boolean ignoreInput;
     private boolean moved;
-    private float targetPitch;
-    private float targetYaw;
+
     private long lastMerchantScroll;
     private int dropCounter = -1;
 
@@ -238,30 +237,10 @@ public class InputHandler
                 }
             }
         }
-
-        Player player = mc.player;
-        if(player == null)
-            return;
-
-        if(mc.screen == null && (this.targetYaw != 0F || this.targetPitch != 0F))
-        {
-            float elapsedTicks = tracker.getGameTimeDeltaTicks();
-            if(!RadialMenuHandler.instance().isVisible())
-            {
-                player.turn((this.targetYaw / 0.15) * (Config.CLIENT.client.options.invertRotation.get() ? -1 : 1) * elapsedTicks, (this.targetPitch / 0.15) * (Config.CLIENT.client.options.invertLook.get() ? -1 : 1) * elapsedTicks);
-            }
-            if(player.getVehicle() != null)
-            {
-                player.getVehicle().onPassengerTurned(player);
-            }
-        }
     }
 
     private void onClientTickStart()
     {
-        this.targetYaw = 0F;
-        this.targetPitch = 0F;
-
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if(player == null)
@@ -270,38 +249,6 @@ public class InputHandler
         Controller controller = Controllable.getController();
         if(controller == null)
             return;
-
-        if(mc.screen == null)
-        {
-            float inputX = controller.getRThumbStickXValue();
-            float inputY = controller.getRThumbStickYValue();
-            boolean canMoveHorizontally = Math.abs(inputX) > 0;
-            boolean canMoveVertically = Math.abs(inputY) > 0;
-            if(canMoveHorizontally || canMoveVertically)
-            {
-                float pitchSensitivity = Config.CLIENT.client.options.pitchSensitivity.get().floatValue();
-                float yawSensitivity = Config.CLIENT.client.options.yawSensitivity.get().floatValue();
-                float rotationSpeed = Config.CLIENT.client.options.rotationSpeed.get().floatValue();
-                float spyglassSensitivity = player.isScoping() ? Config.CLIENT.client.options.spyglassSensitivity.get().floatValue() : 1.0F;
-
-                Value<Float> yawSpeed = new Value<>(rotationSpeed * yawSensitivity * spyglassSensitivity);
-                Value<Float> pitchSpeed = new Value<>(rotationSpeed * pitchSensitivity * spyglassSensitivity);
-                if(!EventHelper.postUpdateCameraEvent(yawSpeed, pitchSpeed))
-                {
-                    if(canMoveHorizontally)
-                    {
-                        this.targetYaw = yawSpeed.get() * inputX * 0.33F;
-                    }
-                    if(canMoveVertically)
-                    {
-                        this.targetPitch = pitchSpeed.get() * inputY * 0.33F;
-                    }
-                }
-
-                /* Mark the controller as in use because the camera is turning */
-                controller.updateInputTime();
-            }
-        }
 
         if(mc.screen == null)
         {

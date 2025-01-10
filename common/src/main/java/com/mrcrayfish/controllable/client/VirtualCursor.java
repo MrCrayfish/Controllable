@@ -39,7 +39,7 @@ public final class VirtualCursor
     @ApiStatus.Internal
     public VirtualCursor()
     {
-        Preconditions.checkState(instance == null, "Only one instance VirtualCursor is allowed");
+        Preconditions.checkState(instance == null, "Only one instance of VirtualCursor is allowed");
         Minecraft mc = Minecraft.getInstance();
         this.renderX = this.x = this.prevX = mc.getWindow().getWidth() / 2;
         this.renderY = this.y = this.prevY = mc.getWindow().getHeight() / 2;
