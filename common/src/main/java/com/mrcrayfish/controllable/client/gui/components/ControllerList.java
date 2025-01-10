@@ -3,7 +3,7 @@ package com.mrcrayfish.controllable.client.gui.components;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.client.input.ControllerManager;
+import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -27,7 +27,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
 {
     private static final ResourceLocation BEACON_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/container/beacon.png");
 
-    private final ControllerManager manager;
+    private final AdaptiveControllerManager manager;
     private final MutableComponent footerSubText;
     private int controllerCount;
 

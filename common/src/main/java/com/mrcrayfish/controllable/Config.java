@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable;
 
+import com.mrcrayfish.controllable.client.input.InputLibrary;
 import com.mrcrayfish.controllable.client.settings.ActionVisibility;
 import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import com.mrcrayfish.controllable.client.settings.CursorStyle;
@@ -33,6 +34,11 @@ public class Config
     {
         @ConfigProperty(name = "options", comment = "In-game related options. These can be changed in game instead of config!")
         public final Options options = new Options();
+
+        @ConfigProperty(name = "inputLibrary", gameRestart = true, comment = """
+            The library to use for game controller input. You can change this if you are having problems detecting game controllers.
+            Please note that changing from the default library may disable some feature in Controllable, only use this as a last resort""")
+        public final EnumProperty<InputLibrary> inputLibrary = EnumProperty.create(InputLibrary.SDL2);
 
         public static class Options
         {

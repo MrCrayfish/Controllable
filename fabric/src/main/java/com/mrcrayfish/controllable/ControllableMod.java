@@ -1,17 +1,15 @@
 package com.mrcrayfish.controllable;
 
-import com.mrcrayfish.controllable.client.ClientBootstrap;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import com.mrcrayfish.framework.FrameworkSetup;
+import net.fabricmc.api.ModInitializer;
 
-public class ControllableMod implements ClientModInitializer
+public class ControllableMod implements ModInitializer
 {
     @Override
-    public void onInitializeClient()
+    public void onInitialize()
     {
-        ClientBootstrap.init();
-        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
-            Controllable.getManager().dispose();
-        });
+        // On Fabric, no guarantee Framework initialization happens before Controllable
+        // So we need to run the setup ourselves.
+        FrameworkSetup.run();
     }
 }

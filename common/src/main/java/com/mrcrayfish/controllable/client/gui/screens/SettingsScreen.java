@@ -16,7 +16,7 @@ import com.mrcrayfish.controllable.client.gui.components.TabOptionTitleItem;
 import com.mrcrayfish.controllable.client.gui.components.TabOptionToggleItem;
 import com.mrcrayfish.controllable.client.gui.components.TabSelectionList;
 import com.mrcrayfish.controllable.client.gui.widget.TabListWidget;
-import com.mrcrayfish.controllable.client.input.ControllerManager;
+import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.config.AbstractProperty;
@@ -232,7 +232,7 @@ public class SettingsScreen extends Screen
             Component updateMappings = ClientHelper.join(Icons.WORLD, Component.translatable("controllable.gui.update_mappings"));
             Component restoreDefaults = ClientHelper.join(Icons.RESET, Component.translatable("controllable.gui.restore_defaults"));
             optionsList.addEntry(new ButtonBindingList.TwoWidgetItem(Button.builder(updateMappings, btn -> {
-                ConfirmationScreen updateConfirmation = new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.update_mapping_message", Component.literal(ControllerManager.MAPPINGS_URL).withStyle(ChatFormatting.YELLOW)), result -> {
+                ConfirmationScreen updateConfirmation = new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.update_mapping_message", Component.literal(AdaptiveControllerManager.MAPPINGS_URL).withStyle(ChatFormatting.YELLOW)), result -> {
                     if(result) {
                         Controllable.getManager().downloadMappings(SettingsScreen.this);
                         return false;

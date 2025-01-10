@@ -2,8 +2,7 @@ package com.mrcrayfish.controllable.client.input.sdl2;
 
 import com.google.common.io.ByteStreams;
 import com.mrcrayfish.controllable.Constants;
-import com.mrcrayfish.controllable.client.input.ControllerManager;
-import com.mrcrayfish.controllable_sdl.api.hints.SdlHints;
+import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.sun.jna.Memory;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
 import com.mrcrayfish.controllable_sdl.api.rwops.SDL_RWops;
@@ -29,7 +28,7 @@ import static com.mrcrayfish.controllable_sdl.api.rwops.SdlRWops.SDL_RWFromConst
 /**
  * Author: MrCrayfish
  */
-public class SDL2ControllerManager extends ControllerManager
+public class SDL2ControllerManager extends AdaptiveControllerManager
 {
     @Override
     public void init()

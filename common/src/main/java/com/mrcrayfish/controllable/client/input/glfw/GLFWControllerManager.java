@@ -4,7 +4,7 @@ import com.google.common.io.ByteStreams;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.client.input.ControllerManager;
+import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * Author: MrCrayfish
  */
-public class GLFWControllerManager extends ControllerManager
+public class GLFWControllerManager extends AdaptiveControllerManager
 {
     @Override
     public void init() {}

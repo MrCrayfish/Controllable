@@ -27,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Author: MrCrayfish
  */
-public abstract class ControllerManager
+public abstract class AdaptiveControllerManager
 {
     public static final String MAPPINGS_URL = "https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt";
 
@@ -124,7 +124,7 @@ public abstract class ControllerManager
     public final void onClientFinishedLoading()
     {
         /* Apply internal mappings */
-        try(InputStream is = ControllerManager.class.getResourceAsStream("/gamecontrollerdb.txt"))
+        try(InputStream is = AdaptiveControllerManager.class.getResourceAsStream("/gamecontrollerdb.txt"))
         {
             if(is != null)
             {
@@ -161,7 +161,7 @@ public abstract class ControllerManager
 
     public void downloadMappings(@Nullable Screen parentScreen)
     {
-        Constants.LOG.info("Downloading mappings from: {}", ControllerManager.MAPPINGS_URL);
+        Constants.LOG.info("Downloading mappings from: {}", AdaptiveControllerManager.MAPPINGS_URL);
         File mappings = new File(Services.PLATFORM.getConfigPath().resolve("controllable").toFile(), "gamecontrollerdb.txt");
         CompletableFuture.supplyAsync(() -> {
             Minecraft mc = Minecraft.getInstance();

@@ -8,7 +8,7 @@ import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.input.ButtonStates;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.client.input.ControllerManager;
+import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -23,7 +23,7 @@ public class InputProcessor
 {
     private final Queue<ButtonStates> inputQueue = new ArrayDeque<>();
     private final InputHandler handler = new InputHandler();
-    private final ControllerManager manager = Controllable.getManager();
+    private final AdaptiveControllerManager manager = Controllable.getManager();
     private boolean initialized;
 
     public void registerEvents()
