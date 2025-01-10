@@ -69,7 +69,7 @@ public class ActionHintOverlay implements IOverlay
         // Draw button icon
         int size = 13;
         int texU = button * size;
-        int texV = Config.CLIENT.client.options.controllerIcons.get().ordinal() * size;
+        int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * size;
         int x = side == Action.Side.LEFT ? 5 : mc.getWindow().getGuiScaledWidth() - 5 - size;
         int y = mc.getWindow().getGuiScaledHeight() + position * -15 - size - 5;
         graphics.blit(ButtonIcons.TEXTURE, x, y, texU, texV, size, size, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
@@ -83,7 +83,7 @@ public class ActionHintOverlay implements IOverlay
 
     private void drawHintBackground(GuiGraphics graphics, int x, int y, int width, int height)
     {
-        if(Config.CLIENT.client.options.drawHintBackground.get())
+        if(Config.CLIENT.options.drawHintBackground.get())
         {
             Minecraft mc = Minecraft.getInstance();
             int backgroundColor = mc.options.getBackgroundColor(0.5F);
@@ -109,7 +109,7 @@ public class ActionHintOverlay implements IOverlay
 
         this.actions.clear();
 
-        ActionVisibility visibility = Config.CLIENT.client.options.showButtonHints.get();
+        ActionVisibility visibility = Config.CLIENT.options.showButtonHints.get();
         if(visibility == ActionVisibility.NONE)
             return;
 

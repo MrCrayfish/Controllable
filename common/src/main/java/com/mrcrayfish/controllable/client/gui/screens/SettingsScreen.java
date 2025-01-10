@@ -271,44 +271,44 @@ public class SettingsScreen extends Screen
                 mc.options.toggleSprint().set(sprintMode == SprintMode.TOGGLE);
                 mc.options.save();
             }));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.quickCraft));
-            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.radialThumbstick));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.spyglassSensitivity, 0.05));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.quickCraft));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.radialThumbstick));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.spyglassSensitivity, 0.05));
 
             // Camera options
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.camera").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.rotationSpeed, 1.0));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.pitchSensitivity, 0.01));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.yawSensitivity, 0.01));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.invertLook));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.invertRotation));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.rotationSpeed, 1.0));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.pitchSensitivity, 0.01));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.yawSensitivity, 0.01));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.invertLook));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.invertRotation));
 
             // Display options
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.display").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
-            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.controllerIcons));
-            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.showButtonHints));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.drawHintBackground));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.consoleHotbar));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.renderMiniPlayer));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.controllerIcons));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.showButtonHints));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.drawHintBackground));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.consoleHotbar));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.renderMiniPlayer));
 
             // Controller options
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.controller").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.autoSelect));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.thumbstickDeadZone, 0.01));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.triggerDeadZone, 0.01));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.cursorSpeed, 1.0));
-            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.cursorThumbstick));
-            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.client.options.cursorType));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.listScrollSpeed, 1.0));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.hoverModifier, 0.05));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.autoSelect));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.thumbstickDeadZone, 0.01));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.triggerDeadZone, 0.01));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.cursorSpeed, 1.0));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.cursorThumbstick));
+            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.cursorType));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.listScrollSpeed, 1.0));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.hoverModifier, 0.05));
             if(!Minecraft.ON_OSX)
             {
-                optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.rumble));
+                optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.rumble));
             }
 
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.other").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.uiSounds));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.fpsPollingFix));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.uiSounds));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.fpsPollingFix));
 
             rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, optionsList));
         }

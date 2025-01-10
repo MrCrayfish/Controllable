@@ -25,7 +25,7 @@ public class PlayerOverlay implements IOverlay
     public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.player != null && mc.screen == null && Config.CLIENT.client.options.renderMiniPlayer.get())
+        if(mc.player != null && mc.screen == null && Config.CLIENT.options.renderMiniPlayer.get())
         {
             if(!EventHelper.postRenderMiniPlayer())
             {

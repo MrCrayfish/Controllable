@@ -216,7 +216,7 @@ public class InputHandler
                 return;
             }
 
-            float yValue = Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
+            float yValue = Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
             if(Math.abs(yValue) >= 0.2F)
             {
                 double cursorX = Controllable.getCursor().getRenderScreenX();
@@ -315,7 +315,7 @@ public class InputHandler
 
         if(mc.screen == null)
         {
-            if((!Controllable.getRadialMenu().isVisible() || Config.CLIENT.client.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent())
+            if((!Controllable.getRadialMenu().isVisible() || Config.CLIENT.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent())
             {
                 float sneakSpeed = (float) player.getAttributeValue(Attributes.SNEAKING_SPEED);
                 float sneakBonus = player.isMovingSlowly() ? sneakSpeed : 1.0F;
@@ -643,7 +643,7 @@ public class InputHandler
                         this.ignoreInput = true;
                     }
 
-                    if(Config.CLIENT.client.options.quickCraft.get())
+                    if(Config.CLIENT.options.quickCraft.get())
                     {
                         this.craftRecipeBookItem();
                     }
@@ -829,7 +829,7 @@ public class InputHandler
                 int windowPointY = (int) (targetPoint.getY() * mc.getWindow().getGuiScale());
                 cursor.jumpCursorTo(windowPointX, windowPointY);
 
-                if(Config.CLIENT.client.options.uiSounds.get())
+                if(Config.CLIENT.options.uiSounds.get())
                 {
                     mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, 2.0F));
                 }
@@ -1163,7 +1163,7 @@ public class InputHandler
     private void handleListScrolling(AbstractSelectionList<?> list, Controller controller)
     {
         double dir = 0;
-        float yValue = Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
+        float yValue = Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
         if(Math.abs(yValue) >= 0.2F)
         {
             controller.updateInputTime();
@@ -1171,13 +1171,13 @@ public class InputHandler
         }
         // TODO test list scroling
         dir *= Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
-        list.setScrollAmount(list.getScrollAmount() + dir * Config.CLIENT.client.options.listScrollSpeed.get());
+        list.setScrollAmount(list.getScrollAmount() + dir * Config.CLIENT.options.listScrollSpeed.get());
     }
 
     private void handleMerchantScrolling(MerchantScreen screen, Controller controller)
     {
         double dir = 0;
-        float yValue = Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
+        float yValue = Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
         if(Math.abs(yValue) >= 0.5F)
         {
             controller.updateInputTime();

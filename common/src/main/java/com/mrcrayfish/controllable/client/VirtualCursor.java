@@ -165,14 +165,14 @@ public final class VirtualCursor
         // If the magnitude is greater than zero, input is being given
         if(this.inputVector.lengthSquared() > 0)
         {
-            double cursorSpeed = Config.CLIENT.client.options.cursorSpeed.get() * Math.max(mc.getWindow().getGuiScale(), 1);
+            double cursorSpeed = Config.CLIENT.options.cursorSpeed.get() * Math.max(mc.getWindow().getGuiScale(), 1);
 
             // It's very easy to miss an interactable element, like widgets and container slots, when
             // moving at the full cursor speed. Instead, when hovering the element, the speed of the
             // cursor is slowed down to accommodate for the reaction time of the user.
             if(this.isHoveringContainerSlot() || this.isHoveringEventListener())
             {
-                cursorSpeed *= Config.CLIENT.client.options.hoverModifier.get();
+                cursorSpeed *= Config.CLIENT.options.hoverModifier.get();
             }
 
             // Update cursor position based on movement vector and speed
@@ -267,12 +267,12 @@ public final class VirtualCursor
 
     private float getCursorThumbstickX(Controller controller)
     {
-        return Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickXValue() : controller.getRThumbStickXValue();
+        return Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickXValue() : controller.getRThumbStickXValue();
     }
 
     private float getCursorThumbstickY(Controller controller)
     {
-        return Config.CLIENT.client.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickYValue() : controller.getRThumbStickYValue();
+        return Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickYValue() : controller.getRThumbStickYValue();
     }
 
     private boolean isHoveringContainerSlot()

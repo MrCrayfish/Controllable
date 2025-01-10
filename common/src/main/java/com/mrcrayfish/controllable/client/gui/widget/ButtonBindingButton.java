@@ -36,7 +36,7 @@ public class ButtonBindingButton extends Button
         if(this.binding.getButton() < 0)
             return;
         int texU = this.binding.getButton() * 13;
-        int texV = Config.CLIENT.client.options.controllerIcons.get().ordinal() * 13;
+        int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
         int size = 13;
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         graphics.blit(ButtonIcons.TEXTURE, this.getX() + (this.width - size) / 2 + 1, this.getY() + 3, texU, texV, size, size, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);

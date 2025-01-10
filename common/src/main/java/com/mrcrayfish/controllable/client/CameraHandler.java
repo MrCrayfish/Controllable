@@ -57,10 +57,10 @@ public class CameraHandler
         float thumbstickY = controller.getRThumbStickYValue();
         if(thumbstickX * thumbstickX > 0 || thumbstickY * thumbstickY > 0)
         {
-            float pitchSensitivity = Config.CLIENT.client.options.pitchSensitivity.get().floatValue();
-            float yawSensitivity = Config.CLIENT.client.options.yawSensitivity.get().floatValue();
-            float rotationSpeed = Config.CLIENT.client.options.rotationSpeed.get().floatValue();
-            float spyglassSensitivity = mc.player.isScoping() ? Config.CLIENT.client.options.spyglassSensitivity.get().floatValue() : 1.0F;
+            float pitchSensitivity = Config.CLIENT.options.pitchSensitivity.get().floatValue();
+            float yawSensitivity = Config.CLIENT.options.yawSensitivity.get().floatValue();
+            float rotationSpeed = Config.CLIENT.options.rotationSpeed.get().floatValue();
+            float spyglassSensitivity = mc.player.isScoping() ? Config.CLIENT.options.spyglassSensitivity.get().floatValue() : 1.0F;
 
             Value<Float> yawSpeed = new Value<>(rotationSpeed * yawSensitivity * spyglassSensitivity);
             Value<Float> pitchSpeed = new Value<>(rotationSpeed * pitchSensitivity * spyglassSensitivity);
@@ -106,8 +106,8 @@ public class CameraHandler
             double elapsedDeltaPitch = this.pitchDelta * elapsedTicks;
 
             // If enabled by the user, invert the yaw and/or pitch for more preferable controls
-            elapsedDeltaYaw *= (Config.CLIENT.client.options.invertRotation.get() ? -1 : 1);
-            elapsedDeltaPitch *= (Config.CLIENT.client.options.invertLook.get() ? -1 : 1);
+            elapsedDeltaYaw *= (Config.CLIENT.options.invertRotation.get() ? -1 : 1);
+            elapsedDeltaPitch *= (Config.CLIENT.options.invertLook.get() ? -1 : 1);
 
             // Finally turn the camera by turning the player
             mc.player.turn(elapsedDeltaYaw, elapsedDeltaPitch);

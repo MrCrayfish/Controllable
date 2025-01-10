@@ -69,7 +69,7 @@ public abstract class AdaptiveControllerManager
             controller = null;
         }
 
-        if(controller == null && Config.CLIENT.client.options.autoSelect.get())
+        if(controller == null && Config.CLIENT.options.autoSelect.get())
         {
             controller = this.connectToFirstGameController();
             this.sendControllerToast(true, controller);
@@ -153,7 +153,7 @@ public abstract class AdaptiveControllerManager
         }
 
         /* Attempts to load the first game controller connected if auto select is enabled */
-        if(Config.CLIENT.client.options.autoSelect.get())
+        if(Config.CLIENT.options.autoSelect.get())
         {
             this.connectToFirstGameController();
         }

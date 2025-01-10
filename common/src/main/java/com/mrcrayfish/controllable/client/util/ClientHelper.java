@@ -41,7 +41,7 @@ public class ClientHelper
 
     public static MutableComponent getButtonComponent(int button)
     {
-        MutableComponent component = Component.literal(String.valueOf((char) (33 + (Config.CLIENT.client.options.controllerIcons.get().ordinal() * Buttons.LENGTH + button))));
+        MutableComponent component = Component.literal(String.valueOf((char) (33 + (Config.CLIENT.options.controllerIcons.get().ordinal() * Buttons.LENGTH + button))));
         component.setStyle(component.getStyle().withColor(ChatFormatting.WHITE).withFont(ClientHelper.BUTTON_FONT));
         return component;
     }
@@ -59,7 +59,7 @@ public class ClientHelper
     public static void drawButton(GuiGraphics graphics, int x, int y, int button)
     {
         int texU = button * 13;
-        int texV = Config.CLIENT.client.options.controllerIcons.get().ordinal() * 13;
+        int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
         int size = 13;
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         graphics.blit(ButtonIcons.TEXTURE, x, y, texU, texV, size, size, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);

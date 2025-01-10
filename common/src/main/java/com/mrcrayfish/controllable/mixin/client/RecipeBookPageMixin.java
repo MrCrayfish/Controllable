@@ -38,7 +38,7 @@ public class RecipeBookPageMixin
     private void controllableRenderTooltipTail(GuiGraphics graphics, int mouseX, int mouseY, CallbackInfo ci)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed() && Config.CLIENT.client.options.quickCraft.get())
+        if(controller != null && controller.isBeingUsed() && Config.CLIENT.options.quickCraft.get())
         {
             if(this.minecraft.screen != null && this.overlay.isVisible())
             {

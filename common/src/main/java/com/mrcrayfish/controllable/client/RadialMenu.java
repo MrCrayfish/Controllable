@@ -395,8 +395,8 @@ public class RadialMenu
             return;
 
         float threshold = 0.5F;
-        float inputX = Config.CLIENT.client.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickXValue() : controller.getLThumbStickXValue();
-        float inputY = Config.CLIENT.client.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
+        float inputX = Config.CLIENT.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickXValue() : controller.getLThumbStickXValue();
+        float inputY = Config.CLIENT.options.radialThumbstick.get() == Thumbstick.RIGHT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
 
         // Don't update selected if thumbstick is not above a certain threshold
         if(Math.abs(inputX) <= threshold && Math.abs(inputY) <= threshold)
@@ -415,7 +415,7 @@ public class RadialMenu
         this.selected = closest.get();
         Minecraft mc = Minecraft.getInstance();
 
-        if(Config.CLIENT.client.options.uiSounds.get())
+        if(Config.CLIENT.options.uiSounds.get())
         {
             mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, 1.5F));
         }

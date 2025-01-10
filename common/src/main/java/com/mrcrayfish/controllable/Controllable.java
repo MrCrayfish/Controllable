@@ -75,6 +75,6 @@ public class Controllable
 
     private static AdaptiveControllerManager createManager()
     {
-        return Config.CLIENT.client.inputLibrary.get().createManager();
+        return Config.CLIENT.inputLibrary.get().createManager();
     }
 }

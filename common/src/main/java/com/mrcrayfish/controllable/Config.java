@@ -22,13 +22,7 @@ public class Config
     public static final ResourceLocation CLIENT_CONFIG_ID = Utils.resource("client");
 
     @FrameworkConfig(id = Constants.MOD_ID, name = "client", separator = '-', type = ConfigType.CLIENT)
-    public static final ClientWrapper CLIENT = new ClientWrapper();
-
-    public static class ClientWrapper
-    {
-        @ConfigProperty(name = "client", comment = "Client configuration settings")
-        public final Client client = new Client();
-    }
+    public static final Client CLIENT = new Client();
 
     public static class Client
     {

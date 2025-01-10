@@ -39,7 +39,7 @@ public class GLFWControllerManager extends AdaptiveControllerManager
     @Override
     public Controller connectToFirstGameController()
     {
-        if(Config.CLIENT.client.options.autoSelect.get())
+        if(Config.CLIENT.options.autoSelect.get())
         {
             for(int jid = GLFW.GLFW_JOYSTICK_1; jid <= GLFW.GLFW_JOYSTICK_LAST; jid++)
             {

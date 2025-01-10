@@ -21,7 +21,7 @@ public class GuiMixin
     @Inject(method = "renderHotbarAndDecorations", at = @At(value = "HEAD"))
     private void consoleHotbarOffsetHead(GuiGraphics graphics, DeltaTracker tracker, CallbackInfo ci)
     {
-        if(Config.CLIENT.client.options.consoleHotbar.get())
+        if(Config.CLIENT.options.consoleHotbar.get())
         {
             graphics.pose().pushPose();
             graphics.pose().translate(0, 20, 0);
@@ -31,7 +31,7 @@ public class GuiMixin
     @Inject(method = "renderHotbarAndDecorations", at = @At(value = "TAIL"))
     private void consoleHotbarOffsetTail(GuiGraphics graphics, DeltaTracker tracker, CallbackInfo ci)
     {
-        if(Config.CLIENT.client.options.consoleHotbar.get())
+        if(Config.CLIENT.options.consoleHotbar.get())
         {
             graphics.pose().popPose();
         }

@@ -25,7 +25,7 @@ public class ForgeRecipeBookPageMixin
     private List<Component> controllableModifyRenderToolTip(List<Component> components)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed() && Config.CLIENT.client.options.quickCraft.get())
+        if(controller != null && controller.isBeingUsed() && Config.CLIENT.options.quickCraft.get())
         {
             if(components.removeIf(c -> c.getContents() instanceof TranslatableContents t && t.getKey().equals("gui.recipebook.moreRecipes")))
             {

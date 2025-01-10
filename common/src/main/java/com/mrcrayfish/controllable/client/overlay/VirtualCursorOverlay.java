@@ -31,7 +31,7 @@ public class VirtualCursorOverlay implements IOverlay
         pose.pushPose();
 
         Minecraft mc = Minecraft.getInstance();
-        CursorStyle type = Config.CLIENT.client.options.cursorType.get();
+        CursorStyle type = Config.CLIENT.options.cursorType.get();
         if(mc.player == null || (mc.player.inventoryMenu.getCarried().isEmpty() || type.getBehaviour() == CursorStyle.ItemHeldBehaviour.SHOW))
         {
             InputHandler input = Controllable.getInput();
