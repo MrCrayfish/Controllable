@@ -155,15 +155,6 @@ public class InputHandler
         {
             this.handleCreativeScrolling((CreativeModeInventoryScreen) mc.screen, controller);
         }
-
-        int cursorX = Controllable.getCursor().getX();
-        int cursorY = Controllable.getCursor().getY();
-        int prevCursorX = Controllable.getCursor().getPrevX();
-        int prevCursorY = Controllable.getCursor().getPrevY();
-        if((cursorX != prevCursorX || cursorY != prevCursorY))
-        {
-            MouseHooks.invokeMouseMoved(mc.screen, cursorX, cursorY, cursorX - prevCursorX, cursorY - prevCursorY);
-        }
     }
 
     private void onScreenOpened(Screen screen)

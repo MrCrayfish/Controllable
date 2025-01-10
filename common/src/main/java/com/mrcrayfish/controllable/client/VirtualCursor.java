@@ -185,6 +185,12 @@ public final class VirtualCursor
 
             // Update the last input time of this controller
             controller.updateInputTime();
+
+            // Send moved event to screens
+            if(this.x != this.prevX || this.y != this.prevY)
+            {
+                MouseHooks.invokeMouseMoved(mc.screen, this.x, this.y, this.x - this.prevX, this.y - this.prevY);
+            }
         }
     }
 
