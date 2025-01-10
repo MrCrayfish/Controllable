@@ -15,6 +15,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.settings.AnalogMovement;
 import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.EventHelper;
@@ -59,6 +60,7 @@ import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -321,6 +323,17 @@ public class InputHandler
                 float sneakBonus = player.isMovingSlowly() ? sneakSpeed : 1.0F;
                 float inputX = controller.getLThumbStickXValue();
                 float inputY = controller.getLThumbStickYValue();
+
+                AnalogMovement movement = Config.CLIENT.options.analogMovement.get();
+                if(movement != AnalogMovement.ALWAYS)
+                {
+                    ServerData data = mc.getCurrentServer();
+                    if(movement != AnalogMovement.LOCAL_ONLY || data != null && data.type() == ServerData.Type.OTHER)
+                    {
+                        inputX = Math.abs(inputX) > 0.5 ? Math.signum(inputX) : 0;
+                        inputY = Math.abs(inputY) > 0.5 ? Math.signum(inputY) : 0;
+                    }
+                }
 
                 if(Math.abs(inputY) > 0)
                 {

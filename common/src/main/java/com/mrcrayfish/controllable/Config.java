@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable;
 
 import com.mrcrayfish.controllable.client.input.InputLibrary;
 import com.mrcrayfish.controllable.client.settings.ActionVisibility;
+import com.mrcrayfish.controllable.client.settings.AnalogMovement;
 import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import com.mrcrayfish.controllable.client.settings.CursorStyle;
 import com.mrcrayfish.controllable.client.settings.Thumbstick;
@@ -107,6 +108,21 @@ public class Config
 
             @ConfigProperty(name = "spyglassSensitivity", comment = "Adjusts the camera sensitivity when looking through a spyglass")
             public final DoubleProperty spyglassSensitivity = DoubleProperty.create(0.2, 0.0, 1.0);
+
+            @ConfigProperty(name = "analogMovement", comment = """
+                Allows you to control the settings of analog movement
+                
+                You have three options:
+                - DISABLED:   Player movement will behave like you are using a keyboard
+                - LOCAL_ONLY: Player movement will depend on how much input you are applying to the
+                              thumbstick, giving you more precise control over direction and speed.
+                              However, this feature will only work in singleplayer/lan servers.
+                - ALWAYS:     Same as LOCAL_ONLY but allows you to additionally use the feature on
+                              remote servers (read message below).
+                
+                You should set this to DISABLED or LOCAL_ONLY if you are playing on public
+                servers (e.g Hypixel) as analog movement may be detected by anti-cheat software.""")
+            public final EnumProperty<AnalogMovement> analogMovement = EnumProperty.create(AnalogMovement.LOCAL_ONLY);
         }
     }
 }
