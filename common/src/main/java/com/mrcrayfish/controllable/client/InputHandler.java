@@ -98,12 +98,8 @@ public class InputHandler
 {
     private static final ResourceLocation RECIPE_BUTTON_LOCATION = ResourceLocation.withDefaultNamespace("textures/gui/recipe_button.png");
 
-    private boolean keyboardSneaking = false;
-    private boolean sneaking = false;
-    private boolean isFlying = false;
     private Slot nearSlot = null;
     private boolean moving = false;
-    private boolean ignoreInput;
     private boolean moved;
 
     private long lastMerchantScroll;
@@ -116,7 +112,6 @@ public class InputHandler
         TickEvents.END_RENDER.register(this::onRenderTickEnd);
         ScreenEvents.OPENED.register(this::onScreenOpened);
         ScreenEvents.BEFORE_DRAW.register(this::onScreenRenderPre);
-        ClientEvents.PLAYER_INPUT_UPDATE.register(this::onInputUpdate);
     }
 
     public boolean isMovingCursor()
@@ -270,109 +265,6 @@ public class InputHandler
         }
     }
 
-    private void onInputUpdate(Player p, Input input)
-    {
-        LocalPlayer player = (LocalPlayer) p;
-        if(player == null)
-            return;
-
-        Controller controller = Controllable.getController();
-        if(controller == null)
-            return;
-
-        Minecraft mc = Minecraft.getInstance();
-        if(this.keyboardSneaking && !mc.options.keyShift.isDown())
-        {
-            this.sneaking = false;
-            this.keyboardSneaking = false;
-        }
-
-        if(!mc.options.toggleCrouch().get())
-        {
-            this.sneaking = ButtonBindings.SNEAK.isButtonDown();
-        }
-
-        if(mc.options.keyShift.isDown())
-        {
-            this.sneaking = true;
-            this.keyboardSneaking = true;
-        }
-
-        if(player.getAbilities().flying || player.isPassenger())
-        {
-            this.sneaking = mc.options.keyShift.isDown();
-            this.sneaking |= ButtonBindings.SNEAK.isButtonDown();
-            if(ButtonBindings.SNEAK.isButtonDown())
-            {
-                controller.updateInputTime();
-            }
-            this.isFlying = true;
-        }
-        else if(this.isFlying)
-        {
-            this.isFlying = false;
-        }
-
-        input.shiftKeyDown = this.sneaking;
-
-        if(mc.screen == null)
-        {
-            if((!Controllable.getRadialMenu().isVisible() || Config.CLIENT.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent())
-            {
-                float sneakSpeed = (float) player.getAttributeValue(Attributes.SNEAKING_SPEED);
-                float sneakBonus = player.isMovingSlowly() ? sneakSpeed : 1.0F;
-                float inputX = controller.getLThumbStickXValue();
-                float inputY = controller.getLThumbStickYValue();
-
-                AnalogMovement movement = Config.CLIENT.options.analogMovement.get();
-                if(movement != AnalogMovement.ALWAYS)
-                {
-                    ServerData data = mc.getCurrentServer();
-                    if(movement != AnalogMovement.LOCAL_ONLY || data != null && data.type() == ServerData.Type.OTHER)
-                    {
-                        inputX = Math.abs(inputX) > 0.5 ? Math.signum(inputX) : 0;
-                        inputY = Math.abs(inputY) > 0.5 ? Math.signum(inputY) : 0;
-                    }
-                }
-
-                if(Math.abs(inputY) > 0)
-                {
-                    input.up = inputY < 0;
-                    input.down = inputY > 0;
-                    input.forwardImpulse = -inputY;
-                    input.forwardImpulse *= sneakBonus;
-                    controller.updateInputTime();
-                }
-
-                float threshold = player.getVehicle() instanceof Boat ? 0.5F : 0.0F;
-                if(Math.abs(inputX) > threshold)
-                {
-                    input.right = inputX > 0;
-                    input.left = inputX < 0;
-                    input.leftImpulse = -inputX;
-                    input.leftImpulse *= sneakBonus;
-                    controller.updateInputTime();
-                }
-            }
-
-            if(this.ignoreInput && !ButtonBindings.JUMP.isButtonDown())
-            {
-                this.ignoreInput = false;
-            }
-
-            if(ButtonBindings.JUMP.isButtonDown() && !this.ignoreInput)
-            {
-                input.jumping = true;
-            }
-        }
-
-        int rightClickDelay = ClientServices.CLIENT.getRightClickDelay(mc);
-        if(ButtonBindings.USE_ITEM.isButtonDown() && rightClickDelay == 0 && !player.isUsingItem())
-        {
-            ClientServices.CLIENT.startUseItem(mc);
-        }
-    }
-
     public void handleButtonInput(Controller controller, int button, boolean state, boolean virtual)
     {
         if(controller == null)
@@ -445,12 +337,18 @@ public class InputHandler
                 }
                 else if(ButtonBindings.SNEAK.isButtonPressed())
                 {
-                    if(mc.player != null && !mc.player.getAbilities().flying && !this.isFlying && !mc.player.isPassenger())
+                    if(mc.options.toggleCrouch().get())
+                    {
+                        mc.options.keyShift.setDown(true);
+                    }
+
+                    /*if(mc.player != null && !mc.player.getAbilities().flying && !mc.player.isPassenger())
                     {
                         if(mc.options.toggleCrouch().get())
                         {
-                            this.sneaking = !this.sneaking;
-                            if(!this.sneaking && mc.options.keyShift.isDown())
+                            MovementController movement = Controllable.getMovementController();
+                            movement.setSneaking(!movement.isSneaking());
+                            if(!movement.isSneaking() && mc.options.keyShift.isDown())
                             {
                                 this.keyboardSneaking = false;
                                 mc.options.keyShift.setDown(true);
@@ -461,7 +359,7 @@ public class InputHandler
                                 mc.options.keyShift.setDown(true);
                             }
                         }
-                    }
+                    }*/
                 }
                 else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
                 {
@@ -545,10 +443,10 @@ public class InputHandler
                         {
                             ClientServices.CLIENT.startAttack(mc);
                         }
-                        /*else if(ButtonBindings.USE_ITEM.isButtonPressed())
+                        else if(ButtonBindings.USE_ITEM.isButtonPressed())
                         {
                             ClientServices.CLIENT.startUseItem(mc);
-                        }*/
+                        }
                         else if(ButtonBindings.PICK_BLOCK.isButtonPressed())
                         {
                             ClientServices.CLIENT.pickBlock(mc);
@@ -651,9 +549,15 @@ public class InputHandler
                 {
                     MouseHooks.invokeMouseClick(mc.screen, GLFW.GLFW_MOUSE_BUTTON_LEFT);
 
+                    // If invokeMouseClick closed the screen, and the button is the same as the jump
+                    // button, the player will jump as soon as the screen is closed. To prevent this,
+                    // the jump binding is simply unpressed.
                     if(mc.screen == null)
                     {
-                        this.ignoreInput = true;
+                        if(ButtonBindings.JUMP.getButton() == ButtonBindings.PICKUP_ITEM.getButton())
+                        {
+                            ButtonBindings.JUMP.resetPressedState();
+                        }
                     }
 
                     if(Config.CLIENT.options.quickCraft.get())

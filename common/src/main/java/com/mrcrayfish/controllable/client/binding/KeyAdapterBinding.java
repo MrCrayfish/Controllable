@@ -46,11 +46,11 @@ public final class KeyAdapterBinding extends ButtonBinding
         this.handlePressed(pressed ? GLFW.GLFW_PRESS : GLFW.GLFW_RELEASE, key, 0);
     }
 
-    @Override
+    /*@Override
     protected void onPressTick()
     {
         //this.updateKeyBindPressTime();
-    }
+    }*/
 
     private void updateKeyBindPressTime()
     {

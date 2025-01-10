@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.client.CameraHandler;
 import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.ControllerProperties;
 import com.mrcrayfish.controllable.client.InputProcessor;
+import com.mrcrayfish.controllable.client.MovementHandler;
 import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.VirtualCursor;
 import com.mrcrayfish.controllable.client.input.Controller;
@@ -12,7 +13,7 @@ import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.controllable.util.Utils;
 
 import org.jetbrains.annotations.Nullable;
-import java.io.File;
+
 import java.util.function.Supplier;
 
 public class Controllable
@@ -23,6 +24,7 @@ public class Controllable
     private static final InputProcessor INPUT_PROCESSOR = new InputProcessor();
     private static final CameraHandler CAMERA_HANDLER = new CameraHandler();
     private static final RadialMenu RADIAL_MENU = new RadialMenu();
+    private static final MovementHandler MOVEMENT_HANDLER = new MovementHandler();
 
     private static final boolean JEI_LOADED = Utils.isModLoaded("jei");
 
@@ -34,6 +36,7 @@ public class Controllable
         INPUT_PROCESSOR.registerEvents();
         CAMERA_HANDLER.registerEvents();
         RADIAL_MENU.registerEvents();
+        MOVEMENT_HANDLER.registerEvents();
     }
 
     public static VirtualCursor getCursor()

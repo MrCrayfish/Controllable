@@ -90,7 +90,10 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         this.button = this.defaultButton;
     }
 
-    protected void onPressTick() {};
+    public void resetPressedState()
+    {
+        this.pressed = false;
+    }
 
     public static void tick()
     {
@@ -129,7 +132,7 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     {
         for(ButtonBinding binding : BindingRegistry.getInstance().getRegisteredBindings())
         {
-            binding.pressed = false;
+            binding.resetPressedState();
         }
     }
 
