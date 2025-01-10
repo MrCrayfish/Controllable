@@ -28,7 +28,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -149,12 +148,6 @@ public class FabricClientHelper implements IClientHelper
     public void startUseItem(Minecraft mc)
     {
         mc.startUseItem();
-    }
-
-    @Override
-    public int getRightClickDelay(Minecraft mc)
-    {
-        return mc.rightClickDelay;
     }
 
     @Override
@@ -280,18 +273,6 @@ public class FabricClientHelper implements IClientHelper
     public void sendKeyInputEvent(int key, int scanCode, int action, int modifiers)
     {
         // Do nothing on Fabric
-    }
-
-    @Override
-    public void clickSlot(AbstractContainerScreen<?> screen, Slot slotIn, int slotId, int mouseButton, ClickType type)
-    {
-        ReflectUtil.clickSlot(screen, slotIn, slotId, mouseButton, type);
-    }
-
-    @Override
-    public void addRenderableToScreen(Screen screen, Renderable renderable)
-    {
-        ReflectUtil.addRenderable(screen, renderable);
     }
 
     @Override

@@ -27,7 +27,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.neoforged.fml.ModList;
@@ -189,12 +188,6 @@ public class ForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public int getRightClickDelay(Minecraft mc)
-    {
-        return mc.rightClickDelay;
-    }
-
-    @Override
     public void startAttack(Minecraft mc)
     {
         mc.startAttack();
@@ -325,18 +318,6 @@ public class ForgeClientHelper implements IClientHelper
     public void sendKeyInputEvent(int key, int scanCode, int action, int modifiers)
     {
         ClientHooks.onKeyInput(key, 0, action, modifiers);
-    }
-
-    @Override
-    public void clickSlot(AbstractContainerScreen<?> screen, Slot slotIn, int slotId, int mouseButton, ClickType type)
-    {
-        ReflectUtil.clickSlot(screen, slotIn, slotId, mouseButton, type);
-    }
-
-    @Override
-    public void addRenderableToScreen(Screen screen, Renderable renderable)
-    {
-        screen.renderables.add(renderable);
     }
 
     @Override

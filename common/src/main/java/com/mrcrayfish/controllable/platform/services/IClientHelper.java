@@ -20,7 +20,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 
 import java.util.List;
@@ -65,8 +64,6 @@ public interface IClientHelper
 
     void startUseItem(Minecraft mc);
 
-    int getRightClickDelay(Minecraft mc);
-
     void startAttack(Minecraft mc);
 
     void pickBlock(Minecraft mc);
@@ -104,10 +101,6 @@ public interface IClientHelper
     IBindingContext createBindingContext(KeyMapping mapping);
 
     void sendKeyInputEvent(int key, int scanCode, int action, int modifiers);
-
-    void clickSlot(AbstractContainerScreen<?> screen, Slot slotIn, int slotId, int mouseButton, ClickType type);
-
-    void addRenderableToScreen(Screen screen, Renderable renderable);
 
     Component getOptionInstanceName(OptionInstance<Boolean> option);
 
