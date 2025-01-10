@@ -38,20 +38,18 @@ public class RecipeBookPageMixin
     private void controllableRenderTooltipTail(GuiGraphics graphics, int mouseX, int mouseY, CallbackInfo ci)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed() && Config.CLIENT.options.quickCraft.get())
-        {
-            if(this.minecraft.screen != null && this.overlay.isVisible())
-            {
-                List<AbstractWidget> recipeButtons = ((OverlayRecipeComponentAccessor) this.overlay).controllableGetRecipeButtons();
-                recipeButtons.stream().filter(AbstractWidget::isHoveredOrFocused).findFirst().ifPresent(btn ->
-                {
-                    if(((OverlayRecipeButtonAccessor) btn).controllableIsCraftable())
-                    {
-                        Component craftText = Component.translatable("controllable.tooltip.craft", ClientHelper.getButtonComponent(ButtonBindings.PICKUP_ITEM.getButton())).withStyle(ChatFormatting.YELLOW);
-                        graphics.renderTooltip(this.minecraft.font, craftText, mouseX, mouseY);
-                    }
-                });
+        if(controller == null || !controller.isBeingUsed() || !Config.CLIENT.options.quickCraft.get())
+            return;
+
+        if(this.minecraft.screen == null || !this.overlay.isVisible())
+            return;
+
+        List<AbstractWidget> recipeButtons = ((OverlayRecipeComponentAccessor) this.overlay).controllableGetRecipeButtons();
+        recipeButtons.stream().filter(AbstractWidget::isHoveredOrFocused).findFirst().ifPresent(btn -> {
+            if(((OverlayRecipeButtonAccessor) btn).controllableIsCraftable()) {
+                Component craftText = Component.translatable("controllable.tooltip.craft", ClientHelper.getButtonComponent(ButtonBindings.PICKUP_ITEM.getButton())).withStyle(ChatFormatting.YELLOW);
+                graphics.renderTooltip(this.minecraft.font, craftText, mouseX, mouseY);
             }
-        }
+        });
     }
 }

@@ -7,7 +7,6 @@
     "refmap": "controllable.refmap.json",
     "client": [
         "client.FabricGameRendererMixin",
-        "client.FabricMinecraftMixin",
         "client.FabricRecipeBookPageMixin",
         "client.KeyMappingMixin",
         "client.jei.GuiIconToggleButtonMixin",

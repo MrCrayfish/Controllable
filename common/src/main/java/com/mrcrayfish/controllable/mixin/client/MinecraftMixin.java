@@ -1,7 +1,9 @@
 package com.mrcrayfish.controllable.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.platform.ClientServices;
@@ -13,7 +15,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -27,33 +28,39 @@ public class MinecraftMixin
     @Shadow
     public LocalPlayer player;
 
-    @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;continueAttack(Z)V"), index = 0)
-    private boolean controllableSendClickBlockToController(boolean original)
+    @Inject(method = "<init>", at = @At(value = "TAIL"))
+    private void controllableOnFinishedLoading(CallbackInfo ci)
     {
-        return original || isLeftClicking();
+        BindingRegistry.getInstance().load();
+        Controllable.getControllerManager().onClientFinishedLoading();
     }
 
-    /*@Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"), slice = @Slice(
-            from = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z"),
-            to = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;releaseUsingItem(Lnet/minecraft/world/entity/player/Player;)V")))
-    private boolean controllableOnKeyDown(KeyMapping mapping)
-    {
-        return mapping.isDown() || KeyUseOverride.isRightClicking();
-    }*/
-
-    /**
-     * Checks if a controller is connected and if the attack button is down. A special except is
-     * added when virtual mouse is enabled and it will ignore if the mouse is grabbed or not.
+    /*
+     * Modifies the return value of keyAttack.isDown() when calling Minecraft#continueAttack()
      */
-    private static boolean isLeftClicking()
+    @ModifyExpressionValue(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 4))
+    private boolean modifyAttackKeyDown(boolean original)
     {
-        Minecraft mc = Minecraft.getInstance();
         Controller controller = Controllable.getController();
-        if(controller != null && ButtonBindings.ATTACK.isButtonDown())
+        if(controller != null && controller.isBeingUsed() && ButtonBindings.ATTACK.isButtonDown())
         {
-            return mc.screen == null && (mc.mouseHandler.isMouseGrabbed() || controller.isBeingUsed());
+            return true;
         }
-        return false;
+        return original;
+    }
+
+    /*
+     * Modifies the return value of keyAttack.isDown() when calling Minecraft#continueAttack()
+     */
+    @ModifyExpressionValue(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 3))
+    private boolean modifyUseKeyDown(boolean original)
+    {
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.isBeingUsed() && ButtonBindings.USE_ITEM.isButtonDown())
+        {
+            return true;
+        }
+        return original;
     }
 
     @Inject(method = "shouldEntityAppearGlowing", at = @At(value = "HEAD"), cancellable = true)
