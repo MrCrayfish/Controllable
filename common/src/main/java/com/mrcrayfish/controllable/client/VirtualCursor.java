@@ -222,8 +222,11 @@ public final class VirtualCursor
             return;
 
         // If position didn't change, don't update
-        if(this.x == this.prevX && this.y == this.prevY)
+        if(this.x == this.prevX && this.y == this.prevY) {
+            this.renderX = this.x;
+            this.renderY = this.y;
             return;
+        }
 
         float partialTick = this.getPartialTick(tracker); // The normalised time between two ticks
         this.renderX = this.prevX + (this.x - this.prevX) * partialTick;
