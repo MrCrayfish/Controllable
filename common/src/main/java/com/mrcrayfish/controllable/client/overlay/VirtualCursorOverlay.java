@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.settings.CursorStyle;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.platform.ClientServices;
 import com.mrcrayfish.controllable.platform.Services;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -41,7 +42,7 @@ public class VirtualCursorOverlay implements IOverlay
             double zIndex = Services.PLATFORM.isNeoForge() ? 300 : 3000; // Hack until I make Forge/Fabric calls the same
             pose.translate(cursorX / guiScale, cursorY / guiScale, zIndex);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            boolean isHoveringSlot = input.getNearSlot() != null;
+            boolean isHoveringSlot = false; // TODO fix
             if(isHoveringSlot && type.isScaleHover())
             {
                 pose.scale(1.33F, 1.33F, 1.33F);

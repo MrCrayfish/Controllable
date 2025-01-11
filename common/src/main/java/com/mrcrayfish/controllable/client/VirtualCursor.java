@@ -44,8 +44,8 @@ public final class VirtualCursor
     {
         Preconditions.checkState(instance == null, "Only one instance of VirtualCursor is allowed");
         Minecraft mc = Minecraft.getInstance();
-        this.renderX = this.x = this.prevX = mc.getWindow().getWidth() / 2;
-        this.renderY = this.y = this.prevY = mc.getWindow().getHeight() / 2;
+        this.renderX = this.x = this.prevX = mc.getWindow().getScreenWidth() / 2;
+        this.renderY = this.y = this.prevY = mc.getWindow().getScreenHeight() / 2;
         instance = this;
     }
 
@@ -61,18 +61,27 @@ public final class VirtualCursor
         }
     }
 
+    /**
+     * @return True if the virtual cursor is visible
+     */
     public boolean isVisible()
     {
         return this.visible;
     }
 
+    /**
+     * Sets the visibility state of the virtual cursor
+     *
+     * @param visible true to make cursor visible in overlay
+     */
+    @ApiStatus.Internal
     public void setVisible(boolean visible)
     {
         this.visible = visible;
     }
 
     /**
-     * @return The x position the cursor is moving to
+     * @return The x position the cursor
      */
     public int getX()
     {
@@ -80,33 +89,29 @@ public final class VirtualCursor
     }
 
     /**
-     * @return The y position the cursor is moving to
+     * @return The y position the cursor
      */
     public int getY()
     {
         return this.y;
     }
 
-    public int getPrevX()
-    {
-        return this.prevX;
-    }
-
-    public int getPrevY()
-    {
-        return this.prevY;
-    }
-
+    /**
+     * @return The x position of the cursor in screen space
+     */
     public int getScreenX()
     {
         Minecraft mc = Minecraft.getInstance();
-        return (int) (this.x * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth());
+        return (int) (this.x * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth());
     }
 
+    /**
+     * @return The y position of the cursor in screen space
+     */
     public int getScreenY()
     {
         Minecraft mc = Minecraft.getInstance();
-        return (int) (this.y * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight());
+        return (int) (this.y * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight());
     }
 
     /**
@@ -131,7 +136,7 @@ public final class VirtualCursor
     public double getRenderScreenX()
     {
         Minecraft mc = Minecraft.getInstance();
-        return this.renderX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
+        return this.renderX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth();
     }
 
     /**
@@ -140,7 +145,7 @@ public final class VirtualCursor
     public double getRenderScreenY()
     {
         Minecraft mc = Minecraft.getInstance();
-        return this.renderY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
+        return this.renderY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight();
     }
 
     /**
@@ -204,6 +209,11 @@ public final class VirtualCursor
         }
     }
 
+    /**
+     * Updates the rendering position of the cursor
+     *
+     * @param tracker the current delta tracker instance
+     */
     private void updateRenderPosition(DeltaTracker tracker)
     {
         // Skip updating if no screen
@@ -249,11 +259,16 @@ public final class VirtualCursor
         Minecraft mc = Minecraft.getInstance();
         if(mc.screen != null)
             return;
-        this.renderX = this.x = this.prevX = mc.getWindow().getWidth() / 2;
-        this.renderY = this.y = this.prevY = mc.getWindow().getHeight() / 2;
+        this.renderX = this.x = this.prevX = mc.getWindow().getScreenWidth() / 2;
+        this.renderY = this.y = this.prevY = mc.getWindow().getScreenHeight() / 2;
         this.setVisible(true);
     }
 
+    /**
+     * Updates the input vector, which is read from the controller thumbsticks
+     *
+     * @param controller the controller instance to read the input from
+     */
     private void updateInputVector(Controller controller)
     {
         float moveThreshold = 0.35F; // TODO change to config option
@@ -271,20 +286,35 @@ public final class VirtualCursor
     private void clampCursorToWindowBounds()
     {
         Minecraft mc = Minecraft.getInstance();
-        this.x = Math.max(0, Math.min(this.x, mc.getWindow().getWidth()));
-        this.y = Math.max(0, Math.min(this.y, mc.getWindow().getHeight()));
+        this.x = Math.max(0, Math.min(this.x, mc.getWindow().getScreenWidth()));
+        this.y = Math.max(0, Math.min(this.y, mc.getWindow().getScreenHeight()));
     }
 
+    /**
+     * Gets the x input from the thumbstick assigned for controlling the cursor
+     *
+     * @param controller the controller instance to read the input from
+     * @return a float ranging from -1 to 1
+     */
     private float getCursorThumbstickX(Controller controller)
     {
         return Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickXValue() : controller.getRThumbStickXValue();
     }
 
+    /**
+     * Gets the y input from the thumbstick assigned for controlling the cursor
+     *
+     * @param controller the controller instance to read the input from
+     * @return a float ranging from -1 to 1
+     */
     private float getCursorThumbstickY(Controller controller)
     {
         return Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickYValue() : controller.getRThumbStickYValue();
     }
 
+    /**
+     * @return True if the cursor is hovering a container slot
+     */
     private boolean isHoveringContainerSlot()
     {
         Minecraft mc = Minecraft.getInstance();
@@ -295,14 +325,17 @@ public final class VirtualCursor
         return false;
     }
 
+    /**
+     * @return True if the cursor is hovering an event listener (e.g. a button)
+     */
     private boolean isHoveringEventListener()
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.screen == null)
             return false;
-        // Convert to position to screen space
-        double cursorScreenX = this.x * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
-        double cursorScreenY = this.y * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
+        // Convert the position to screen space before passing off
+        double cursorScreenX = this.x * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth();
+        double cursorScreenY = this.y * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight();
         return ScreenHelper.findHoveredEventListenerExcludeList(mc.screen, cursorScreenX, cursorScreenY).isPresent();
     }
 
@@ -321,6 +354,10 @@ public final class VirtualCursor
         this.renderY = this.prevY = this.y;
     }
 
+    /**
+     * Snaps the cursor to center of the currently hovered container slot, only if the slot has an
+     * item or the cursor is currently carrying an item.
+     */
     private void snapToContainerSlot()
     {
         Minecraft mc = Minecraft.getInstance();
