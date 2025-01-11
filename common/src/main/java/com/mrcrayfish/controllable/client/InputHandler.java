@@ -98,10 +98,6 @@ public class InputHandler
 {
     private static final ResourceLocation RECIPE_BUTTON_LOCATION = ResourceLocation.withDefaultNamespace("textures/gui/recipe_button.png");
 
-    private Slot nearSlot = null;
-    private boolean moving = false;
-    private boolean moved;
-
     private long lastMerchantScroll;
     private int dropCounter = -1;
 
@@ -110,18 +106,6 @@ public class InputHandler
         TickEvents.START_CLIENT.register(this::onClientTick);
         TickEvents.START_CLIENT.register(this::onClientTickStart);
         TickEvents.END_RENDER.register(this::onRenderTickEnd);
-        ScreenEvents.OPENED.register(this::onScreenOpened);
-        ScreenEvents.BEFORE_DRAW.register(this::onScreenRenderPre);
-    }
-
-    public boolean isMovingCursor()
-    {
-        return this.moving;
-    }
-
-    public Slot getNearSlot()
-    {
-        return this.nearSlot;
     }
 
     private void onClientTick()
@@ -137,64 +121,9 @@ public class InputHandler
         }
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.screen == null || mc.screen instanceof ControllerLayoutScreen)
-            return;
-
-        // TODO figure out "moved"
-        /*if(Math.abs(this.cursorSpeedX) > 0F || Math.abs(this.cursorSpeedY) > 0F)
-        {
-            this.moved = true;
-        }*/
-
-        this.moveCursorToClosestSlot(this.moving, mc.screen);
-
         if(mc.screen instanceof CreativeModeInventoryScreen)
         {
             this.handleCreativeScrolling((CreativeModeInventoryScreen) mc.screen, controller);
-        }
-    }
-
-    private void onScreenOpened(Screen screen)
-    {
-        Minecraft mc = Minecraft.getInstance();
-        if(mc.screen == null)
-        {
-            this.nearSlot = null;
-            this.moved = false;
-        }
-    }
-
-    private void onScreenRenderPre(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
-    {
-        Minecraft mc = Minecraft.getInstance();
-        this.nearSlot = null;
-        if(mc.screen instanceof AbstractContainerScreen<?> containerScreen && this.moved)
-        {
-            /*int guiLeft = ClientServices.CLIENT.getScreenLeft(containerScreen);
-            int guiTop = ClientServices.CLIENT.getScreenTop(containerScreen);
-            double guiScale = mc.getWindow().getGuiScale();
-            int cursorX = (int) (this.cursorX / guiScale);
-            int cursorY = (int) (this.cursorY / guiScale);
-
-            *//* Finds the closest slot in the GUI within 14 pixels (inclusive) *//*
-            Slot closestSlot = null;
-            double closestDistance = -1.0;
-            for(Slot slot : containerScreen.getMenu().slots)
-            {
-                int posX = guiLeft + slot.x + 8;
-                int posY = guiTop + slot.y + 8;
-                double distance = Math.sqrt(Math.pow(posX - cursorX, 2) + Math.pow(posY - cursorY, 2));
-                if((closestDistance == -1.0 || distance < closestDistance) && distance <= 14.0)
-                {
-                    closestSlot = slot;
-                    closestDistance = distance;
-                }
-            }
-
-            if(closestSlot != null && (closestSlot.hasItem() || !containerScreen.getMenu().getCarried().isEmpty()))
-            {
-                this.nearSlot = closestSlot;
-            }*/
         }
     }
 
@@ -752,7 +681,6 @@ public class InputHandler
                 }
                 MouseHooks.invokeMouseMoved(screen, windowPointX, windowPointY, windowPointX - targetCursorX, windowPointY - targetCursorY);
                 cursor.setVisible(!targetPoint.shouldHide());
-                this.moved = true;
             });
         }
     }
@@ -999,61 +927,6 @@ public class InputHandler
                 MouseHooks.invokeMouseReleased(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
             }
         }
-    }
-
-    private void moveCursorToClosestSlot(boolean moving, Screen screen)
-    {
-        /* Makes the mouse attracted to slots. This helps with selecting items when using
-         * a controller. */
-        /*if(screen instanceof AbstractContainerScreen<?> containerScreen)
-        {
-            *//* Prevents cursor from moving until at least some input is detected *//*
-            if(!this.moved)
-                return;
-
-            if(this.nearSlot != null)
-            {
-                Minecraft mc = Minecraft.getInstance();
-                int guiLeft = ClientServices.CLIENT.getScreenLeft(containerScreen);
-                int guiTop = ClientServices.CLIENT.getScreenTop(containerScreen);
-                double guiScale = mc.getWindow().getGuiScale();
-                int slotCenterXScaled = guiLeft + this.nearSlot.x + 8;
-                int slotCenterYScaled = guiTop + this.nearSlot.y + 8;
-                int slotCenterX = (int) (slotCenterXScaled * guiScale);
-                int slotCenterY = (int) (slotCenterYScaled * guiScale);
-                double deltaX = slotCenterX - this.cursorX;
-                double deltaY = slotCenterY - this.cursorY;
-
-                if(!moving)
-                {
-                    if(deltaX > 0.05 || deltaY > 0.05)
-                    {
-                        this.cursorX += deltaX * 0.9;
-                        this.cursorY += deltaY * 0.9;
-                    }
-                    else
-                    {
-                        this.cursorX = slotCenterX;
-                        this.cursorY = slotCenterY;
-                        this.cursorSpeedX = 0.0F;
-                        this.cursorSpeedY = 0.0F;
-                    }
-                }
-
-                this.cursorSpeedX *= 0.75F;
-                this.cursorSpeedY *= 0.75F;
-            }
-            else
-            {
-                this.cursorSpeedX = 0.0F;
-                this.cursorSpeedY = 0.0F;
-            }
-        }
-        else
-        {
-            this.cursorSpeedX = 0.0F;
-            this.cursorSpeedY = 0.0F;
-        }*/
     }
 
     private void handleCreativeScrolling(CreativeModeInventoryScreen screen, Controller controller)

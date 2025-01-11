@@ -17,6 +17,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Vector2f;
 
@@ -35,6 +36,7 @@ public final class VirtualCursor
     private double renderX;
     private double renderY;
     private boolean visible;
+    private boolean snapIfNoMove;
     private boolean initialized;
 
     @ApiStatus.Internal
@@ -186,11 +188,19 @@ public final class VirtualCursor
             // Update the last input time of this controller
             controller.updateInputTime();
 
-            // Send moved event to screens
-            if(this.x != this.prevX || this.y != this.prevY)
-            {
-                MouseHooks.invokeMouseMoved(mc.screen, this.x, this.y, this.x - this.prevX, this.y - this.prevY);
-            }
+            // Let the next update know to try snapping if no input detected
+            this.snapIfNoMove = true;
+        }
+        else if(this.snapIfNoMove)
+        {
+            this.snapToContainerSlot();
+            this.snapIfNoMove = false;
+        }
+
+        // Send moved event to screens
+        if(this.x != this.prevX || this.y != this.prevY)
+        {
+            MouseHooks.invokeMouseMoved(mc.screen, this.x, this.y, this.x - this.prevX, this.y - this.prevY);
         }
     }
 
@@ -309,5 +319,24 @@ public final class VirtualCursor
         this.clampCursorToWindowBounds();
         this.renderX = this.prevX = this.x;
         this.renderY = this.prevY = this.y;
+    }
+
+    private void snapToContainerSlot()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.player != null && mc.screen instanceof AbstractContainerScreen<?> screen)
+        {
+            Slot slot = ClientServices.CLIENT.getSlotUnderMouse(screen);
+            if(slot != null && slot.isActive() && (slot.hasItem() || !screen.getMenu().getCarried().isEmpty()))
+            {
+                int slotX = ClientServices.CLIENT.getScreenLeft(screen) + slot.x + 8;
+                int slotY = ClientServices.CLIENT.getScreenTop(screen) + slot.y + 8;
+                slotX *= (int) mc.getWindow().getGuiScale();
+                slotY *= (int) mc.getWindow().getGuiScale();
+                this.x = slotX;
+                this.y = slotY;
+                this.clampCursorToWindowBounds();
+            }
+        }
     }
 }

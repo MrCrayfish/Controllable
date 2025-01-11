@@ -21,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.Slot;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -48,6 +49,7 @@ public interface IClientHelper
 
     int getMinecraftFramerateLimit();
 
+    @Nullable
     Slot getSlotUnderMouse(AbstractContainerScreen<?> screen);
 
     int getAbstractListTop(AbstractSelectionList<?> list);
