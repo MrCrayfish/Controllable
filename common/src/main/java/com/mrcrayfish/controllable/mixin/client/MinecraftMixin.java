@@ -44,6 +44,7 @@ public class MinecraftMixin
         Controller controller = Controllable.getController();
         if(controller != null && controller.isBeingUsed() && ButtonBindings.ATTACK.isButtonDown())
         {
+            controller.updateInputTime();
             return true;
         }
         return original;
@@ -58,6 +59,7 @@ public class MinecraftMixin
         Controller controller = Controllable.getController();
         if(controller != null && controller.isBeingUsed() && ButtonBindings.USE_ITEM.isButtonDown())
         {
+            controller.updateInputTime();
             return true;
         }
         return original;

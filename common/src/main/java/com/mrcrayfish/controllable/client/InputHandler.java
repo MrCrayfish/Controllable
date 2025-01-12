@@ -114,12 +114,6 @@ public class InputHandler
         if(controller == null)
             return;
 
-        /* If the player is mining a block, actively mark the controller as "in use" */
-        if((Math.abs(controller.getLTriggerValue()) > 0.0F || Math.abs(controller.getRTriggerValue()) > 0.0F) && !(Minecraft.getInstance().screen instanceof ControllerLayoutScreen))
-        {
-            controller.updateInputTime();
-        }
-
         Minecraft mc = Minecraft.getInstance();
         if(mc.screen instanceof CreativeModeInventoryScreen)
         {
