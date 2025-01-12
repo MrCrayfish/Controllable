@@ -53,14 +53,20 @@ public class ScrollingHandler
         }
     }
 
+    /**
+     * Reset the last scroll time to ensure scrolls can happen straight away
+     *
+     * @param screen the screen that is being opened
+     */
     private void onScreenOpened(Screen screen)
     {
         this.lastScrollTime = 0;
     }
 
     /**
+     * Handles scrolling input to screens
      *
-     * @param tracker
+     * @param tracker a delta tracker instance for rendering
      */
     private void scrollScreensWithLists(DeltaTracker tracker)
     {
@@ -122,9 +128,11 @@ public class ScrollingHandler
     }
 
     /**
+     * Gets the time interval to wait between scrolling. Since scrolling is handled during the
+     * rendering of a frame, to not scroll too fast, scrolling is based on time intervals.
      *
-     * @param screen
-     * @return
+     * @param screen the screen to get the specific interval
+     * @return a long value of the time interval in millis
      */
     private long getScrollIntervalInMillis(Screen screen)
     {
