@@ -15,27 +15,19 @@ import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.client.settings.AnalogMovement;
-import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.EventHelper;
 import com.mrcrayfish.controllable.client.util.MouseHooks;
-import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.event.Value;
 import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import com.mrcrayfish.controllable.platform.ClientServices;
-import com.mrcrayfish.framework.api.event.ClientEvents;
-import com.mrcrayfish.framework.api.event.ScreenEvents;
 import com.mrcrayfish.framework.api.event.TickEvents;
-import net.minecraft.Util;
 import net.minecraft.client.CameraType;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -52,7 +44,6 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
-import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
@@ -60,8 +51,6 @@ import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
-import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
@@ -70,11 +59,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.StonecutterMenu;
@@ -98,56 +84,11 @@ public class InputHandler
 {
     private static final ResourceLocation RECIPE_BUTTON_LOCATION = ResourceLocation.withDefaultNamespace("textures/gui/recipe_button.png");
 
-    private long lastMerchantScroll;
     private int dropCounter = -1;
 
     public InputHandler()
     {
-        TickEvents.START_CLIENT.register(this::onClientTick);
         TickEvents.START_CLIENT.register(this::onClientTickStart);
-        TickEvents.END_RENDER.register(this::onRenderTickEnd);
-    }
-
-    private void onClientTick()
-    {
-        Controller controller = Controllable.getController();
-        if(controller == null)
-            return;
-
-        Minecraft mc = Minecraft.getInstance();
-        if(mc.screen instanceof CreativeModeInventoryScreen)
-        {
-            this.handleCreativeScrolling((CreativeModeInventoryScreen) mc.screen, controller);
-        }
-    }
-
-    private void onRenderTickEnd(DeltaTracker tracker)
-    {
-        Controller controller = Controllable.getController();
-        if(controller == null)
-            return;
-
-        Minecraft mc = Minecraft.getInstance();
-        if(mc.screen != null && controller.isBeingUsed())
-        {
-            if(mc.screen instanceof MerchantScreen screen)
-            {
-                this.handleMerchantScrolling(screen, controller);
-                return;
-            }
-
-            float yValue = Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
-            if(Math.abs(yValue) >= 0.2F)
-            {
-                double cursorX = Controllable.getCursor().getRenderScreenX();
-                double cursorY = Controllable.getCursor().getRenderScreenY();
-                GuiEventListener hoveredListener = ScreenHelper.findHoveredListener(mc.screen, cursorX, cursorY, listener -> listener instanceof AbstractSelectionList<?>).orElse(null);
-                if(hoveredListener instanceof AbstractSelectionList<?> selectionList)
-                {
-                    this.handleListScrolling(selectionList, controller);
-                }
-            }
-        }
     }
 
     private void onClientTickStart()
@@ -395,12 +336,12 @@ public class InputHandler
                     }
                     else if(mc.screen instanceof CreativeModeInventoryScreen)
                     {
-                        this.scrollCreativeTabs((CreativeModeInventoryScreen) mc.screen, 1);
+                        this.navigateCreativeTabs((CreativeModeInventoryScreen) mc.screen, 1);
                         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                     }
                     else if(mc.screen instanceof RecipeUpdateListener listener)
                     {
-                        this.scrollRecipePage(listener.getRecipeBookComponent(), 1);
+                        this.navigateRecipePage(listener.getRecipeBookComponent(), 1);
                     }
                 }
                 else if(ButtonBindings.NEXT_CREATIVE_TAB.isButtonPressed())
@@ -411,26 +352,26 @@ public class InputHandler
                     }
                     else if(mc.screen instanceof CreativeModeInventoryScreen)
                     {
-                        this.scrollCreativeTabs((CreativeModeInventoryScreen) mc.screen, -1);
+                        this.navigateCreativeTabs((CreativeModeInventoryScreen) mc.screen, -1);
                         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                     }
                     else if(mc.screen instanceof RecipeUpdateListener listener)
                     {
-                        this.scrollRecipePage(listener.getRecipeBookComponent(), -1);
+                        this.navigateRecipePage(listener.getRecipeBookComponent(), -1);
                     }
                 }
                 else if(ButtonBindings.NEXT_RECIPE_TAB.isButtonPressed())
                 {
                     if(mc.screen instanceof RecipeUpdateListener listener)
                     {
-                        this.scrollRecipeTab(listener.getRecipeBookComponent(), -1);
+                        this.navigateRecipeTab(listener.getRecipeBookComponent(), -1);
                     }
                 }
                 else if(ButtonBindings.PREVIOUS_RECIPE_TAB.isButtonPressed())
                 {
                     if(mc.screen instanceof RecipeUpdateListener listener)
                     {
-                        this.scrollRecipeTab(listener.getRecipeBookComponent(), 1);
+                        this.navigateRecipeTab(listener.getRecipeBookComponent(), 1);
                     }
                 }
                 else if(ButtonBindings.TOGGLE_CRAFT_BOOK.isButtonPressed())
@@ -539,12 +480,12 @@ public class InputHandler
         }
     }
 
-    private void scrollCreativeTabs(CreativeModeInventoryScreen screen, int dir)
+    private void navigateCreativeTabs(CreativeModeInventoryScreen screen, int dir)
     {
         ClientServices.CLIENT.scrollCreativeTabs(screen, dir);
     }
 
-    private void scrollRecipeTab(RecipeBookComponent recipeBook, int dir)
+    private void navigateRecipeTab(RecipeBookComponent recipeBook, int dir)
     {
         if(!recipeBook.isVisible())
             return;
@@ -585,7 +526,7 @@ public class InputHandler
         }
     }
 
-    private void scrollRecipePage(RecipeBookComponent recipeBook, int dir)
+    private void navigateRecipePage(RecipeBookComponent recipeBook, int dir)
     {
         if(!recipeBook.isVisible())
             return;
@@ -920,66 +861,6 @@ public class InputHandler
             {
                 MouseHooks.invokeMouseReleased(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
             }
-        }
-    }
-
-    private void handleCreativeScrolling(CreativeModeInventoryScreen screen, Controller controller)
-    {
-        int i = (screen.getMenu().items.size() + 9 - 1) / 9 - 5;
-        int dir = 0;
-
-        if(controller.getRThumbStickYValue() <= -0.8F)
-        {
-            dir = 1;
-        }
-        else if(controller.getRThumbStickYValue() >= 0.8F)
-        {
-            dir = -1;
-        }
-
-        float currentScroll = ClientServices.CLIENT.getCreativeScrollOffset(screen);
-        currentScroll = (float) ((double) currentScroll - (double) dir / (double) i);
-        currentScroll = Mth.clamp(currentScroll, 0.0F, 1.0F);
-        ClientServices.CLIENT.setCreativeScrollOffset(screen, currentScroll);
-        screen.getMenu().scrollTo(currentScroll);
-    }
-
-    private void handleListScrolling(AbstractSelectionList<?> list, Controller controller)
-    {
-        double dir = 0;
-        float yValue = Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
-        if(Math.abs(yValue) >= 0.2F)
-        {
-            controller.updateInputTime();
-            dir = yValue;
-        }
-        // TODO test list scroling
-        dir *= Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
-        list.setScrollAmount(list.getScrollAmount() + dir * Config.CLIENT.options.listScrollSpeed.get());
-    }
-
-    private void handleMerchantScrolling(MerchantScreen screen, Controller controller)
-    {
-        double dir = 0;
-        float yValue = Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
-        if(Math.abs(yValue) >= 0.5F)
-        {
-            controller.updateInputTime();
-            dir = -yValue;
-        }
-        else
-        {
-            // Do this to allow thumbstick to be tap up or down
-            this.lastMerchantScroll = 0;
-        }
-        long scrollTime = Util.getMillis();
-        if(dir != 0 && scrollTime - this.lastMerchantScroll >= 150)
-        {
-            // TODO test merchant scrolling
-            int screenCursorX = Controllable.getCursor().getScreenX();
-            int screenCursorY = Controllable.getCursor().getScreenY();
-            screen.mouseScrolled(screenCursorX, screenCursorY, 0, Math.signum(dir));
-            this.lastMerchantScroll = scrollTime;
         }
     }
 

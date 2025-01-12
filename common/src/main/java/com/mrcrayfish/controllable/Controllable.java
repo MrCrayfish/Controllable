@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.client.ControllerProperties;
 import com.mrcrayfish.controllable.client.InputProcessor;
 import com.mrcrayfish.controllable.client.MovementHandler;
 import com.mrcrayfish.controllable.client.RadialMenu;
+import com.mrcrayfish.controllable.client.ScrollingHandler;
 import com.mrcrayfish.controllable.client.VirtualCursor;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
@@ -25,6 +26,7 @@ public class Controllable
     private static final CameraHandler CAMERA_HANDLER = new CameraHandler();
     private static final RadialMenu RADIAL_MENU = new RadialMenu();
     private static final MovementHandler MOVEMENT_HANDLER = new MovementHandler();
+    private static final ScrollingHandler SCROLLING_HANDLER = new ScrollingHandler();
 
     private static final boolean JEI_LOADED = Utils.isModLoaded("jei");
 
@@ -37,6 +39,7 @@ public class Controllable
         CAMERA_HANDLER.registerEvents();
         RADIAL_MENU.registerEvents();
         MOVEMENT_HANDLER.registerEvents();
+        SCROLLING_HANDLER.registerEvents();
     }
 
     public static VirtualCursor getCursor()
