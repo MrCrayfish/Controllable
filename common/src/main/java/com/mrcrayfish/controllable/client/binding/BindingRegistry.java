@@ -4,12 +4,17 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.MoreFiles;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.GsonHelper;
 import org.apache.commons.lang3.StringUtils;
 
 import org.jetbrains.annotations.Nullable;
@@ -21,10 +26,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 /**
@@ -84,6 +92,8 @@ public class BindingRegistry
         }
         return instance;
     }
+
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final List<ButtonBinding> bindings = new ArrayList<>();
     private final Map<String, ButtonBinding> registeredBindings = new HashMap<>();
@@ -174,19 +184,18 @@ public class BindingRegistry
         try
         {
             // Load regular button bindings
-            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("bindings.properties");
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("bindings.json");
             MoreFiles.createParentDirectories(path);
             if(Files.exists(path))
             {
                 try(BufferedReader reader = Files.newBufferedReader(path))
                 {
-                    // TODO modernise with json
-                    Properties properties = new Properties();
-                    properties.load(reader);
+                    JsonObject adapters = GSON.fromJson(reader, JsonObject.class);
                     this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding -> {
-                        String name = properties.getProperty(binding.getDescription(), Buttons.getNameForButton(binding.getButton()));
-                        if(name != null) {
-                            binding.setButton(Buttons.getButtonFromName(name));
+                        String description = binding.getDescription();
+                        if(adapters.get(description) instanceof JsonPrimitive value && value.isString())
+                        {
+                            binding.setButton(Buttons.getButtonFromName(value.getAsString()));
                         }
                     });
                 }
@@ -203,7 +212,7 @@ public class BindingRegistry
 
         try
         {
-            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("key_adapters.properties");
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("key_adapters.json");
             MoreFiles.createParentDirectories(path);
             if(Files.exists(path))
             {
@@ -214,14 +223,13 @@ public class BindingRegistry
                     {
                         bindings.put(mapping.getName(), mapping);
                     }
-
-                    // TODO modernise with json
-                    Properties properties = new Properties();
-                    properties.load(reader);
-                    properties.forEach((key, value) -> {
-                        KeyMapping mapping = bindings.get(key.toString());
+                    JsonObject adapters = GSON.fromJson(reader, JsonObject.class);
+                    adapters.asMap().forEach((key, element) -> {
+                        if(!(element instanceof JsonPrimitive value) || !value.isString())
+                            return;
+                        KeyMapping mapping = bindings.get(key);
                         if(mapping != null) {
-                            int button = Buttons.getButtonFromName(StringUtils.defaultIfEmpty(value.toString(), ""));
+                            int button = Buttons.getButtonFromName(StringUtils.defaultIfEmpty(element.getAsString(), ""));
                             KeyAdapterBinding keyAdapter = new KeyAdapterBinding(button, mapping);
                             if(this.keyAdapters.putIfAbsent(keyAdapter.getDescription(), keyAdapter) == null) {
                                 this.bindings.add(keyAdapter);
@@ -250,34 +258,42 @@ public class BindingRegistry
     {
         try
         {
-            Properties properties = new Properties();
-            this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding -> {
-                String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
-                properties.put(binding.getDescription(), name);
-            });
-            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("bindings.properties");
+            JsonObject bindings = new JsonObject();
+            this.registeredBindings.values().stream()
+                .filter(ButtonBinding::isNotReserved)
+                .sorted(Comparator.comparing(ButtonBinding::getDescription))
+                .forEach(binding -> {
+                    String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
+                    bindings.addProperty(binding.getDescription(), name);
+                });
+            String json = GSON.toJson(bindings);
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("bindings.json");
             MoreFiles.createParentDirectories(path);
-            properties.store(Files.newOutputStream(path), "Button Bindings");
+            Files.writeString(path, json);
         }
         catch(IOException e)
         {
-            Constants.LOG.error("Failed to save bindings.properties", e);
+            Constants.LOG.error("Failed to save bindings.json", e);
         }
 
         try
         {
-            Properties properties = new Properties();
-            this.keyAdapters.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding -> {
-                String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
-                properties.put(binding.getKeyMapping().getName(), name);
-            });
-            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("key_adapters.properties");
+            JsonObject adapters = new JsonObject();
+            this.keyAdapters.values().stream()
+                .filter(ButtonBinding::isNotReserved)
+                .sorted(Comparator.comparing(ButtonBinding::getDescription))
+                .forEach(binding -> {
+                    String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
+                    adapters.addProperty(binding.getKeyMapping().getName(), name);
+                });
+            String json = GSON.toJson(adapters);
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("key_adapters.json");
             MoreFiles.createParentDirectories(path);
-            properties.store(Files.newOutputStream(path), "Key Adapters");
+            Files.writeString(path, json);
         }
         catch(IOException e)
         {
-            Constants.LOG.error("Failed to save key_adapters.properties", e);
+            Constants.LOG.error("Failed to save key_adapters.json", e);
         }
     }
 }
