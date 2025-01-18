@@ -1,9 +1,21 @@
 package com.mrcrayfish.controllable.client;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.api.client.binding.handlers.action.BindingMovementInput;
+import com.mrcrayfish.controllable.api.client.binding.handlers.action.BindingOnRender;
+import com.mrcrayfish.controllable.api.client.binding.handlers.action.BindingOnTick;
+import com.mrcrayfish.controllable.api.client.binding.handlers.action.BindingPressed;
+import com.mrcrayfish.controllable.api.client.binding.handlers.action.BindingReleased;
+import com.mrcrayfish.controllable.api.client.binding.handlers.ButtonHandler;
+import com.mrcrayfish.controllable.api.client.binding.handlers.action.context.Context;
+import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.api.client.binding.handlers.action.context.MovementInputContext;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
+import com.mrcrayfish.controllable.client.binding.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.ListEntryNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.ListWidgetNavigationPoint;
@@ -12,22 +24,21 @@ import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
 import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
-import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
-import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.settings.AnalogMovement;
+import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.EventHelper;
 import com.mrcrayfish.controllable.client.util.MouseHooks;
 import com.mrcrayfish.controllable.event.ControllerEvents;
-import com.mrcrayfish.controllable.event.Value;
 import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import com.mrcrayfish.controllable.platform.ClientServices;
+import com.mrcrayfish.framework.api.event.ClientEvents;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -36,13 +47,10 @@ import net.minecraft.client.gui.components.TabButton;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
-import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
@@ -51,20 +59,21 @@ import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.StonecutterMenu;
 import net.minecraft.world.level.block.entity.BannerPattern;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
@@ -73,9 +82,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.BiFunction;
-
-//TODO this has become a big mess, and really needs to be organised
 
 /**
  * Author: MrCrayfish
@@ -83,52 +92,37 @@ import java.util.function.BiFunction;
 public class InputHandler
 {
     private static final ResourceLocation RECIPE_BUTTON_LOCATION = ResourceLocation.withDefaultNamespace("textures/gui/recipe_button.png");
+    private static InputHandler instance;
 
-    private int dropCounter = -1;
+    private final Multimap<Integer, PriorityHandler<BindingPressed>> pressHandlers = TreeMultimap.create();
+    private final Multimap<Integer, PriorityHandler<BindingReleased>> releaseHandlers = TreeMultimap.create();
+    private final Multimap<BindingOnTick.TickPhase, PriorityHandler<BindingOnTick>> tickHandlers = TreeMultimap.create();
+    private final Multimap<BindingOnRender.RenderPhase, PriorityHandler<BindingOnRender>> renderHandlers = TreeMultimap.create();
+    private final Set<PriorityHandler<BindingMovementInput>> movementInputHandlers = new TreeSet<>();
+    private boolean initialized;
 
+    @ApiStatus.Internal
     public InputHandler()
     {
-        TickEvents.START_CLIENT.register(this::onClientTickStart);
+        Preconditions.checkState(instance == null, "Only one instance of InputHandler is allowed");
+        instance = this;
     }
 
-    private void onClientTickStart()
+    @ApiStatus.Internal
+    public void registerEvents()
     {
-        Minecraft mc = Minecraft.getInstance();
-        Player player = mc.player;
-        if(player == null)
-            return;
-
-        Controller controller = Controllable.getController();
-        if(controller == null)
-            return;
-
-        if(mc.screen == null)
+        if(!this.initialized)
         {
-            if(ButtonBindings.DROP_ITEM.isButtonDown())
-            {
-                controller.updateInputTime();
-                this.dropCounter++;
-            }
-        }
-
-        if(this.dropCounter > 20)
-        {
-            if (!mc.player.isSpectator())
-            {
-                mc.player.drop(true);
-            }
-            this.dropCounter = 0;
-        }
-        else if(this.dropCounter > 0 && !ButtonBindings.DROP_ITEM.isButtonDown())
-        {
-            if (!mc.player.isSpectator())
-            {
-                mc.player.drop(false);
-            }
-            this.dropCounter = 0;
+            TickEvents.START_CLIENT.register(this::onStartClickTick);
+            TickEvents.END_CLIENT.register(this::onEndClickTick);
+            TickEvents.START_PLAYER.register(this::onStartPlayerTick);
+            TickEvents.END_PLAYER.register(this::onEndPlayerTick);
+            ClientEvents.PLAYER_INPUT_UPDATE.register(this::updateInput);
+            this.initialized = true;
         }
     }
 
+    @ApiStatus.Internal
     public void handleButtonInput(Controller controller, int button, boolean state, boolean virtual)
     {
         if(controller == null)
@@ -136,334 +130,196 @@ public class InputHandler
 
         controller.updateInputTime();
 
-        /* We don't send event for buttons that are not bound.
-         * This can happen when using the radial menu. */
-        if(button != -1)
-        {
-            Value<Integer> newButton = new Value<>(button);
-            if(EventHelper.postInputEvent(controller, newButton, button, state))
-                return;
-
-            button = newButton.get();
-            ButtonBinding.setButtonState(button, state);
-        }
-
-        if(EventHelper.postButtonEvent(controller))
-            return;
-
-        Minecraft mc = Minecraft.getInstance();
         if(state)
         {
-            if(ButtonBindings.FULLSCREEN.isButtonPressed())
+            for(PriorityHandler<BindingPressed> handler : this.pressHandlers.get(button))
             {
-                mc.getWindow().toggleFullScreen();
-                mc.options.fullscreen().set(mc.getWindow().isFullscreen());
-                mc.options.save();
-            }
-            else if(ButtonBindings.SCREENSHOT.isButtonPressed())
-            {
-                if(mc.level != null)
-                {
-                    Screenshot.grab(mc.gameDirectory, mc.getMainRenderTarget(), (component) -> {
-                        mc.execute(() -> mc.gui.getChat().addMessage(component));
-                    });
-                }
-            }
-            else if(mc.screen == null)
-            {
-                if(ButtonBindings.OPEN_INVENTORY.isButtonPressed() && mc.gameMode != null && mc.player != null)
-                {
-                    if(mc.gameMode.isServerControlledInventory())
-                    {
-                        mc.player.sendOpenInventory();
-                    }
-                    else
-                    {
-                        mc.getTutorial().onOpenInventory();
-                        mc.setScreen(new InventoryScreen(mc.player));
-                    }
-                }
-                else if(ButtonBindings.SPRINT.isButtonPressed())
-                {
-                    if(mc.player != null)
-                    {
-                        LocalPlayer player = mc.player;
-                        boolean canSprint = !player.isSprinting() && !player.hasEffect(MobEffects.BLINDNESS);
-                        boolean hasRequiredFood = (float) player.getFoodData().getFoodLevel() > 6.0F || player.getAbilities().mayfly;
-                        boolean hasImpulse = player.isUnderWater() ? player.input.hasForwardImpulse() : (double) player.input.forwardImpulse >= 0.8D;
-                        boolean canSwimInFluid = ClientServices.CLIENT.canLocalPlayerSwimInFluid(player);
-                        boolean usingItem = player.isUsingItem();
-                        if(canSprint && canSwimInFluid && hasImpulse && hasRequiredFood && !usingItem)
-                        {
-                            player.setSprinting(true);
-                        }
-                    }
-                }
-                else if(ButtonBindings.SNEAK.isButtonPressed())
-                {
-                    if(mc.options.toggleCrouch().get())
-                    {
-                        mc.options.keyShift.setDown(true);
-                    }
+                ButtonBinding binding = handler.binding();
+                if(!binding.getContext().isActive())
+                    continue;
 
-                    /*if(mc.player != null && !mc.player.getAbilities().flying && !mc.player.isPassenger())
-                    {
-                        if(mc.options.toggleCrouch().get())
-                        {
-                            MovementController movement = Controllable.getMovementController();
-                            movement.setSneaking(!movement.isSneaking());
-                            if(!movement.isSneaking() && mc.options.keyShift.isDown())
-                            {
-                                this.keyboardSneaking = false;
-                                mc.options.keyShift.setDown(true);
-                            }
-                            else if(this.sneaking && !mc.options.keyShift.isDown())
-                            {
-                                this.keyboardSneaking = true;
-                                mc.options.keyShift.setDown(true);
-                            }
-                        }
-                    }*/
-                }
-                else if(ButtonBindings.SCROLL_RIGHT.isButtonPressed())
-                {
-                    if(mc.player != null)
-                    {
-                        mc.player.getInventory().swapPaint(-1);
-                    }
-                }
-                else if(ButtonBindings.SCROLL_LEFT.isButtonPressed())
-                {
-                    if(mc.player != null)
-                    {
-                        mc.player.getInventory().swapPaint(1);
-                    }
-                }
-                else if(ButtonBindings.SWAP_HANDS.isButtonPressed())
-                {
-                    if(mc.player != null && !mc.player.isSpectator() && mc.getConnection() != null)
-                    {
-                        mc.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ZERO, Direction.DOWN));
-                    }
-                }
-                else if(ButtonBindings.TOGGLE_PERSPECTIVE.isButtonPressed())
-                {
-                    this.cycleThirdPersonView();
-                }
-                else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
-                {
-                    if(mc.player != null)
-                    {
-                        mc.pauseGame(false);
-                    }
-                }
-                else if(ButtonBindings.ADVANCEMENTS.isButtonPressed())
-                {
-                    if(mc.player != null)
-                    {
-                        mc.setScreen(new AdvancementsScreen(mc.player.connection.getAdvancements()));
-                    }
-                }
-                else if(ButtonBindings.CINEMATIC_CAMERA.isButtonPressed())
-                {
-                    if(mc.player != null)
-                    {
-                        mc.options.smoothCamera = !mc.options.smoothCamera;
-                    }
-                }
-                else if(ButtonBindings.DEBUG_INFO.isButtonPressed())
-                {
-                    mc.getDebugOverlay().toggleOverlay();
-                }
-                else if(ButtonBindings.RADIAL_MENU.isButtonPressed() && !virtual)
-                {
-                    Controllable.getRadialMenu().interact();
-                }
-                else if(mc.player != null)
-                {
-                    if(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS.isButtonPressed())
-                    {
-                        mc.setScreen(new SettingsScreen(null, 1));
-                        return;
-                    }
-                    else if(ButtonBindings.OPEN_CHAT.isButtonPressed())
-                    {
-                        ClientServices.CLIENT.openChatScreen("");
-                        return;
-                    }
+                Minecraft mc = Minecraft.getInstance();
+                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, virtual);
+                Optional<Runnable> action = handler.handler().createPressedHandler(context);
+                if(action.isEmpty())
+                    continue;
 
-                    for(int i = 0; i < 9; i++)
-                    {
-                        if(ButtonBindings.HOTBAR_SLOTS[i].isButtonPressed())
-                        {
-                            mc.player.getInventory().selected = i;
-                            return;
-                        }
-                    }
+                ButtonBinding.setButtonState(binding, true);
+                action.get().run();
 
-                    if(!mc.player.isUsingItem())
-                    {
-                        if(ButtonBindings.ATTACK.isButtonPressed())
-                        {
-                            ClientServices.CLIENT.startAttack(mc);
-                        }
-                        else if(ButtonBindings.USE_ITEM.isButtonPressed())
-                        {
-                            ClientServices.CLIENT.startUseItem(mc);
-                        }
-                        else if(ButtonBindings.PICK_BLOCK.isButtonPressed())
-                        {
-                            ClientServices.CLIENT.pickBlock(mc);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if(ButtonBindings.CLOSE_INVENTORY.isButtonPressed())
-                {
-                    if(mc.screen != null)
-                    {
-                        // Fake an escape press for best support
-                        mc.screen.keyPressed(GLFW.GLFW_KEY_ESCAPE, GLFW.glfwGetKeyScancode(GLFW.GLFW_KEY_ESCAPE), 0);
-                    }
-                }
-                else if(ButtonBindings.PREVIOUS_CREATIVE_TAB.isButtonPressed())
-                {
-                    if(mc.screen.children().stream().anyMatch(listener -> listener instanceof TabNavigationBar))
-                    {
-                        this.navigateTabBar(mc.screen, 1);
-                    }
-                    else if(mc.screen instanceof CreativeModeInventoryScreen)
-                    {
-                        this.navigateCreativeTabs((CreativeModeInventoryScreen) mc.screen, 1);
-                        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-                    }
-                    else if(mc.screen instanceof RecipeUpdateListener listener)
-                    {
-                        this.navigateRecipePage(listener.getRecipeBookComponent(), 1);
-                    }
-                }
-                else if(ButtonBindings.NEXT_CREATIVE_TAB.isButtonPressed())
-                {
-                    if(mc.screen.children().stream().anyMatch(listener -> listener instanceof TabNavigationBar))
-                    {
-                        this.navigateTabBar(mc.screen, -1);
-                    }
-                    else if(mc.screen instanceof CreativeModeInventoryScreen)
-                    {
-                        this.navigateCreativeTabs((CreativeModeInventoryScreen) mc.screen, -1);
-                        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-                    }
-                    else if(mc.screen instanceof RecipeUpdateListener listener)
-                    {
-                        this.navigateRecipePage(listener.getRecipeBookComponent(), -1);
-                    }
-                }
-                else if(ButtonBindings.NEXT_RECIPE_TAB.isButtonPressed())
-                {
-                    if(mc.screen instanceof RecipeUpdateListener listener)
-                    {
-                        this.navigateRecipeTab(listener.getRecipeBookComponent(), -1);
-                    }
-                }
-                else if(ButtonBindings.PREVIOUS_RECIPE_TAB.isButtonPressed())
-                {
-                    if(mc.screen instanceof RecipeUpdateListener listener)
-                    {
-                        this.navigateRecipeTab(listener.getRecipeBookComponent(), 1);
-                    }
-                }
-                else if(ButtonBindings.TOGGLE_CRAFT_BOOK.isButtonPressed())
-                {
-                    if(mc.screen instanceof RecipeUpdateListener listener)
-                    {
-                        // Since no reference to craft book button, instead search for it and invoke press.
-                        ClientServices.CLIENT.getScreenRenderables(mc.screen).stream().filter(widget -> {
-                            return widget instanceof ImageButton btn && RECIPE_BUTTON_LOCATION.equals(ClientServices.CLIENT.getImageButtonResource(btn));
-                        }).findFirst().ifPresent(btn -> ((Button) btn).onPress());
-                        boolean visible = listener.getRecipeBookComponent().isVisible();
-                        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, visible ? 1.0F : 0.95F));
-                    }
-                }
-                else if(ButtonBindings.PAUSE_GAME.isButtonPressed())
-                {
-                    if(mc.screen instanceof PauseScreen)
-                    {
-                        mc.setScreen(null);
-                    }
-                }
-                else if(ButtonBindings.NAVIGATE_UP.isButtonPressed())
-                {
-                    this.navigateCursor(mc.screen, Navigate.UP);
-                }
-                else if(ButtonBindings.NAVIGATE_DOWN.isButtonPressed())
-                {
-                    this.navigateCursor(mc.screen, Navigate.DOWN);
-                }
-                else if(ButtonBindings.NAVIGATE_LEFT.isButtonPressed())
-                {
-                    this.navigateCursor(mc.screen, Navigate.LEFT);
-                }
-                else if(ButtonBindings.NAVIGATE_RIGHT.isButtonPressed())
-                {
-                    this.navigateCursor(mc.screen, Navigate.RIGHT);
-                }
-                else if(button == ButtonBindings.PICKUP_ITEM.getButton())
-                {
-                    MouseHooks.invokeMouseClick(mc.screen, GLFW.GLFW_MOUSE_BUTTON_LEFT);
-
-                    // If invokeMouseClick closed the screen, and the button is the same as the jump
-                    // button, the player will jump as soon as the screen is closed. To prevent this,
-                    // the jump binding is simply unpressed.
-                    if(mc.screen == null)
-                    {
-                        if(ButtonBindings.JUMP.getButton() == ButtonBindings.PICKUP_ITEM.getButton())
-                        {
-                            ButtonBindings.JUMP.resetPressedState();
-                        }
-                    }
-
-                    if(Config.CLIENT.options.quickCraft.get())
-                    {
-                        this.craftRecipeBookItem();
-                    }
-                }
-                else if(button == ButtonBindings.SPLIT_STACK.getButton())
-                {
-                    MouseHooks.invokeMouseClick(mc.screen, GLFW.GLFW_MOUSE_BUTTON_RIGHT);
-                }
-                else if(button == ButtonBindings.QUICK_MOVE.getButton() && mc.player != null)
-                {
-                    if(mc.player.inventoryMenu.getCarried().isEmpty())
-                    {
-                        MouseHooks.invokeMouseClick(mc.screen, GLFW.GLFW_MOUSE_BUTTON_LEFT);
-                    }
-                    else
-                    {
-                        MouseHooks.invokeMouseReleased(mc.screen, GLFW.GLFW_MOUSE_BUTTON_RIGHT);
-                    }
-                }
+                if(handler.handler() instanceof BindingOnTick tick)
+                    this.tickHandlers.put(tick.phase(), new PriorityHandler<>(binding, tick));
+                if(handler.handler() instanceof BindingOnRender tick)
+                    this.renderHandlers.put(tick.phase(), new PriorityHandler<>(binding, tick));
+                if(handler.handler() instanceof BindingMovementInput input)
+                    this.movementInputHandlers.add(new PriorityHandler<>(binding, input));
+                break;
             }
         }
         else
         {
-            if(mc.screen == null)
+            /*
+             * If a binding has both a pressed and released handler, it has priority over bindings
+             * that exclusively have a released handler. We do this as we consider this is combined
+             * action and requires that the released handler is guaranteed to be called, and not
+             * prioritised by another binding's released handler.
+             */
+            for(PriorityHandler<BindingPressed> handler : this.pressHandlers.get(button))
             {
+                ButtonBinding binding = handler.binding();
+                if(!binding.isButtonDown())
+                    continue;
 
+                ButtonBinding.setButtonState(binding, false);
+
+                if(!(handler.handler() instanceof BindingReleased released))
+                    continue;
+
+                // Cancel the handler if context is no longer valid
+                if(!binding.getContext().isActive())
+                    break;
+
+                Minecraft mc = Minecraft.getInstance();
+                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, virtual);
+                released.handleReleased(context);
+                return;
             }
-            else
+
+            for(PriorityHandler<BindingReleased> handler : this.releaseHandlers.get(button))
             {
-                if(button == ButtonBindings.PICKUP_ITEM.getButton())
+                ButtonBinding binding = handler.binding();
+                if(!binding.getContext().isActive())
+                    continue;
+
+                ButtonBinding.setButtonState(binding, false);
+                Minecraft mc = Minecraft.getInstance();
+                Context context = new Context(handler.binding, controller, mc, mc.player, mc.level, mc.screen, virtual);
+                if(handler.handler().handleReleased(context))
+                    break;
+            }
+        }
+    }
+
+    private void onStartClickTick()
+    {
+        this.runTickHandler(BindingOnTick.TickPhase.START_CLIENT);
+    }
+
+    private void onEndClickTick()
+    {
+        this.runTickHandler(BindingOnTick.TickPhase.END_CLIENT);
+    }
+
+    private void onStartPlayerTick(Player player)
+    {
+        this.runTickHandler(BindingOnTick.TickPhase.START_PLAYER);
+    }
+
+    private void onEndPlayerTick(Player player)
+    {
+        this.runTickHandler(BindingOnTick.TickPhase.END_PLAYER);
+    }
+
+    private void runTickHandler(BindingOnTick.TickPhase type)
+    {
+        Minecraft mc = Minecraft.getInstance();
+        Controller controller = Controllable.getController();
+        this.tickHandlers.get(type).removeIf(handler -> {
+            if(controller == null)
+                return true;
+            ButtonBinding binding = handler.binding();
+            if(!binding.isButtonDown() || !binding.getContext().isActive())
+                return true;
+            Context context = new Context(handler.binding, controller, mc, mc.player, mc.level, mc.screen, false);
+            handler.handler().handleTick(context);
+            return false;
+        });
+    }
+
+    private void updateInput(Player player, Input input)
+    {
+        LocalPlayer localPlayer = (LocalPlayer) player;
+        if(localPlayer == null)
+            return;
+
+        Minecraft mc = Minecraft.getInstance();
+        Controller controller = Controllable.getController();
+        this.movementInputHandlers.removeIf(handler -> {
+            if(controller == null)
+                return true;
+            ButtonBinding binding = handler.binding();
+            if(!binding.isButtonDown() || !binding.getContext().isActive())
+                return true;
+            MovementInputContext context = new MovementInputContext(handler.binding, controller, mc, mc.player, mc.level, mc.screen, false, input);
+            handler.handler().handleMovementInput(context);
+            return false;
+        });
+
+        if(mc.screen == null && controller != null)
+        {
+            if((!Controllable.getRadialMenu().isVisible() || Config.CLIENT.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent())
+            {
+                float sneakSpeed = (float) localPlayer.getAttributeValue(Attributes.SNEAKING_SPEED);
+                float sneakBonus = localPlayer.isMovingSlowly() ? sneakSpeed : 1.0F;
+                float inputX = controller.getLThumbStickXValue();
+                float inputY = controller.getLThumbStickYValue();
+
+                AnalogMovement movement = Config.CLIENT.options.analogMovement.get();
+                if(movement != AnalogMovement.ALWAYS)
                 {
-                    MouseHooks.invokeMouseReleased(mc.screen, 0);
+                    ServerData data = mc.getCurrentServer();
+                    if(movement != AnalogMovement.LOCAL_ONLY || data != null && data.type() == ServerData.Type.OTHER)
+                    {
+                        inputX = Math.abs(inputX) >= 0.5F ? Math.signum(inputX) : 0;
+                        inputY = Math.abs(inputY) >= 0.5F ? Math.signum(inputY) : 0;
+                    }
                 }
-                else if(button == ButtonBindings.SPLIT_STACK.getButton())
+
+                if(Math.abs(inputY) > 0)
                 {
-                    MouseHooks.invokeMouseReleased(mc.screen, 1);
+                    input.up = inputY < 0;
+                    input.down = inputY > 0;
+                    input.forwardImpulse = -inputY;
+                    input.forwardImpulse *= sneakBonus;
+                    controller.updateInputTime();
+                }
+
+                float threshold = localPlayer.getVehicle() instanceof Boat ? 0.5F : 0;
+                if(Math.abs(inputX) > threshold)
+                {
+                    input.right = inputX > 0;
+                    input.left = inputX < 0;
+                    input.leftImpulse = -inputX;
+                    input.leftImpulse *= sneakBonus;
+                    controller.updateInputTime();
                 }
             }
         }
+    }
+
+    public static void navigateToHotbarSlot(Context context, int index)
+    {
+        if(context.screen().isEmpty()) {
+            context.player().ifPresent(player -> {
+                player.getInventory().selected = index;
+            });
+        }
+    }
+
+    public static void toggleCraftBook(Context context)
+    {
+        context.screen().ifPresent(screen -> {
+            if(screen instanceof RecipeUpdateListener listener) {
+                // Since no reference to craft book button, instead search for it and invoke press.
+                ClientServices.CLIENT.getScreenRenderables(screen).stream().filter(widget -> {
+                    return widget instanceof ImageButton btn && RECIPE_BUTTON_LOCATION.equals(ClientServices.CLIENT.getImageButtonResource(btn));
+                }).findFirst().ifPresent(btn -> ((Button) btn).onPress());
+                boolean visible = listener.getRecipeBookComponent().isVisible();
+                Minecraft.getInstance()
+                    .getSoundManager()
+                    .play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, visible ? 1.0F : 0.95F));
+            }
+        });
     }
 
     /**
@@ -480,12 +336,12 @@ public class InputHandler
         }
     }
 
-    private void navigateCreativeTabs(CreativeModeInventoryScreen screen, int dir)
+    public static void navigateCreativeTabs(CreativeModeInventoryScreen screen, int dir)
     {
         ClientServices.CLIENT.scrollCreativeTabs(screen, dir);
     }
 
-    private void navigateRecipeTab(RecipeBookComponent recipeBook, int dir)
+    public static void navigateRecipeTab(RecipeBookComponent recipeBook, int dir)
     {
         if(!recipeBook.isVisible())
             return;
@@ -526,7 +382,7 @@ public class InputHandler
         }
     }
 
-    private void navigateRecipePage(RecipeBookComponent recipeBook, int dir)
+    public static void navigateRecipePage(RecipeBookComponent recipeBook, int dir)
     {
         if(!recipeBook.isVisible())
             return;
@@ -540,7 +396,7 @@ public class InputHandler
         }
     }
 
-    private void navigateTabBar(Screen screen, int dir)
+    public static void navigateTabBar(Screen screen, int direction)
     {
         TabNavigationBar bar = screen.children().stream().filter(listener -> listener instanceof TabNavigationBar).map(listener -> (TabNavigationBar) listener).findFirst().orElse(null);
         if(bar != null)
@@ -556,7 +412,7 @@ public class InputHandler
             int selectedIndex = buttons.stream().filter(TabButton::isSelected).map(buttons::indexOf).findFirst().orElse(-1);
             if(selectedIndex != -1)
             {
-                int newIndex = selectedIndex + dir;
+                int newIndex = selectedIndex + direction;
                 if(newIndex >= 0 && newIndex < buttons.size())
                 {
                     bar.selectTab(newIndex, true);
@@ -565,11 +421,11 @@ public class InputHandler
         }
     }
 
-    private void navigateCursor(Screen screen, Navigate navigate)
+    public static void navigateCursor(Screen screen, Navigate navigate)
     {
         int cursorScreenX = Controllable.getCursor().getScreenX();
         int cursorScreenY = Controllable.getCursor().getScreenY();
-        List<NavigationPoint> points = this.gatherNavigationPoints(screen, navigate, cursorScreenX, cursorScreenY);
+        List<NavigationPoint> points = gatherNavigationPoints(screen, navigate, cursorScreenX, cursorScreenY);
 
         // Get only the points that are in the target direction
         points.removeIf(p -> !navigate.canMoveTo().test(p, cursorScreenX, cursorScreenY));
@@ -620,7 +476,7 @@ public class InputHandler
         }
     }
 
-    private List<NavigationPoint> gatherNavigationPoints(Screen screen, Navigate navigate, int cursorX, int cursorY)
+    private static List<NavigationPoint> gatherNavigationPoints(Screen screen, Navigate navigate, int cursorX, int cursorY)
     {
         List<NavigationPoint> points = new ArrayList<>();
         List<AbstractWidget> widgets = new ArrayList<>();
@@ -641,7 +497,7 @@ public class InputHandler
 
         for(GuiEventListener listener : screen.children())
         {
-            this.gatherNavigationPointsFromListener(listener, navigate, cursorX, cursorY, points, null, null);
+            gatherNavigationPointsFromListener(listener, navigate, cursorX, cursorY, points, null, null);
         }
 
         if(screen instanceof RecipeUpdateListener)
@@ -748,18 +604,18 @@ public class InputHandler
         return points;
     }
 
-    private void gatherNavigationPointsFromListener(GuiEventListener listener, Navigate navigate, int cursorX, int cursorY, List<NavigationPoint> points, @Nullable AbstractSelectionList<?> list, @Nullable GuiEventListener entry)
+    private static void gatherNavigationPointsFromListener(GuiEventListener listener, Navigate navigate, int cursorX, int cursorY, List<NavigationPoint> points, @Nullable AbstractSelectionList<?> list, @Nullable GuiEventListener entry)
     {
         if(listener instanceof Navigatable navigatable)
         {
             navigatable.elements().forEach(child ->
             {
-                this.gatherNavigationPointsFromListener(child, navigate, cursorX, cursorY, points, list, entry);
+                gatherNavigationPointsFromListener(child, navigate, cursorX, cursorY, points, list, entry);
             });
         }
         else if(listener instanceof AbstractSelectionList<?> selectionList)
         {
-            this.gatherNavigationPointsFromAbstractList(selectionList, navigate, cursorX, cursorY, points);
+            gatherNavigationPointsFromAbstractList(selectionList, navigate, cursorX, cursorY, points);
         }
         else if(listener instanceof TabNavigationBar navigationBar)
         {
@@ -767,7 +623,7 @@ public class InputHandler
             {
                 if(child instanceof TabButton button)
                 {
-                    this.createWidgetNavigationPoint(button, points, list, entry);
+                    createWidgetNavigationPoint(button, points, list, entry);
                 }
             });
         }
@@ -775,16 +631,16 @@ public class InputHandler
         {
             handler.children().forEach(child ->
             {
-                this.gatherNavigationPointsFromListener(child, navigate, cursorX, cursorY, points, list, entry);
+                gatherNavigationPointsFromListener(child, navigate, cursorX, cursorY, points, list, entry);
             });
         }
         else if(listener instanceof AbstractWidget widget && widget.active && widget.visible)
         {
-            this.createWidgetNavigationPoint(widget, points, list, entry);
+            createWidgetNavigationPoint(widget, points, list, entry);
         }
     }
 
-    private void createWidgetNavigationPoint(AbstractWidget widget, List<NavigationPoint> points, @Nullable AbstractSelectionList<?> list, @Nullable GuiEventListener entry)
+    private static void createWidgetNavigationPoint(AbstractWidget widget, List<NavigationPoint> points, @Nullable AbstractSelectionList<?> list, @Nullable GuiEventListener entry)
     {
         if(widget == null || widget.isHovered() || !widget.visible || !widget.active)
             return;
@@ -800,7 +656,7 @@ public class InputHandler
         }
     }
 
-    private void gatherNavigationPointsFromAbstractList(AbstractSelectionList<?> list, Navigate navigate, int cursorX, int cursorY, List<NavigationPoint> points)
+    private static void gatherNavigationPointsFromAbstractList(AbstractSelectionList<?> list, Navigate navigate, int cursorX, int cursorY, List<NavigationPoint> points)
     {
         List<? extends GuiEventListener> children = list.children();
         int dir = navigate == Navigate.UP ? -1 : 1;
@@ -821,7 +677,7 @@ public class InputHandler
                         points.add(new ListEntryNavigationPoint(list, entry, i, dir));
                     }
                 }
-                this.gatherNavigationPointsFromListener(entry, navigate, cursorX, cursorY, points, list, entry);
+                gatherNavigationPointsFromListener(entry, navigate, cursorX, cursorY, points, list, entry);
             }
             else if(list.isMouseOver(cursorX, cursorY))
             {
@@ -830,7 +686,7 @@ public class InputHandler
         }
     }
 
-    private void craftRecipeBookItem()
+    public static void craftRecipeBookItem()
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.player == null)
@@ -864,7 +720,24 @@ public class InputHandler
         }
     }
 
-    private enum Navigate
+    public void addHandler(ButtonBinding binding)
+    {
+        int button = binding.getButton();
+        if(button == -1)
+            return;
+        ButtonHandler handler = binding.getHandler();
+        if(handler instanceof BindingPressed pressed)
+            this.pressHandlers.put(button, new PriorityHandler<>(binding, pressed));
+        if(handler instanceof BindingReleased released)
+            this.releaseHandlers.put(button, new PriorityHandler<>(binding, released));
+    }
+
+    public void removeHandler(KeyAdapterBinding binding)
+    {
+
+    }
+
+    public enum Navigate
     {
         UP((p, x, y) -> p.getY() < y, (p, v) -> Math.abs(p.getX() - v.x)),
         DOWN((p, x, y) -> p.getY() > y + 1, (p, v) -> Math.abs(p.getX() - v.x)),
@@ -899,5 +772,60 @@ public class InputHandler
     private interface NavigatePredicate
     {
         boolean test(NavigationPoint point, int cursorScreenX, int cursorScreenY);
+    }
+
+    private static class PriorityHandler<T> implements Comparable<PriorityHandler<T>>
+    {
+        private final ButtonBinding binding;
+        private final T handler;
+        private final int priority;
+
+        public PriorityHandler(ButtonBinding binding, T handler)
+        {
+            this.binding = binding;
+            this.handler = handler;
+            this.priority = binding.getContext().priority();
+        }
+
+        public ButtonBinding binding()
+        {
+            return this.binding;
+        }
+
+        public T handler()
+        {
+            return this.handler;
+        }
+
+        @Override
+        public int compareTo(PriorityHandler<T> o)
+        {
+            int result = -Integer.compare(this.priority, o.priority);
+            if(result == 0)
+            {
+                return this.binding.getDescription().compareTo(o.binding.getDescription());
+            }
+            return result;
+        }
+
+        @Override
+        public final boolean equals(Object o)
+        {
+            if(!(o instanceof PriorityHandler<?> that))
+                return false;
+            return this.binding.equals(that.binding);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return this.binding.hashCode();
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.priority + " " + this.binding.getDescription();
+        }
     }
 }

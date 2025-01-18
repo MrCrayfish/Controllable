@@ -37,9 +37,9 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
         this.resetButton = this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 155, this.height - 32, 150, 20, Component.translatable("controllable.gui.reset"), (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_keybinds"), result -> {
                 if(result) {
-                    List<KeyAdapterBinding> copy = new ArrayList<>(BindingRegistry.getInstance().getKeyAdapters().values());
+                    List<KeyAdapterBinding> copy = new ArrayList<>(Controllable.getBindingRegistry().getKeyAdapters().values());
                     copy.forEach(binding -> {
-                        BindingRegistry.getInstance().removeKeyAdapter(binding);
+                        Controllable.getBindingRegistry().removeKeyAdapter(binding);
                         Controllable.getRadialMenu().removeBinding(binding);
                     });
                     this.list.children().stream().filter(entry -> entry instanceof KeyBindingItem).map(entry -> (KeyBindingItem) entry).forEach(KeyBindingItem::updateButtons);
@@ -63,6 +63,6 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
 
     protected void updateButtons()
     {
-        this.resetButton.active = BindingRegistry.getInstance().getKeyAdapters().size() > 0;
+        this.resetButton.active = Controllable.getBindingRegistry().getKeyAdapters().size() > 0;
     }
 }

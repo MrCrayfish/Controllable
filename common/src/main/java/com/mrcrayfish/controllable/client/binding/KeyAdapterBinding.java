@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.binding;
 
-import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.api.client.binding.handlers.EmptyHandler;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -20,7 +21,7 @@ public final class KeyAdapterBinding extends ButtonBinding
 
     public KeyAdapterBinding(int button, KeyMapping mapping)
     {
-        super(button, mapping.getName() + ".custom", "key.categories.controllable_custom", ClientServices.CLIENT.createBindingContext(mapping));
+        super(button, mapping.getName() + ".custom", "key.categories.controllable_custom", ClientServices.CLIENT.createBindingContext(mapping), EmptyHandler.INSTANCE);
         this.keyMapping = mapping;
         this.labelKey = mapping.getName();
     }
@@ -39,6 +40,11 @@ public final class KeyAdapterBinding extends ButtonBinding
     @Override
     protected void setPressed(boolean pressed)
     {
+        // TODO trigger click count
+        /*if(!this.pressed && pressed)
+        {
+            this.keyMapping.
+        }*/
         super.setPressed(pressed);
         this.keyMapping.setDown(pressed);
         if(pressed) this.updateKeyBindPressTime();

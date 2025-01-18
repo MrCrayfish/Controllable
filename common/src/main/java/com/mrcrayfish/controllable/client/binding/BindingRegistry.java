@@ -1,8 +1,10 @@
 package com.mrcrayfish.controllable.client.binding;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.TreeMultimap;
 import com.google.common.io.MoreFiles;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,29 +12,24 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.GsonHelper;
 import org.apache.commons.lang3.StringUtils;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
 import java.util.stream.Stream;
 
 /**
@@ -40,77 +37,82 @@ import java.util.stream.Stream;
  */
 public class BindingRegistry
 {
-    static
-    {
-        getInstance().register(ButtonBindings.JUMP);
-        getInstance().register(ButtonBindings.SNEAK);
-        getInstance().register(ButtonBindings.SPRINT);
-        getInstance().register(ButtonBindings.OPEN_INVENTORY);
-        getInstance().register(ButtonBindings.CLOSE_INVENTORY);
-        getInstance().register(ButtonBindings.SWAP_HANDS);
-        getInstance().register(ButtonBindings.DROP_ITEM);
-        getInstance().register(ButtonBindings.USE_ITEM);
-        getInstance().register(ButtonBindings.ATTACK);
-        getInstance().register(ButtonBindings.PICK_BLOCK);
-        getInstance().register(ButtonBindings.PLAYER_LIST);
-        getInstance().register(ButtonBindings.TOGGLE_PERSPECTIVE);
-        getInstance().register(ButtonBindings.SCREENSHOT);
-        getInstance().register(ButtonBindings.SCROLL_LEFT);
-        getInstance().register(ButtonBindings.SCROLL_RIGHT);
-        getInstance().register(ButtonBindings.PAUSE_GAME);
-        getInstance().register(ButtonBindings.NEXT_CREATIVE_TAB);
-        getInstance().register(ButtonBindings.PREVIOUS_CREATIVE_TAB);
-        getInstance().register(ButtonBindings.NEXT_RECIPE_TAB);
-        getInstance().register(ButtonBindings.PREVIOUS_RECIPE_TAB);
-        getInstance().register(ButtonBindings.NAVIGATE_UP);
-        getInstance().register(ButtonBindings.NAVIGATE_DOWN);
-        getInstance().register(ButtonBindings.NAVIGATE_LEFT);
-        getInstance().register(ButtonBindings.NAVIGATE_RIGHT);
-        getInstance().register(ButtonBindings.PICKUP_ITEM);
-        getInstance().register(ButtonBindings.QUICK_MOVE);
-        getInstance().register(ButtonBindings.SPLIT_STACK);
-        getInstance().register(ButtonBindings.SOCIAL_INTERACTIONS);
-        getInstance().register(ButtonBindings.ADVANCEMENTS);
-        getInstance().register(ButtonBindings.HIGHLIGHT_PLAYERS);
-        getInstance().register(ButtonBindings.CINEMATIC_CAMERA);
-        getInstance().register(ButtonBindings.FULLSCREEN);
-        getInstance().register(ButtonBindings.DEBUG_INFO);
-        getInstance().register(ButtonBindings.RADIAL_MENU);
-        Stream.of(ButtonBindings.HOTBAR_SLOTS).forEach(binding -> getInstance().register(binding));
-        getInstance().register(ButtonBindings.TOGGLE_CRAFT_BOOK);
-        getInstance().register(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS);
-        getInstance().register(ButtonBindings.OPEN_CHAT);
-    }
-
     private static BindingRegistry instance;
-
-    public static BindingRegistry getInstance()
-    {
-        if(instance == null)
-        {
-            instance = new BindingRegistry();
-        }
-        return instance;
-    }
-
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final List<ButtonBinding> bindings = new ArrayList<>();
     private final Map<String, ButtonBinding> registeredBindings = new HashMap<>();
     private final Map<String, KeyAdapterBinding> keyAdapters = new HashMap<>();
-    private final Map<Integer, List<ButtonBinding>> idToButtonList = new HashMap<>();
+    private final Multimap<Integer, ButtonBinding> idToButtonList = TreeMultimap.create(Ordering.natural(),
+        Comparator.<ButtonBinding, Integer>comparing(binding -> binding.getContext().priority()).reversed()
+    );
 
-    private BindingRegistry() {}
+    public BindingRegistry()
+    {
+        Preconditions.checkState(instance == null, "Only one instance of BindingRegistry is allowed");
+        this.registerBuiltinBindings();
+        instance = this;
+    }
 
-    List<ButtonBinding> getRegisteredBindings()
+    private void registerBuiltinBindings()
+    {
+        this.register(ButtonBindings.JUMP);
+        this.register(ButtonBindings.SNEAK);
+        this.register(ButtonBindings.SPRINT);
+        this.register(ButtonBindings.OPEN_INVENTORY);
+        this.register(ButtonBindings.CLOSE_INVENTORY);
+        this.register(ButtonBindings.SWAP_HANDS);
+        this.register(ButtonBindings.DROP_ITEM);
+        this.register(ButtonBindings.USE_ITEM);
+        this.register(ButtonBindings.ATTACK);
+        this.register(ButtonBindings.PICK_BLOCK);
+        this.register(ButtonBindings.PLAYER_LIST);
+        this.register(ButtonBindings.TOGGLE_PERSPECTIVE);
+        this.register(ButtonBindings.SCREENSHOT);
+        this.register(ButtonBindings.SCROLL_HOTBAR_LEFT);
+        this.register(ButtonBindings.SCROLL_HOTBAR_RIGHT);
+        this.register(ButtonBindings.PAUSE_GAME);
+        this.register(ButtonBindings.UNPAUSE_GAME);
+        this.register(ButtonBindings.NEXT_CREATIVE_TAB);
+        this.register(ButtonBindings.PREVIOUS_CREATIVE_TAB);
+        this.register(ButtonBindings.NEXT_RECIPE_TAB);
+        this.register(ButtonBindings.PREVIOUS_RECIPE_TAB);
+        this.register(ButtonBindings.NAVIGATE_UP);
+        this.register(ButtonBindings.NAVIGATE_DOWN);
+        this.register(ButtonBindings.NAVIGATE_LEFT);
+        this.register(ButtonBindings.NAVIGATE_RIGHT);
+        this.register(ButtonBindings.PICKUP_ITEM);
+        this.register(ButtonBindings.QUICK_MOVE);
+        this.register(ButtonBindings.SPLIT_STACK);
+        this.register(ButtonBindings.SOCIAL_INTERACTIONS);
+        this.register(ButtonBindings.ADVANCEMENTS);
+        this.register(ButtonBindings.HIGHLIGHT_PLAYERS);
+        this.register(ButtonBindings.CINEMATIC_CAMERA);
+        this.register(ButtonBindings.FULLSCREEN);
+        this.register(ButtonBindings.DEBUG_INFO);
+        this.register(ButtonBindings.RADIAL_MENU);
+        this.register(ButtonBindings.HOTBAR_SLOT_1);
+        this.register(ButtonBindings.HOTBAR_SLOT_2);
+        this.register(ButtonBindings.HOTBAR_SLOT_3);
+        this.register(ButtonBindings.HOTBAR_SLOT_4);
+        this.register(ButtonBindings.HOTBAR_SLOT_5);
+        this.register(ButtonBindings.HOTBAR_SLOT_6);
+        this.register(ButtonBindings.HOTBAR_SLOT_7);
+        this.register(ButtonBindings.HOTBAR_SLOT_8);
+        this.register(ButtonBindings.HOTBAR_SLOT_9);
+        this.register(ButtonBindings.TOGGLE_CRAFT_BOOK);
+        this.register(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS);
+        this.register(ButtonBindings.OPEN_CHAT);
+    }
+
+    public List<ButtonBinding> getRegisteredBindings()
     {
         return this.bindings;
     }
 
-    List<ButtonBinding> getBindingListForButton(int button)
+    public Collection<ButtonBinding> getBindingListForButton(int button)
     {
-        List<ButtonBinding> list = this.idToButtonList.get(button);
-        return list != null ? ImmutableList.copyOf(list) : ImmutableList.of();
+        return this.idToButtonList.get(button);
     }
 
     @Nullable
@@ -143,7 +145,8 @@ public class BindingRegistry
             this.bindings.add(binding);
             if(binding.getButton() != -1)
             {
-                this.idToButtonList.computeIfAbsent(binding.getButton(), i -> new ArrayList<>()).add(binding);
+                this.idToButtonList.put(binding.getButton(), binding);
+                Controllable.getInputHandler().addHandler(binding);
             }
         }
     }
@@ -155,7 +158,8 @@ public class BindingRegistry
             this.bindings.add(binding);
             if(binding.getButton() != -1)
             {
-                this.idToButtonList.computeIfAbsent(binding.getButton(), i -> new ArrayList<>()).add(binding);
+                this.idToButtonList.put(binding.getButton(), binding);
+                Controllable.getInputHandler().addHandler(binding);
             }
             this.save();
         }
@@ -166,20 +170,21 @@ public class BindingRegistry
         if(this.bindings.remove(binding))
         {
             this.keyAdapters.remove(binding.getDescription());
-            this.idToButtonList.remove(binding.getButton());
+            this.idToButtonList.remove(binding.getButton(), binding);
+            Controllable.getInputHandler().removeHandler(binding);
             this.save();
         }
     }
 
-    public void resetBindingHash()
+    public void rebuildCache()
     {
         this.idToButtonList.clear();
         this.bindings.stream().filter(binding -> binding.getButton() != -1).forEach(binding -> {
-            this.idToButtonList.computeIfAbsent(binding.getButton(), i -> new ArrayList<>()).add(binding);
+            this.idToButtonList.put(binding.getButton(), binding);
         });
     }
 
-    public void load()
+    public void completeSetup()
     {
         try
         {
@@ -191,11 +196,12 @@ public class BindingRegistry
                 try(BufferedReader reader = Files.newBufferedReader(path))
                 {
                     JsonObject adapters = GSON.fromJson(reader, JsonObject.class);
-                    this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding -> {
+                    this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
+                    {
                         String description = binding.getDescription();
                         if(adapters.get(description) instanceof JsonPrimitive value && value.isString())
                         {
-                            binding.setButton(Buttons.getButtonFromName(value.getAsString()));
+                            ButtonBinding.setButton(binding, Buttons.getButtonFromName(value.getAsString()));
                         }
                     });
                 }
@@ -234,7 +240,7 @@ public class BindingRegistry
                             if(this.keyAdapters.putIfAbsent(keyAdapter.getDescription(), keyAdapter) == null) {
                                 this.bindings.add(keyAdapter);
                                 if(keyAdapter.getButton() != -1) {
-                                    this.idToButtonList.computeIfAbsent(keyAdapter.getButton(), i -> new ArrayList<>()).add(keyAdapter);
+                                    this.idToButtonList.put(keyAdapter.getButton(), keyAdapter);
                                 }
                             }
                         }
@@ -251,7 +257,7 @@ public class BindingRegistry
             Constants.LOG.error("Failed to load key_adapters.properties", e);
         }
 
-        this.resetBindingHash();
+        this.rebuildCache();
     }
 
     public void save()

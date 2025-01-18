@@ -7,7 +7,6 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.settings.CursorStyle;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.platform.ClientServices;
 import com.mrcrayfish.controllable.platform.Services;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -35,7 +34,7 @@ public class VirtualCursorOverlay implements IOverlay
         CursorStyle type = Config.CLIENT.options.cursorType.get();
         if(mc.player == null || (mc.player.inventoryMenu.getCarried().isEmpty() || type.getBehaviour() == CursorStyle.ItemHeldBehaviour.SHOW))
         {
-            InputHandler input = Controllable.getInput();
+            InputHandler input = Controllable.getInputHandler();
             double guiScale = mc.getWindow().getGuiScale();
             double cursorX = Controllable.getCursor().getRenderX();
             double cursorY = Controllable.getCursor().getRenderY();

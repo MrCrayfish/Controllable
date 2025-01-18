@@ -18,6 +18,18 @@ jarJar.enable()
     config 'controllable.neoforge.mixins.json'
 }*/
 
+sourceSets {
+    test {
+        compileClasspath += project(':common').sourceSets.main.output
+        runtimeClasspath += project(':common').sourceSets.main.output
+    }
+}
+
+configurations {
+    testImplementation.extendsFrom implementation
+    testRuntimeOnly.extendsFrom runtimeOnly
+}
+
 runs {
     configureEach {
         modSource project.sourceSets.main
@@ -38,6 +50,9 @@ runs {
     data {
         programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
+    junit {
+
+    }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
@@ -55,6 +70,10 @@ dependencies {
     library jarJar("com.mrcrayfish:controllable-sdl:2.30.10-1.0") {
         transitive(false)
     }
+
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.7.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 tasks.jarJar.configure {
@@ -77,3 +96,14 @@ tasks.register('signJar', PotentiallySignJar) {
 }
 
 jar.finalizedBy 'signJar'
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -6,7 +6,6 @@ import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.gui.toasts.ConnectionToast;
 import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
 import com.mrcrayfish.controllable.client.gui.screens.PendingScreen;
-import com.mrcrayfish.controllable.platform.Services;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,15 +15,11 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import org.jetbrains.annotations.Nullable;
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -128,7 +123,7 @@ public abstract class AdaptiveControllerManager
         return this.controllers.size();
     }
 
-    public final void onClientFinishedLoading()
+    public final void completeSetup()
     {
         /* Apply internal mappings */
         try(InputStream is = AdaptiveControllerManager.class.getResourceAsStream("/gamecontrollerdb.txt"))

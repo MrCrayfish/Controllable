@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.platform;
 
-import com.mrcrayfish.controllable.client.binding.BindingContext;
-import com.mrcrayfish.controllable.client.binding.IBindingContext;
+import com.mrcrayfish.controllable.api.client.binding.context.BindingContext;
+import com.mrcrayfish.controllable.api.client.binding.context.GlobalContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
@@ -151,9 +151,9 @@ public class FabricClientHelper implements IClientHelper
     }
 
     @Override
-    public void startAttack(Minecraft mc)
+    public boolean startAttack(Minecraft mc)
     {
-        mc.startAttack();
+        return mc.startAttack();
     }
 
     @Override
@@ -264,9 +264,9 @@ public class FabricClientHelper implements IClientHelper
     }
 
     @Override
-    public IBindingContext createBindingContext(KeyMapping mapping)
+    public BindingContext createBindingContext(KeyMapping mapping)
     {
-        return BindingContext.GLOBAL;
+        return GlobalContext.INSTANCE;
     }
 
     @Override

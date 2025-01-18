@@ -123,20 +123,20 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
         {
             super(Component.translatable(mapping.getName()));
             this.mapping = mapping;
-            Collection<KeyAdapterBinding> bindings = BindingRegistry.getInstance().getKeyAdapters().values();
+            Collection<KeyAdapterBinding> bindings = Controllable.getBindingRegistry().getKeyAdapters().values();
             this.addBinding = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button ->
             {
-                BindingRegistry.getInstance().addKeyAdapter(new KeyAdapterBinding(-1, this.mapping));
+                Controllable.getBindingRegistry().addKeyAdapter(new KeyAdapterBinding(-1, this.mapping));
                 this.addBinding.active = false;
                 this.removeBinding.active = true;
                 KeyBindingListMenuScreen.this.onChange();
             });
             this.removeBinding = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 98, 15, 10, 10, button ->
             {
-                KeyAdapterBinding keyAdapter = BindingRegistry.getInstance().getKeyAdapterByDescriptionKey(this.mapping.getName() + ".custom");
+                KeyAdapterBinding keyAdapter = Controllable.getBindingRegistry().getKeyAdapterByDescriptionKey(this.mapping.getName() + ".custom");
                 if(keyAdapter != null)
                 {
-                    BindingRegistry.getInstance().removeKeyAdapter(keyAdapter);
+                    Controllable.getBindingRegistry().removeKeyAdapter(keyAdapter);
                     Controllable.getRadialMenu().removeBinding(keyAdapter);
                 }
                 this.addBinding.active = true;
@@ -155,7 +155,7 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
 
         public void updateButtons()
         {
-            Collection<KeyAdapterBinding> bindings = BindingRegistry.getInstance().getKeyAdapters().values();
+            Collection<KeyAdapterBinding> bindings = Controllable.getBindingRegistry().getKeyAdapters().values();
             this.addBinding.active = bindings.stream().noneMatch(entry -> entry.getKeyMapping() == this.mapping);
             this.removeBinding.active = bindings.stream().anyMatch(entry -> entry.getKeyMapping() == this.mapping);
         }

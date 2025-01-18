@@ -18,7 +18,7 @@ public abstract class ContainerScreenMixin
     private boolean isQuickMovePressedOnClick(boolean original)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && ButtonBindings.QUICK_MOVE.isButtonPressed())
+        if(controller != null && ButtonBindings.QUICK_MOVE.isButtonDown())
         {
             return true;
         }
@@ -29,7 +29,7 @@ public abstract class ContainerScreenMixin
     private boolean isQuickMovePressedOnReleased(boolean original)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && ButtonBindings.QUICK_MOVE.isButtonPressed())
+        if(controller != null && ButtonBindings.QUICK_MOVE.isButtonDown())
         {
             return true;
         }

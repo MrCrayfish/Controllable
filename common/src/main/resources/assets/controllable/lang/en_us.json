@@ -136,6 +136,7 @@
     "controllable.key.open_controllable_settings": "Open Controllable Settings",
     "controllable.key.open_inventory": "Open Inventory",
     "controllable.key.pause_game": "Pause Game",
+    "controllable.key.unpause_game": "Unpause Game",
     "controllable.key.pickup_item": "Left Click / Pickup Item",
     "controllable.key.previous_creative_tab": "Previous Creative Tab / Recipe Page",
     "controllable.key.previous_hotbar_item": "Scroll Hotbar Left",

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
-import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.settings.SneakMode;
 import com.mrcrayfish.controllable.client.settings.SprintMode;
@@ -192,10 +192,10 @@ public class SettingsScreen extends Screen
     {
         if(this.selectedBinding != null)
         {
-            this.selectedBinding.setButton(index);
+            ButtonBinding.setButton(this.selectedBinding, index);
             this.selectedBinding = null;
-            BindingRegistry registry = BindingRegistry.getInstance();
-            registry.resetBindingHash();
+            BindingRegistry registry = Controllable.getBindingRegistry();
+            registry.rebuildCache();
             registry.save();
             return true;
         }

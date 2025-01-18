@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.mixin.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.KeyAdapterBinding;
 import net.minecraft.client.KeyMapping;
@@ -21,7 +22,7 @@ public abstract class NeoForgeKeyMappingMixin implements IKeyMappingExtension
     public boolean isActiveAndMatches(InputConstants.Key keyCode)
     {
         String customKey = this.getCategory() + ".custom";
-        KeyAdapterBinding adapter = BindingRegistry.getInstance().getKeyAdapters().get(customKey);
+        KeyAdapterBinding adapter = Controllable.getBindingRegistry().getKeyAdapters().get(customKey);
         if(adapter != null && adapter.isButtonDown())
         {
             return true;

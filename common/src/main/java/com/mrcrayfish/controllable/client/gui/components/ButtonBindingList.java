@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
-import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
 import com.mrcrayfish.controllable.client.gui.Icons;
@@ -72,9 +72,9 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         }).build(), Button.builder(restoreDefaults, btn -> {
             this.minecraft.setScreen(new ConfirmationScreen(this.settingsScreen, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
-                    BindingRegistry registry = BindingRegistry.getInstance();
+                    BindingRegistry registry = Controllable.getBindingRegistry();
                     registry.getBindings().forEach(ButtonBinding::resetMappedButton);
-                    registry.resetBindingHash();
+                    registry.rebuildCache();
                     registry.save();
                 }
                 return true;
@@ -85,7 +85,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         this.categories.forEach((category, list) -> list.clear());
 
         // Add all button bindings to the appropriate category or create a new one
-        BindingRegistry.getInstance().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
+        Controllable.getBindingRegistry().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
         {
             // Only show unbound bindings for select binding screen for radial menu
             if(showUnbound && binding.getButton() != -1) return;
@@ -120,15 +120,15 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
                     ButtonBindingList.this.settingsScreen.setSelectedBinding(this.binding);
                     return true;
                 } else if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-                    this.binding.setButton(-1);
+                    ButtonBinding.setButton(this.binding, -1);
                     return true;
                 }
                 return false;
             });
             this.resetButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button -> {
                 binding.resetMappedButton();
-                BindingRegistry registry = BindingRegistry.getInstance();
-                registry.resetBindingHash();
+                BindingRegistry registry = Controllable.getBindingRegistry();
+                registry.rebuildCache();
                 registry.save();
             });
         }

@@ -17,8 +17,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.binding.BindingRegistry;
-import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.screens.RadialMenuConfigureScreen;
@@ -45,17 +44,11 @@ import org.joml.Matrix4fStack;
 
 import org.jetbrains.annotations.Nullable;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -120,7 +113,7 @@ public class RadialMenu
                     JsonObject object = element.getAsJsonObject();
                     String key = GsonHelper.getAsString(object, "key");
                     String colorName = GsonHelper.getAsString(object, "color");
-                    ButtonBinding binding = BindingRegistry.getInstance().getBindingByDescriptionKey(key);
+                    ButtonBinding binding = Controllable.getBindingRegistry().getBindingByDescriptionKey(key);
                     if(binding != null)
                     {
                         ChatFormatting color = ChatFormatting.getByName(colorName);
@@ -658,7 +651,7 @@ public class RadialMenu
             radialMenu.setVisibility(false);
             radialMenu.clearAnimation();
             this.entry.getBinding().setActiveAndPressed();
-            Controllable.getInput().handleButtonInput(Controllable.getController(), -1, true, true);
+            Controllable.getInputHandler().handleButtonInput(Controllable.getController(), -1, true, true);
         }
 
         @Override

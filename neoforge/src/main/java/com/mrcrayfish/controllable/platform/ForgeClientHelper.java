@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.platform;
 
-import com.mrcrayfish.controllable.client.NeoForgeBindingContext;
-import com.mrcrayfish.controllable.client.binding.IBindingContext;
+import com.mrcrayfish.controllable.api.client.binding.context.NeoForgeKeyContext;
+import com.mrcrayfish.controllable.api.client.binding.context.BindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
@@ -46,7 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ForgeClientHelper implements IClientHelper
 {
-    public final Map<IKeyConflictContext, IBindingContext> keyContextMap = new Object2ObjectOpenHashMap<>();
+    public final Map<IKeyConflictContext, BindingContext> keyContextMap = new Object2ObjectOpenHashMap<>();
 
     @Override
     public float getGuiFarPlane()
@@ -188,9 +188,9 @@ public class ForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public void startAttack(Minecraft mc)
+    public boolean startAttack(Minecraft mc)
     {
-        mc.startAttack();
+        return mc.startAttack();
     }
 
     @Override
@@ -309,9 +309,9 @@ public class ForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public IBindingContext createBindingContext(KeyMapping mapping)
+    public BindingContext createBindingContext(KeyMapping mapping)
     {
-        return this.keyContextMap.computeIfAbsent(mapping.getKeyConflictContext(), NeoForgeBindingContext::new);
+        return this.keyContextMap.computeIfAbsent(mapping.getKeyConflictContext(), NeoForgeKeyContext::new);
     }
 
     @Override

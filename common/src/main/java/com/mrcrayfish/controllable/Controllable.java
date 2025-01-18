@@ -2,17 +2,16 @@ package com.mrcrayfish.controllable;
 
 import com.google.common.base.Suppliers;
 import com.mrcrayfish.controllable.client.CameraHandler;
-import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.ControllerProperties;
+import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.InputProcessor;
-import com.mrcrayfish.controllable.client.MovementHandler;
 import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.ScrollingHandler;
 import com.mrcrayfish.controllable.client.VirtualCursor;
-import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.util.Utils;
-
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
@@ -21,11 +20,12 @@ public class Controllable
 {
     private static final Supplier<AdaptiveControllerManager> MANAGER = Suppliers.memoize(Controllable::createManager);
     private static final ControllerProperties PROPERTIES = new ControllerProperties();
+    private static final InputHandler INPUT_HANDLER = new InputHandler();
+    private static final BindingRegistry BINDING_REGISTRY = new BindingRegistry();
     private static final VirtualCursor CURSOR = new VirtualCursor();
     private static final InputProcessor INPUT_PROCESSOR = new InputProcessor();
     private static final CameraHandler CAMERA_HANDLER = new CameraHandler();
     private static final RadialMenu RADIAL_MENU = new RadialMenu();
-    private static final MovementHandler MOVEMENT_HANDLER = new MovementHandler();
     private static final ScrollingHandler SCROLLING_HANDLER = new ScrollingHandler();
 
     private static final boolean JEI_LOADED = Utils.isModLoaded("jei");
@@ -36,10 +36,15 @@ public class Controllable
         MANAGER.get().init();
         CURSOR.registerEvents();
         INPUT_PROCESSOR.registerEvents();
+        INPUT_HANDLER.registerEvents();
         CAMERA_HANDLER.registerEvents();
         RADIAL_MENU.registerEvents();
-        MOVEMENT_HANDLER.registerEvents();
         SCROLLING_HANDLER.registerEvents();
+    }
+
+    public static BindingRegistry getBindingRegistry()
+    {
+        return BINDING_REGISTRY;
     }
 
     public static VirtualCursor getCursor()
@@ -52,10 +57,9 @@ public class Controllable
         return INPUT_PROCESSOR;
     }
 
-    // TODO this should probably not be a thing soon
-    public static InputHandler getInput()
+    public static InputHandler getInputHandler()
     {
-        return INPUT_PROCESSOR.getHandler();
+        return INPUT_HANDLER;
     }
 
     public static RadialMenu getRadialMenu()

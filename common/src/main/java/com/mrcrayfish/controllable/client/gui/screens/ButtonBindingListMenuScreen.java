@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
-import com.mrcrayfish.controllable.client.binding.BindingRegistry;
-import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -44,8 +44,7 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
         this.categories.forEach((category, list) -> list.clear());
 
         // Add all button bindings to the appropriate category or create a new one
-        BindingRegistry.getInstance().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
-        {
+        Controllable.getBindingRegistry().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding -> {
             // Only show unbound bindings for select binding screen for radial menu
             if(showUnbound && binding.getButton() != -1) return;
             List<ButtonBinding> list = this.categories.computeIfAbsent(binding.getCategory(), category -> new ArrayList<>());

@@ -1,8 +1,9 @@
 package com.mrcrayfish.controllable.client;
 
+import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.input.ButtonStates;
@@ -12,6 +13,7 @@ import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -21,11 +23,19 @@ import java.util.Queue;
  */
 public class InputProcessor
 {
+    private static InputProcessor instance;
+
     private final Queue<ButtonStates> inputQueue = new ArrayDeque<>();
-    private final InputHandler handler = new InputHandler();
-    private final AdaptiveControllerManager manager = Controllable.getControllerManager();
     private boolean initialized;
 
+    @ApiStatus.Internal
+    public InputProcessor()
+    {
+        Preconditions.checkState(instance == null, "Only one instance of InputProcessor is allowed");
+        instance = this;
+    }
+
+    @ApiStatus.Internal
     public void registerEvents()
     {
         if(!this.initialized)
@@ -49,9 +59,9 @@ public class InputProcessor
 
     private void gatherAndQueueControllerInput()
     {
-        this.manager.tick();
-
-        Controller currentController = this.manager.getActiveController();
+        AdaptiveControllerManager manager = Controllable.getControllerManager();
+        manager.tick();
+        Controller currentController = manager.getActiveController();
         if(currentController == null)
             return;
 
@@ -82,7 +92,7 @@ public class InputProcessor
             return;
         }
 
-        Controller controller = this.manager.getActiveController();
+        Controller controller = Controllable.getController();
         if(controller == null)
             return;
 
@@ -94,13 +104,13 @@ public class InputProcessor
                 trackedStates.setState(index, true);
                 if(screen instanceof SettingsScreen settings && settings.isWaitingForButtonInput() && settings.processButton(index))
                     return;
-                this.handler.handleButtonInput(controller, index, true, false); // Handle on down
+                Controllable.getInputHandler().handleButtonInput(controller, index, true, false); // Handle on down
             }
         }
         else if(trackedStates.getState(index))
         {
             trackedStates.setState(index, false);
-            this.handler.handleButtonInput(controller, index, false, false); // Handle on release
+            Controllable.getInputHandler().handleButtonInput(controller, index, false, false); // Handle on release
         }
     }
 
@@ -119,10 +129,5 @@ public class InputProcessor
             RenderSystem.limitDisplayFPS(fps * captureCount);
             this.gatherAndQueueControllerInput();
         }
-    }
-
-    public InputHandler getHandler()
-    {
-        return this.handler;
     }
 }

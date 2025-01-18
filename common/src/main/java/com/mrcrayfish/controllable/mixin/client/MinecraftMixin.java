@@ -3,13 +3,12 @@ package com.mrcrayfish.controllable.mixin.client;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
+import com.mrcrayfish.controllable.client.binding.handlers.AttackHandler;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,8 +30,8 @@ public class MinecraftMixin
     @Inject(method = "<init>", at = @At(value = "TAIL"))
     private void controllableOnFinishedLoading(CallbackInfo ci)
     {
-        BindingRegistry.getInstance().load();
-        Controllable.getControllerManager().onClientFinishedLoading();
+        //Controllable.getBindingRegistry().load();
+        //Controllable.getControllerManager().onClientFinishedLoading();
     }
 
     /*
@@ -45,7 +44,7 @@ public class MinecraftMixin
         if(controller != null && controller.isBeingUsed() && ButtonBindings.ATTACK.isButtonDown())
         {
             controller.updateInputTime();
-            return true;
+            return !AttackHandler.shouldPreventContinue();
         }
         return original;
     }
@@ -65,13 +64,10 @@ public class MinecraftMixin
         return original;
     }
 
-    @Inject(method = "shouldEntityAppearGlowing", at = @At(value = "HEAD"), cancellable = true)
-    private void controllableIsEntityGlowing(Entity entity, CallbackInfoReturnable<Boolean> cir)
+    @ModifyExpressionValue(method = "shouldEntityAppearGlowing", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"))
+    private boolean controllableIsEntityGlowing(boolean original)
     {
-        if(this.player != null && this.player.isSpectator() && ButtonBindings.HIGHLIGHT_PLAYERS.isButtonDown() && entity.getType() == EntityType.PLAYER)
-        {
-            cir.setReturnValue(true);
-        }
+        return original || ButtonBindings.HIGHLIGHT_PLAYERS.isButtonDown();
     }
 
     // Prevents the game from pausing (when losing focus) when a controller is plugged in.

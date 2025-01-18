@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.platform.services;
 
-import com.mrcrayfish.controllable.client.binding.IBindingContext;
+import com.mrcrayfish.controllable.api.client.binding.context.BindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
@@ -66,7 +66,7 @@ public interface IClientHelper
 
     void startUseItem(Minecraft mc);
 
-    void startAttack(Minecraft mc);
+    boolean startAttack(Minecraft mc);
 
     void pickBlock(Minecraft mc);
 
@@ -100,7 +100,7 @@ public interface IClientHelper
 
     void setKeyPressTime(KeyMapping mapping, int time);
 
-    IBindingContext createBindingContext(KeyMapping mapping);
+    BindingContext createBindingContext(KeyMapping mapping);
 
     void sendKeyInputEvent(int key, int scanCode, int action, int modifiers);
 

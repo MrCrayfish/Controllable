@@ -1,9 +1,18 @@
-package com.mrcrayfish.controllable.client.binding;
+package com.mrcrayfish.controllable.api.client.binding;
 
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.api.client.binding.context.BindingContext;
+import com.mrcrayfish.controllable.api.client.binding.context.rule.ContextRule;
+import com.mrcrayfish.controllable.api.client.binding.handlers.ButtonHandler;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import net.minecraft.client.resources.language.I18n;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Author: MrCrayfish
@@ -13,19 +22,19 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     private final int defaultButton;
     private final String descriptionKey;
     private final String category;
-    private final IBindingContext context;
+    private final BindingContext context;
     private final boolean reserved;
+    private final ButtonHandler handler;
     private int button;
     private boolean pressed;
-    private int pressedTime;
     private boolean active;
 
-    public ButtonBinding(int button, String descriptionKey, String category, IBindingContext context)
+    public ButtonBinding(int button, String descriptionKey, String category, BindingContext context, ButtonHandler handler)
     {
-        this(button, descriptionKey, category, context, false);
+        this(button, descriptionKey, category, context, false, handler);
     }
 
-    ButtonBinding(int button, String descriptionKey, String category, IBindingContext context, boolean reserved)
+    ButtonBinding(int button, String descriptionKey, String category, BindingContext context, boolean reserved, ButtonHandler handler)
     {
         this.button = button;
         this.defaultButton = button;
@@ -33,16 +42,12 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         this.category = category;
         this.context = context;
         this.reserved = reserved;
+        this.handler = handler;
     }
 
     public int getButton()
     {
         return this.button;
-    }
-
-    public void setButton(int button)
-    {
-        this.button = button;
     }
 
     public String getLabelKey()
@@ -60,6 +65,11 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         return this.category;
     }
 
+    public BindingContext getContext()
+    {
+        return this.context;
+    }
+
     public boolean isDefault()
     {
         return this.button == this.defaultButton;
@@ -70,24 +80,19 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         this.pressed = pressed;
     }
 
-    public boolean isButtonPressed()
-    {
-        return this.pressed && this.pressedTime == 0 && this.isActiveAndValidContext();
-    }
-
     public boolean isNotReserved()
     {
         return !this.reserved;
     }
 
-    public boolean isButtonDown()
+    public ButtonHandler getHandler()
     {
-        return this.pressed && this.isActiveAndValidContext();
+        return this.handler;
     }
 
-    public void resetMappedButton()
+    public boolean isButtonDown()
     {
-        this.button = this.defaultButton;
+        return this.pressed;
     }
 
     public void resetPressedState()
@@ -95,42 +100,45 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         this.pressed = false;
     }
 
+    @ApiStatus.Internal
+    public void resetMappedButton()
+    {
+        this.button = this.defaultButton;
+    }
+
+    @ApiStatus.Internal
     public static void tick()
     {
-        for(ButtonBinding binding : BindingRegistry.getInstance().getRegisteredBindings())
+        for(ButtonBinding binding : Controllable.getBindingRegistry().getRegisteredBindings())
         {
-            if(binding.isButtonDown() || (binding.active && ButtonBindings.RADIAL_MENU.isButtonDown()))
-            {
-                binding.pressedTime--;
-            }
             if(binding.active && !ButtonBindings.RADIAL_MENU.isButtonDown())
             {
-                Controllable.getInput().handleButtonInput(Controllable.getController(), -1, false, true);
+                Controllable.getInputHandler().handleButtonInput(Controllable.getController(), -1, false, true);
                 binding.active = false;
                 binding.setPressed(false);
             }
         }
     }
 
-    public static void setButtonState(int button, boolean state)
+    @ApiStatus.Internal
+    public static void setButton(ButtonBinding binding, int button)
     {
-        List<ButtonBinding> bindings = BindingRegistry.getInstance().getBindingListForButton(button);
-        for(ButtonBinding binding : bindings)
-        {
-            binding.setPressed(state);
-            if(state)
-            {
-                binding.pressedTime = 0;
-            }
-        }
+        binding.button = button;
+    }
+
+    @ApiStatus.Internal
+    public static void setButtonState(ButtonBinding binding, boolean state)
+    {
+        binding.setPressed(state);
     }
 
     /**
      * Resets all buttons states. Called when a GUI is opened.
      */
+    @ApiStatus.Internal
     public static void resetButtonStates()
     {
-        for(ButtonBinding binding : BindingRegistry.getInstance().getRegisteredBindings())
+        for(ButtonBinding binding : Controllable.getBindingRegistry().getRegisteredBindings())
         {
             binding.resetPressedState();
         }
@@ -144,12 +152,7 @@ public class ButtonBinding implements Comparable<ButtonBinding>
 
     public boolean isConflictingContext()
     {
-        List<ButtonBinding> bindings = BindingRegistry.getInstance().getBindingListForButton(this.button);
-
-        if(bindings == null)
-            return false;
-
-        for(ButtonBinding binding : bindings)
+        for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingListForButton(this.button))
         {
             if(this.conflicts(binding))
             {
@@ -157,14 +160,6 @@ public class ButtonBinding implements Comparable<ButtonBinding>
             }
         }
         return false;
-    }
-
-    /**
-     * Checks if the context is active and that this binding does not conflict with any other binding.
-     */
-    private boolean isActiveAndValidContext()
-    {
-        return this.context.isActive() && !this.isConflictingContext();
     }
 
     /**
@@ -197,6 +192,5 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     {
         this.active = true;
         this.setPressed(true);
-        this.pressedTime = 0;
     }
 }
