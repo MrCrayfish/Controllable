@@ -1,14 +1,14 @@
 package test;
 
-import com.mrcrayfish.controllable.api.client.binding.context.BindingContext;
-import com.mrcrayfish.controllable.api.client.binding.context.GlobalContext;
-import com.mrcrayfish.controllable.api.client.binding.context.InGameContext;
-import com.mrcrayfish.controllable.api.client.binding.context.InGameWithScreenContext;
-import com.mrcrayfish.controllable.api.client.binding.context.InScreenContext;
-import com.mrcrayfish.controllable.api.client.binding.context.rule.ContextRule;
-import com.mrcrayfish.controllable.api.client.binding.context.rule.HasPlayerRule;
-import com.mrcrayfish.controllable.api.client.binding.context.rule.HasScreenRule;
-import com.mrcrayfish.controllable.api.client.binding.context.rule.NoScreenRule;
+import com.mrcrayfish.controllable.client.binding.context.BindingContext;
+import com.mrcrayfish.controllable.client.binding.context.GlobalContext;
+import com.mrcrayfish.controllable.client.binding.context.InGameContext;
+import com.mrcrayfish.controllable.client.binding.context.InGameWithScreenContext;
+import com.mrcrayfish.controllable.client.binding.context.InScreenContext;
+import com.mrcrayfish.controllable.client.binding.context.rule.ContextRule;
+import com.mrcrayfish.controllable.client.binding.context.rule.HasPlayerRule;
+import com.mrcrayfish.controllable.client.binding.context.rule.HasScreenRule;
+import com.mrcrayfish.controllable.client.binding.context.rule.NoScreenRule;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.client.gui.screens.inventory.AnvilScreen;
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;

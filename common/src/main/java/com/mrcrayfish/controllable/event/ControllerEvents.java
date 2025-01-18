@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.event;
 
 import com.mrcrayfish.controllable.client.Action;
 import com.mrcrayfish.controllable.client.settings.ActionVisibility;
-import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.input.Controller;

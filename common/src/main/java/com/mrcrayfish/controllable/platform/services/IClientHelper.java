@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.platform.services;
 
-import com.mrcrayfish.controllable.api.client.binding.context.BindingContext;
+import com.mrcrayfish.controllable.client.binding.context.BindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;

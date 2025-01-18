@@ -5,7 +5,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Action;
 import com.mrcrayfish.controllable.client.ActionDescriptions;
 import com.mrcrayfish.controllable.client.settings.ActionVisibility;
-import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import com.mrcrayfish.controllable.client.input.Controller;

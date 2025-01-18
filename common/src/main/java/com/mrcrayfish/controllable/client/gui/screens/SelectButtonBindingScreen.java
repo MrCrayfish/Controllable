@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;

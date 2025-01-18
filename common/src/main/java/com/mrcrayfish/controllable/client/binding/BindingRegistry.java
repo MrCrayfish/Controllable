@@ -12,7 +12,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.client.KeyMapping;

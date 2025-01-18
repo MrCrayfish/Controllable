@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mrcrayfish.controllable.api.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import net.minecraft.ChatFormatting;
 
 /**

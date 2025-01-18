@@ -1,9 +1,10 @@
 package com.mrcrayfish.controllable.api.client.binding.context;
 
-import com.mrcrayfish.controllable.api.client.binding.context.rule.ContextRule;
-import com.mrcrayfish.controllable.api.client.binding.context.rule.HasPlayerRule;
-import com.mrcrayfish.controllable.api.client.binding.context.rule.HasScreenRule;
-import com.mrcrayfish.controllable.api.client.binding.context.rule.NoScreenRule;
+import com.mrcrayfish.controllable.client.binding.context.BindingContext;
+import com.mrcrayfish.controllable.client.binding.context.rule.ContextRule;
+import com.mrcrayfish.controllable.client.binding.context.rule.HasPlayerRule;
+import com.mrcrayfish.controllable.client.binding.context.rule.HasScreenRule;
+import com.mrcrayfish.controllable.client.binding.context.rule.NoScreenRule;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
