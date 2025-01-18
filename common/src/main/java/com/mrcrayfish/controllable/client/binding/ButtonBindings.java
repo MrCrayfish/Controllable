@@ -410,4 +410,16 @@ public class ButtonBindings
     public static final ButtonBinding OPEN_CHAT = new ButtonBinding(-1, "key.chat", "key.categories.multiplayer", InGameContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> ClientServices.CLIENT.openChatScreen(""));
     }));
+
+    public static final ButtonBinding MOVE_CURSOR_UP = new ButtonBinding(Buttons.LEFT_THUMB_STICK_UP, "controllable.key.move_cursor_up", "key.categories.ui", InScreenContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding MOVE_CURSOR_DOWN = new ButtonBinding(Buttons.LEFT_THUMB_STICK_DOWN, "controllable.key.move_cursor_down", "key.categories.ui", InScreenContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding MOVE_CURSOR_LEFT = new ButtonBinding(Buttons.LEFT_THUMB_STICK_LEFT, "controllable.key.move_cursor_left", "key.categories.ui", InScreenContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding MOVE_CURSOR_RIGHT = new ButtonBinding(Buttons.LEFT_THUMB_STICK_RIGHT, "controllable.key.move_cursor_right", "key.categories.ui", InScreenContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding SCROLL_UP = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_UP, "controllable.key.scroll_up", "key.categories.ui", InScreenContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding SCROLL_DOWN = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_DOWN, "controllable.key.scroll_down", "key.categories.ui", InScreenContext.INSTANCE, EmptyHandler.INSTANCE);
 }

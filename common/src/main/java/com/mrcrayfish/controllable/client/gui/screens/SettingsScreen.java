@@ -298,7 +298,6 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.thumbstickDeadZone, 0.01));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.triggerDeadZone, 0.01));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.cursorSpeed, 1.0));
-            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.cursorThumbstick));
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.cursorType));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.listScrollSpeed, 1.0));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.hoverModifier, 0.05));

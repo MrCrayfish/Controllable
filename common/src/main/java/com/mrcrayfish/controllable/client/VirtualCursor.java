@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client;
 import com.google.common.base.Preconditions;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.settings.Thumbstick;
@@ -275,8 +276,8 @@ public final class VirtualCursor
     private void updateInputVector(Controller controller)
     {
         float moveThreshold = 0.35F; // TODO change to config option
-        float thumbstickX = this.getCursorThumbstickX(controller);
-        float thumbstickY = this.getCursorThumbstickY(controller);
+        float thumbstickX = this.getCursorInputX(controller);
+        float thumbstickY = this.getCursorInputY(controller);
         float cursorVectorX = Math.abs(thumbstickX) >= moveThreshold ? thumbstickX : 0;
         float cursorVectorY = Math.abs(thumbstickY) >= moveThreshold ? thumbstickY : 0;
         this.inputVector.x = ClientHelper.applyDeadzone(cursorVectorX, moveThreshold);
@@ -299,9 +300,13 @@ public final class VirtualCursor
      * @param controller the controller instance to read the input from
      * @return a float ranging from -1 to 1
      */
-    private float getCursorThumbstickX(Controller controller)
+    private float getCursorInputX(Controller controller)
     {
-        return Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickXValue() : controller.getRThumbStickXValue();
+        float left = controller.getPressedValue(ButtonBindings.MOVE_CURSOR_LEFT.getButton());
+        float right = controller.getPressedValue(ButtonBindings.MOVE_CURSOR_RIGHT.getButton());
+        if(left > 0 && right > 0) // If both pressed, return no input
+            return 0;
+        return -left + right;
     }
 
     /**
@@ -310,9 +315,13 @@ public final class VirtualCursor
      * @param controller the controller instance to read the input from
      * @return a float ranging from -1 to 1
      */
-    private float getCursorThumbstickY(Controller controller)
+    private float getCursorInputY(Controller controller)
     {
-        return Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getLThumbStickYValue() : controller.getRThumbStickYValue();
+        float up = controller.getPressedValue(ButtonBindings.MOVE_CURSOR_UP.getButton());
+        float down = controller.getPressedValue(ButtonBindings.MOVE_CURSOR_DOWN.getButton());
+        if(up > 0 && down > 0) // If both pressed, return no input
+            return 0;
+        return down - up;
     }
 
     /**

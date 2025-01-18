@@ -43,7 +43,6 @@ public class ControllerOptions
     public static final ControllerSetting<Thumbstick> RADIAL_THUMBSTICK = createValuesSetting("controllable.options.radialThumbstick", Thumbstick.class, Config.CLIENT.options.radialThumbstick);
     public static final VanillaSetting<Boolean> SNEAK_MODE = createVanillaSetting(() -> Minecraft.getInstance().options.toggleCrouch());
     public static final VanillaSetting<Boolean> SPRINT_MODE = createVanillaSetting(() -> Minecraft.getInstance().options.toggleSprint());
-    public static final ControllerSetting<Thumbstick> CURSOR_THUMBSTICK = createValuesSetting("controllable.options.cursorThumbstick", Thumbstick.class, Config.CLIENT.options.cursorThumbstick);
     public static final ControllerSetting<Boolean> FPS_POLLING_FIX = createToggleSetting("controllable.options.fpsPollingFix", Config.CLIENT.options.fpsPollingFix);
     public static final ControllerSetting<Boolean> HINT_BACKGROUND = createToggleSetting("controllable.options.hintBackground", Config.CLIENT.options.drawHintBackground);
     public static final ControllerSetting<Double> LIST_SCROLL_SPEED = createSliderSetting("controllable.options.listScrollSpeed", Config.CLIENT.options.listScrollSpeed, 1.0);

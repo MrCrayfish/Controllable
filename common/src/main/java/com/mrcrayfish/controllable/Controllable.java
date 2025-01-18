@@ -34,8 +34,8 @@ public class Controllable
     {
         PROPERTIES.load();
         MANAGER.get().init();
-        CURSOR.registerEvents();
         INPUT_PROCESSOR.registerEvents();
+        CURSOR.registerEvents();
         INPUT_HANDLER.registerEvents();
         CAMERA_HANDLER.registerEvents();
         RADIAL_MENU.registerEvents();

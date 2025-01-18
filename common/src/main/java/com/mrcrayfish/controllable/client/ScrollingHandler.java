@@ -3,8 +3,8 @@ package com.mrcrayfish.controllable.client;
 import com.google.common.base.Preconditions;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.event.ScreenEvents;
@@ -95,7 +95,7 @@ public class ScrollingHandler
      */
     private void handleScreenScrolling(Screen screen, Controller controller)
     {
-        float input = this.getScrollingThumbstickY(controller);
+        float input = this.getScrollingInputY(controller);
         if(Math.abs(input) >= SCROLL_THRESHOLD)
         {
             int screenCursorX = Controllable.getCursor().getScreenX();
@@ -184,7 +184,7 @@ public class ScrollingHandler
      */
     private boolean handleAbstractListScrolling(Screen screen, Controller controller)
     {
-        float input = this.getScrollingThumbstickY(controller);
+        float input = this.getScrollingInputY(controller);
         if(Math.abs(input) >= ABSTRACT_LIST_SCROLL_THRESHOLD)
         {
             double cursorX = Controllable.getCursor().getRenderScreenX();
@@ -209,8 +209,12 @@ public class ScrollingHandler
      * @param controller the controller instance to read the input from
      * @return a float ranging from -1 to 1
      */
-    private float getScrollingThumbstickY(Controller controller)
+    private float getScrollingInputY(Controller controller)
     {
-        return Config.CLIENT.options.cursorThumbstick.get() == Thumbstick.LEFT ? controller.getRThumbStickYValue() : controller.getLThumbStickYValue();
+        float up = controller.getPressedValue(ButtonBindings.SCROLL_UP.getButton());
+        float down = controller.getPressedValue(ButtonBindings.SCROLL_DOWN.getButton());
+        if(up > 0 && down > 0) // If both pressed, return no input
+            return 0;
+        return -up + down;
     }
 }

@@ -91,9 +91,6 @@ public class Config
             @ConfigProperty(name = "radialThumbstick", comment = "The thumbstick to use when scrolling items in the radial menu")
             public final EnumProperty<Thumbstick> radialThumbstick = EnumProperty.create(Thumbstick.RIGHT);
 
-            @ConfigProperty(name = "cursorThumbstick", comment = "The thumbstick that controls moving the cursor")
-            public final EnumProperty<Thumbstick> cursorThumbstick = EnumProperty.create(Thumbstick.LEFT);
-
             @ConfigProperty(name = "hoverModifier", comment = "The scale of the mouse speed when hovering a widget or item slot")
             public final DoubleProperty hoverModifier = DoubleProperty.create(0.6, 0.05, 1.0);
 

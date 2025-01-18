@@ -102,6 +102,12 @@ public class BindingRegistry
         this.register(ButtonBindings.TOGGLE_CRAFT_BOOK);
         this.register(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS);
         this.register(ButtonBindings.OPEN_CHAT);
+        this.register(ButtonBindings.MOVE_CURSOR_UP);
+        this.register(ButtonBindings.MOVE_CURSOR_DOWN);
+        this.register(ButtonBindings.MOVE_CURSOR_LEFT);
+        this.register(ButtonBindings.MOVE_CURSOR_RIGHT);
+        this.register(ButtonBindings.SCROLL_UP);
+        this.register(ButtonBindings.SCROLL_DOWN);
     }
 
     public List<ButtonBinding> getRegisteredBindings()

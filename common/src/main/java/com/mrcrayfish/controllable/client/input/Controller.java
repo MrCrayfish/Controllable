@@ -156,4 +156,52 @@ public abstract class Controller
     {
         return Util.getMillis() - this.lastInputTime < 4000;
     }
+
+    /**
+     * Gets the pressed value of a button. This value ranges from 0 to 1 (inclusive). If the value
+     * is greater than zero, it is considered pressed. Binary buttons will only be either 0 or 1,
+     * while virtual buttons like the thumbstick may be any number between 0 and 1 (inclusive).
+     *
+     * @param button the button to get the pressed value for
+     * @return a float value between 0 and 1 (inclusive)
+     */
+    public final float getPressedValue(int button)
+    {
+        return switch(button)
+        {
+            case Buttons.LEFT_THUMB_STICK_UP -> {
+                float value = this.getLThumbStickYValue();
+                yield value < 0 ? -value : 0;
+            }
+            case Buttons.LEFT_THUMB_STICK_DOWN -> {
+                float value = this.getLThumbStickYValue();
+                yield value > 0 ? value : 0;
+            }
+            case Buttons.LEFT_THUMB_STICK_LEFT -> {
+                float value = this.getLThumbStickXValue();
+                yield value < 0 ? -value : 0;
+            }
+            case Buttons.LEFT_THUMB_STICK_RIGHT -> {
+                float value = this.getLThumbStickXValue();
+                yield value > 0 ? value : 0;
+            }
+            case Buttons.RIGHT_THUMB_STICK_UP -> {
+                float value = this.getRThumbStickYValue();
+                yield value < 0 ? -value : 0;
+            }
+            case Buttons.RIGHT_THUMB_STICK_DOWN -> {
+                float value = this.getRThumbStickYValue();
+                yield value > 0 ? value : 0;
+            }
+            case Buttons.RIGHT_THUMB_STICK_LEFT -> {
+                float value = this.getRThumbStickXValue();
+                yield value < 0 ? -value : 0;
+            }
+            case Buttons.RIGHT_THUMB_STICK_RIGHT -> {
+                float value = this.getRThumbStickXValue();
+                yield value > 0 ? value : 0;
+            }
+            default -> button != -1 && this.isButtonPressed(button) ? 1 : 0;
+        };
+    }
 }
