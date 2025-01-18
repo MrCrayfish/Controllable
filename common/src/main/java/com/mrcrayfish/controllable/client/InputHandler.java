@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.binding.handlers.action.BindingMovementInput;
 import com.mrcrayfish.controllable.client.binding.handlers.action.BindingOnRender;
 import com.mrcrayfish.controllable.client.binding.handlers.action.BindingOnTick;
@@ -28,6 +29,7 @@ import com.mrcrayfish.controllable.client.settings.AnalogMovement;
 import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.EventHelper;
+import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable.client.util.MouseHooks;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
@@ -260,8 +262,8 @@ public class InputHandler
             {
                 float sneakSpeed = (float) localPlayer.getAttributeValue(Attributes.SNEAKING_SPEED);
                 float sneakBonus = localPlayer.isMovingSlowly() ? sneakSpeed : 1.0F;
-                float inputX = controller.getLThumbStickXValue();
-                float inputY = controller.getLThumbStickYValue();
+                float inputX = InputHelper.getCombinedPressedValue(controller, ButtonBindings.STRAFE_LEFT, ButtonBindings.STRAFE_RIGHT);
+                float inputY = InputHelper.getCombinedPressedValue(controller, ButtonBindings.WALK_FORWARDS, ButtonBindings.WALK_BACKWARDS);
 
                 AnalogMovement movement = Config.CLIENT.options.analogMovement.get();
                 if(movement != AnalogMovement.ALWAYS)

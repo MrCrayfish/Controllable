@@ -422,4 +422,12 @@ public class ButtonBindings
     public static final ButtonBinding SCROLL_UP = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_UP, "controllable.key.scroll_up", "key.categories.ui", InScreenContext.INSTANCE, EmptyHandler.INSTANCE);
 
     public static final ButtonBinding SCROLL_DOWN = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_DOWN, "controllable.key.scroll_down", "key.categories.ui", InScreenContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding WALK_FORWARDS = new ButtonBinding(Buttons.LEFT_THUMB_STICK_UP, "key.forward", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding WALK_BACKWARDS = new ButtonBinding(Buttons.LEFT_THUMB_STICK_DOWN, "key.back", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding STRAFE_LEFT = new ButtonBinding(Buttons.LEFT_THUMB_STICK_LEFT, "key.left", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding STRAFE_RIGHT = new ButtonBinding(Buttons.LEFT_THUMB_STICK_RIGHT, "key.right", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
 }
