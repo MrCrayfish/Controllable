@@ -5,7 +5,7 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.event.ScreenEvents;
 import com.mrcrayfish.framework.api.event.TickEvents;
@@ -102,7 +102,7 @@ public class ScrollingHandler
             int screenCursorY = Controllable.getCursor().getScreenY();
             if(this.usePreciseInput(screen))
             {
-                input = ClientHelper.applyDeadzone(input, SCROLL_THRESHOLD);
+                input = InputHelper.applyDeadzone(input, SCROLL_THRESHOLD);
                 input = this.scaleInputForScreen(screen, input);
                 input *= Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
                 screen.mouseScrolled(screenCursorX, screenCursorY, 0, -input);
@@ -192,7 +192,7 @@ public class ScrollingHandler
             GuiEventListener hoveredListener = ScreenHelper.findHoveredListener(screen, cursorX, cursorY, listener -> listener instanceof AbstractSelectionList<?>).orElse(null);
             if(hoveredListener instanceof AbstractSelectionList<?> list)
             {
-                double direction = ClientHelper.applyDeadzone(input, ABSTRACT_LIST_SCROLL_THRESHOLD);
+                double direction = InputHelper.applyDeadzone(input, ABSTRACT_LIST_SCROLL_THRESHOLD);
                 direction *= Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
                 list.setScrollAmount(list.getScrollAmount() + direction * Config.CLIENT.options.listScrollSpeed.get());
                 controller.updateInputTime();

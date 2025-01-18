@@ -6,8 +6,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.client.settings.Thumbstick;
-import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable.client.util.MouseHooks;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.mixin.client.TimerAccessor;
@@ -280,8 +279,8 @@ public final class VirtualCursor
         float thumbstickY = this.getCursorInputY(controller);
         float cursorVectorX = Math.abs(thumbstickX) >= moveThreshold ? thumbstickX : 0;
         float cursorVectorY = Math.abs(thumbstickY) >= moveThreshold ? thumbstickY : 0;
-        this.inputVector.x = ClientHelper.applyDeadzone(cursorVectorX, moveThreshold);
-        this.inputVector.y = ClientHelper.applyDeadzone(cursorVectorY, moveThreshold);
+        this.inputVector.x = InputHelper.applyDeadzone(cursorVectorX, moveThreshold);
+        this.inputVector.y = InputHelper.applyDeadzone(cursorVectorY, moveThreshold);
     }
 
     /**

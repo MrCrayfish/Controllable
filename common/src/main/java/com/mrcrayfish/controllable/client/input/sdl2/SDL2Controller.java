@@ -4,7 +4,7 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.input.ButtonStates;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable_sdl.api.gamecontroller.SDL_GameController;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
 import net.minecraft.client.resources.language.I18n;
@@ -133,41 +133,41 @@ public class SDL2Controller extends Controller
     public float getLTriggerValue()
     {
         float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) / (float) SDL_JOYSTICK_AXIS_MAX, 0, 1);
-        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.triggerDeadZone.get().floatValue());
+        return InputHelper.applyDeadzone(input, Config.CLIENT.options.triggerDeadZone.get().floatValue());
     }
 
     @Override
     public float getRTriggerValue()
     {
         float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / (float) SDL_JOYSTICK_AXIS_MAX, 0, 1);
-        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.triggerDeadZone.get().floatValue());
+        return InputHelper.applyDeadzone(input, Config.CLIENT.options.triggerDeadZone.get().floatValue());
     }
 
     @Override
     public float getLThumbStickXValue()
     {
         float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_LEFTX) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
-        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
+        return InputHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
     }
 
     @Override
     public float getLThumbStickYValue()
     {
         float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_LEFTY) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
-        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
+        return InputHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
     }
 
     @Override
     public float getRThumbStickXValue()
     {
         float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_RIGHTX) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
-        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
+        return InputHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
     }
 
     @Override
     public float getRThumbStickYValue()
     {
         float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_RIGHTY) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
-        return ClientHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
+        return InputHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
     }
 }
