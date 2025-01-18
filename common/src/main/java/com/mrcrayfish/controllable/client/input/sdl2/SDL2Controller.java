@@ -78,8 +78,8 @@ public class SDL2Controller extends Controller
         states.setState(Buttons.RIGHT_THUMB_STICK, this.readButton(SDL_CONTROLLER_BUTTON_RIGHTSTICK));
         states.setState(Buttons.LEFT_BUMPER, this.readButton(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
         states.setState(Buttons.RIGHT_BUMPER, this.readButton(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
-        states.setState(Buttons.LEFT_TRIGGER, this.getLTriggerValue() >= 0.5F); // TODO config option
-        states.setState(Buttons.RIGHT_TRIGGER, this.getRTriggerValue() >= 0.5F); // TODO config option
+        states.setState(Buttons.LEFT_TRIGGER, this.getLTriggerValue() >= 0.5F);
+        states.setState(Buttons.RIGHT_TRIGGER, this.getRTriggerValue() >= 0.5F);
         states.setState(Buttons.DPAD_UP, this.readButton(SDL_CONTROLLER_BUTTON_DPAD_UP));
         states.setState(Buttons.DPAD_DOWN, this.readButton(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
         states.setState(Buttons.DPAD_LEFT, this.readButton(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
@@ -90,6 +90,14 @@ public class SDL2Controller extends Controller
         states.setState(Buttons.PADDLE_THREE, this.readButton(SDL_CONTROLLER_BUTTON_PADDLE3));
         states.setState(Buttons.PADDLE_FOUR, this.readButton(SDL_CONTROLLER_BUTTON_PADDLE4));
         states.setState(Buttons.TOUCHPAD, this.readButton(SDL_CONTROLLER_BUTTON_TOUCHPAD));
+        states.setState(Buttons.LEFT_THUMB_STICK_UP, this.getLThumbStickYValue() <= -0.5F);
+        states.setState(Buttons.LEFT_THUMB_STICK_DOWN, this.getLThumbStickYValue() >= 0.5F);
+        states.setState(Buttons.LEFT_THUMB_STICK_LEFT, this.getLThumbStickXValue() <= -0.5F);
+        states.setState(Buttons.LEFT_THUMB_STICK_RIGHT, this.getLThumbStickXValue() >= 0.5F);
+        states.setState(Buttons.RIGHT_THUMB_STICK_UP, this.getRThumbStickYValue() <= -0.5F);
+        states.setState(Buttons.RIGHT_THUMB_STICK_DOWN, this.getRThumbStickYValue() >= 0.5F);
+        states.setState(Buttons.RIGHT_THUMB_STICK_LEFT, this.getRThumbStickXValue() <= -0.5F);
+        states.setState(Buttons.RIGHT_THUMB_STICK_RIGHT, this.getRThumbStickXValue() >= 0.5F);
         return states;
     }
 

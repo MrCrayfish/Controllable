@@ -67,6 +67,14 @@ public class GLFWController extends Controller
         states.setState(Buttons.DPAD_DOWN, this.readButton(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
         states.setState(Buttons.DPAD_LEFT, this.readButton(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
         states.setState(Buttons.DPAD_RIGHT, this.readButton(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+        states.setState(Buttons.LEFT_THUMB_STICK_UP, this.getLThumbStickYValue() <= -0.5F);
+        states.setState(Buttons.LEFT_THUMB_STICK_DOWN, this.getLThumbStickYValue() >= 0.5F);
+        states.setState(Buttons.LEFT_THUMB_STICK_LEFT, this.getLThumbStickXValue() <= -0.5F);
+        states.setState(Buttons.LEFT_THUMB_STICK_RIGHT, this.getLThumbStickXValue() >= 0.5F);
+        states.setState(Buttons.RIGHT_THUMB_STICK_UP, this.getRThumbStickYValue() <= -0.5F);
+        states.setState(Buttons.RIGHT_THUMB_STICK_DOWN, this.getRThumbStickYValue() >= 0.5F);
+        states.setState(Buttons.RIGHT_THUMB_STICK_LEFT, this.getRThumbStickXValue() <= -0.5F);
+        states.setState(Buttons.RIGHT_THUMB_STICK_RIGHT, this.getRThumbStickXValue() >= 0.5F);
         return states;
     }
 

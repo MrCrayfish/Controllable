@@ -32,8 +32,21 @@ public class Buttons
     public static final int PADDLE_THREE = 20;
     public static final int PADDLE_FOUR = 21;
     public static final int TOUCHPAD = 22;
-    public static final int LENGTH = 23;
-    public static final int[] BUTTONS = {A, B, X, Y, SELECT, HOME, START, LEFT_THUMB_STICK, RIGHT_THUMB_STICK, LEFT_BUMPER, RIGHT_BUMPER, LEFT_TRIGGER, RIGHT_TRIGGER, DPAD_UP, DPAD_DOWN, DPAD_LEFT, DPAD_RIGHT, MISC, PADDLE_ONE, PADDLE_TWO, PADDLE_THREE, PADDLE_FOUR, TOUCHPAD};
+    public static final int LEFT_THUMB_STICK_UP = 23; // Virtual
+    public static final int LEFT_THUMB_STICK_DOWN = 24; // Virtual
+    public static final int LEFT_THUMB_STICK_LEFT = 25; // Virtual
+    public static final int LEFT_THUMB_STICK_RIGHT = 26; // Virtual
+    public static final int RIGHT_THUMB_STICK_UP = 27; // Virtual
+    public static final int RIGHT_THUMB_STICK_DOWN = 28; // Virtual
+    public static final int RIGHT_THUMB_STICK_LEFT = 29; // Virtual
+    public static final int RIGHT_THUMB_STICK_RIGHT = 30; // Virtual
+    public static final int LENGTH = 31;
+    public static final int[] BUTTONS = {A, B, X, Y, SELECT, HOME, START, LEFT_THUMB_STICK,
+        RIGHT_THUMB_STICK, LEFT_BUMPER, RIGHT_BUMPER, LEFT_TRIGGER, RIGHT_TRIGGER, DPAD_UP,
+        DPAD_DOWN, DPAD_LEFT, DPAD_RIGHT, MISC, PADDLE_ONE, PADDLE_TWO, PADDLE_THREE, PADDLE_FOUR,
+        TOUCHPAD, LEFT_THUMB_STICK_UP, LEFT_THUMB_STICK_DOWN, LEFT_THUMB_STICK_LEFT,
+        LEFT_THUMB_STICK_RIGHT, RIGHT_THUMB_STICK_UP, RIGHT_THUMB_STICK_DOWN,
+        RIGHT_THUMB_STICK_LEFT, RIGHT_THUMB_STICK_RIGHT};
     public static final String[] NAMES = {
         "controllable.button.a",
         "controllable.button.b",
@@ -57,7 +70,15 @@ public class Buttons
         "controllable.button.paddle_two",
         "controllable.button.paddle_three",
         "controllable.button.paddle_four",
-        "controllable.button.touchpad"
+        "controllable.button.touchpad",
+        "controllable.button.left_thumb_stick_up",
+        "controllable.button.left_thumb_stick_down",
+        "controllable.button.left_thumb_stick_left",
+        "controllable.button.left_thumb_stick_right",
+        "controllable.button.right_thumb_stick_up",
+        "controllable.button.right_thumb_stick_down",
+        "controllable.button.right_thumb_stick_left",
+        "controllable.button.right_thumb_stick_right"
     };
 
     @Nullable
