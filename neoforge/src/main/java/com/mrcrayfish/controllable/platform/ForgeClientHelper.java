@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.platform;
 
-import com.mrcrayfish.controllable.api.client.binding.context.NeoForgeKeyContext;
+import com.mrcrayfish.controllable.client.binding.context.NeoForgeKeyContext;
 import com.mrcrayfish.controllable.client.binding.context.BindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;

@@ -1,6 +1,5 @@
-package com.mrcrayfish.controllable.api.client.binding.context;
+package com.mrcrayfish.controllable.client.binding.context;
 
-import com.mrcrayfish.controllable.client.binding.context.BindingContext;
 import com.mrcrayfish.controllable.client.binding.context.rule.ContextRule;
 import com.mrcrayfish.controllable.client.binding.context.rule.HasPlayerRule;
 import com.mrcrayfish.controllable.client.binding.context.rule.HasScreenRule;
