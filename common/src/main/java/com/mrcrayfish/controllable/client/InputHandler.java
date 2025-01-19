@@ -15,7 +15,6 @@ import com.mrcrayfish.controllable.client.binding.handlers.ButtonHandler;
 import com.mrcrayfish.controllable.client.binding.handlers.action.context.Context;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.binding.handlers.action.context.MovementInputContext;
-import com.mrcrayfish.controllable.client.binding.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.ListEntryNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.ListWidgetNavigationPoint;
@@ -95,11 +94,9 @@ public class InputHandler
     private static final ResourceLocation RECIPE_BUTTON_LOCATION = ResourceLocation.withDefaultNamespace("textures/gui/recipe_button.png");
     private static InputHandler instance;
 
-    private final Multimap<Integer, PriorityHandler<BindingPressed>> pressHandlers = TreeMultimap.create();
-    private final Multimap<Integer, PriorityHandler<BindingReleased>> releaseHandlers = TreeMultimap.create();
-    private final Multimap<BindingOnTick.TickPhase, PriorityHandler<BindingOnTick>> tickHandlers = TreeMultimap.create();
-    private final Multimap<BindingOnRender.RenderPhase, PriorityHandler<BindingOnRender>> renderHandlers = TreeMultimap.create();
-    private final Set<PriorityHandler<BindingMovementInput>> movementInputHandlers = new TreeSet<>();
+    private final Multimap<BindingOnTick.TickPhase, PriorityHandler<BindingOnTick>> activeTickHandlers = TreeMultimap.create();
+    private final Multimap<BindingOnRender.RenderPhase, PriorityHandler<BindingOnRender>> activeRenderHandlers = TreeMultimap.create();
+    private final Set<PriorityHandler<BindingMovementInput>> activeMovementInputHandlers = new TreeSet<>();
     private boolean initialized;
 
     @ApiStatus.Internal
@@ -133,47 +130,48 @@ public class InputHandler
 
         if(state)
         {
-            for(PriorityHandler<BindingPressed> handler : this.pressHandlers.get(button))
+            for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
             {
-                ButtonBinding binding = handler.binding();
+                ButtonHandler handler = binding.getHandler();
+                if(!(handler instanceof BindingPressed pressed))
+                    continue;
+
                 if(!binding.getContext().isActive())
                     continue;
 
                 Minecraft mc = Minecraft.getInstance();
                 Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, virtual);
-                Optional<Runnable> action = handler.handler().createPressedHandler(context);
+                Optional<Runnable> action = pressed.createPressedHandler(context);
                 if(action.isEmpty())
                     continue;
 
                 ButtonBinding.setButtonState(binding, true);
                 action.get().run();
 
-                if(handler.handler() instanceof BindingOnTick tick)
-                    this.tickHandlers.put(tick.phase(), new PriorityHandler<>(binding, tick));
-                if(handler.handler() instanceof BindingOnRender tick)
-                    this.renderHandlers.put(tick.phase(), new PriorityHandler<>(binding, tick));
-                if(handler.handler() instanceof BindingMovementInput input)
-                    this.movementInputHandlers.add(new PriorityHandler<>(binding, input));
+                if(handler instanceof BindingOnTick tick)
+                    this.activeTickHandlers.put(tick.phase(), new PriorityHandler<>(binding, tick));
+                if(handler instanceof BindingOnRender tick)
+                    this.activeRenderHandlers.put(tick.phase(), new PriorityHandler<>(binding, tick));
+                if(handler instanceof BindingMovementInput input)
+                    this.activeMovementInputHandlers.add(new PriorityHandler<>(binding, input));
+
                 break;
             }
         }
         else
         {
-            /*
-             * If a binding has both a pressed and released handler, it has priority over bindings
-             * that exclusively have a released handler. We do this as we consider this is combined
-             * action and requires that the released handler is guaranteed to be called, and not
-             * prioritised by another binding's released handler.
-             */
-            for(PriorityHandler<BindingPressed> handler : this.pressHandlers.get(button))
+            for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
             {
-                ButtonBinding binding = handler.binding();
+                ButtonHandler handler = binding.getHandler();
+                if(!(handler instanceof BindingPressed))
+                    continue;
+
                 if(!binding.isButtonDown())
                     continue;
 
                 ButtonBinding.setButtonState(binding, false);
 
-                if(!(handler.handler() instanceof BindingReleased released))
+                if(!(handler instanceof BindingReleased released))
                     continue;
 
                 // Cancel the handler if context is no longer valid
@@ -186,16 +184,19 @@ public class InputHandler
                 return;
             }
 
-            for(PriorityHandler<BindingReleased> handler : this.releaseHandlers.get(button))
+            for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
             {
-                ButtonBinding binding = handler.binding();
+                ButtonHandler handler = binding.getHandler();
+                if(!(handler instanceof BindingReleased released))
+                    continue;
+
                 if(!binding.getContext().isActive())
                     continue;
 
                 ButtonBinding.setButtonState(binding, false);
                 Minecraft mc = Minecraft.getInstance();
-                Context context = new Context(handler.binding, controller, mc, mc.player, mc.level, mc.screen, virtual);
-                if(handler.handler().handleReleased(context))
+                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, virtual);
+                if(released.handleReleased(context))
                     break;
             }
         }
@@ -225,7 +226,7 @@ public class InputHandler
     {
         Minecraft mc = Minecraft.getInstance();
         Controller controller = Controllable.getController();
-        this.tickHandlers.get(type).removeIf(handler -> {
+        this.activeTickHandlers.get(type).removeIf(handler -> {
             if(controller == null)
                 return true;
             ButtonBinding binding = handler.binding();
@@ -245,7 +246,7 @@ public class InputHandler
 
         Minecraft mc = Minecraft.getInstance();
         Controller controller = Controllable.getController();
-        this.movementInputHandlers.removeIf(handler -> {
+        this.activeMovementInputHandlers.removeIf(handler -> {
             if(controller == null)
                 return true;
             ButtonBinding binding = handler.binding();
@@ -721,21 +722,11 @@ public class InputHandler
         }
     }
 
-    public void addHandler(ButtonBinding binding)
+    public void clearActiveHandlers()
     {
-        int button = binding.getButton();
-        if(button == -1)
-            return;
-        ButtonHandler handler = binding.getHandler();
-        if(handler instanceof BindingPressed pressed)
-            this.pressHandlers.put(button, new PriorityHandler<>(binding, pressed));
-        if(handler instanceof BindingReleased released)
-            this.releaseHandlers.put(button, new PriorityHandler<>(binding, released));
-    }
-
-    public void removeHandler(KeyAdapterBinding binding)
-    {
-
+        this.activeTickHandlers.clear();
+        this.activeRenderHandlers.clear();
+        this.activeMovementInputHandlers.clear();
     }
 
     public enum Navigate

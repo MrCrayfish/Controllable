@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.client.KeyMapping;
@@ -43,7 +44,7 @@ public class BindingRegistry
     private final Map<String, ButtonBinding> registeredBindings = new HashMap<>();
     private final Map<String, KeyAdapterBinding> keyAdapters = new HashMap<>();
     private final Multimap<Integer, ButtonBinding> idToButtonList = TreeMultimap.create(Ordering.natural(),
-        Comparator.<ButtonBinding, Integer>comparing(binding -> binding.getContext().priority()).reversed()
+        Comparator.<ButtonBinding, Integer>comparing(binding -> binding.getContext().priority()).reversed().thenComparing(ButtonBinding::compareTo)
     );
 
     public BindingRegistry()
@@ -119,7 +120,7 @@ public class BindingRegistry
         return this.bindings;
     }
 
-    public Collection<ButtonBinding> getBindingListForButton(int button)
+    public Collection<ButtonBinding> getBindingsForButton(int button)
     {
         return this.idToButtonList.get(button);
     }
@@ -155,7 +156,6 @@ public class BindingRegistry
             if(binding.getButton() != -1)
             {
                 this.idToButtonList.put(binding.getButton(), binding);
-                Controllable.getInputHandler().addHandler(binding);
             }
         }
     }
@@ -168,7 +168,6 @@ public class BindingRegistry
             if(binding.getButton() != -1)
             {
                 this.idToButtonList.put(binding.getButton(), binding);
-                Controllable.getInputHandler().addHandler(binding);
             }
             this.save();
         }
@@ -180,13 +179,13 @@ public class BindingRegistry
         {
             this.keyAdapters.remove(binding.getDescription());
             this.idToButtonList.remove(binding.getButton(), binding);
-            Controllable.getInputHandler().removeHandler(binding);
             this.save();
         }
     }
 
     public void rebuildCache()
     {
+        Controllable.getInputHandler().clearActiveHandlers();
         this.idToButtonList.clear();
         this.bindings.stream().filter(binding -> binding.getButton() != -1).forEach(binding -> {
             this.idToButtonList.put(binding.getButton(), binding);

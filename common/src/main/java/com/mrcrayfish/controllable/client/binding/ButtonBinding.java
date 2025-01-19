@@ -144,7 +144,7 @@ public class ButtonBinding implements Comparable<ButtonBinding>
 
     public boolean isConflictingContext()
     {
-        for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingListForButton(this.button))
+        for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(this.button))
         {
             if(this.conflicts(binding))
             {
