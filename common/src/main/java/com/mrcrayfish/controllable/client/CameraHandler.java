@@ -3,8 +3,10 @@ package com.mrcrayfish.controllable.client;
 import com.google.common.base.Preconditions;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.EventHelper;
+import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable.event.Value;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import net.minecraft.client.DeltaTracker;
@@ -53,8 +55,8 @@ public class CameraHandler
         if(controller == null)
             return;
 
-        float thumbstickX = controller.getRThumbStickXValue();
-        float thumbstickY = controller.getRThumbStickYValue();
+        float thumbstickX = InputHelper.getCombinedPressedValue(controller, ButtonBindings.LOOK_LEFT, ButtonBindings.LOOK_RIGHT);
+        float thumbstickY = InputHelper.getCombinedPressedValue(controller, ButtonBindings.LOOK_UP, ButtonBindings.LOOK_DOWN);
         if(thumbstickX * thumbstickX > 0 || thumbstickY * thumbstickY > 0)
         {
             float pitchSensitivity = Config.CLIENT.options.pitchSensitivity.get().floatValue();

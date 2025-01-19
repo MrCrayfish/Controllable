@@ -430,4 +430,12 @@ public class ButtonBindings
     public static final ButtonBinding STRAFE_LEFT = new ButtonBinding(Buttons.LEFT_THUMB_STICK_LEFT, "key.left", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
 
     public static final ButtonBinding STRAFE_RIGHT = new ButtonBinding(Buttons.LEFT_THUMB_STICK_RIGHT, "key.right", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding LOOK_UP = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_UP, "controllable.key.look_up", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding LOOK_DOWN = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_DOWN, "controllable.key.look_down", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding LOOK_LEFT = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_LEFT, "controllable.key.look_left", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding LOOK_RIGHT = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_RIGHT, "controllable.key.look_right", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
 }

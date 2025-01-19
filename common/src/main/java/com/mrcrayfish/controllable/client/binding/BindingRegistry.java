@@ -113,6 +113,10 @@ public class BindingRegistry
         this.register(ButtonBindings.WALK_BACKWARDS);
         this.register(ButtonBindings.STRAFE_LEFT);
         this.register(ButtonBindings.STRAFE_RIGHT);
+        this.register(ButtonBindings.LOOK_UP);
+        this.register(ButtonBindings.LOOK_DOWN);
+        this.register(ButtonBindings.LOOK_LEFT);
+        this.register(ButtonBindings.LOOK_RIGHT);
     }
 
     public List<ButtonBinding> getRegisteredBindings()
