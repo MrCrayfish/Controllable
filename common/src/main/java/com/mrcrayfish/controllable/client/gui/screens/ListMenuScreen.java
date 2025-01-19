@@ -2,15 +2,20 @@ package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
-import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
+import com.mrcrayfish.controllable.client.gui.widget.BackgroundStringWidget;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -38,12 +43,13 @@ public abstract class ListMenuScreen extends Screen
 {
     protected final Screen parent;
     protected final int itemHeight;
+    protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     protected EntryList list;
     protected List<Item> entries;
     protected FocusedEditBox activeTextField;
     protected FocusedEditBox searchTextField;
     protected Component subTitle;
-    protected boolean searchBarVisible = true;
+    protected boolean searchable = true;
     protected int rowWidth = 240;
 
     protected ListMenuScreen(Screen parent, Component title, int itemHeight)
@@ -58,9 +64,9 @@ public abstract class ListMenuScreen extends Screen
         this.subTitle = subTitle;
     }
 
-    public void setSearchBarVisible(boolean visible)
+    public void setSearchable(boolean visible)
     {
-        this.searchBarVisible = visible;
+        this.searchable = visible;
     }
 
     public void setRowWidth(int rowWidth)
@@ -75,45 +81,64 @@ public abstract class ListMenuScreen extends Screen
         List<Item> entries = new ArrayList<>();
         this.constructEntries(entries);
         this.entries = ImmutableList.copyOf(entries); //Should this still be immutable?
-        this.list = new EntryList(this.entries, this.calculateTop());
-        //this.list.setRenderBackground(!ClientHelper.isPlayingGame());
-        this.addRenderableWidget(this.list);
+        this.list = new EntryList(this.entries);
+        this.layout.addToContents(this.list);
 
-        // Adds a search text field to the top of the screen
-        this.searchTextField = new FocusedEditBox(this.font, this.width / 2 - 110, this.calculateSearchBarY(), 220, 20, Component.literal("Search"));
-        this.searchTextField.setResponder(s ->
-        {
-            this.updateSearchTextFieldSuggestion(s);
-            this.list.replaceEntries(s.isEmpty() ? this.entries : this.entries.stream().filter(item -> {
-                return item instanceof ISearchable searchable && searchable.getLabel().plainCopy().toString().toLowerCase(Locale.ENGLISH).contains(s.toLowerCase(Locale.ENGLISH));
-            }).collect(Collectors.toList()));
-            if(!s.isEmpty())
-            {
-                this.list.setScrollAmount(0);
-            }
-        });
-        this.addRenderableWidget(this.searchTextField);
-        this.searchTextField.visible = this.searchBarVisible;
+        LinearLayout headerLayout = this.layout.addToHeader(LinearLayout.vertical().spacing(4));
+        headerLayout.defaultCellSetting().alignHorizontallyCenter();
+        this.setupHeader(headerLayout);
+
+        LinearLayout footerLayout = this.layout.addToFooter(LinearLayout.horizontal().spacing(4));
+        footerLayout.defaultCellSetting().alignVerticallyMiddle();
+        this.setupFooter(footerLayout);
+
+        // Set the height according the layout height
+        headerLayout.arrangeElements();
+        this.layout.setHeaderHeight(headerLayout.getHeight() + 12);
+
+        footerLayout.arrangeElements();
+        this.layout.setFooterHeight(footerLayout.getHeight() + 11);
+
         this.updateSearchTextFieldSuggestion("");
+        this.layout.visitWidgets(this::addRenderableWidget);
+        this.repositionElements();
     }
 
-    private int calculateTop()
+    protected void setupHeader(LinearLayout headerLayout)
     {
-        int top = 30;
-        if(this.searchBarVisible)
-        {
-            top += 20;
-        }
+        headerLayout.addChild(new StringWidget(this.getTitle(), this.font));
         if(this.subTitle != null)
         {
-            top += 14;
+            headerLayout.addChild(new BackgroundStringWidget(this.subTitle, this.font));
         }
-        return top;
+        if(this.searchable)
+        {
+            // Adds a search text field to the top of the screen
+            this.searchTextField = headerLayout.addChild(new FocusedEditBox(this.font, 0, 0, 220, 20, Component.literal("Search")));
+            this.searchTextField.setResponder(s -> {
+                this.updateSearchTextFieldSuggestion(s);
+                this.list.replaceEntries(s.isEmpty() ? this.entries : this.entries.stream()
+                    .filter(item -> {
+                        return item instanceof ISearchable searchable && searchable.getLabel()
+                            .getString()
+                            .toLowerCase(Locale.ENGLISH)
+                            .contains(s.toLowerCase(Locale.ENGLISH));
+                    })
+                    .collect(Collectors.toList()));
+                if(!s.isEmpty()) {
+                    this.list.setScrollAmount(0);
+                }
+            });
+        }
     }
 
-    private int calculateSearchBarY()
+    protected void setupFooter(LinearLayout footerLayout) {}
+
+    @Override
+    protected void repositionElements()
     {
-        return this.subTitle != null ? 36 : 22;
+        this.layout.arrangeElements();
+        this.list.updateSize(this.width, this.layout);
     }
 
     protected abstract void constructEntries(List<Item> entries);
@@ -132,40 +157,6 @@ public abstract class ListMenuScreen extends Screen
         }
     }
 
-    protected void updateTooltip(int mouseX, int mouseY)
-    {
-        if(ScreenHelper.isMouseWithin(10, 13, 23, 23, mouseX, mouseY))
-        {
-            this.setActiveTooltip(Objects.requireNonNull(this.minecraft).font.split(Component.translatable("configured.gui.info"), 200));
-        }
-    }
-
-    @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
-    {
-        // Draws the background texture (dirt or custom texture)
-        //this.renderBackground(graphics); // TODO test
-
-        super.render(graphics, mouseX, mouseY, partialTicks);
-
-        // Draws widgets manually since they are not buttons
-        //this.list.render(graphics, mouseX, mouseY, partialTicks);
-        //this.searchTextField.render(graphics, mouseX, mouseY, partialTicks);
-
-        // Draw title
-        int titleY = 7 + (!this.searchBarVisible && this.subTitle == null ? 5 : 0);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, titleY, 0xFFFFFF);
-
-        // Draw sub title
-        if(this.subTitle != null)
-        {
-            graphics.drawCenteredString(this.font, this.subTitle, this.width / 2, 21, 0xFFFFFF);
-        }
-
-        // Gives a chance for child classes to set the active tooltip
-        this.updateTooltip(mouseX, mouseY);
-    }
-
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
@@ -180,10 +171,10 @@ public abstract class ListMenuScreen extends Screen
 
     protected class EntryList extends ContainerObjectSelectionList<Item>
     {
-        public EntryList(List<Item> entries, int top)
+        public EntryList(List<Item> entries)
         {
             // ListMenuScreen.this.height - 44 TODO test
-            super(Objects.requireNonNull(ListMenuScreen.this.minecraft), ListMenuScreen.this.width, ListMenuScreen.this.height, top, ListMenuScreen.this.itemHeight);
+            super(Objects.requireNonNull(ListMenuScreen.this.minecraft), 0, 0, 0, ListMenuScreen.this.itemHeight);
             entries.forEach(this::addEntry);
         }
 
@@ -315,7 +306,7 @@ public abstract class ListMenuScreen extends Screen
         }
     }
 
-    public class TitleItem extends Item
+    public class TitleItem extends Item implements SkipItem
     {
         public TitleItem(Component title)
         {
@@ -328,8 +319,11 @@ public abstract class ListMenuScreen extends Screen
         }
 
         @Override
-        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void render(GuiGraphics graphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
+            Font font = Minecraft.getInstance().font;
+            int labelWidth = font.width(this.label) + 2;
+            ScreenHelper.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
             graphics.drawCenteredString(Objects.requireNonNull(ListMenuScreen.this.minecraft).font, this.label, left + width / 2, top + 5, 0xFFFFFF);
         }
     }
@@ -358,18 +352,20 @@ public abstract class ListMenuScreen extends Screen
 
     protected void updateSearchTextFieldSuggestion(String value)
     {
+        if(this.searchTextField == null)
+            return;
+
         if(!value.isEmpty())
         {
             Optional<? extends ISearchable> optional = this.entries.stream()
                     .filter(item -> item instanceof ISearchable)
                     .map(item -> (ISearchable) item)
-                    .filter(item -> item.getLabel().plainCopy().toString().toLowerCase(Locale.ENGLISH).startsWith(value.toLowerCase(Locale.ENGLISH)))
-                    .min(Comparator.comparing(item -> item.getLabel().plainCopy().toString()));
+                    .filter(item -> item.getLabel().getString().toLowerCase(Locale.ENGLISH).contains(value.toLowerCase(Locale.ENGLISH)))
+                    .min(Comparator.comparing(item -> item.getLabel().getString()));
             if(optional.isPresent())
             {
-                int length = value.length();
-                String displayName = optional.get().getLabel().plainCopy().toString();
-                this.searchTextField.setSuggestion(displayName.substring(length));
+                String displayName = optional.get().getLabel().getString();
+                this.searchTextField.setSuggestion(" (%s)".formatted(displayName));
             }
             else
             {

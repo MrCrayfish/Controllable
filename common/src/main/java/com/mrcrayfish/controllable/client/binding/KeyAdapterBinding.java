@@ -39,23 +39,21 @@ public final class KeyAdapterBinding extends ButtonBinding
     @Override
     protected void setPressed(boolean pressed)
     {
-        // TODO trigger click count
-        /*if(!this.pressed && pressed)
-        {
-            this.keyMapping.
-        }*/
+        boolean wasPressed = this.isButtonDown();
         super.setPressed(pressed);
         this.keyMapping.setDown(pressed);
-        if(pressed) this.updateKeyBindPressTime();
-        int key = ClientServices.CLIENT.getKeyValue(this.keyMapping);
-        this.handlePressed(pressed ? GLFW.GLFW_PRESS : GLFW.GLFW_RELEASE, key, 0);
+        if(!wasPressed && pressed)
+        {
+            this.updateKeyBindPressTime();
+            int key = ClientServices.CLIENT.getKeyValue(this.keyMapping);
+            this.handlePressed(GLFW.GLFW_PRESS, key, 0);
+        }
+        else if(wasPressed && !pressed)
+        {
+            int key = ClientServices.CLIENT.getKeyValue(this.keyMapping);
+            this.handlePressed(GLFW.GLFW_RELEASE, key, 0);
+        }
     }
-
-    /*@Override
-    protected void onPressTick()
-    {
-        //this.updateKeyBindPressTime();
-    }*/
 
     private void updateKeyBindPressTime()
     {
@@ -65,13 +63,8 @@ public final class KeyAdapterBinding extends ButtonBinding
     private void handlePressed(int action, int key, int modifiers)
     {
         Screen screen = Minecraft.getInstance().screen;
-        if(screen != null)
-        {
-            if(ClientServices.CLIENT.sendScreenInput(screen, key, action, modifiers))
-            {
-                return;
-            }
-        }
+        if(screen != null && ClientServices.CLIENT.sendScreenInput(screen, key, action, modifiers))
+            return;
         ClientServices.CLIENT.sendKeyInputEvent(key, 0, action, modifiers);
     }
 }

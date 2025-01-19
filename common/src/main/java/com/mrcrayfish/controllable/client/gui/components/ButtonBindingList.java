@@ -15,12 +15,14 @@ import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -110,11 +112,13 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         private final ButtonBinding binding;
         private final Button bindingButton;
         private final Button resetButton;
+        private final WidgetTooltipHolder tooltip = new WidgetTooltipHolder();
 
         protected ButtonBindingItem(ButtonBinding binding)
         {
             super(Component.translatable(binding.getLabelKey()));
             this.binding = binding;
+            this.tooltip.setDelay(Duration.ofMillis(400));
             this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> {
                 if(button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                     ButtonBindingList.this.settingsScreen.setSelectedBinding(this.binding);
@@ -125,7 +129,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
                 }
                 return false;
             });
-            this.resetButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 108, 0, 16, 16, button -> {
+            this.resetButton = new ImageButton(0, 0, 20, Icons.TEXTURE, 44, 0, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT, button -> {
                 binding.resetMappedButton();
                 BindingRegistry registry = Controllable.getBindingRegistry();
                 registry.rebuildCache();
@@ -172,6 +176,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         @SuppressWarnings("ConstantConditions")
         public void render(GuiGraphics graphics, int index, int top, int left, int width, int itemHeight, int mouseX, int mouseY, boolean selected, float partialTick)
         {
+            this.updateTooltip(mouseX, mouseY);
             this.setLabelColor(this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor());
             super.render(graphics, index, top, left, width, itemHeight, mouseX, mouseY, selected, partialTick);
             this.bindingButton.setTooltip(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
@@ -183,6 +188,20 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             this.resetButton.setY(top - 1);
             this.resetButton.active = !this.binding.isDefault();
             this.resetButton.render(graphics, mouseX, mouseY, partialTick);
+        }
+
+        private void updateTooltip(double mouseX, double mouseY)
+        {
+            Controller controller = Controllable.getController();
+            if(this.isMouseOver(mouseX, mouseY) && controller != null && controller.isBeingUsed())
+            {
+                this.tooltip.set(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
+            }
+            else
+            {
+                this.tooltip.set(null);
+            }
+            this.tooltip.refreshTooltipForNextRenderPass(true, false, this.getRectangle());
         }
 
         @Override

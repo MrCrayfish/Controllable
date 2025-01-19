@@ -26,6 +26,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
     public SelectButtonBindingScreen(RadialMenuConfigureScreen parentScreen)
     {
         super(parentScreen, Component.translatable("controllable.gui.title.select_button_bindings"), 22);
+        this.setRowWidth(290);
     }
 
     public RadialMenuConfigureScreen getRadialConfigureScreen()
@@ -107,16 +108,21 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void render(GuiGraphics graphics, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void render(GuiGraphics graphics, int index, int top, int left, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
+            // Draws a transparent black background on every odd item to help match the widgets with the label
+            if(index % 2 != 0)
+            {
+                graphics.fill(left - 2, top - 2, left + rowWidth + 2, top + rowHeight + 2, 0x55000000);
+            }
             Font font = SelectButtonBindingScreen.this.minecraft.font;
             int color = this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor();
-            graphics.drawString(font, this.label, left - 15, y + 6, color);
-            this.bindingButton.setX(left + width - 37);
-            this.bindingButton.setY(y);
+            graphics.drawString(font, this.label, left - 15, top + 6, color);
+            this.bindingButton.setX(left + rowWidth - 37);
+            this.bindingButton.setY(top);
             this.bindingButton.render(graphics, mouseX, mouseY, partialTicks);
-            this.deleteButton.setX(left + width - 15);
-            this.deleteButton.setY(y);
+            this.deleteButton.setX(left + rowWidth - 15);
+            this.deleteButton.setY(top);
             this.deleteButton.render(graphics, mouseX, mouseY, partialTicks);
         }
     }

@@ -57,7 +57,7 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
-        AtomicBoolean cancelled = new AtomicBoolean();
+        AtomicBoolean handled = new AtomicBoolean();
         Screen.wrapScreenError(() -> {
             if(action == GLFW.GLFW_RELEASE) {
                 if(!ClientHooks.onScreenKeyReleasedPre(screen, key, -1, modifiers)) {
@@ -67,7 +67,7 @@ public class ForgeClientHelper implements IClientHelper
                         }
                     }
                 }
-                cancelled.set(true);
+                handled.set(true);
             } else if(action == GLFW.GLFW_PRESS) {
                 if(!ClientHooks.onScreenKeyPressedPre(screen, key, -1, modifiers)) {
                     if(!screen.keyPressed(key, -1, modifiers)) {
@@ -76,10 +76,10 @@ public class ForgeClientHelper implements IClientHelper
                         }
                     }
                 }
-                cancelled.set(true);
+                handled.set(true);
             }
         }, "Controllable keyPressed event handler", screen.getClass().getCanonicalName());
-        return cancelled.get();
+        return handled.get();
     }
 
     @Override

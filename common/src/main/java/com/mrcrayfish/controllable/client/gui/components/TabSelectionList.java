@@ -18,6 +18,7 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Collections;
 import java.util.List;
@@ -102,8 +103,8 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         {
             Font font = TabSelectionList.this.minecraft.font;
             int footerWidth = font.width(this.footerText);
-            ScreenHelper.drawRoundedBox(graphics, this.getX() + (this.width - footerWidth) / 2, this.getBottom() + 4, footerWidth, 14, 0x55000000);
-            graphics.drawCenteredString(font, this.footerText, this.getX() + this.width / 2, this.getBottom() + 7, 0xFFFFFF);
+            ScreenHelper.drawRoundedBox(graphics, this.getX() + (this.width - footerWidth) / 2, this.getBottom() + 6, footerWidth, 14, 0x55000000);
+            graphics.drawCenteredString(font, this.footerText, this.getX() + this.width / 2, this.getBottom() + 9, 0xFFFFFF);
         }
         //graphics.fillGradient(this.getX(), this.getY(), this.getRight(), this.getY() + 4, 0xFF000000, 0);
         //graphics.fillGradient(this.getX(), this.getBottom() - 4, this.getRight(), this.getBottom(), 0, 0xFF000000);
@@ -111,6 +112,12 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
 
     @Override
     public void visitWidgets(Consumer<AbstractWidget> consumer) {}
+
+    @Override
+    protected boolean isValidMouseClick(int button)
+    {
+        return super.isValidMouseClick(button) || button == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+    }
 
     public abstract static class Item<T extends ContainerObjectSelectionList.Entry<T>> extends ContainerObjectSelectionList.Entry<T>
     {

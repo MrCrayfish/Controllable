@@ -6,7 +6,9 @@ import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
 import com.mrcrayfish.controllable.client.binding.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.RadialMenu;
+import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
@@ -54,15 +56,12 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
         bindings.add(options.keyChat);
         bindings.add(options.keyPlayerList);
         bindings.add(options.keyPickItem);
-        bindings.add(options.keyCommand);
         bindings.add(options.keyScreenshot);
         bindings.add(options.keyTogglePerspective);
         bindings.add(options.keySmoothCamera);
         bindings.add(options.keyFullscreen);
         bindings.add(options.keySpectatorOutlines);
         bindings.add(options.keySwapOffhand);
-        bindings.add(options.keySaveHotbarActivator);
-        bindings.add(options.keyLoadHotbarActivator);
         bindings.add(options.keyAdvancements);
         bindings.addAll(Arrays.asList(options.keyHotbarSlots));
         bindings.add(options.keySocialInteractions);
@@ -74,6 +73,7 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
     protected KeyBindingListMenuScreen(Screen parent, Component title, int itemHeight)
     {
         super(parent, title, itemHeight);
+        this.setRowWidth(290);
         this.categories.put("key.categories.movement", new ArrayList<>());
         this.categories.put("key.categories.gameplay", new ArrayList<>());
         this.categories.put("key.categories.inventory", new ArrayList<>());
@@ -116,33 +116,30 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
     public class KeyBindingItem extends Item implements ISearchable
     {
         private final KeyMapping mapping;
-        private Button addBinding;
-        private Button removeBinding;
+        private final Button addBinding;
+        private final Button removeBinding;
 
         protected KeyBindingItem(KeyMapping mapping)
         {
             super(Component.translatable(mapping.getName()));
             this.mapping = mapping;
             Collection<KeyAdapterBinding> bindings = Controllable.getBindingRegistry().getKeyAdapters().values();
-            this.addBinding = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button ->
-            {
+            this.addBinding = Button.builder(ClientHelper.getIconComponent(Icons.ADD), button -> {
                 Controllable.getBindingRegistry().addKeyAdapter(new KeyAdapterBinding(-1, this.mapping));
-                this.addBinding.active = false;
-                this.removeBinding.active = true;
+                KeyBindingItem.this.addBinding.active = false;
+                KeyBindingItem.this.removeBinding.active = true;
                 KeyBindingListMenuScreen.this.onChange();
-            });
-            this.removeBinding = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 98, 15, 10, 10, button ->
-            {
+            }).size(20, 20).build();
+            this.removeBinding = Button.builder(ClientHelper.getIconComponent(Icons.CROSS), button -> {
                 KeyAdapterBinding keyAdapter = Controllable.getBindingRegistry().getKeyAdapterByDescriptionKey(this.mapping.getName() + ".custom");
-                if(keyAdapter != null)
-                {
+                if(keyAdapter != null) {
                     Controllable.getBindingRegistry().removeKeyAdapter(keyAdapter);
                     Controllable.getRadialMenu().removeBinding(keyAdapter);
                 }
-                this.addBinding.active = true;
-                this.removeBinding.active = false;
+                KeyBindingItem.this.addBinding.active = true;
+                KeyBindingItem.this.removeBinding.active = false;
                 KeyBindingListMenuScreen.this.onChange();
-            });
+            }).size(20, 20).build();
             this.addBinding.active = bindings.stream().noneMatch(entry -> entry.getKeyMapping() == this.mapping);
             this.removeBinding.active = bindings.stream().anyMatch(entry -> entry.getKeyMapping() == this.mapping);
         }
@@ -168,15 +165,20 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void render(GuiGraphics graphics, int x, int y, int left, int width, int p_230432_6_, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void render(GuiGraphics graphics, int index, int top, int left, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean selected, float partialTicks)
         {
+            // Draws a transparent black background on every odd item to help match the widgets with the label
+            if(index % 2 != 0)
+            {
+                graphics.fill(left - 2, top - 2, left + rowWidth + 2, top + rowHeight + 2, 0x55000000);
+            }
             Font font = KeyBindingListMenuScreen.this.minecraft.font;
-            graphics.drawString(font, this.label, left, y + 6, 0xFFFFFF);
-            this.addBinding.setX(left + width - 42);
-            this.addBinding.setY(y);
+            graphics.drawString(font, this.label, left + 5, top + 5, 0xFFFFFF);
+            this.addBinding.setX(left + rowWidth - 42);
+            this.addBinding.setY(top - 1);
             this.addBinding.render(graphics, mouseX, mouseY, partialTicks);
-            this.removeBinding.setX(left + width - 20);
-            this.removeBinding.setY(y);
+            this.removeBinding.setX(left + rowWidth - 20);
+            this.removeBinding.setY(top - 1);
             this.removeBinding.render(graphics, mouseX, mouseY, partialTicks);
         }
 

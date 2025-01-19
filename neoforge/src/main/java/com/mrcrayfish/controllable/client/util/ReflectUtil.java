@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
+import net.minecraft.locale.Language;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
@@ -72,6 +73,7 @@ public class ReflectUtil
     public static void pushLinesToTooltip(Tooltip tooltip, List<FormattedCharSequence> lines)
     {
         ObfuscationReflectionHelper.setPrivateValue(Tooltip.class, tooltip, lines, "cachedTooltip");
+        ObfuscationReflectionHelper.setPrivateValue(Tooltip.class, tooltip, Language.getInstance(), "splitWithLanguage");
     }
 
     public static float getCreativeScrollOffset(CreativeModeInventoryScreen screen)

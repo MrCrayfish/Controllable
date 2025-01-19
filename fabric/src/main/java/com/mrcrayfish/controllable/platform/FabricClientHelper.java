@@ -43,16 +43,16 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
-        AtomicBoolean cancelled = new AtomicBoolean();
+        AtomicBoolean handled = new AtomicBoolean();
         Screen.wrapScreenError(() -> {
             if(action == GLFW.GLFW_RELEASE) {
-                cancelled.set(screen.keyReleased(key, -1, modifiers));
+                handled.set(screen.keyReleased(key, -1, modifiers));
             } else if(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT) {
                 screen.afterKeyboardAction();
-                cancelled.set(screen.keyPressed(key, -1, modifiers));
+                handled.set(screen.keyPressed(key, -1, modifiers));
             }
         }, "Controllable keyPressed event handler", screen.getClass().getCanonicalName());
-        return cancelled.get();
+        return handled.get();
     }
 
     @Override
