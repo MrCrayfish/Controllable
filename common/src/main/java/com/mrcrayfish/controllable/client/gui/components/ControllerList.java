@@ -25,7 +25,7 @@ import java.util.Objects;
  */
 public class ControllerList extends TabSelectionList<ControllerList.ControllerEntry>
 {
-    private static final ResourceLocation BEACON_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/container/beacon.png");
+    private static final ResourceLocation CHECKMARK = ResourceLocation.withDefaultNamespace("container/beacon/confirm");
 
     private final AdaptiveControllerManager manager;
     private final MutableComponent footerSubText;
@@ -131,7 +131,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             if(ControllerList.this.getSelected() == this)
             {
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-                graphics.blit(BEACON_TEXTURE, left + 3, top + 3, 91, 224, 14, 12, 256, 256);
+                graphics.blitSprite(CHECKMARK, left + 3, top, 18, 18);
             }
             else if(slotIndex % 2 != 0)
             {
