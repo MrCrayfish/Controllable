@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.overlay;
 
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
@@ -45,8 +46,8 @@ public class TabNavigationOverlay implements IOverlay
     {
         List<? extends GuiEventListener> tabs = this.navigationBar.children();
         ScreenRectangle firstTab = tabs.get(0).getRectangle();
-        ClientHelper.drawButton(graphics, firstTab.left() - 18, (firstTab.height() - 11) / 2, Buttons.LEFT_BUMPER);
+        ClientHelper.drawButton(graphics, firstTab.left() - 18, (firstTab.height() - 11) / 2, ButtonBindings.NEXT_RECIPE_TAB.getButton());
         ScreenRectangle lastTab = tabs.get(tabs.size() - 1).getRectangle();
-        ClientHelper.drawButton(graphics, lastTab.right() + 5, (lastTab.height() - 11) / 2, Buttons.RIGHT_BUMPER);
+        ClientHelper.drawButton(graphics, lastTab.right() + 5, (lastTab.height() - 11) / 2, ButtonBindings.PREVIOUS_RECIPE_TAB.getButton());
     }
 }

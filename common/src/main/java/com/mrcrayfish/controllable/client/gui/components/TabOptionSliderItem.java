@@ -66,14 +66,14 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
         Controller controller = Controllable.getController();
         if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
         {
-            ClientHelper.drawButton(graphics, left + listWidth - this.slider.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, Buttons.LEFT_TRIGGER);
-            ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, Buttons.RIGHT_TRIGGER);
+            ClientHelper.drawButton(graphics, left + listWidth - this.slider.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, ButtonBindings.NEXT_CREATIVE_TAB.getButton());
+            ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton());
 
             long currentTime = System.currentTimeMillis();
             if(currentTime - this.lastChange > 100)
             {
                 boolean changing = false;
-                if(ButtonBindings.NEXT_RECIPE_TAB.isButtonDown())
+                if(ButtonBindings.NEXT_CREATIVE_TAB.isButtonDown())
                 {
                     Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ANVIL_STEP, 0.7F, 0.25F));
                     this.slider.stepBackward();
@@ -81,7 +81,7 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
                     this.save = true;
                     changing = true;
                 }
-                else if(ButtonBindings.PREVIOUS_RECIPE_TAB.isButtonDown())
+                else if(ButtonBindings.PREVIOUS_CREATIVE_TAB.isButtonDown())
                 {
                     Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ANVIL_STEP, 0.75F, 0.25F));
                     this.slider.stepForward();

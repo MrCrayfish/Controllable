@@ -78,10 +78,10 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
         Controller controller = Controllable.getController();
         if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
         {
-            ClientHelper.drawButton(graphics, left + listWidth - this.cycle.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, Buttons.LEFT_TRIGGER);
-            ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, Buttons.RIGHT_TRIGGER);
+            ClientHelper.drawButton(graphics, left + listWidth - this.cycle.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, ButtonBindings.NEXT_CREATIVE_TAB.getButton());
+            ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton());
 
-            if(ButtonBindings.NEXT_RECIPE_TAB.isButtonDown())
+            if(ButtonBindings.NEXT_CREATIVE_TAB.isButtonDown())
             {
                 if(this.canChange)
                 {
@@ -90,7 +90,7 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
                     this.canChange = false;
                 }
             }
-            else if(ButtonBindings.PREVIOUS_RECIPE_TAB.isButtonDown())
+            else if(ButtonBindings.PREVIOUS_CREATIVE_TAB.isButtonDown())
             {
                 if(this.canChange)
                 {

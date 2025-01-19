@@ -180,9 +180,7 @@ public class ButtonBindings
     public static final ButtonBinding NEXT_CREATIVE_TAB = new ButtonBinding(Buttons.LEFT_BUMPER, "controllable.key.previous_creative_tab", "key.categories.inventory", InScreenContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
             context.screen().ifPresent(screen -> {
-                if(screen.children().stream().anyMatch(listener -> listener instanceof TabNavigationBar)) {
-                    InputHandler.navigateTabBar(screen, -1);
-                } else if(screen instanceof CreativeModeInventoryScreen) {
+                if(screen instanceof CreativeModeInventoryScreen) {
                     InputHandler.navigateCreativeTabs((CreativeModeInventoryScreen) screen, -1);
                     context.minecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 } else if(screen instanceof RecipeUpdateListener listener) {
@@ -195,9 +193,7 @@ public class ButtonBindings
     public static final ButtonBinding PREVIOUS_CREATIVE_TAB = new ButtonBinding(Buttons.RIGHT_BUMPER, "controllable.key.next_creative_tab", "key.categories.inventory", InScreenContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
             context.screen().ifPresent(screen -> {
-                if(screen.children().stream().anyMatch(listener -> listener instanceof TabNavigationBar)) {
-                    InputHandler.navigateTabBar(screen, 1);
-                } else if(screen instanceof CreativeModeInventoryScreen) {
+                if(screen instanceof CreativeModeInventoryScreen) {
                     InputHandler.navigateCreativeTabs((CreativeModeInventoryScreen) screen, 1);
                     context.minecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 } else if(screen instanceof RecipeUpdateListener listener) {
@@ -210,7 +206,9 @@ public class ButtonBindings
     public static final ButtonBinding NEXT_RECIPE_TAB = new ButtonBinding(Buttons.LEFT_TRIGGER, "controllable.key.previous_recipe_tab", "key.categories.inventory", InScreenContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
             context.screen().ifPresent(screen -> {
-                if(screen instanceof RecipeUpdateListener listener) {
+                if(screen.children().stream().anyMatch(listener -> listener instanceof TabNavigationBar)) {
+                    InputHandler.navigateTabBar(screen, -1);
+                } else if(screen instanceof RecipeUpdateListener listener) {
                     InputHandler.navigateRecipeTab(listener.getRecipeBookComponent(), -1);
                 }
             });
@@ -220,7 +218,9 @@ public class ButtonBindings
     public static final ButtonBinding PREVIOUS_RECIPE_TAB = new ButtonBinding(Buttons.RIGHT_TRIGGER, "controllable.key.next_recipe_tab", "key.categories.inventory", InScreenContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
             context.screen().ifPresent(screen -> {
-                if(screen instanceof RecipeUpdateListener listener) {
+                if(screen.children().stream().anyMatch(listener -> listener instanceof TabNavigationBar)) {
+                    InputHandler.navigateTabBar(screen, 1);
+                } else if(screen instanceof RecipeUpdateListener listener) {
                     InputHandler.navigateRecipeTab(listener.getRecipeBookComponent(), 1);
                 }
             });
