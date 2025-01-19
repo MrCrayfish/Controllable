@@ -196,7 +196,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         private void updateTooltip(double mouseX, double mouseY)
         {
             Controller controller = Controllable.getController();
-            if(this.isMouseOver(mouseX, mouseY) && controller != null && controller.isBeingUsed())
+            if(!this.bindingButton.isHovered() && !this.resetButton.isHovered() && this.isMouseOver(mouseX, mouseY) && controller != null && controller.isBeingUsed())
             {
                 this.tooltip.set(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
             }
