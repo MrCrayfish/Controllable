@@ -125,6 +125,9 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
                     return true;
                 } else if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
                     ButtonBinding.setButton(this.binding, -1);
+                    BindingRegistry registry = Controllable.getBindingRegistry();
+                    registry.rebuildCache();
+                    registry.save();
                     return true;
                 }
                 return false;
