@@ -1,9 +1,17 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
+import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.gui.Icons;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -33,13 +41,15 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
     }
 
     @Override
-    protected void constructEntries(List<Item> entries)
+    protected List<Item> constructEntries()
     {
-        this.updateList(entries, false); //TODO do I need the second param?
+        return this.createItems(false);
     }
 
-    public void updateList(List<Item> entries, boolean showUnbound)
+    public List<Item> createItems(boolean showUnbound)
     {
+        List<Item> items = new ArrayList<>();
+
         // Clear the list of bindings for each category
         this.categories.forEach((category, list) -> list.clear());
 
@@ -47,6 +57,7 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
         Controllable.getBindingRegistry().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding -> {
             // Only show unbound bindings for select binding screen for radial menu
             if(showUnbound && binding.getButton() != -1) return;
+            if(this.shouldExcludeBinding(binding)) return;
             List<ButtonBinding> list = this.categories.computeIfAbsent(binding.getCategory(), category -> new ArrayList<>());
             list.add(binding);
         });
@@ -54,14 +65,54 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
         // Sorts the button binding list then adds new entries to the option list for each category
         this.categories.forEach((category, list) ->
         {
-            if(!list.isEmpty())
+            boolean isCustom = category.equals("key.categories.controllable_custom");
+            if(!list.isEmpty() || isCustom)
             {
                 Collections.sort(list);
-                entries.add(new TitleItem(Component.translatable(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
-                list.forEach(binding -> entries.add(this.createItemFromBinding(binding)));
+                items.add(new TitleItem(Component.translatable(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+                list.forEach(binding -> items.add(this.createItemFromBinding(binding)));
+                if(isCustom)
+                {
+                    Component addKeybind = ClientHelper.join(Icons.KEY_CAP, Component.translatable("controllable.gui.add_key_bind"));
+                    items.add(new OneWidgetItem(Button.builder(addKeybind, btn -> {
+                        this.minecraft.setScreen(new SelectKeyBindingScreen(this, this::rebuildItems));
+                    }).build()));
+                }
             }
         });
+        return items;
+    }
+
+    protected boolean shouldExcludeBinding(ButtonBinding binding)
+    {
+        return false;
     }
 
     protected abstract Item createItemFromBinding(ButtonBinding binding);
+
+    public class OneWidgetItem extends Item
+    {
+        private final AbstractWidget widget;
+
+        public OneWidgetItem(AbstractWidget widget)
+        {
+            super(CommonComponents.EMPTY);
+            this.widget = widget;
+        }
+
+        @Override
+        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
+        {
+            this.widget.setWidth((int) (width * 0.5));
+            this.widget.setX(left + (width - this.widget.getWidth()) / 2);
+            this.widget.setY(top);
+            this.widget.render(graphics, mouseX, mouseY, partialTick);
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children()
+        {
+            return ImmutableList.of(this.widget);
+        }
+    }
 }

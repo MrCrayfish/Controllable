@@ -2,13 +2,12 @@ package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
 import com.mrcrayfish.controllable.client.binding.KeyAdapterBinding;
-import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.gui.Icons;
-import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
@@ -17,11 +16,13 @@ import net.minecraft.client.Options;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -84,13 +85,10 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
     }
 
     @Override
-    protected void constructEntries(List<Item> entries)
+    protected List<Item> constructEntries()
     {
-        this.updateList(entries);
-    }
+        List<Item> items = new ArrayList<>();
 
-    public void updateList(List<Item> entries)
-    {
         // Clear the list of bindings for each category
         this.categories.forEach((category, list) -> list.clear());
 
@@ -105,10 +103,11 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
             if(!list.isEmpty())
             {
                 Collections.sort(list);
-                entries.add(new TitleItem(Component.translatable(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
-                list.forEach(binding -> entries.add(new KeyBindingItem(binding)));
+                items.add(new TitleItem(Component.translatable(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+                list.forEach(binding -> items.add(new KeyBindingItem(binding)));
             }
         });
+        return items;
     }
 
     protected void onChange() {}
@@ -171,6 +170,11 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
             if(index % 2 != 0)
             {
                 graphics.fill(left - 2, top - 2, left + rowWidth + 2, top + rowHeight + 2, 0x55000000);
+            }
+            Controller controller = Controllable.getController();
+            if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, rowWidth, rowHeight, mouseX, mouseY))
+            {
+                ScreenHelper.drawOutlinedBox(graphics, left - 2, top - 2, rowWidth + 4, rowHeight + 4, 0xAAFFFFFF);
             }
             Font font = KeyBindingListMenuScreen.this.minecraft.font;
             graphics.drawString(font, this.label, left + 5, top + 5, 0xFFFFFF);

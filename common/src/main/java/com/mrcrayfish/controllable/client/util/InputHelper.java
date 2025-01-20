@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client.util;
 
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.util.Mth;
@@ -11,6 +12,7 @@ public class InputHelper
 {
     public static float getCombinedPressedValue(Controller controller, ButtonBinding first, ButtonBinding second)
     {
+        ButtonBinding active = Controllable.getInputHandler()
         float firstValue = controller.getPressedValue(first.getButton());
         float secondValue = controller.getPressedValue(second.getButton());
         if(firstValue > 0 && secondValue > 0) // Both pressed equals centered

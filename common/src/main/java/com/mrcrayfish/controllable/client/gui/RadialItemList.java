@@ -84,7 +84,7 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
         graphics.fill(left + 1, rowTop - 1, right - 1, rowTop + rowHeight + 1, backgroundColour);
     }
 
-    class ButtonBindingEntry extends ContainerObjectSelectionList.Entry<ButtonBindingEntry>
+    public class ButtonBindingEntry extends ContainerObjectSelectionList.Entry<ButtonBindingEntry>
     {
         private final ButtonBindingData data;
         private final Component description;

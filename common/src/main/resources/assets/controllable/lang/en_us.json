@@ -65,7 +65,7 @@
     "controllable.cursor.legacy_dark": "Dark (Legacy)",
     "controllable.cursor.legacy_light": "Light (Legacy)",
     "controllable.cursor.light": "Light",
-    "controllable.gui.add_binding": "Modify Bindings",
+    "controllable.gui.add_binding": "Add Bindings",
     "controllable.gui.add_key_bind": "Add Keybinds...",
     "controllable.gui.change_binding": "Press %s to Change",
     "controllable.gui.clear_binding": "Press %s to Clear",
@@ -107,7 +107,7 @@
     "controllable.gui.title.radial_menu_configure": "Configure Radial Menu",
     "controllable.gui.title.select_button_bindings": "Add/Remove Bindings",
     "controllable.gui.title.select_controller": "Select a Controller",
-    "controllable.gui.title.select_key_bindings": "Add/Remove Key Bindings",
+    "controllable.gui.title.select_key_bindings": "Add Custom Keybinds",
     "controllable.gui.title.thumbstick_settings": "Thumbstick Settings",
     "controllable.gui.waiting_for_input": "Listening for button input...",
     "controllable.gui.download": "Download",
@@ -122,6 +122,7 @@
     "controllable.gui.shift_down": "Shift Down",
     "controllable.gui.delete": "Delete",
     "controllable.gui.change_color": "Change Color",
+    "controllable.gui.add": "Add",
     "controllable.key.close_inventory": "Close Inventory",
     "controllable.key.debug_info": "Show Debug Info",
     "controllable.key.hotbar_slot_1": "Hotbar Slot #1",
@@ -236,5 +237,7 @@
     "framework_config.controllable.client.options.spyglassSensitivity.tooltip": "Adjusts the sensitivity of the camera when looking through a spyglass",
     "framework_config.controllable.client.options.analogMovement": "Analog Movement",
     "framework_config.controllable.client.options.analogMovement.tooltip": "Allows you to control the settings of analog movement",
-    "key.categories.controllable_custom": "Custom"
+    "key.categories.controllable_custom": "Custom Keybinds",
+    "controllable.gui.add_to_radial_menu": "Add to Radial Menu",
+    "controllable.gui.manage_keybinds": "Manage Keybinds"
 }

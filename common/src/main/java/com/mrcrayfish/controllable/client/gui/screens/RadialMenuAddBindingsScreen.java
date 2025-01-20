@@ -5,27 +5,32 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
+import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * Author: MrCrayfish
  */
-public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
+public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
 {
-    public SelectButtonBindingScreen(RadialMenuConfigureScreen parentScreen)
+    public RadialMenuAddBindingsScreen(RadialMenuConfigureScreen parentScreen)
     {
-        super(parentScreen, Component.translatable("controllable.gui.title.select_button_bindings"), 22);
+        super(parentScreen, Component.translatable("controllable.gui.title.select_button_bindings"), 24);
         this.setRowWidth(290);
     }
 
@@ -35,22 +40,30 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
     }
 
     @Override
-    protected void init()
+    protected void setupFooter(LinearLayout footerLayout)
     {
-        super.init();
-        this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 150, 20, Component.translatable("controllable.gui.restore_defaults"), (button) -> {
+        super.setupFooter(footerLayout);
+        Component resetLabel = ClientHelper.join(Icons.RESET, Component.translatable("controllable.gui.restore_defaults"));
+        footerLayout.addChild(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 150, 20, resetLabel, (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     ((RadialMenuConfigureScreen) this.parent).getBindings().clear();
                     ((RadialMenuConfigureScreen) this.parent).getBindings().addAll(Controllable.getRadialMenu().getDefaults());
-                    this.list.children().stream().filter(entry -> entry instanceof ButtonBindingItem).map(entry -> (ButtonBindingItem) entry).forEach(ButtonBindingItem::updateButtons);
                 }
                 return true;
             }));
         }));
-        this.addRenderableWidget(ScreenHelper.button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_DONE, (button) -> {
+        footerLayout.addChild(ScreenHelper.button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_BACK, (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));
+    }
+
+    @Override
+    protected boolean shouldExcludeBinding(ButtonBinding binding)
+    {
+        return this.getRadialConfigureScreen().getBindings().stream().anyMatch(data -> {
+            return data.getBinding() == binding;
+        });
     }
 
     @Override
@@ -62,8 +75,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
     public class ButtonBindingItem extends Item implements ISearchable
     {
         private final ButtonBinding binding;
-        private Button bindingButton;
-        private Button deleteButton;
+        private final Button bindingButton;
 
         protected ButtonBindingItem(ButtonBinding binding)
         {
@@ -71,27 +83,13 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
             this.binding = binding;
 
             List<ButtonBindingData> bindings = getRadialConfigureScreen().getBindings();
-            this.bindingButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button ->
-            {
+            this.bindingButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button -> {
                 bindings.add(new ButtonBindingData(this.binding, ChatFormatting.YELLOW));
-                this.bindingButton.active = false;
-                this.deleteButton.active = true;
+                Objects.requireNonNull(RadialMenuAddBindingsScreen.this.minecraft).setScreen(RadialMenuAddBindingsScreen.this.parent);
+                getRadialConfigureScreen().scrollToBottomAndSelectLast();
             });
-            this.deleteButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 98, 15, 10, 10, button ->
-            {
-                bindings.removeIf(entry -> entry.getBinding() == this.binding);
-                this.bindingButton.active = true;
-                this.deleteButton.active = false;
-            });
-            this.bindingButton.active = bindings.stream().noneMatch(entry -> entry.getBinding() == this.binding);
-            this.deleteButton.active = bindings.stream().anyMatch(entry -> entry.getBinding() == this.binding);
-        }
-
-        public void updateButtons()
-        {
-            List<ButtonBindingData> bindings = getRadialConfigureScreen().getBindings();
-            this.bindingButton.active = bindings.stream().noneMatch(entry -> entry.getBinding() == this.binding);
-            this.deleteButton.active = bindings.stream().anyMatch(entry -> entry.getBinding() == this.binding);
+            this.bindingButton.setTooltip(Tooltip.create(Component.translatable("controllable.gui.add_to_radial_menu")));
+            this.bindingButton.setTooltipDelay(Duration.ofMillis(400));
         }
 
         @Override
@@ -103,7 +101,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
         @Override
         public List<? extends GuiEventListener> children()
         {
-            return ImmutableList.of(this.bindingButton, this.deleteButton);
+            return ImmutableList.of(this.bindingButton);
         }
 
         @Override
@@ -115,15 +113,12 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
             {
                 graphics.fill(left - 2, top - 2, left + rowWidth + 2, top + rowHeight + 2, 0x55000000);
             }
-            Font font = SelectButtonBindingScreen.this.minecraft.font;
+            Font font = RadialMenuAddBindingsScreen.this.minecraft.font;
             int color = this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor();
-            graphics.drawString(font, this.label, left - 15, top + 6, color);
-            this.bindingButton.setX(left + rowWidth - 37);
+            graphics.drawString(font, this.label, left + 5, top + 6, color);
+            this.bindingButton.setX(left + rowWidth - 25);
             this.bindingButton.setY(top);
             this.bindingButton.render(graphics, mouseX, mouseY, partialTicks);
-            this.deleteButton.setX(left + rowWidth - 15);
-            this.deleteButton.setY(top);
-            this.deleteButton.render(graphics, mouseX, mouseY, partialTicks);
         }
     }
 }

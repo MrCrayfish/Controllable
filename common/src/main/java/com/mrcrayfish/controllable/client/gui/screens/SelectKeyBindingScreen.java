@@ -49,8 +49,8 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
                         Controllable.getBindingRegistry().removeKeyAdapter(binding);
                         Controllable.getRadialMenu().removeBinding(binding);
                     });
-                    this.list.children().stream().filter(entry -> entry instanceof KeyBindingItem).map(entry -> (KeyBindingItem) entry).forEach(KeyBindingItem::updateButtons);
                     this.updateButtons();
+                    this.rebuildItems();
                 }
                 return true;
             }));

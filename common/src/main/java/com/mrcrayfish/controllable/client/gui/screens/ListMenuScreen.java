@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -44,8 +45,8 @@ public abstract class ListMenuScreen extends Screen
     protected final Screen parent;
     protected final int itemHeight;
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
+    private List<Item> items = new ArrayList<>();
     protected EntryList list;
-    protected List<Item> entries;
     protected FocusedEditBox activeTextField;
     protected FocusedEditBox searchTextField;
     protected Component subTitle;
@@ -78,10 +79,8 @@ public abstract class ListMenuScreen extends Screen
     protected void init()
     {
         // Constructs a list of entries and adds them to an option list
-        List<Item> entries = new ArrayList<>();
-        this.constructEntries(entries);
-        this.entries = ImmutableList.copyOf(entries); //Should this still be immutable?
-        this.list = new EntryList(this.entries);
+        this.items = this.constructEntries();
+        this.list = new EntryList(this.items);
         this.layout.addToContents(this.list);
 
         LinearLayout headerLayout = this.layout.addToHeader(LinearLayout.vertical().spacing(4));
@@ -117,19 +116,29 @@ public abstract class ListMenuScreen extends Screen
             this.searchTextField = headerLayout.addChild(new FocusedEditBox(this.font, 0, 0, 220, 20, Component.literal("Search")));
             this.searchTextField.setResponder(s -> {
                 this.updateSearchTextFieldSuggestion(s);
-                this.list.replaceEntries(s.isEmpty() ? this.entries : this.entries.stream()
-                    .filter(item -> {
-                        return item instanceof ISearchable searchable && searchable.getLabel()
-                            .getString()
-                            .toLowerCase(Locale.ENGLISH)
-                            .contains(s.toLowerCase(Locale.ENGLISH));
-                    })
-                    .collect(Collectors.toList()));
-                if(!s.isEmpty()) {
-                    this.list.setScrollAmount(0);
-                }
+                this.filterItems(s);
             });
         }
+    }
+
+    private void filterItems(String s)
+    {
+        this.list.replaceEntries(s.isEmpty() ? this.items : this.items.stream()
+            .filter(item -> item instanceof ISearchable searchable && searchable.getLabel()
+                .getString()
+                .toLowerCase(Locale.ENGLISH)
+                .contains(s.toLowerCase(Locale.ENGLISH)))
+            .collect(Collectors.toList()));
+        if(!s.isEmpty())
+        {
+            this.list.setScrollAmount(0);
+        }
+    }
+
+    protected void rebuildItems()
+    {
+        this.items = this.constructEntries();
+        this.filterItems(this.searchTextField.getValue());
     }
 
     protected void setupFooter(LinearLayout footerLayout) {}
@@ -141,7 +150,7 @@ public abstract class ListMenuScreen extends Screen
         this.list.updateSize(this.width, this.layout);
     }
 
-    protected abstract void constructEntries(List<Item> entries);
+    protected abstract List<Item> constructEntries();
 
     /**
      * Sets the tool tip to render. Must be actively called in the render method as
@@ -171,11 +180,11 @@ public abstract class ListMenuScreen extends Screen
 
     protected class EntryList extends ContainerObjectSelectionList<Item>
     {
-        public EntryList(List<Item> entries)
+        public EntryList(List<Item> items)
         {
             // ListMenuScreen.this.height - 44 TODO test
             super(Objects.requireNonNull(ListMenuScreen.this.minecraft), 0, 0, 0, ListMenuScreen.this.itemHeight);
-            entries.forEach(this::addEntry);
+            items.forEach(this::addEntry);
         }
 
         @Override
@@ -357,7 +366,7 @@ public abstract class ListMenuScreen extends Screen
 
         if(!value.isEmpty())
         {
-            Optional<? extends ISearchable> optional = this.entries.stream()
+            Optional<? extends ISearchable> optional = this.list.children().stream()
                     .filter(item -> item instanceof ISearchable)
                     .map(item -> (ISearchable) item)
                     .filter(item -> item.getLabel().getString().toLowerCase(Locale.ENGLISH).contains(value.toLowerCase(Locale.ENGLISH)))
