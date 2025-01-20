@@ -70,7 +70,6 @@ public class InputProcessor
 
     private void processButtonStates()
     {
-        ButtonBinding.tick();
         while(!this.inputQueue.isEmpty())
         {
             ButtonStates states = this.inputQueue.poll();
@@ -104,13 +103,13 @@ public class InputProcessor
                 trackedStates.setState(index, true);
                 if(screen instanceof SettingsScreen settings && settings.isWaitingForButtonInput() && settings.processButton(index))
                     return;
-                Controllable.getInputHandler().handleButtonInput(controller, index, true, false); // Handle on down
+                Controllable.getInputHandler().handleButtonInput(controller, index, true); // Handle on down
             }
         }
         else if(trackedStates.getState(index))
         {
             trackedStates.setState(index, false);
-            Controllable.getInputHandler().handleButtonInput(controller, index, false, false); // Handle on release
+            Controllable.getInputHandler().handleButtonInput(controller, index, false); // Handle on release
         }
     }
 

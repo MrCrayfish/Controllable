@@ -275,9 +275,10 @@ public class RadialMenu
 
     private void onClientTickStart()
     {
-        //if(this.visible && !Controllable.getInput().isControllerInUse())
+        Controller controller = Controllable.getController();
+        if(this.visible && (controller == null || !controller.isBeingUsed()))
         {
-            //this.setVisibility(false);
+            this.setVisibility(false);
         }
     }
 
@@ -650,8 +651,11 @@ public class RadialMenu
         {
             radialMenu.setVisibility(false);
             radialMenu.clearAnimation();
-            this.entry.getBinding().setActiveAndPressed();
-            Controllable.getInputHandler().handleButtonInput(Controllable.getController(), -1, true, true);
+            Controller controller = Controllable.getController();
+            if(controller != null)
+            {
+                Controllable.getInputHandler().handleBindingPressed(controller, this.entry.getBinding(), true);
+            }
         }
 
         @Override

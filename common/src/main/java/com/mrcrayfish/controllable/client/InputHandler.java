@@ -97,6 +97,7 @@ public class InputHandler
     private final Multimap<BindingOnTick.TickPhase, PriorityHandler<BindingOnTick>> activeTickHandlers = TreeMultimap.create();
     private final Multimap<BindingOnRender.RenderPhase, PriorityHandler<BindingOnRender>> activeRenderHandlers = TreeMultimap.create();
     private final Set<PriorityHandler<BindingMovementInput>> activeMovementInputHandlers = new TreeSet<>();
+    private @Nullable ButtonBinding activeVirtualBinding;
     private boolean initialized;
 
     @ApiStatus.Internal
@@ -121,7 +122,7 @@ public class InputHandler
     }
 
     @ApiStatus.Internal
-    public void handleButtonInput(Controller controller, int button, boolean state, boolean virtual)
+    public void handleButtonInput(Controller controller, int button, boolean state)
     {
         if(controller == null)
             return;
@@ -132,30 +133,8 @@ public class InputHandler
         {
             for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
             {
-                ButtonHandler handler = binding.getHandler();
-                if(!(handler instanceof BindingPressed pressed))
-                    continue;
-
-                if(!binding.getContext().isActive())
-                    continue;
-
-                Minecraft mc = Minecraft.getInstance();
-                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, virtual);
-                Optional<Runnable> action = pressed.createPressedHandler(context);
-                if(action.isEmpty())
-                    continue;
-
-                ButtonBinding.setButtonState(binding, true);
-                action.get().run();
-
-                if(handler instanceof BindingOnTick tick)
-                    this.activeTickHandlers.put(tick.phase(), new PriorityHandler<>(binding, tick));
-                if(handler instanceof BindingOnRender tick)
-                    this.activeRenderHandlers.put(tick.phase(), new PriorityHandler<>(binding, tick));
-                if(handler instanceof BindingMovementInput input)
-                    this.activeMovementInputHandlers.add(new PriorityHandler<>(binding, input));
-
-                break;
+                if(this.handleBindingPressed(controller, binding, false))
+                    break;
             }
         }
         else
@@ -179,7 +158,7 @@ public class InputHandler
                     break;
 
                 Minecraft mc = Minecraft.getInstance();
-                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, virtual);
+                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, false);
                 released.handleReleased(context);
                 return;
             }
@@ -195,15 +174,80 @@ public class InputHandler
 
                 ButtonBinding.setButtonState(binding, false);
                 Minecraft mc = Minecraft.getInstance();
-                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, virtual);
+                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, false);
                 if(released.handleReleased(context))
                     break;
             }
         }
     }
 
+    @ApiStatus.Internal
+    public boolean handleBindingPressed(Controller controller, ButtonBinding binding, boolean virtual)
+    {
+        if(binding.isButtonDown())
+            return true;
+
+        ButtonHandler handler = binding.getHandler();
+        if(!(handler instanceof BindingPressed pressed))
+            return false;
+
+        if(!binding.getContext().isActive())
+            return false;
+
+        Minecraft mc = Minecraft.getInstance();
+        Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, virtual);
+        Optional<Runnable> action = pressed.createPressedHandler(context);
+        if(action.isEmpty())
+            return false;
+
+        ButtonBinding.setButtonState(binding, true);
+        action.get().run();
+
+        if(handler instanceof BindingOnTick tick)
+            this.activeTickHandlers.put(tick.phase(), new PriorityHandler<>(binding, tick));
+        if(handler instanceof BindingOnRender tick)
+            this.activeRenderHandlers.put(tick.phase(), new PriorityHandler<>(binding, tick));
+        if(handler instanceof BindingMovementInput input)
+            this.activeMovementInputHandlers.add(new PriorityHandler<>(binding, input));
+
+        if(virtual)
+        {
+            this.activeVirtualBinding = binding;
+        }
+
+        return true;
+    }
+
+    private void handleActiveVirtualBinding()
+    {
+        ButtonBinding virtualBinding = this.activeVirtualBinding;
+        if(virtualBinding == null)
+            return;
+
+        if(virtualBinding.isButtonDown() && ButtonBindings.RADIAL_MENU.isButtonDown())
+            return;
+
+        this.activeVirtualBinding = null;
+        ButtonBinding.setButtonState(virtualBinding, false);
+
+        Controller controller = Controllable.getController();
+        if(controller == null)
+            return;
+
+        if(!virtualBinding.getContext().isActive())
+            return;
+
+        if(!(virtualBinding.getHandler() instanceof BindingReleased released))
+            return;
+
+        Minecraft mc = Minecraft.getInstance();
+        Context context = new Context(virtualBinding, controller, mc, mc.player, mc.level, mc.screen, false);
+        released.handleReleased(context);
+    }
+
     private void onStartClickTick()
     {
+        this.handleActiveVirtualBinding();
         this.runTickHandler(BindingOnTick.TickPhase.START_CLIENT);
     }
 

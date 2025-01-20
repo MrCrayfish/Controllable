@@ -19,7 +19,6 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     private final ButtonHandler handler;
     private int button;
     private boolean pressed;
-    private boolean active;
 
     public ButtonBinding(int button, String descriptionKey, String category, BindingContext context, ButtonHandler handler)
     {
@@ -99,20 +98,6 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     }
 
     @ApiStatus.Internal
-    public static void tick()
-    {
-        for(ButtonBinding binding : Controllable.getBindingRegistry().getRegisteredBindings())
-        {
-            if(binding.active && !ButtonBindings.RADIAL_MENU.isButtonDown())
-            {
-                Controllable.getInputHandler().handleButtonInput(Controllable.getController(), -1, false, true);
-                binding.active = false;
-                binding.setPressed(false);
-            }
-        }
-    }
-
-    @ApiStatus.Internal
     public static void setButton(ButtonBinding binding, int button)
     {
         binding.button = button;
@@ -175,14 +160,5 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     public boolean equals(Object obj)
     {
         return this == obj;
-    }
-
-    /**
-     * Sets the binding as active and will use the radial menu button to determine it's state
-     */
-    public void setActiveAndPressed()
-    {
-        this.active = true;
-        this.setPressed(true);
     }
 }
