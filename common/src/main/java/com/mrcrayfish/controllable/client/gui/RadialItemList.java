@@ -5,12 +5,14 @@ import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ColorButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -18,6 +20,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -85,10 +88,12 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     {
         private final ButtonBindingData data;
         private final Component description;
+        private final ColorButton colorButton;
         private final Button moveUpButton;
         private final Button moveDownButton;
+        private final Button deleteButton;
+        private final Button[] buttons;
         private Component label;
-        private ColorButton colorButton;
 
         public ButtonBindingEntry(ButtonBindingData data)
         {
@@ -97,15 +102,30 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
             this.moveUpButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 98, 35, 10, 10, button -> {
                 this.shiftBinding(false);
             });
+            this.moveUpButton.setTooltip(Tooltip.create(Component.translatable("controllable.gui.shift_up")));
+            this.moveUpButton.setTooltipDelay(Duration.ofMillis(400));
             this.moveDownButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 35, 10, 10, button -> {
                 this.shiftBinding(true);
             });
+            this.moveDownButton.setTooltip(Tooltip.create(Component.translatable("controllable.gui.shift_down")));
+            this.moveDownButton.setTooltipDelay(Duration.ofMillis(400));
             this.label = Component.translatable(data.getBinding().getLabelKey()).withStyle(data.getColor());
             this.colorButton = new ColorButton(0, 0, button -> {
-                data.setColor(this.colorButton.getColor());
-                this.label = this.label.copy().withStyle(this.colorButton.getColor());
+                data.setColor(((ColorButton) button).getColor());
+                this.label = this.label.copy().withStyle(((ColorButton) button).getColor());
             });
             this.colorButton.setColor(data.getColor());
+            this.colorButton.setTooltip(Tooltip.create(Component.translatable("controllable.gui.change_color")));
+            this.colorButton.setTooltipDelay(Duration.ofMillis(400));
+            this.deleteButton = Button.builder(ClientHelper.getIconComponent(Icons.CROSS), button -> {
+                RadialItemList.this.bindings.remove(data);
+                RadialItemList.this.removeEntry(this);
+                RadialItemList.this.clampScrollAmount();
+                RadialItemList.this.children().forEach(ButtonBindingEntry::updateButtons);
+            }).size(20, 20).build();
+            this.deleteButton.setTooltip(Tooltip.create(Component.translatable("controllable.gui.delete")));
+            this.deleteButton.setTooltipDelay(Duration.ofMillis(400));
+            this.buttons = new Button[]{this.colorButton, this.moveDownButton, this.moveUpButton, this.deleteButton};
             this.updateButtons();
         }
 
@@ -135,7 +155,7 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
         @Override
         public List<? extends GuiEventListener> children()
         {
-            return ImmutableList.of(this.colorButton, this.moveUpButton, this.moveDownButton);
+            return ImmutableList.of(this.colorButton, this.moveUpButton, this.moveDownButton, this.deleteButton);
         }
 
         @Override
@@ -148,18 +168,15 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
             Font font = RadialItemList.this.minecraft.font;
             graphics.drawString(font, this.label, left + 5, top + 5, 0xFFFFFF);
             graphics.drawString(font, this.description, left + 5, top + 18, 0xFFFFFF);
-            this.colorButton.visible = RadialItemList.this.getSelected() == this;
-            this.colorButton.setX(left + RadialItemList.this.getRowWidth() - 78);
-            this.colorButton.setY(top + 6);
-            this.colorButton.render(graphics, mouseX, mouseY, partialTicks);
-            this.moveUpButton.visible = RadialItemList.this.getSelected() == this;
-            this.moveUpButton.setX(left + RadialItemList.this.getRowWidth() - 34);
-            this.moveUpButton.setY(top + 6);
-            this.moveUpButton.render(graphics, mouseX, mouseY, partialTicks);
-            this.moveDownButton.visible = RadialItemList.this.getSelected() == this;
-            this.moveDownButton.setX(left + RadialItemList.this.getRowWidth() - 56);
-            this.moveDownButton.setY(top + 6);
-            this.moveDownButton.render(graphics, mouseX, mouseY, partialTicks);
+            for(int i = 0; i < this.buttons.length; i++)
+            {
+                int offset = (this.buttons.length - i) * 22;
+                int buttonLeft = left + rowWidth - 6 - offset;
+                this.buttons[i].visible = RadialItemList.this.getSelected() == this;
+                this.buttons[i].setX(buttonLeft);
+                this.buttons[i].setY(top + 6);
+                this.buttons[i].render(graphics, mouseX, mouseY, partialTicks);
+            }
         }
 
         @Override
