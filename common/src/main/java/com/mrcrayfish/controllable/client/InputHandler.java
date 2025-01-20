@@ -121,6 +121,12 @@ public class InputHandler
         }
     }
 
+    @Nullable
+    public ButtonBinding getActiveVirtualBinding()
+    {
+        return this.activeVirtualBinding;
+    }
+
     @ApiStatus.Internal
     public void handleButtonInput(Controller controller, int button, boolean state)
     {
