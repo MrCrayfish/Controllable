@@ -16,6 +16,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
@@ -102,7 +103,7 @@ public class RadialMenu
         if(this.loaded)
             return;
 
-        Path path = Utils.getConfigDirectory().resolve("controllable/radial_menu_items.json");
+        Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("radial_menu_items.json");
         if(Files.exists(path))
         {
             try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path.toFile()), Charsets.UTF_8)))
@@ -151,7 +152,7 @@ public class RadialMenu
         try
         {
             String json = new GsonBuilder().setPrettyPrinting().create().toJson(array);
-            Path path = Utils.getConfigDirectory().resolve("controllable/radial_menu_items.json");
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("radial_menu_items.json");
             Files.writeString(path, json, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         }
         catch(IOException e)
