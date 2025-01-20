@@ -1,11 +1,14 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
+import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.gui.RadialItemList;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -21,6 +24,7 @@ import java.util.Objects;
 public class RadialMenuConfigureScreen extends Screen
 {
     private final List<ButtonBindingData> bindings;
+    protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private RadialItemList list;
 
     public RadialMenuConfigureScreen(LinkedHashSet<ButtonBindingData> bindings)
@@ -32,26 +36,36 @@ public class RadialMenuConfigureScreen extends Screen
     @Override
     protected void init()
     {
-        this.list = new RadialItemList(this.minecraft, this.width, this.height, 45, this.height - 44, this.bindings);
-        this.addWidget(this.list);
-        this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 100, 20, CommonComponents.GUI_DONE, buttons -> {
+        LinearLayout headerLayout = this.layout.addToHeader(LinearLayout.vertical());
+        headerLayout.addChild(new StringWidget(this.title, this.font));
+
+        this.list = new RadialItemList(this.minecraft, this.bindings);
+        this.layout.addToContents(this.list);
+
+        LinearLayout footerLayout = this.layout.addToFooter(LinearLayout.horizontal().spacing(4));
+        Component saveLabel = ClientHelper.join(Icons.SAVE, Component.translatable("controllable.gui.save"));
+        footerLayout.addChild(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 100, 20, saveLabel, buttons -> {
             Controllable.getRadialMenu().setBindings(new LinkedHashSet<>(this.bindings));
             Objects.requireNonNull(this.minecraft).setScreen(null);
         }));
-        this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 50, this.height - 29, 100, 20, Component.translatable("controllable.gui.add_binding"), buttons -> {
-            Objects.requireNonNull(this.minecraft).setScreen(new SelectButtonBindingScreen(this));
+        Component addLabel = ClientHelper.join(Icons.ADD, Component.translatable("controllable.gui.add_binding"));
+        footerLayout.addChild(ScreenHelper.button(this.width / 2 - 50, this.height - 29, 100, 20, addLabel, buttons -> {
+            Objects.requireNonNull(this.minecraft).setScreen(new RadialMenuAddBindingsScreen(this));
         }));
-        this.addRenderableWidget(ScreenHelper.button(this.width / 2 + 55, this.height - 29, 100, 20, CommonComponents.GUI_CANCEL, buttons -> {
+        footerLayout.addChild(ScreenHelper.button(this.width / 2 + 55, this.height - 29, 100, 20, CommonComponents.GUI_CANCEL, buttons -> {
             Objects.requireNonNull(this.minecraft).setScreen(null);
         }));
+
+        this.layout.visitWidgets(this::addRenderableWidget);
+        this.repositionElements();
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    protected void repositionElements()
     {
-        this.list.render(graphics, mouseX, mouseY, partialTicks);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
-        super.render(graphics, mouseX, mouseY, partialTicks);
+        this.layout.arrangeElements();
+        this.list.updateEntries();
+        this.list.updateSize(this.width, this.layout);
     }
 
     public List<ButtonBindingData> getBindings()

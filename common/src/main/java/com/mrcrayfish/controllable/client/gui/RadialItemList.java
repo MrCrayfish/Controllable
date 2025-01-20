@@ -28,15 +28,14 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     private final List<ButtonBindingData> bindings;
     private ButtonBinding selectedBinding;
 
-    public RadialItemList(Minecraft mc, int width, int height, int top, int bottom, List<ButtonBindingData> bindings)
+    public RadialItemList(Minecraft mc, List<ButtonBindingData> bindings)
     {
-        //super(mc, width, height, top, bottom, 36);
-        super(mc, width, height, top, 36);
+        super(mc, 0, 0, 0, 36);
         this.bindings = bindings;
         this.updateEntries();
     }
 
-    private void updateEntries()
+    public void updateEntries()
     {
         this.clearEntries();
         this.bindings.forEach(binding -> this.addEntry(new ButtonBindingEntry(binding)));
@@ -55,15 +54,8 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     @Override
     public int getRowWidth()
     {
-        return 260;
+        return 340;
     }
-
-    //TODO figure why I needed this
-    /*@Override
-    public int getLeft()
-    {
-        return super.getLeft();
-    }*/
 
     @Override
     public int getRowLeft()
@@ -72,7 +64,22 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     }
 
     @Override
+    protected int getScrollbarPosition()
+    {
+        return super.getRowRight() + 2;
+    }
+
+    @Override
     protected void updateWidgetNarration(NarrationElementOutput output) {}
+
+    @Override
+    protected void renderSelection(GuiGraphics graphics, int rowTop, int rowWidth, int rowHeight, int outlineColour, int backgroundColour)
+    {
+        int left = this.getRowLeft();
+        int right = this.getRowRight();
+        graphics.fill(left, rowTop - 2, right, rowTop + rowHeight + 2, outlineColour);
+        graphics.fill(left + 1, rowTop - 1, right - 1, rowTop + rowHeight + 1, backgroundColour);
+    }
 
     class ButtonBindingEntry extends ContainerObjectSelectionList.Entry<ButtonBindingEntry>
     {
@@ -132,8 +139,12 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
         }
 
         @Override
-        public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTicks)
+        public void render(GuiGraphics graphics, int slotIndex, int top, int left, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean hovered, float partialTicks)
         {
+            if(slotIndex % 2 != 0)
+            {
+                graphics.fill(left, top - 2, left + rowWidth, top + rowHeight + 2, 0x55000000);
+            }
             Font font = RadialItemList.this.minecraft.font;
             graphics.drawString(font, this.label, left + 5, top + 5, 0xFFFFFF);
             graphics.drawString(font, this.description, left + 5, top + 18, 0xFFFFFF);
