@@ -50,6 +50,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
     {
         super(mc, itemHeight);
         this.settingsScreen = settingsScreen;
+        this.categories.put("key.categories.controllable_custom", new ArrayList<>());
         this.categories.put("key.categories.movement", new ArrayList<>());
         this.categories.put("key.categories.gameplay", new ArrayList<>());
         this.categories.put("key.categories.inventory", new ArrayList<>());
@@ -57,7 +58,6 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         this.categories.put("key.categories.multiplayer", new ArrayList<>());
         this.categories.put("key.categories.ui", new ArrayList<>());
         this.categories.put("key.categories.misc", new ArrayList<>());
-        this.categories.put("key.categories.controllable_custom", new ArrayList<>());
         this.repopulateBindings(false);
     }
 
