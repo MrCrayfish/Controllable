@@ -28,10 +28,10 @@ import java.util.List;
  */
 public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonBindingEntry>
 {
-    private final List<ButtonBindingData> bindings;
+    private final List<RadialMenuAction> bindings;
     private ButtonBinding selectedBinding;
 
-    public RadialItemList(Minecraft mc, List<ButtonBindingData> bindings)
+    public RadialItemList(Minecraft mc, List<RadialMenuAction> bindings)
     {
         super(mc, 0, 0, 0, 36);
         this.bindings = bindings;
@@ -41,7 +41,10 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     public void updateEntries()
     {
         this.clearEntries();
-        this.bindings.forEach(binding -> this.addEntry(new ButtonBindingEntry(binding)));
+
+        this.bindings.forEach(binding -> {
+            this.addEntry(new ButtonBindingEntry(binding));
+        });
 
         // Update the selected entry
         ButtonBindingEntry selected = this.children().stream().filter(data -> data.getData().getBinding() == this.selectedBinding).findFirst().orElse(null);
@@ -86,7 +89,7 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
 
     public class ButtonBindingEntry extends ContainerObjectSelectionList.Entry<ButtonBindingEntry>
     {
-        private final ButtonBindingData data;
+        private final RadialMenuAction data;
         private final Component description;
         private final ColorButton colorButton;
         private final Button moveUpButton;
@@ -95,7 +98,7 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
         private final Button[] buttons;
         private Component label;
 
-        public ButtonBindingEntry(ButtonBindingData data)
+        public ButtonBindingEntry(RadialMenuAction data)
         {
             this.data = data;
             this.description = Component.translatable(data.getBinding().getCategory());
@@ -129,14 +132,14 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
             this.updateButtons();
         }
 
-        public ButtonBindingData getData()
+        public RadialMenuAction getData()
         {
             return this.data;
         }
 
         private void shiftBinding(boolean down)
         {
-            List<ButtonBindingData> bindings = RadialItemList.this.bindings;
+            List<RadialMenuAction> bindings = RadialItemList.this.bindings;
             int index = bindings.indexOf(this.data);
             bindings.remove(this.data);
             index = Mth.clamp(index + (down ? 1 : -1), 0, bindings.size());

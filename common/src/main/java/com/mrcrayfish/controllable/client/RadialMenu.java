@@ -20,7 +20,7 @@ import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
-import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
+import com.mrcrayfish.controllable.client.gui.RadialMenuAction;
 import com.mrcrayfish.controllable.client.gui.screens.RadialMenuConfigureScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.settings.Thumbstick;
@@ -52,6 +52,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -71,7 +72,7 @@ public class RadialMenu
     private boolean visible;
     private int animateTicks;
     private int prevAnimateTicks;
-    private Set<ButtonBindingData> bindings = new LinkedHashSet<>();
+    private Set<RadialMenuAction> actions = new LinkedHashSet<>();
     private AbstractRadialItem settingsItem;
     private AbstractRadialItem closeItem;
     private List<AbstractRadialItem> allItems = new ArrayList<>();
@@ -122,7 +123,7 @@ public class RadialMenu
                         {
                             color = ChatFormatting.YELLOW;
                         }
-                        this.bindings.add(new ButtonBindingData(binding, color));
+                        this.actions.add(new RadialMenuAction(binding, color));
                     }
                 });
             }
@@ -133,7 +134,7 @@ public class RadialMenu
         }
         else
         {
-            this.bindings.addAll(this.getBindings());
+            this.actions.addAll(this.getActions());
             this.save();
         }
 
@@ -143,7 +144,7 @@ public class RadialMenu
     private void save()
     {
         JsonArray array = new JsonArray();
-        this.bindings.forEach(data -> {
+        this.actions.forEach(data -> {
             JsonObject object = new JsonObject();
             object.addProperty("key", data.getBinding().getDescription());
             object.addProperty("color", data.getColor().name());
@@ -161,13 +162,13 @@ public class RadialMenu
         }
     }
 
-    public List<ButtonBindingData> getDefaults()
+    public List<RadialMenuAction> getDefaults()
     {
-        List<ButtonBindingData> defaults = new ArrayList<>();
-        defaults.add(new ButtonBindingData(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS, ChatFormatting.BLUE));
-        defaults.add(new ButtonBindingData(ButtonBindings.ADVANCEMENTS, ChatFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.SCREENSHOT, ChatFormatting.YELLOW));
-        defaults.add(new ButtonBindingData(ButtonBindings.FULLSCREEN, ChatFormatting.YELLOW));
+        List<RadialMenuAction> defaults = new ArrayList<>();
+        defaults.add(new RadialMenuAction(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS, ChatFormatting.BLUE));
+        defaults.add(new RadialMenuAction(ButtonBindings.ADVANCEMENTS, ChatFormatting.YELLOW));
+        defaults.add(new RadialMenuAction(ButtonBindings.SCREENSHOT, ChatFormatting.YELLOW));
+        defaults.add(new RadialMenuAction(ButtonBindings.FULLSCREEN, ChatFormatting.YELLOW));
         return defaults;
     }
 
@@ -196,21 +197,21 @@ public class RadialMenu
         return this.selected;
     }
 
-    public LinkedHashSet<ButtonBindingData> getBindings()
+    public LinkedHashSet<RadialMenuAction> getActions()
     {
-        return new LinkedHashSet<>(this.bindings);
+        return new LinkedHashSet<>(this.actions);
     }
 
-    public void setBindings(Set<ButtonBindingData> bindings)
+    public void setActions(Collection<RadialMenuAction> actions)
     {
-        this.bindings = bindings;
+        this.actions = new LinkedHashSet<>(actions);
         this.save();
         this.populateAndConstruct();
     }
 
     public void removeBinding(ButtonBinding binding)
     {
-        if(this.bindings.removeIf(data -> data.getBinding() == binding))
+        if(this.actions.removeIf(data -> data.getBinding() == binding))
         {
             this.save();
             this.populateAndConstruct();
@@ -234,7 +235,7 @@ public class RadialMenu
         this.leftItems.clear();
 
         List<AbstractRadialItem> items = new ArrayList<>();
-        this.bindings.forEach(binding -> items.add(new ButtonBindingItem(binding)));
+        this.actions.forEach(binding -> items.add(new ButtonBindingItem(binding)));
         //while(this.items.size() < MIN_ITEMS - 1) this.items.add(new EmptyRadialItem());
         //this.items.add(new RadialSettingsItem());
 
@@ -360,6 +361,7 @@ public class RadialMenu
         RenderSystem.applyModelViewMatrix();
     }
 
+    // TODO draw minimised version if too many entries (aka only draw the action name, not the category too)
     private void drawRadialItems(List<AbstractRadialItem> items, GuiGraphics graphics, Minecraft mc, float animation)
     {
         for(int i = 0; i < items.size(); i++)
@@ -571,7 +573,7 @@ public class RadialMenu
         {
             handler.setVisibility(false);
             handler.clearAnimation();
-            Minecraft.getInstance().setScreen(new RadialMenuConfigureScreen(null, handler.getBindings()));
+            Minecraft.getInstance().setScreen(new RadialMenuConfigureScreen(null));
         }
 
         @Override
@@ -639,9 +641,9 @@ public class RadialMenu
      */
     private static class ButtonBindingItem extends AbstractRadialItem
     {
-        public ButtonBindingData entry;
+        public RadialMenuAction entry;
 
-        public ButtonBindingItem(ButtonBindingData entry)
+        public ButtonBindingItem(RadialMenuAction entry)
         {
             super(Component.translatable(entry.getBinding().getLabelKey()).withStyle(entry.getColor()), Component.translatable(entry.getBinding().getCategory()));
             this.entry = entry;

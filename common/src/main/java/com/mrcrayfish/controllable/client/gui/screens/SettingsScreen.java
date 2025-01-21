@@ -275,9 +275,8 @@ public class SettingsScreen extends Screen
 
             Component radialMenuLabel = ClientHelper.join(Icons.SETTINGS, Component.translatable("controllable.gui.title.radial_menu_configure"));
             optionsList.addEntry(new ButtonBindingList.OneWidgetItem(Button.builder(radialMenuLabel, button -> {
-                RadialMenu radialMenu = Controllable.getRadialMenu();
-                radialMenu.load();
-                Minecraft.getInstance().setScreen(new RadialMenuConfigureScreen(SettingsScreen.this, radialMenu.getBindings()));
+                Controllable.getRadialMenu().load();
+                Minecraft.getInstance().setScreen(new RadialMenuConfigureScreen(SettingsScreen.this));
             }).build()));
 
             // Gameplay options

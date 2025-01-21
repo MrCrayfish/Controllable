@@ -3,8 +3,9 @@ package com.mrcrayfish.controllable.client.gui.screens;
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.binding.KeyAdapterBinding;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
-import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
+import com.mrcrayfish.controllable.client.gui.RadialMenuAction;
 import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
@@ -48,8 +49,8 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
             Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     RadialMenuConfigureScreen screen = getRadialConfigureScreen();
-                    screen.getBindings().clear();
-                    screen.getBindings().addAll(Controllable.getRadialMenu().getDefaults());
+                    screen.getActions().clear();
+                    screen.getActions().addAll(Controllable.getRadialMenu().getDefaults());
                     this.list.children().forEach(item -> {
                         if(item instanceof ButtonBindingItem bindingItem) {
                             bindingItem.updateActiveState();
@@ -62,6 +63,18 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
         footerLayout.addChild(ScreenHelper.button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_BACK, (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));
+    }
+
+    @Override
+    protected void repositionElements()
+    {
+        getRadialConfigureScreen().getActions().removeIf(action -> {
+            if(action.getBinding() instanceof KeyAdapterBinding adapter) {
+                return !Controllable.getBindingRegistry().getKeyAdapters().containsValue(adapter);
+            }
+            return false;
+        });
+        super.repositionElements();
     }
 
     @Override
@@ -80,9 +93,9 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
         {
             super(Component.translatable(binding.getLabelKey()));
             this.binding = binding;
-            List<ButtonBindingData> bindings = getRadialConfigureScreen().getBindings();
+            List<RadialMenuAction> bindings = getRadialConfigureScreen().getActions();
             this.bindingButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button -> {
-                bindings.add(new ButtonBindingData(this.binding, ChatFormatting.YELLOW));
+                bindings.add(new RadialMenuAction(this.binding, ChatFormatting.YELLOW));
                 Objects.requireNonNull(RadialMenuAddBindingsScreen.this.minecraft).setScreen(RadialMenuAddBindingsScreen.this.parent);
                 getRadialConfigureScreen().scrollToBottomAndSelectLast();
             });
@@ -122,7 +135,7 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
 
         public void updateActiveState()
         {
-            this.active = getRadialConfigureScreen().getBindings().stream().noneMatch(data -> {
+            this.active = getRadialConfigureScreen().getActions().stream().noneMatch(data -> {
                 return data.getBinding() == binding;
             });
             Tooltip addTooltip = this.active ?

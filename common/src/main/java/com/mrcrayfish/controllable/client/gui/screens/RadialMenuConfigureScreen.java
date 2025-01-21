@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
+import com.mrcrayfish.controllable.client.gui.RadialMenuAction;
 import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.gui.RadialItemList;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
@@ -25,15 +25,15 @@ import java.util.Objects;
 public class RadialMenuConfigureScreen extends Screen
 {
     private final @Nullable Screen parent;
-    private final List<ButtonBindingData> bindings;
+    private final List<RadialMenuAction> actions = new ArrayList<>();
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private RadialItemList list;
 
-    public RadialMenuConfigureScreen(@Nullable Screen parent, LinkedHashSet<ButtonBindingData> bindings)
+    public RadialMenuConfigureScreen(@Nullable Screen parent)
     {
         super(Component.translatable("controllable.gui.title.radial_menu_configure"));
         this.parent = parent;
-        this.bindings = new ArrayList<>(bindings);
+        this.actions.addAll(Controllable.getRadialMenu().getActions());
     }
 
     @Override
@@ -42,13 +42,13 @@ public class RadialMenuConfigureScreen extends Screen
         LinearLayout headerLayout = this.layout.addToHeader(LinearLayout.vertical());
         headerLayout.addChild(new StringWidget(this.title, this.font));
 
-        this.list = new RadialItemList(this.minecraft, this.bindings);
+        this.list = new RadialItemList(this.minecraft, this.actions);
         this.layout.addToContents(this.list);
 
         LinearLayout footerLayout = this.layout.addToFooter(LinearLayout.horizontal().spacing(4));
         Component saveLabel = ClientHelper.join(Icons.SAVE, Component.translatable("controllable.gui.save"));
         footerLayout.addChild(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 100, 20, saveLabel, buttons -> {
-            Controllable.getRadialMenu().setBindings(new LinkedHashSet<>(this.bindings));
+            Controllable.getRadialMenu().setActions(this.actions);
             Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));
         Component addLabel = ClientHelper.join(Icons.ADD, Component.translatable("controllable.gui.add_binding"));
@@ -71,9 +71,9 @@ public class RadialMenuConfigureScreen extends Screen
         this.list.updateSize(this.width, this.layout);
     }
 
-    public List<ButtonBindingData> getBindings()
+    public List<RadialMenuAction> getActions()
     {
-        return this.bindings;
+        return this.actions;
     }
 
     public void scrollToBottomAndSelectLast()
