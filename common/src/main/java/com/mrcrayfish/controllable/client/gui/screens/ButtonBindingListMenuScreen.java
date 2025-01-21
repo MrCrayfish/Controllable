@@ -57,7 +57,6 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
         Controllable.getBindingRegistry().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding -> {
             // Only show unbound bindings for select binding screen for radial menu
             if(showUnbound && binding.getButton() != -1) return;
-            if(this.shouldExcludeBinding(binding)) return;
             List<ButtonBinding> list = this.categories.computeIfAbsent(binding.getCategory(), category -> new ArrayList<>());
             list.add(binding);
         });
@@ -81,11 +80,6 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
             }
         });
         return items;
-    }
-
-    protected boolean shouldExcludeBinding(ButtonBinding binding)
-    {
-        return false;
     }
 
     protected abstract Item createItemFromBinding(ButtonBinding binding);

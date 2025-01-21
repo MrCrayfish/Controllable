@@ -47,8 +47,14 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
         footerLayout.addChild(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 150, 20, resetLabel, (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
-                    ((RadialMenuConfigureScreen) this.parent).getBindings().clear();
-                    ((RadialMenuConfigureScreen) this.parent).getBindings().addAll(Controllable.getRadialMenu().getDefaults());
+                    RadialMenuConfigureScreen screen = getRadialConfigureScreen();
+                    screen.getBindings().clear();
+                    screen.getBindings().addAll(Controllable.getRadialMenu().getDefaults());
+                    this.list.children().forEach(item -> {
+                        if(item instanceof ButtonBindingItem bindingItem) {
+                            bindingItem.updateActiveState();
+                        }
+                    });
                 }
                 return true;
             }));
@@ -56,14 +62,6 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
         footerLayout.addChild(ScreenHelper.button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_BACK, (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));
-    }
-
-    @Override
-    protected boolean shouldExcludeBinding(ButtonBinding binding)
-    {
-        return this.getRadialConfigureScreen().getBindings().stream().anyMatch(data -> {
-            return data.getBinding() == binding;
-        });
     }
 
     @Override
@@ -76,20 +74,20 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
     {
         private final ButtonBinding binding;
         private final Button bindingButton;
+        private boolean active;
 
         protected ButtonBindingItem(ButtonBinding binding)
         {
             super(Component.translatable(binding.getLabelKey()));
             this.binding = binding;
-
             List<ButtonBindingData> bindings = getRadialConfigureScreen().getBindings();
             this.bindingButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button -> {
                 bindings.add(new ButtonBindingData(this.binding, ChatFormatting.YELLOW));
                 Objects.requireNonNull(RadialMenuAddBindingsScreen.this.minecraft).setScreen(RadialMenuAddBindingsScreen.this.parent);
                 getRadialConfigureScreen().scrollToBottomAndSelectLast();
             });
-            this.bindingButton.setTooltip(Tooltip.create(Component.translatable("controllable.gui.add_to_radial_menu")));
             this.bindingButton.setTooltipDelay(Duration.ofMillis(400));
+            this.updateActiveState();
         }
 
         @Override
@@ -114,11 +112,23 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
                 graphics.fill(left - 2, top - 2, left + rowWidth + 2, top + rowHeight + 2, 0x55000000);
             }
             Font font = RadialMenuAddBindingsScreen.this.minecraft.font;
-            int color = this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor();
-            graphics.drawString(font, this.label, left + 5, top + 6, color);
+            int colour = this.active ? ChatFormatting.WHITE.getColor() : ChatFormatting.DARK_GRAY.getColor();
+            graphics.drawString(font, this.label, left + 5, top + 6, colour);
             this.bindingButton.setX(left + rowWidth - 25);
             this.bindingButton.setY(top);
             this.bindingButton.render(graphics, mouseX, mouseY, partialTicks);
+            this.bindingButton.active = this.active;
+        }
+
+        public void updateActiveState()
+        {
+            this.active = getRadialConfigureScreen().getBindings().stream().noneMatch(data -> {
+                return data.getBinding() == binding;
+            });
+            Tooltip addTooltip = this.active ?
+                Tooltip.create(Component.translatable("controllable.gui.add_to_radial_menu")) :
+                Tooltip.create(Component.translatable("controllable.gui.binding_already_added").withStyle(ChatFormatting.RED));
+            this.bindingButton.setTooltip(addTooltip);
         }
     }
 }

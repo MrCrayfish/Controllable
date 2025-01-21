@@ -239,5 +239,6 @@
     "framework_config.controllable.client.options.analogMovement.tooltip": "Allows you to control the settings of analog movement",
     "key.categories.controllable_custom": "Custom Keybinds",
     "controllable.gui.add_to_radial_menu": "Add to Radial Menu",
-    "controllable.gui.manage_keybinds": "Manage Keybinds"
+    "controllable.gui.manage_keybinds": "Manage Keybinds",
+    "controllable.gui.binding_already_added": "Already Added"
 }
