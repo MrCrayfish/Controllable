@@ -65,8 +65,8 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
     {
         this.clearEntries();
 
-        Component addKeybind = Component.empty().append(ClientHelper.getIconComponent(Icons.ADD)).append(" ").append(Component.translatable("controllable.gui.add_key_bind"));
-        Component restoreDefaults = Component.empty().append(ClientHelper.getIconComponent(Icons.RESET)).append(" ").append(Component.translatable("controllable.gui.restore_defaults"));
+        Component addKeybind = ClientHelper.join(Icons.KEY_CAP, Component.translatable("controllable.gui.add_key_bind"));
+        Component restoreDefaults = ClientHelper.join(Icons.RESET, Component.translatable("controllable.gui.restore_defaults"));
         this.addEntry(new TwoWidgetItem(Button.builder(addKeybind, btn -> {
             this.minecraft.setScreen(new SelectKeyBindingScreen(this.settingsScreen, () -> {
                 this.repopulateBindings(false);
