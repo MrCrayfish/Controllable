@@ -5,17 +5,16 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.gui.screens.RadialMenuConfigureScreen;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
 import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
-import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SelectKeyBindingScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -185,10 +184,10 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             this.bindingButton.setTooltip(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
             this.bindingButton.setTooltipDelay(Duration.ofMillis(400));
             this.bindingButton.setX(left + width - 65);
-            this.bindingButton.setY(top - 1);
+            this.bindingButton.setY(top);
             this.bindingButton.render(graphics, mouseX, mouseY, partialTick);
             this.resetButton.setX(left + width - 24);
-            this.resetButton.setY(top - 1);
+            this.resetButton.setY(top);
             this.resetButton.active = !this.binding.isDefault();
             this.resetButton.render(graphics, mouseX, mouseY, partialTick);
         }
@@ -235,6 +234,32 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
                     output.add(NarratedElementType.TITLE, ButtonBindingItem.this.label);
                 }
             });
+        }
+    }
+
+    public static class OneWidgetItem extends BaseItem
+    {
+        private final AbstractWidget widget;
+
+        public OneWidgetItem(AbstractWidget widget)
+        {
+            super(CommonComponents.EMPTY);
+            this.widget = widget;
+        }
+
+        @Override
+        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
+        {
+            this.widget.setWidth(width - 10);
+            this.widget.setX(left + 5);
+            this.widget.setY(top);
+            this.widget.render(graphics, mouseX, mouseY, partialTick);
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children()
+        {
+            return ImmutableList.of(this.widget);
         }
     }
 

@@ -12,6 +12,7 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -23,13 +24,15 @@ import java.util.Objects;
  */
 public class RadialMenuConfigureScreen extends Screen
 {
+    private final @Nullable Screen parent;
     private final List<ButtonBindingData> bindings;
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private RadialItemList list;
 
-    public RadialMenuConfigureScreen(LinkedHashSet<ButtonBindingData> bindings)
+    public RadialMenuConfigureScreen(@Nullable Screen parent, LinkedHashSet<ButtonBindingData> bindings)
     {
         super(Component.translatable("controllable.gui.title.radial_menu_configure"));
+        this.parent = parent;
         this.bindings = new ArrayList<>(bindings);
     }
 
@@ -46,14 +49,14 @@ public class RadialMenuConfigureScreen extends Screen
         Component saveLabel = ClientHelper.join(Icons.SAVE, Component.translatable("controllable.gui.save"));
         footerLayout.addChild(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 100, 20, saveLabel, buttons -> {
             Controllable.getRadialMenu().setBindings(new LinkedHashSet<>(this.bindings));
-            Objects.requireNonNull(this.minecraft).setScreen(null);
+            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));
         Component addLabel = ClientHelper.join(Icons.ADD, Component.translatable("controllable.gui.add_binding"));
         footerLayout.addChild(ScreenHelper.button(this.width / 2 - 50, this.height - 29, 100, 20, addLabel, buttons -> {
             Objects.requireNonNull(this.minecraft).setScreen(new RadialMenuAddBindingsScreen(this));
         }));
         footerLayout.addChild(ScreenHelper.button(this.width / 2 + 55, this.height - 29, 100, 20, CommonComponents.GUI_CANCEL, buttons -> {
-            Objects.requireNonNull(this.minecraft).setScreen(null);
+            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));
 
         this.layout.visitWidgets(this::addRenderableWidget);

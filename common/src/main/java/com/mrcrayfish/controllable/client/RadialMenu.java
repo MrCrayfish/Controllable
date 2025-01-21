@@ -98,7 +98,7 @@ public class RadialMenu
         }
     }
 
-    private void load()
+    public void load()
     {
         if(this.loaded)
             return;
@@ -571,7 +571,7 @@ public class RadialMenu
         {
             handler.setVisibility(false);
             handler.clearAnimation();
-            Minecraft.getInstance().setScreen(new RadialMenuConfigureScreen(handler.getBindings()));
+            Minecraft.getInstance().setScreen(new RadialMenuConfigureScreen(null, handler.getBindings()));
         }
 
         @Override
