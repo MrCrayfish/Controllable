@@ -17,6 +17,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -25,6 +26,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -129,6 +131,8 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
                 KeyBindingItem.this.removeBinding.active = true;
                 KeyBindingListMenuScreen.this.onChange();
             }).size(20, 20).build();
+            this.addBinding.setTooltip(Tooltip.create(Component.translatable("controllable.gui.register")));
+            this.addBinding.setTooltipDelay(Duration.ofMillis(400));
             this.removeBinding = Button.builder(ClientHelper.getIconComponent(Icons.CROSS), button -> {
                 KeyAdapterBinding keyAdapter = Controllable.getBindingRegistry().getKeyAdapterByDescriptionKey(this.mapping.getName() + ".custom");
                 if(keyAdapter != null) {
@@ -139,8 +143,11 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
                 KeyBindingItem.this.removeBinding.active = false;
                 KeyBindingListMenuScreen.this.onChange();
             }).size(20, 20).build();
+            this.removeBinding.setTooltip(Tooltip.create(Component.translatable("controllable.gui.unregister")));
+            this.removeBinding.setTooltipDelay(Duration.ofMillis(400));
             this.addBinding.active = bindings.stream().noneMatch(entry -> entry.getKeyMapping() == this.mapping);
             this.removeBinding.active = bindings.stream().anyMatch(entry -> entry.getKeyMapping() == this.mapping);
+
         }
 
         @Override

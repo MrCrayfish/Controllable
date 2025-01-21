@@ -240,5 +240,7 @@
     "key.categories.controllable_custom": "Custom Keybinds",
     "controllable.gui.add_to_radial_menu": "Add to Radial Menu",
     "controllable.gui.manage_keybinds": "Manage Keybinds",
-    "controllable.gui.binding_already_added": "Already Added"
+    "controllable.gui.binding_already_added": "Already Added",
+    "controllable.gui.register": "Register",
+    "controllable.gui.unregister": "Unregister"
 }
