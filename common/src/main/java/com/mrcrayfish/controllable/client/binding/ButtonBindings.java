@@ -112,7 +112,9 @@ public class ButtonBindings
     }));
 
     public static final ButtonBinding PICK_BLOCK = new ButtonBinding(Buttons.DPAD_LEFT, "key.pickItem", "key.categories.gameplay", InGameContext.INSTANCE, OnPressHandler.create(context -> {
-        return Optional.of(() -> {});
+        return Optional.of(() -> {
+            ClientServices.CLIENT.pickBlock(context.minecraft());
+        });
     }));
 
     public static final ButtonBinding PLAYER_LIST = new ButtonBinding(Buttons.SELECT, "key.playerlist", "key.categories.multiplayer", InGameContext.INSTANCE, OnPressHandler.create(context -> Optional.of(() -> {})));
