@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.client.ControllerProperties;
 import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.InputProcessor;
 import com.mrcrayfish.controllable.client.RadialMenu;
+import com.mrcrayfish.controllable.client.RumbleHandler;
 import com.mrcrayfish.controllable.client.ScrollingHandler;
 import com.mrcrayfish.controllable.client.VirtualCursor;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
@@ -27,6 +28,7 @@ public class Controllable
     private static final CameraHandler CAMERA_HANDLER = new CameraHandler();
     private static final RadialMenu RADIAL_MENU = new RadialMenu();
     private static final ScrollingHandler SCROLLING_HANDLER = new ScrollingHandler();
+    private static final RumbleHandler RUMBLE_HANDLER = new RumbleHandler();
 
     private static final boolean JEI_LOADED = Utils.isModLoaded("jei");
 
@@ -65,6 +67,11 @@ public class Controllable
     public static RadialMenu getRadialMenu()
     {
         return RADIAL_MENU;
+    }
+
+    public static RumbleHandler getRumbleHandler()
+    {
+        return RUMBLE_HANDLER;
     }
 
     public static boolean isJeiLoaded()

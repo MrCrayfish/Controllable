@@ -38,7 +38,7 @@ public class ScrollingHandler
     @ApiStatus.Internal
     public ScrollingHandler()
     {
-        Preconditions.checkState(instance == null, "Only one instance of ScrollSupport is allowed");
+        Preconditions.checkState(instance == null, "Only one instance of ScrollingHandler is allowed");
         instance = this;
     }
 
