@@ -17,6 +17,7 @@ import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -285,9 +286,9 @@ public class ForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public ResourceLocation getImageButtonResource(ImageButton btn)
+    public WidgetSprites getImageButtonResource(ImageButton btn)
     {
-        return null;
+        return ReflectUtil.getImageButtonResource(btn);
     }
 
     @Override

@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -23,6 +24,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Author: MrCrayfish
@@ -34,11 +36,11 @@ public class ReflectUtil
     private static final Method ABSTRACT_CONTAINER_SCREEN_CLICK_SLOT = ReflectUtil.findMethod(AbstractContainerScreen.class, "net.minecraft.class_465", "method_2383", "(Lnet/minecraft/class_1735;IILnet/minecraft/class_1713;)V", Slot.class, int.class, int.class, ClickType.class);
     private static final Method SCREEN_ADD_RENDER_WIDGET = ReflectUtil.findMethod(Screen.class, "net.minecraft.class_437", "method_37060", "(Lnet/minecraft/class_4068;)Lnet/minecraft/class_4068;", Renderable.class);
     private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ReflectUtil.findField(AbstractSelectionList.class, "net.minecraft.class_350", "field_22741", "I");
-    private static final Field IMAGE_BUTTON_RESOURCE = ReflectUtil.findField(ImageButton.class, "net.minecraft.class_344", "field_2127", "Lnet/minecraft/class_2960;");
+    private static final Field IMAGE_BUTTON_SPRITES = ReflectUtil.findField(ImageButton.class, "net.minecraft.class_344", "field_45356", "Lnet/minecraft/class_8666;");
     private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ReflectUtil.findField(CreativeModeInventoryScreen.class, "net.minecraft.class_481", "field_2890", "F");
     private static final Field KEY_MAPPING_PRESS_TIME = ReflectUtil.findField(KeyMapping.class, "net.minecraft.class_304", "field_1661", "I");
     private static final Field TOOLTIP_LINES = ReflectUtil.findField(Tooltip.class, "net.minecraft.class_7919", "field_41103", "Ljava/util/List;");
-    private static final Field TOOLTIP_LANGUAGE = ReflectUtil.findField(Tooltip.class, "net.minecraft.class_7919", "field_51822", "Lnet/minecraft/locale/Language;");
+    private static final Field TOOLTIP_LANGUAGE = ReflectUtil.findField(Tooltip.class, "net.minecraft.class_7919", "field_51822", "Lnet/minecraft/class_2477;");
     private static final Field STONE_CUTTER_INDEX = ReflectUtil.findField(StonecutterScreen.class, "net.minecraft.class_3979", "field_17671", "I");
     private static final Field LOOM_START_ROW = ReflectUtil.findField(LoomScreen.class, "net.minecraft.class_494", "field_39190", "I");
 
@@ -111,11 +113,11 @@ public class ReflectUtil
     }
 
     @Nullable
-    public static ResourceLocation getImageButtonResource(ImageButton button)
+    public static WidgetSprites getImageButtonResource(ImageButton button)
     {
         try
         {
-            return (ResourceLocation) IMAGE_BUTTON_RESOURCE.get(button);
+            return (WidgetSprites) IMAGE_BUTTON_SPRITES.get(button);
         }
         catch(IllegalAccessException e)
         {

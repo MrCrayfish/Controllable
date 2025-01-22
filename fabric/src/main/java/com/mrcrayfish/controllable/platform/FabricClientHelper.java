@@ -19,6 +19,7 @@ import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -240,7 +241,7 @@ public class FabricClientHelper implements IClientHelper
     }
 
     @Override
-    public ResourceLocation getImageButtonResource(ImageButton btn)
+    public WidgetSprites getImageButtonResource(ImageButton btn)
     {
         return ReflectUtil.getImageButtonResource(btn);
     }

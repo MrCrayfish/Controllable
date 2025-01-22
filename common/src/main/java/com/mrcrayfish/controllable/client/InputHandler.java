@@ -91,7 +91,6 @@ import java.util.function.BiFunction;
  */
 public class InputHandler
 {
-    private static final ResourceLocation RECIPE_BUTTON_LOCATION = ResourceLocation.withDefaultNamespace("textures/gui/recipe_button.png");
     private static InputHandler instance;
 
     private final Multimap<BindingOnTick.TickPhase, PriorityHandler<BindingOnTick>> activeTickHandlers = TreeMultimap.create();
@@ -364,7 +363,7 @@ public class InputHandler
             if(screen instanceof RecipeUpdateListener listener) {
                 // Since no reference to craft book button, instead search for it and invoke press.
                 ClientServices.CLIENT.getScreenRenderables(screen).stream().filter(widget -> {
-                    return widget instanceof ImageButton btn && RECIPE_BUTTON_LOCATION.equals(ClientServices.CLIENT.getImageButtonResource(btn));
+                    return widget instanceof ImageButton btn && RecipeBookComponent.RECIPE_BUTTON_SPRITES.equals(ClientServices.CLIENT.getImageButtonResource(btn));
                 }).findFirst().ifPresent(btn -> ((Button) btn).onPress());
                 boolean visible = listener.getRecipeBookComponent().isVisible();
                 Minecraft.getInstance()
