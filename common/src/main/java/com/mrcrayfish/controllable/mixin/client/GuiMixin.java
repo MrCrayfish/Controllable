@@ -18,25 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Gui.class)
 public class GuiMixin
 {
-    @Inject(method = "renderHotbarAndDecorations", at = @At(value = "HEAD"))
-    private void consoleHotbarOffsetHead(GuiGraphics graphics, DeltaTracker tracker, CallbackInfo ci)
-    {
-        if(Config.CLIENT.options.consoleHotbar.get())
-        {
-            graphics.pose().pushPose();
-            graphics.pose().translate(0, 20, 0);
-        }
-    }
-
-    @Inject(method = "renderHotbarAndDecorations", at = @At(value = "TAIL"))
-    private void consoleHotbarOffsetTail(GuiGraphics graphics, DeltaTracker tracker, CallbackInfo ci)
-    {
-        if(Config.CLIENT.options.consoleHotbar.get())
-        {
-            graphics.pose().popPose();
-        }
-    }
-
     @ModifyExpressionValue(method = "renderTabList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"))
     private boolean controllableRenderPlayerList(boolean original)
     {

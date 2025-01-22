@@ -7,8 +7,9 @@
     "refmap": "controllable.refmap.json",
     "client": [
         "client.FabricGameRendererMixin",
-        "client.FabricRecipeBookPageMixin",
+        "client.FabricGuiMixin",
         "client.FabricKeyMappingMixin",
+        "client.FabricRecipeBookPageMixin",
         "client.jei.GuiIconToggleButtonMixin",
         "client.jei.IngredientGridMixin",
         "client.jei.IngredientGridWithNavigationMixin",
