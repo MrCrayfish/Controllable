@@ -40,13 +40,7 @@ public class ClientEvents
     @SubscribeEvent
     public static void onGameShuttingDown(GameShuttingDownEvent event)
     {
-        Controllable.getControllerManager().completeSetup();
-    }
-
-    @SubscribeEvent(receiveCanceled = true)
-    public static void onPlayerUsingItem(LivingEntityUseItemEvent.Tick event)
-    {
-        //RumbleHandler.onPlayerUsingItem(event.getEntity(), event.getItem(), event.getDuration());
+        Controllable.getControllerManager().dispose();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
