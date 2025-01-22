@@ -25,7 +25,7 @@ public class ControllableMod
         event.enqueueWork(() -> {
             Controllable.getBindingRegistry().completeSetup();
             Controllable.getControllerManager().completeSetup();
-            //Controllable.getInputHandler().completeSetup();
+            Controllable.getCursor().resetToCenter();
         });
     }
 }

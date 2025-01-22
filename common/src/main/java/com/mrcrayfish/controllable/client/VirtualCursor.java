@@ -43,9 +43,6 @@ public final class VirtualCursor
     public VirtualCursor()
     {
         Preconditions.checkState(instance == null, "Only one instance of VirtualCursor is allowed");
-        Minecraft mc = Minecraft.getInstance();
-        this.renderX = this.x = this.prevX = mc.getWindow().getScreenWidth() / 2;
-        this.renderY = this.y = this.prevY = mc.getWindow().getScreenHeight() / 2;
         instance = this;
     }
 
@@ -59,6 +56,14 @@ public final class VirtualCursor
             ScreenEvents.OPENED.register(this::onScreenOpened);
             this.initialized = true;
         }
+    }
+
+    @ApiStatus.Internal
+    public void resetToCenter()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        this.renderX = this.x = this.prevX = mc.getWindow().getScreenWidth() / 2;
+        this.renderY = this.y = this.prevY = mc.getWindow().getScreenHeight() / 2;
     }
 
     /**
