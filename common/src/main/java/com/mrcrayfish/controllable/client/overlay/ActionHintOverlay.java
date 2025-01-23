@@ -70,6 +70,7 @@ public class ActionHintOverlay implements IOverlay
     {
         PoseStack pose = graphics.pose();
         pose.pushPose();
+        pose.translate(0, 0, 400);
 
         Minecraft mc = Minecraft.getInstance();
         pose.translate(5, mc.getWindow().getGuiScaledHeight() - BUTTON_SIZE - 5, 0);
