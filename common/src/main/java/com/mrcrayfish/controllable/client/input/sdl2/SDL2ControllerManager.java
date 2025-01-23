@@ -34,6 +34,7 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
     public void init()
     {
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_VERTICAL_JOY_CONS, "1");
+        SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
         SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
     }
 
