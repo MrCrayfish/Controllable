@@ -104,6 +104,12 @@ public class GLFWController extends Controller
     }
 
     @Override
+    public boolean supportsRumble()
+    {
+        return false;
+    }
+
+    @Override
     public boolean rumble(float lowFrequency, float highFrequency, int timeInMs)
     {
         return false;

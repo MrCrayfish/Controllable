@@ -131,6 +131,12 @@ public class SDL2Controller extends Controller
     }
 
     @Override
+    public boolean supportsRumble()
+    {
+        return SDL_GameControllerHasRumble(this.controller);
+    }
+
+    @Override
     public boolean rumble(float lowFrequency, float highFrequency, int timeInMs)
     {
         lowFrequency = Mth.clamp(lowFrequency, 0.0F, 1.0F);

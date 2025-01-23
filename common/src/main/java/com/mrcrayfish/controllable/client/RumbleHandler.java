@@ -33,7 +33,7 @@ public class RumbleHandler
             return;
         
         Controller controller = Controllable.getController();
-        if(controller == null || !controller.isBeingUsed())
+        if(controller == null || !controller.isBeingUsed() || !controller.supportsRumble())
             return;
 
         float scale = damage / player.getMaxHealth();
@@ -49,7 +49,7 @@ public class RumbleHandler
             return;
 
         Controller controller = Controllable.getController();
-        if(controller == null || !controller.isBeingUsed())
+        if(controller == null || !controller.isBeingUsed() || !controller.supportsRumble())
             return;
 
         if(!player.isUsingItem())

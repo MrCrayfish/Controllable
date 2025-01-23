@@ -53,6 +53,11 @@ public abstract class Controller
     public abstract String getName(); // TODO convert to component
 
     /**
+     * @return True if this controller supports rumble
+     */
+    public abstract boolean supportsRumble();
+
+    /**
      * Rumbles the controller if supported
      *
      * @param lowFrequency  the low frequency rumble
