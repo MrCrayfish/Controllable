@@ -20,7 +20,6 @@ public enum ButtonIcons implements SettingEnum
     GAMECUBE("controllable.controller.gamecube"),
     STEAM("controllable.controller.steam");
 
-    // TODO convert to sprites
     public static final ResourceLocation TEXTURE = Utils.resource("textures/gui/buttons.png");
     public static final int TEXTURE_WIDTH = Buttons.LENGTH * 13;
     public static final int TEXTURE_HEIGHT = values().length * 13;

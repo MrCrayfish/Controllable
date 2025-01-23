@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
@@ -50,7 +51,7 @@ public class ClientEvents
         {
             PoseStack pose = event.getGuiGraphics().pose();
             pose.pushPose();
-            pose.translate(0, -20, 0);
+            pose.translate(0, -25, 0);
         }
     }
 

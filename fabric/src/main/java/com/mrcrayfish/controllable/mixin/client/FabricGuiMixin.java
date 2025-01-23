@@ -21,7 +21,7 @@ public class FabricGuiMixin
         if(Config.CLIENT.options.consoleHotbar.get())
         {
             graphics.pose().pushPose();
-            graphics.pose().translate(0, 20, 0);
+            graphics.pose().translate(0, 25, 0);
         }
     }
 

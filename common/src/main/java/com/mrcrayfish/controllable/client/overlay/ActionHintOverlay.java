@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client.overlay;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Action;
@@ -24,9 +25,13 @@ import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,6 +39,8 @@ import java.util.Map;
  */
 public class ActionHintOverlay implements IOverlay
 {
+    private static final int BUTTON_SIZE = 13;
+
     private final Map<Integer, Action> actions = new HashMap<>();
 
     @Override
@@ -46,6 +53,55 @@ public class ActionHintOverlay implements IOverlay
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
+        if(this.actions.isEmpty())
+            return;
+
+        if(Config.CLIENT.options.consoleHotbar.get())
+        {
+            this.drawConsoleHints(graphics);
+        }
+        else
+        {
+            this.drawSidedHints(graphics);
+        }
+    }
+
+    private void drawConsoleHints(GuiGraphics graphics)
+    {
+        PoseStack pose = graphics.pose();
+        pose.pushPose();
+
+        Minecraft mc = Minecraft.getInstance();
+        pose.translate(5, mc.getWindow().getGuiScaledHeight() - BUTTON_SIZE - 5, 0);
+
+        List<Pair<Integer, Action>> sortedActions = this.actions.entrySet().stream()
+            .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+            .sorted(Map.Entry.comparingByValue())
+            .toList();
+        for(Pair<Integer, Action> pair : sortedActions)
+        {
+            int button = pair.getKey();
+            Action action = pair.getValue();
+
+            // Draw button
+            int buttonU = button * BUTTON_SIZE;
+            int buttonV = Config.CLIENT.options.controllerIcons.get().ordinal() * BUTTON_SIZE;
+            graphics.blit(ButtonIcons.TEXTURE, 0, 0, BUTTON_SIZE, BUTTON_SIZE, buttonU, buttonV, BUTTON_SIZE, BUTTON_SIZE, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
+
+            // Draw text and background
+            int textWidth = mc.font.width(action.getDescription());
+            this.drawHintBackground(graphics, BUTTON_SIZE + 5, 0, textWidth, BUTTON_SIZE);
+            this.drawHintLabel(graphics, action.getDescription(), BUTTON_SIZE + 5, 3);
+
+            // Finally translate for next action to be positioned correctly
+            pose.translate(BUTTON_SIZE + 5 + textWidth + 10, 0, 0);
+        }
+
+        pose.popPose();
+    }
+
+    private void drawSidedHints(GuiGraphics graphics)
+    {
         int[] positions = new int[2];
         for(int button : this.actions.keySet())
         {
@@ -56,22 +112,21 @@ public class ActionHintOverlay implements IOverlay
                 continue;
 
             int position = positions[side.ordinal()];
-            this.drawHint(graphics, action, side, button, position);
+            this.drawSideHint(graphics, action, side, button, position);
             positions[side.ordinal()] = position + 1;
         }
     }
 
-    private void drawHint(GuiGraphics graphics, Action action, Action.Side side, int button, int position)
+    private void drawSideHint(GuiGraphics graphics, Action action, Action.Side side, int button, int position)
     {
         Minecraft mc = Minecraft.getInstance();
 
         // Draw button icon
-        int size = 13;
-        int texU = button * size;
-        int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * size;
-        int x = side == Action.Side.LEFT ? 5 : mc.getWindow().getGuiScaledWidth() - 5 - size;
-        int y = mc.getWindow().getGuiScaledHeight() + position * -15 - size - 5;
-        graphics.blit(ButtonIcons.TEXTURE, x, y, texU, texV, size, size, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
+        int texU = button * BUTTON_SIZE;
+        int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * BUTTON_SIZE;
+        int x = side == Action.Side.LEFT ? 5 : mc.getWindow().getGuiScaledWidth() - 5 - BUTTON_SIZE;
+        int y = mc.getWindow().getGuiScaledHeight() + position * -15 - BUTTON_SIZE - 5;
+        graphics.blit(ButtonIcons.TEXTURE, x, y, texU, texV, BUTTON_SIZE, BUTTON_SIZE, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
 
         // Draw label
         int textWidth = mc.font.width(action.getDescription());
