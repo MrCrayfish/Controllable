@@ -105,6 +105,13 @@ public abstract class Controller
     public abstract float getRThumbStickYValue();
 
     /**
+     * Gets the device information about this controller
+     *
+     * @return a {@link DeviceInfo} instance
+     */
+    public abstract DeviceInfo getInfo();
+
+    /**
      * @return The device index of the controller. This should not be used to determine the controller.
      */
     public int getDeviceIndex()

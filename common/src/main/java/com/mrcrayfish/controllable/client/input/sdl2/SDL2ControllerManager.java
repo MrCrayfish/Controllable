@@ -2,7 +2,10 @@ package com.mrcrayfish.controllable.client.input.sdl2;
 
 import com.google.common.io.ByteStreams;
 import com.mrcrayfish.controllable.Constants;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
+import com.mrcrayfish.controllable.client.input.DeviceInfo;
+import com.mrcrayfish.controllable_sdl.api.gamecontroller.SdlGamecontroller;
 import com.sun.jna.Memory;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
 import com.mrcrayfish.controllable_sdl.api.rwops.SDL_RWops;
@@ -11,8 +14,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static com.mrcrayfish.controllable_sdl.api.Sdl.SDL_Init;
 import static com.mrcrayfish.controllable_sdl.api.Sdl.SDL_Quit;
@@ -84,8 +90,30 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
 
     @Override
     @Nullable
-    public SDL2Controller connectToFirstGameController()
+    public SDL2Controller connectToBestGameController()
     {
+        DeviceInfo info = Controllable.getLastController().getLastDevice();
+        if(info != null)
+        {
+            Optional<SDL2Controller> optional = IntStream.range(0, SDL_NumJoysticks())
+                .filter(SdlGamecontroller::SDL_IsGameController)
+                .mapToObj(SDL2Controller::new)
+                .filter(controller -> {
+                    controller.open();
+                    boolean result = info.equals(controller.getInfo());
+                    controller.close();
+                    return result;
+                }).findFirst();
+            if(optional.isPresent())
+            {
+                SDL2Controller controller = optional.get();
+                if(this.setActiveController(controller))
+                {
+                    return controller;
+                }
+            }
+        }
+
         int joysticksCount = SDL_NumJoysticks();
         for(int deviceIndex = 0; deviceIndex < joysticksCount; deviceIndex++)
         {

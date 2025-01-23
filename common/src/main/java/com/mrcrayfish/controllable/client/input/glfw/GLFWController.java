@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.input.ButtonStates;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.input.DeviceInfo;
 import com.mrcrayfish.controllable.client.util.InputHelper;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.util.Mth;
@@ -17,6 +18,7 @@ public class GLFWController extends Controller
 {
     private GLFWGamepadState controller;
     private String cachedName;
+    private DeviceInfo info;
 
     public GLFWController(int deviceIndex)
     {
@@ -31,7 +33,11 @@ public class GLFWController extends Controller
     }
 
     @Override
-    public void close() {}
+    public void close()
+    {
+        this.controller.close();
+        this.controller = null;
+    }
 
     @Override
     public Number getJid()
@@ -143,5 +149,17 @@ public class GLFWController extends Controller
     {
         float input = Mth.clamp(this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y), -1, 1);
         return InputHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
+    }
+
+    @Override
+    public DeviceInfo getInfo()
+    {
+        if(this.info == null)
+        {
+            String name = GLFW.glfwGetGamepadName(this.deviceIndex);
+            String guid = GLFW.glfwGetJoystickGUID(this.deviceIndex);
+            this.info = new DeviceInfo(name, guid, null, -1, -1, -1, -1, -1);
+        }
+        return this.info;
     }
 }

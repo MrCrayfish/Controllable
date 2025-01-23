@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.input;
 import com.google.common.io.MoreFiles;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.toasts.ConnectionToast;
 import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
 import com.mrcrayfish.controllable.client.gui.screens.PendingScreen;
@@ -43,7 +44,7 @@ public abstract class AdaptiveControllerManager
     public abstract Controller createController(int deviceIndex, Number jid);
 
     @Nullable
-    public abstract Controller connectToFirstGameController();
+    public abstract Controller connectToBestGameController();
 
     public abstract void updateMappings(InputStream is) throws IOException;
 
@@ -73,7 +74,7 @@ public abstract class AdaptiveControllerManager
 
         if(controller == null && Config.CLIENT.options.autoSelect.get())
         {
-            controller = this.connectToFirstGameController();
+            controller = this.connectToBestGameController();
             this.sendControllerToast(true, controller);
         }
     }
@@ -108,8 +109,8 @@ public abstract class AdaptiveControllerManager
         {
             if(!controller.open())
                 return false;
-
             this.activeController = controller;
+            Controllable.getLastController().setLastDevice(controller.getInfo());
         }
         else
         {
@@ -165,7 +166,7 @@ public abstract class AdaptiveControllerManager
         /* Attempts to load the first game controller connected if auto select is enabled */
         if(Config.CLIENT.options.autoSelect.get())
         {
-            this.connectToFirstGameController();
+            this.connectToBestGameController();
         }
     }
 

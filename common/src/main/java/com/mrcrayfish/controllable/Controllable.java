@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable;
 
 import com.google.common.base.Suppliers;
 import com.mrcrayfish.controllable.client.CameraHandler;
-import com.mrcrayfish.controllable.client.ControllerProperties;
+import com.mrcrayfish.controllable.client.LastController;
 import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.InputProcessor;
 import com.mrcrayfish.controllable.client.RadialMenu;
@@ -20,7 +20,6 @@ import java.util.function.Supplier;
 public class Controllable
 {
     private static final Supplier<AdaptiveControllerManager> MANAGER = Suppliers.memoize(Controllable::createManager);
-    private static final ControllerProperties PROPERTIES = new ControllerProperties();
     private static final InputHandler INPUT_HANDLER = new InputHandler();
     private static final BindingRegistry BINDING_REGISTRY = new BindingRegistry();
     private static final VirtualCursor CURSOR = new VirtualCursor();
@@ -29,12 +28,13 @@ public class Controllable
     private static final RadialMenu RADIAL_MENU = new RadialMenu();
     private static final ScrollingHandler SCROLLING_HANDLER = new ScrollingHandler();
     private static final RumbleHandler RUMBLE_HANDLER = new RumbleHandler();
+    private static final LastController LAST_CONTROLLER = new LastController();
 
     private static final boolean JEI_LOADED = Utils.isModLoaded("jei");
 
     public static void init()
     {
-        PROPERTIES.load();
+        LAST_CONTROLLER.load();
         MANAGER.get().init();
         INPUT_PROCESSOR.registerEvents();
         CURSOR.registerEvents();
@@ -72,6 +72,11 @@ public class Controllable
     public static RumbleHandler getRumbleHandler()
     {
         return RUMBLE_HANDLER;
+    }
+
+    public static LastController getLastController()
+    {
+        return LAST_CONTROLLER;
     }
 
     public static boolean isJeiLoaded()

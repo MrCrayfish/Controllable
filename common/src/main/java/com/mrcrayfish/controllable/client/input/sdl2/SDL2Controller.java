@@ -4,8 +4,11 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.input.ButtonStates;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.input.DeviceInfo;
 import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable_sdl.api.gamecontroller.SDL_GameController;
+import com.mrcrayfish.controllable_sdl.api.joystick.SDL_Joystick;
+import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickGUID;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.util.Mth;
@@ -13,7 +16,7 @@ import net.minecraft.util.Mth;
 import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SDL_GameControllerAxis.*;
 import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SDL_GameControllerButton.*;
 import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SdlGamecontroller.*;
-import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.SDL_JoystickGetDeviceInstanceID;
+import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.*;
 import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystickConst.SDL_JOYSTICK_AXIS_MAX;
 
 /**
@@ -26,6 +29,7 @@ public class SDL2Controller extends Controller
     private final SDL_JoystickID jid;
     private SDL_GameController controller;
     private String cachedName;
+    private DeviceInfo info;
 
     public SDL2Controller(int deviceIndex)
     {
@@ -43,8 +47,12 @@ public class SDL2Controller extends Controller
     @Override
     public boolean open()
     {
-        this.controller = SDL_GameControllerOpen(this.deviceIndex);
-        return this.controller != null;
+        if(this.controller == null)
+        {
+            this.controller = SDL_GameControllerOpen(this.deviceIndex);
+            return this.controller != null;
+        }
+        return true;
     }
 
     @Override
@@ -169,5 +177,24 @@ public class SDL2Controller extends Controller
     {
         float input = Mth.clamp(SDL_GameControllerGetAxis(this.controller, SDL_CONTROLLER_AXIS_RIGHTY) / (float) SDL_JOYSTICK_AXIS_MAX, -1, 1);
         return InputHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
+    }
+
+    @Override
+    public DeviceInfo getInfo()
+    {
+        if(this.info == null)
+        {
+            String name = SDL_GameControllerName(this.controller);
+            SDL_Joystick joystick = SDL_GameControllerGetJoystick(this.controller);
+            String guid = SDL_JoystickGetGUID(joystick).toString();
+            String serial = SDL_GameControllerGetSerial(this.controller);
+            int type = SDL_GameControllerGetType(this.controller);
+            short vendor = SDL_GameControllerGetVendor(this.controller);
+            short product = SDL_GameControllerGetProduct(this.controller);
+            int buttons = SDL_JoystickNumButtons(joystick);
+            int axes = SDL_JoystickNumAxes(joystick);
+            this.info = new DeviceInfo(name, guid, serial, type, vendor, product, buttons, axes);
+        }
+        return this.info;
     }
 }

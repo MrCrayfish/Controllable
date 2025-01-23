@@ -1,10 +1,11 @@
 package com.mrcrayfish.controllable.client.input.glfw;
 
 import com.google.common.io.ByteStreams;
-import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
+import com.mrcrayfish.controllable.client.input.DeviceInfo;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -15,6 +16,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.IntStream;
 
 /**
  * Mac will still use GLFW due to LibSDL4J requiring JVM arguments to load correctly.
@@ -37,19 +40,33 @@ public class GLFWControllerManager extends AdaptiveControllerManager
 
     @Nullable
     @Override
-    public Controller connectToFirstGameController()
+    public Controller connectToBestGameController()
     {
-        if(Config.CLIENT.options.autoSelect.get())
+        DeviceInfo info = Controllable.getLastController().getLastDevice();
+        if(info != null)
         {
-            for(int jid = GLFW.GLFW_JOYSTICK_1; jid <= GLFW.GLFW_JOYSTICK_LAST; jid++)
+            Optional<GLFWController> optional = IntStream.rangeClosed(GLFW.GLFW_JOYSTICK_1, GLFW.GLFW_JOYSTICK_LAST)
+                .filter(jid -> GLFW.glfwJoystickPresent(jid) && GLFW.glfwJoystickIsGamepad(jid))
+                .mapToObj(GLFWController::new)
+                .filter(controller -> info.equals(controller.getInfo())).findFirst();
+            if(optional.isPresent())
             {
-                if(GLFW.glfwJoystickPresent(jid) && GLFW.glfwJoystickIsGamepad(jid))
+                GLFWController controller = optional.get();
+                if(this.setActiveController(controller))
                 {
-                    GLFWController controller = new GLFWController(jid);
-                    if(this.setActiveController(controller))
-                    {
-                        return controller;
-                    }
+                    return controller;
+                }
+            }
+        }
+
+        for(int jid = GLFW.GLFW_JOYSTICK_1; jid <= GLFW.GLFW_JOYSTICK_LAST; jid++)
+        {
+            if(GLFW.glfwJoystickPresent(jid) && GLFW.glfwJoystickIsGamepad(jid))
+            {
+                GLFWController controller = new GLFWController(jid);
+                if(this.setActiveController(controller))
+                {
+                    return controller;
                 }
             }
         }
