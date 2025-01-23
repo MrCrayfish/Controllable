@@ -88,6 +88,9 @@ public class Config
             @ConfigProperty(name = "uiSounds", comment = "If enabled, plays a pop sound when you navigate in inventories, menus or scrolling the radial menu")
             public final BoolProperty uiSounds = BoolProperty.create(true);
 
+            @ConfigProperty(name = "quickMoveSound", comment = "If enabled, plays the wooden button sound when quick moving items in an inventory (similar to legacy console edition)")
+            public final BoolProperty quickMoveSound = BoolProperty.create(true);
+
             @ConfigProperty(name = "radialThumbstick", comment = "The thumbstick to use when scrolling items in the radial menu")
             public final EnumProperty<Thumbstick> radialThumbstick = EnumProperty.create(Thumbstick.RIGHT);
 

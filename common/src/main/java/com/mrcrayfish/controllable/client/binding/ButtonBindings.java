@@ -28,6 +28,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.client.gui.screens.social.SocialInteractionsScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -291,6 +292,9 @@ public class ButtonBindings
                 context.player().ifPresent(player -> {
                     if(player.inventoryMenu.getCarried().isEmpty()) {
                         MouseHooks.invokeMouseClick(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+                        if(Config.CLIENT.options.quickMoveSound.get()) {
+                            context.minecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WOODEN_BUTTON_CLICK_ON, 1.75F, 1.0F));
+                        }
                     } else {
                         MouseHooks.invokeMouseReleased(screen, GLFW.GLFW_MOUSE_BUTTON_RIGHT);
                     }
