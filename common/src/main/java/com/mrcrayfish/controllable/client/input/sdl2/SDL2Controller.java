@@ -61,6 +61,7 @@ public class SDL2Controller extends Controller
         if(SDL_GameControllerGetAttached(this.controller))
         {
             SDL_GameControllerClose(this.controller);
+            this.controller = null;
         }
     }
 
