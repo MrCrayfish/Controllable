@@ -37,7 +37,7 @@ public class ControllerOptions
     public static final ControllerSetting<Double> YAW_SENSITIVITY = createSliderSetting("controllable.options.yawSensitivity", Config.CLIENT.options.yawSensitivity, 0.01);
     public static final ControllerSetting<Double> MOUSE_SPEED = createSliderSetting("controllable.options.mouseSpeed", Config.CLIENT.options.cursorSpeed, 1.0);
     public static final ControllerSetting<Boolean> QUICK_CRAFT = createToggleSetting("controllable.options.quickCraft", Config.CLIENT.options.quickCraft);
-    public static final ControllerSetting<Boolean> UI_SOUNDS = createToggleSetting("controllable.options.uiSounds", Config.CLIENT.options.uiSounds);
+    public static final ControllerSetting<Boolean> UI_SOUNDS = createToggleSetting("controllable.options.uiSounds", Config.CLIENT.options.navigateSound);
     public static final ControllerSetting<Double> HOVER_MODIFIER = createSliderSetting("controllable.options.hoverModifier", Config.CLIENT.options.hoverModifier, 0.05);
     public static final ControllerSetting<ActionVisibility> SHOW_ACTIONS = createValuesSetting("controllable.options.showActions", ActionVisibility.class, Config.CLIENT.options.showButtonHints);
     public static final ControllerSetting<Thumbstick> RADIAL_THUMBSTICK = createValuesSetting("controllable.options.radialThumbstick", Thumbstick.class, Config.CLIENT.options.radialThumbstick);

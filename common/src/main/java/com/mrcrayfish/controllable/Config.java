@@ -40,6 +40,9 @@ public class Config
             @ConfigProperty(name = "rumble", comment = "If enabled, some gameplay elements will cause the controller to rumble")
             public final BoolProperty rumble = BoolProperty.create(true);
 
+            @ConfigProperty(name = "rumbleIntensity", comment = "If rumble is enabled, this option determines the intensity. The higher the value, the stronger the feedback.")
+            public final DoubleProperty rumbleIntensity = DoubleProperty.create(0.1, 0, 1);
+
             @ConfigProperty(name = "autoSelect", comment = "If enabled, controller will be automatically selected on start up or when plugged in")
             public final BoolProperty autoSelect = BoolProperty.create(true);
 
@@ -85,8 +88,8 @@ public class Config
             @ConfigProperty(name = "quickCraft", comment = "If enabled, allows you to craft quickly when clicking an item in the recipe book")
             public final BoolProperty quickCraft = BoolProperty.create(true);
 
-            @ConfigProperty(name = "uiSounds", comment = "If enabled, plays a pop sound when you navigate in inventories, menus or scrolling the radial menu")
-            public final BoolProperty uiSounds = BoolProperty.create(true);
+            @ConfigProperty(name = "navigateSound", comment = "If enabled, plays a pop sound when you navigate in inventories, menus or scrolling the radial menu")
+            public final BoolProperty navigateSound = BoolProperty.create(true);
 
             @ConfigProperty(name = "quickMoveSound", comment = "If enabled, plays the wooden button sound when quick moving items in an inventory (similar to legacy console edition)")
             public final BoolProperty quickMoveSound = BoolProperty.create(true);

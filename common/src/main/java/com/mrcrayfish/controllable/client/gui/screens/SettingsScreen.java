@@ -1,10 +1,8 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.Icons;
@@ -329,7 +327,7 @@ public class SettingsScreen extends Screen
             }
 
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.other").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.uiSounds));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.navigateSound));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.fpsPollingFix));
 
             rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, optionsList));

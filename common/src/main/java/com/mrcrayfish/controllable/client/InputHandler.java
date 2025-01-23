@@ -64,7 +64,6 @@ import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -517,7 +516,7 @@ public class InputHandler
                 int windowPointY = (int) (targetPoint.getY() * mc.getWindow().getGuiScale());
                 cursor.jumpCursorTo(windowPointX, windowPointY);
 
-                if(Config.CLIENT.options.uiSounds.get())
+                if(Config.CLIENT.options.navigateSound.get())
                 {
                     mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, 2.0F));
                 }

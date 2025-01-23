@@ -412,7 +412,7 @@ public class RadialMenu
         this.selected = closest.get();
         Minecraft mc = Minecraft.getInstance();
 
-        if(Config.CLIENT.options.uiSounds.get())
+        if(Config.CLIENT.options.navigateSound.get())
         {
             mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.ITEM_PICKUP, 1.5F));
         }
