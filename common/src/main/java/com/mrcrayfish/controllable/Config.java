@@ -47,7 +47,7 @@ public class Config
             public final BoolProperty renderMiniPlayer = BoolProperty.create(true);
 
             @ConfigProperty(name = "consoleHotbar", comment = "If enabled, hotbar will render closer to the center of the screen like on console.")
-            public final BoolProperty consoleHotbar = BoolProperty.create(false);
+            public final BoolProperty consoleHotbar = BoolProperty.create(true);
 
             @ConfigProperty(name = "cursorType", comment = "The image to use for the cursor. This only applies if virtual mouse is enabled!")
             public final EnumProperty<CursorStyle> cursorType = EnumProperty.create(CursorStyle.CONSOLE);
