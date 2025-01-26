@@ -219,6 +219,8 @@
     "framework_config.controllable.client.options.listScrollSpeed.tooltip": "The speed that lists scroll",
     "framework_config.controllable.client.options.mouseSpeed": "Cursor Speed",
     "framework_config.controllable.client.options.mouseSpeed.tooltip": "The speed which the cursor or virtual mouse moves around the screen",
+    "framework_config.controllable.client.options.navigateSound": "Navigation Sound",
+    "framework_config.controllable.client.options.navigateSound.tooltip": "If enabled, plays a pop sound when you navigate in inventories, menus or scrolling the radial menu",
     "framework_config.controllable.client.options.pitchSensitivity": "Pitch Sensitivity",
     "framework_config.controllable.client.options.pitchSensitivity.tooltip": "The sensitivity of the camera's pitch rotation when applying the rotation speed. Setting to 1.0 would mean applying 100% of the rotation speed to the pitch.",
     "framework_config.controllable.client.options.quickCraft": "Quick Craft",
