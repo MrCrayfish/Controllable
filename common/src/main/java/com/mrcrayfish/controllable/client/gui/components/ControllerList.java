@@ -69,12 +69,6 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
     }
 
     @Override
-    public int getRowWidth()
-    {
-        return 320;
-    }
-
-    @Override
     protected boolean isSelectedItem(int index)
     {
         return false;
