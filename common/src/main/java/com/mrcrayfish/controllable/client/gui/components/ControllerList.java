@@ -216,6 +216,10 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
                 ScreenHelper.drawRoundedBox(graphics, left, top, listWidth, slotHeight, 0xFF000000);
                 graphics.blitSprite(CHECKMARK, left + 2, top, 18, 18);
             }
+            else if(Controllable.getController() != null && hovered)
+            {
+                graphics.blit(Icons.TEXTURE, left + 4, top + 4, 11, 11, 110, 0, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
+            }
             Font font = Minecraft.getInstance().font;
             graphics.drawString(font, this.label, left + 22, top + (slotHeight - font.lineHeight) / 2 + 1, 0xFFFFFF);
         }
