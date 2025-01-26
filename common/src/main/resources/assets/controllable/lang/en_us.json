@@ -244,5 +244,6 @@
     "framework_config.controllable.client.options.virtualMouse.tooltip": "If enabled, the game will use a virtual cursor instead of the real cursor. This must be turned on to be able to run multiple instances!",
     "framework_config.controllable.client.options.yawSensitivity": "Yaw Sensitivity",
     "framework_config.controllable.client.options.yawSensitivity.tooltip": "The sensitivity of the camera's yaw rotation when applying the rotation speed. Setting to 1.0 would mean applying 100% of the rotation speed to the yaw.",
-    "key.categories.controllable_custom": "Custom Keybinds"
+    "key.categories.controllable_custom": "Custom Keybinds",
+    "controllable.gui.link": "Create Link"
 }
