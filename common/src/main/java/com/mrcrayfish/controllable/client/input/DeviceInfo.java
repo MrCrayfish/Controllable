@@ -41,7 +41,6 @@ public record DeviceInfo(@Nullable String name,
     public JsonObject toJson()
     {
         JsonObject object = new JsonObject();
-        object.addProperty("__comment", "Information to restore the last controller used for next load of the game");
         if(this.name != null) object.addProperty("name", this.name);
         if(this.guid != null) object.addProperty("guid", this.guid);
         if(this.serial != null) object.addProperty("serial", this.serial);

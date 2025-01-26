@@ -224,7 +224,7 @@ public class SettingsScreen extends Screen
         {
             super(TITLE);
             GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
-            ControllerList list = new ControllerList(SettingsScreen.this.minecraft, 24);
+            ControllerList list = new ControllerList(SettingsScreen.this, SettingsScreen.this.minecraft, 24);
             rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, list));
             screen.tickers.add(list::tick);
         }

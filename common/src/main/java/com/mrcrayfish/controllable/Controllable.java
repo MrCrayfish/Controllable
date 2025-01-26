@@ -2,7 +2,6 @@ package com.mrcrayfish.controllable;
 
 import com.google.common.base.Suppliers;
 import com.mrcrayfish.controllable.client.CameraHandler;
-import com.mrcrayfish.controllable.client.LastController;
 import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.InputProcessor;
 import com.mrcrayfish.controllable.client.RadialMenu;
@@ -28,13 +27,11 @@ public class Controllable
     private static final RadialMenu RADIAL_MENU = new RadialMenu();
     private static final ScrollingHandler SCROLLING_HANDLER = new ScrollingHandler();
     private static final RumbleHandler RUMBLE_HANDLER = new RumbleHandler();
-    private static final LastController LAST_CONTROLLER = new LastController();
 
     private static final boolean JEI_LOADED = Utils.isModLoaded("jei");
 
     public static void init()
     {
-        LAST_CONTROLLER.load();
         MANAGER.get().init();
         INPUT_PROCESSOR.registerEvents();
         CURSOR.registerEvents();
@@ -72,11 +69,6 @@ public class Controllable
     public static RumbleHandler getRumbleHandler()
     {
         return RUMBLE_HANDLER;
-    }
-
-    public static LastController getLastController()
-    {
-        return LAST_CONTROLLER;
     }
 
     public static boolean isJeiLoaded()

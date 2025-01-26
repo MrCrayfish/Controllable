@@ -1,9 +1,12 @@
 package com.mrcrayfish.controllable.client.input;
 
 import com.google.common.io.MoreFiles;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
-import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.toasts.ConnectionToast;
 import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
 import com.mrcrayfish.controllable.client.gui.screens.PendingScreen;
@@ -14,8 +17,10 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.tuple.Pair;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,19 +28,24 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * Author: MrCrayfish
  */
+@ApiStatus.Internal
 public abstract class AdaptiveControllerManager
 {
     public static final String MAPPINGS_URL = "https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     protected Controller activeController;
     protected Map<Number, Pair<Integer, String>> controllers = new HashMap<>();
+    protected List<DeviceInfo> lastDevices = new ArrayList<>();
 
     public abstract void init();
 
@@ -63,19 +73,30 @@ public abstract class AdaptiveControllerManager
         // Removes all connected from the old map of connected controllers
         oldControllers.keySet().removeIf(this.controllers::containsKey);
 
-        // If no controller is active and auto select is enabled, connect to the first controller
-        Controller controller = this.getActiveController();
-        if(controller != null && oldControllers.containsKey(controller.getJid()))
+        Controller activeController = this.getActiveController();
+        if(activeController instanceof MultiController multi)
         {
-            this.sendControllerToast(false, controller);
+            // If current controller is a multi, remove controllers that no longer exist
+            for(Controller childController : multi.getControllers())
+            {
+                if(oldControllers.containsKey(childController.getJid()))
+                {
+                    this.removeActiveController(childController);
+                }
+            }
+        }
+        else if(activeController != null && oldControllers.containsKey(activeController.getJid()))
+        {
+            this.sendControllerToast(false, activeController);
             this.setActiveController(null);
-            controller = null;
+            activeController = null;
         }
 
-        if(controller == null && Config.CLIENT.options.autoSelect.get())
+        // If no controller is active and auto select is enabled, connect to the first controller
+        if(activeController == null && Config.CLIENT.options.autoSelect.get())
         {
-            controller = this.connectToBestGameController();
-            this.sendControllerToast(true, controller);
+            activeController = this.connectToBestGameController();
+            this.sendControllerToast(true, activeController);
         }
     }
 
@@ -99,24 +120,78 @@ public abstract class AdaptiveControllerManager
         return this.activeController;
     }
 
-    public boolean setActiveController(Controller controller)
+    public final boolean setActiveController(@Nullable Controller controller)
     {
         if(this.activeController != null)
         {
             this.activeController.close();
+            this.activeController = null;
         }
         if(controller != null)
         {
-            if(!controller.open())
-                return false;
-            this.activeController = controller;
-            Controllable.getLastController().setLastDevice(controller.getInfo());
+            if(controller.open())
+            {
+                this.activeController = controller;
+            }
+        }
+        this.updateLastDevices();
+        return true;
+    }
+
+    public final boolean addActiveController(Controller controller)
+    {
+        if(!controller.open())
+            return false;
+
+        if(this.activeController != null)
+        {
+            if(this.activeController instanceof MultiController activeMultiController)
+            {
+                List<Controller> newControllers = new ArrayList<>(activeMultiController.getControllers());
+                newControllers.add(controller);
+                this.setActiveController(new MultiController(newControllers));
+            }
+            else
+            {
+                this.setActiveController(new MultiController(List.of(this.activeController, controller)));
+            }
         }
         else
         {
-            this.activeController = null;
+            this.setActiveController(controller);
         }
         return true;
+    }
+
+    public final boolean removeActiveController(Controller controller)
+    {
+        if(this.activeController != null)
+        {
+            if(this.activeController instanceof MultiController m)
+            {
+                List<Controller> controllers = new ArrayList<>(m.getControllers());
+                controllers.remove(controller);
+                if(controllers.isEmpty())
+                {
+                    this.setActiveController(null);
+                }
+                else if(controllers.size() == 1)
+                {
+                    this.setActiveController(controllers.getFirst());
+                }
+                else
+                {
+                    this.setActiveController(new MultiController(controllers));
+                }
+                return true;
+            }
+            else if(this.activeController.getJid().equals(controller.getJid()))
+            {
+                this.setActiveController(null);
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getControllerCount()
@@ -126,6 +201,8 @@ public abstract class AdaptiveControllerManager
 
     public final void completeSetup()
     {
+        this.loadLastDevices();
+
         /* Apply internal mappings */
         try(InputStream is = AdaptiveControllerManager.class.getResourceAsStream("/gamecontrollerdb.txt"))
         {
@@ -167,6 +244,83 @@ public abstract class AdaptiveControllerManager
         if(Config.CLIENT.options.autoSelect.get())
         {
             this.connectToBestGameController();
+        }
+    }
+
+    public List<DeviceInfo> getLastDevices()
+    {
+        return this.lastDevices;
+    }
+
+    private void updateLastDevices()
+    {
+        this.lastDevices.clear();
+        if(this.activeController != null)
+        {
+            if(this.activeController instanceof MultiController m)
+            {
+                m.getControllers().forEach(controller -> this.lastDevices.add(controller.getInfo()));
+            }
+            else
+            {
+                this.lastDevices.add(this.activeController.getInfo());
+            }
+        }
+        this.saveLastDevices();
+    }
+    
+    private void loadLastDevices()
+    {
+        try
+        {
+            this.lastDevices.clear();
+
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("selected_controllers.json");
+            MoreFiles.createParentDirectories(path);
+            if(!Files.exists(path))
+                return;
+
+            try(BufferedReader reader = Files.newBufferedReader(path))
+            {
+                JsonObject object = GSON.fromJson(reader, JsonObject.class);
+                if(!(object.get("selected") instanceof JsonArray array))
+                    return;
+
+                array.forEach(element -> {
+                    if(element instanceof JsonObject child) {
+                        this.lastDevices.add(DeviceInfo.fromJson(child));
+                    }
+                });
+            }
+        }
+        catch(IOException e)
+        {
+            Constants.LOG.error("Failed to load controller.properties", e);
+        }
+    }
+    
+    private void saveLastDevices()
+    {
+        try
+        {
+            // Build json object
+            JsonObject object = new JsonObject();
+            object.addProperty("__comment", "Information to restore the selected controllers for next load of the game");
+            JsonArray selected = new JsonArray();
+            this.lastDevices.forEach(info -> {
+                selected.add(info.toJson());
+            });
+            object.add("selected", selected);
+            
+            // Write to file
+            String json = GSON.toJson(object);
+            Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("selected_controllers.json");
+            MoreFiles.createParentDirectories(path);
+            Files.writeString(path, json);
+        }
+        catch(IOException e)
+        {
+            throw new RuntimeException(e);
         }
     }
 

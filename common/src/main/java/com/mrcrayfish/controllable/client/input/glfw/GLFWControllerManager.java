@@ -14,9 +14,13 @@ import org.lwjgl.system.MemoryUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -42,20 +46,33 @@ public class GLFWControllerManager extends AdaptiveControllerManager
     @Override
     public Controller connectToBestGameController()
     {
-        DeviceInfo info = Controllable.getLastController().getLastDevice();
-        if(info != null)
+        List<DeviceInfo> lastDevices = this.getLastDevices();
+        if(!lastDevices.isEmpty())
         {
-            Optional<GLFWController> optional = IntStream.rangeClosed(GLFW.GLFW_JOYSTICK_1, GLFW.GLFW_JOYSTICK_LAST)
+            List<GLFWController> selectedControllers = new ArrayList<>();
+            List<GLFWController> availableControllers = IntStream.rangeClosed(GLFW.GLFW_JOYSTICK_1, GLFW.GLFW_JOYSTICK_LAST)
                 .filter(jid -> GLFW.glfwJoystickPresent(jid) && GLFW.glfwJoystickIsGamepad(jid))
                 .mapToObj(GLFWController::new)
-                .filter(controller -> info.equals(controller.getInfo())).findFirst();
-            if(optional.isPresent())
+                .collect(Collectors.toCollection(ArrayList::new));
+            for(DeviceInfo info : lastDevices)
             {
-                GLFWController controller = optional.get();
-                if(this.setActiveController(controller))
+                Iterator<GLFWController> it = availableControllers.iterator();
+                while(it.hasNext())
                 {
-                    return controller;
+                    GLFWController controller = it.next();
+                    if(controller.getInfo().equals(info))
+                    {
+                        selectedControllers.add(controller);
+                        it.remove();
+                    }
                 }
+            }
+            selectedControllers.forEach(this::addActiveController);
+
+            Controller controller = this.getActiveController();
+            if(controller != null)
+            {
+                return controller;
             }
         }
 

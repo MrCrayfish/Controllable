@@ -8,7 +8,6 @@ import com.mrcrayfish.controllable.client.input.DeviceInfo;
 import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable_sdl.api.gamecontroller.SDL_GameController;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_Joystick;
-import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickGUID;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.util.Mth;
@@ -26,6 +25,7 @@ import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystickConst.SDL_
  */
 public class SDL2Controller extends Controller
 {
+    private final int deviceIndex;
     private final SDL_JoystickID jid;
     private SDL_GameController controller;
     private String cachedName;
@@ -33,8 +33,8 @@ public class SDL2Controller extends Controller
 
     public SDL2Controller(int deviceIndex)
     {
-        super(deviceIndex);
         this.jid = SDL_JoystickGetDeviceInstanceID(deviceIndex);
+        this.deviceIndex = deviceIndex;
         this.getName(); //cache the name straight away
     }
 

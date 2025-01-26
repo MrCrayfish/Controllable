@@ -8,13 +8,11 @@ import net.minecraft.Util;
  */
 public abstract class Controller
 {
-    protected final int deviceIndex;
     protected final ButtonStates states;
     protected long lastInputTime;
 
-    public Controller(int deviceIndex)
+    public Controller()
     {
-        this.deviceIndex = deviceIndex;
         this.states = new ButtonStates();
     }
 
@@ -115,14 +113,6 @@ public abstract class Controller
      * @return a {@link DeviceInfo} instance
      */
     public abstract DeviceInfo getInfo();
-
-    /**
-     * @return The device index of the controller. This should not be used to determine the controller.
-     */
-    public int getDeviceIndex()
-    {
-        return this.deviceIndex;
-    }
 
     /**
      * Used internally to update button states

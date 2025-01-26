@@ -4,7 +4,9 @@ import com.google.common.io.ByteStreams;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.DeviceInfo;
+import com.mrcrayfish.controllable.client.input.MultiController;
 import com.mrcrayfish.controllable_sdl.api.gamecontroller.SdlGamecontroller;
 import com.sun.jna.Memory;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
@@ -14,10 +16,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.mrcrayfish.controllable_sdl.api.Sdl.SDL_Init;
@@ -90,27 +95,37 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
 
     @Override
     @Nullable
-    public SDL2Controller connectToBestGameController()
+    public Controller connectToBestGameController()
     {
-        DeviceInfo info = Controllable.getLastController().getLastDevice();
-        if(info != null)
+        List<DeviceInfo> lastDevices = this.getLastDevices();
+        if(!lastDevices.isEmpty())
         {
-            Optional<SDL2Controller> optional = IntStream.range(0, SDL_NumJoysticks())
+            List<SDL2Controller> selectedControllers = new ArrayList<>();
+            List<SDL2Controller> availableControllers = IntStream.range(0, SDL_NumJoysticks())
                 .filter(SdlGamecontroller::SDL_IsGameController)
                 .mapToObj(SDL2Controller::new)
-                .filter(controller -> {
-                    controller.open();
-                    boolean result = info.equals(controller.getInfo());
-                    controller.close();
-                    return result;
-                }).findFirst();
-            if(optional.isPresent())
+                .collect(Collectors.toCollection(ArrayList::new));
+            for(DeviceInfo info : lastDevices)
             {
-                SDL2Controller controller = optional.get();
-                if(this.setActiveController(controller))
+                Iterator<SDL2Controller> it = availableControllers.iterator();
+                while(it.hasNext())
                 {
-                    return controller;
+                    SDL2Controller controller = it.next();
+                    controller.open();
+                    if(controller.getInfo().equals(info))
+                    {
+                        selectedControllers.add(controller);
+                        it.remove();
+                    }
+                    controller.close();
                 }
+            }
+            selectedControllers.forEach(this::addActiveController);
+
+            Controller controller = this.getActiveController();
+            if(controller != null)
+            {
+                return controller;
             }
         }
 

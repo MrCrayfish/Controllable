@@ -16,13 +16,14 @@ import org.lwjgl.glfw.GLFWGamepadState;
  */
 public class GLFWController extends Controller
 {
+    private final int deviceIndex;
     private GLFWGamepadState controller;
     private String cachedName;
     private DeviceInfo info;
 
     public GLFWController(int deviceIndex)
     {
-        super(deviceIndex);
+        this.deviceIndex = deviceIndex;
     }
 
     @Override
