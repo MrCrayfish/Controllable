@@ -26,13 +26,6 @@ public class MinecraftMixin
     @Shadow
     public LocalPlayer player;
 
-    @Inject(method = "<init>", at = @At(value = "TAIL"))
-    private void controllableOnFinishedLoading(CallbackInfo ci)
-    {
-        //Controllable.getBindingRegistry().load();
-        //Controllable.getControllerManager().onClientFinishedLoading();
-    }
-
     /*
      * Modifies the return value of keyAttack.isDown() when calling Minecraft#continueAttack()
      */

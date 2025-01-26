@@ -11,7 +11,6 @@
         "client.LocalPlayerMixin",
         "client.MinecraftMixin",
         "client.MouseHelperMixin",
-        "client.OptionsMixin",
         "client.OverlayRecipeButtonAccessor",
         "client.OverlayRecipeComponentAccessor",
         "client.RecipeBookComponentAccessor",
