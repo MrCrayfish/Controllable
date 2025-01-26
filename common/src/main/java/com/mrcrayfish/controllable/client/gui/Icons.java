@@ -18,7 +18,8 @@ public enum Icons
     CROSS,
     SAVE,
     KEY_CAP,
-    LINK;
+    LINK,
+    INFO;
 
     public static final ResourceLocation TEXTURE = Utils.resource("textures/gui/icons.png");
     public static final int TEXTURE_WIDTH = Icons.values().length * 11;
