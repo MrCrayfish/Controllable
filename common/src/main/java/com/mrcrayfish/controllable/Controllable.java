@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable;
 import com.mrcrayfish.controllable.client.ControllerInput;
 import com.mrcrayfish.controllable.client.ControllerProperties;
 import com.mrcrayfish.controllable.client.InputProcessor;
+import com.mrcrayfish.controllable.client.RumbleHandler;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.ControllerManager;
 import com.mrcrayfish.controllable.client.input.glfw.GLFWControllerManager;
@@ -17,6 +18,7 @@ public class Controllable
     private static ControllerManager manager;
     private static File configFolder;
     private static boolean jeiLoaded;
+    private static RumbleHandler rumbleHandler;
 
     public static void init()
     {
@@ -24,6 +26,7 @@ public class Controllable
         jeiLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("jei");
         ControllerProperties.load(configFolder);
         getManager().init();
+        rumbleHandler = new RumbleHandler();
     }
 
     public static ControllerInput getInput()
@@ -39,6 +42,11 @@ public class Controllable
     public static boolean isJeiLoaded()
     {
         return jeiLoaded;
+    }
+
+    public static RumbleHandler getRumbleHandler()
+    {
+        return rumbleHandler;
     }
 
     @Nullable

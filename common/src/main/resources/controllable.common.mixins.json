@@ -8,6 +8,7 @@
     "client": [
         "client.ContainerScreenMixin",
         "client.GameRendererMixin",
+        "client.LocalPlayerMixin",
         "client.MinecraftMixin",
         "client.MouseHelperMixin",
         "client.OptionsMixin",

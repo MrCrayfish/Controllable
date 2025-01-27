@@ -130,4 +130,9 @@ public abstract class Controller
     {
         return this.states.getState(button);
     }
+
+    public boolean supportsRumble()
+    {
+        return false;
+    }
 }
