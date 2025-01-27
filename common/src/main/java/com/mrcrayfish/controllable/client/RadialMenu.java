@@ -162,7 +162,7 @@ public class RadialMenu
         }
     }
 
-    public List<RadialMenuAction> getDefaults()
+    public List<RadialMenuAction> createDefaultActions()
     {
         List<RadialMenuAction> defaults = new ArrayList<>();
         defaults.add(new RadialMenuAction(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS, ChatFormatting.BLUE));

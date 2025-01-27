@@ -50,7 +50,7 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
                 if(result) {
                     RadialMenuConfigureScreen screen = getRadialConfigureScreen();
                     screen.getActions().clear();
-                    screen.getActions().addAll(Controllable.getRadialMenu().getDefaults());
+                    screen.getActions().addAll(Controllable.getRadialMenu().createDefaultActions());
                     this.list.children().forEach(item -> {
                         if(item instanceof ButtonBindingItem bindingItem) {
                             bindingItem.updateActiveState();
