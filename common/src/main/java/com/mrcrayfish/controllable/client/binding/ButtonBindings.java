@@ -55,13 +55,17 @@ public class ButtonBindings
     public static final ButtonBinding SPRINT = new ButtonBinding(Buttons.LEFT_THUMB_STICK, "key.sprint", "key.categories.movement", InGameContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
             context.player().ifPresent(player -> {
-                boolean canSprint = !player.isSprinting() && !player.hasEffect(MobEffects.BLINDNESS);
-                boolean hasRequiredFood = (float) player.getFoodData().getFoodLevel() > 6.0F || player.getAbilities().mayfly;
-                boolean hasImpulse = player.isUnderWater() ? player.input.hasForwardImpulse() : (double) player.input.forwardImpulse >= 0.8D;
-                boolean canSwimInFluid = ClientServices.CLIENT.canLocalPlayerSwimInFluid(player);
-                boolean usingItem = player.isUsingItem();
-                if(canSprint && canSwimInFluid && hasImpulse && hasRequiredFood && !usingItem) {
-                    player.setSprinting(true);
+                if(context.minecraft().options.toggleSprint().get()) {
+                    context.minecraft().options.keySprint.setDown(true);
+                } else {
+                    boolean canSprint = !player.isSprinting() && !player.hasEffect(MobEffects.BLINDNESS);
+                    boolean hasRequiredFood = (float) player.getFoodData().getFoodLevel() > 6.0F || player.getAbilities().mayfly;
+                    boolean hasImpulse = player.isUnderWater() ? player.input.hasForwardImpulse() : (double) player.input.forwardImpulse >= 0.8D;
+                    boolean canSwimInFluid = ClientServices.CLIENT.canLocalPlayerSwimInFluid(player);
+                    boolean usingItem = player.isUsingItem();
+                    if(canSprint && canSwimInFluid && hasImpulse && hasRequiredFood && !usingItem) {
+                        player.setSprinting(true);
+                    }
                 }
             });
         });
