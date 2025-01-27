@@ -1,6 +1,5 @@
 package com.mrcrayfish.controllable.mixin;
 
-import com.mrcrayfish.controllable.client.RumbleHandler;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;

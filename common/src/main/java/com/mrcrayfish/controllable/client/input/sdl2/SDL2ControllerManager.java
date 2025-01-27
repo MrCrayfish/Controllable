@@ -4,8 +4,8 @@ import com.google.common.io.ByteStreams;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.client.input.ControllerManager;
 import com.sun.jna.Memory;
-import io.github.libsdl4j.api.joystick.SDL_JoystickID;
-import io.github.libsdl4j.api.rwops.SDL_RWops;
+import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
+import com.mrcrayfish.controllable_sdl.api.rwops.SDL_RWops;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -14,14 +14,14 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.github.libsdl4j.api.Sdl.SDL_Init;
-import static io.github.libsdl4j.api.Sdl.SDL_Quit;
-import static io.github.libsdl4j.api.SdlSubSystemConst.SDL_INIT_GAMECONTROLLER;
-import static io.github.libsdl4j.api.SdlSubSystemConst.SDL_INIT_JOYSTICK;
-import static io.github.libsdl4j.api.gamecontroller.SdlGamecontroller.*;
-import static io.github.libsdl4j.api.joystick.SdlJoystick.SDL_JoystickGetDeviceInstanceID;
-import static io.github.libsdl4j.api.joystick.SdlJoystick.SDL_NumJoysticks;
-import static io.github.libsdl4j.api.rwops.SdlRWops.SDL_RWFromConstMem;
+import static com.mrcrayfish.controllable_sdl.api.Sdl.SDL_Init;
+import static com.mrcrayfish.controllable_sdl.api.Sdl.SDL_Quit;
+import static com.mrcrayfish.controllable_sdl.api.SdlSubSystemConst.SDL_INIT_GAMECONTROLLER;
+import static com.mrcrayfish.controllable_sdl.api.SdlSubSystemConst.SDL_INIT_JOYSTICK;
+import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SdlGamecontroller.*;
+import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.SDL_JoystickGetDeviceInstanceID;
+import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.SDL_NumJoysticks;
+import static com.mrcrayfish.controllable_sdl.api.rwops.SdlRWops.SDL_RWFromConstMem;
 
 /**
  * Author: MrCrayfish
