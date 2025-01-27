@@ -56,7 +56,7 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
         // Add all button bindings to the appropriate category or create a new one
         Controllable.getBindingRegistry().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding -> {
             // Only show unbound bindings for select binding screen for radial menu
-            if(showUnbound && binding.getButton() != -1) return;
+            if(showUnbound && !binding.isUnbound()) return;
             List<ButtonBinding> list = this.categories.computeIfAbsent(binding.getCategory(), category -> new ArrayList<>());
             list.add(binding);
         });

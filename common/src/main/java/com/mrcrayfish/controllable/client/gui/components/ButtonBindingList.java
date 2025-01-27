@@ -89,7 +89,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         Controllable.getBindingRegistry().getBindings().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
         {
             // Only show unbound bindings for select binding screen for radial menu
-            if(showUnbound && binding.getButton() != -1) return;
+            if(showUnbound && !binding.isUnbound()) return;
             List<ButtonBinding> list = this.categories.computeIfAbsent(binding.getCategory(), category -> new ArrayList<>());
             list.add(binding);
         });
@@ -146,7 +146,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             {
                 List<Component> components = new ArrayList<>();
                 components.add(Component.translatable("controllable.gui.change_binding", ClientHelper.getButtonComponent(Buttons.A)).withStyle(ChatFormatting.YELLOW));
-                if(binding.getButton() != -1)
+                if(!binding.isUnbound())
                 {
                     components.add(Component.translatable("controllable.gui.clear_binding", ClientHelper.getButtonComponent(Buttons.X)).withStyle(ChatFormatting.YELLOW));
                 }
@@ -155,7 +155,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
 
             List<Component> components = new ArrayList<>();
             components.add(Component.translatable("controllable.gui.change_binding", InputConstants.Type.MOUSE.getOrCreate(0).getDisplayName().copy().withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW));
-            if(binding.getButton() != -1)
+            if(!binding.isUnbound())
             {
                 components.add(Component.translatable("controllable.gui.clear_binding", InputConstants.Type.MOUSE.getOrCreate(1).getDisplayName().copy().withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW));
             }

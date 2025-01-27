@@ -157,7 +157,7 @@ public class BindingRegistry
         if(this.registeredBindings.putIfAbsent(binding.getDescription(), binding) == null)
         {
             this.bindings.add(binding);
-            if(binding.getButton() != -1)
+            if(!binding.isUnbound())
             {
                 this.idToButtonList.put(binding.getButton(), binding);
             }
@@ -169,7 +169,7 @@ public class BindingRegistry
         if(this.keyAdapters.putIfAbsent(binding.getDescription(), binding) == null)
         {
             this.bindings.add(binding);
-            if(binding.getButton() != -1)
+            if(!binding.isUnbound())
             {
                 this.idToButtonList.put(binding.getButton(), binding);
             }
@@ -191,7 +191,7 @@ public class BindingRegistry
     {
         Controllable.getInputHandler().clearActiveHandlers();
         this.idToButtonList.clear();
-        this.bindings.stream().filter(binding -> binding.getButton() != -1).forEach(binding -> {
+        this.bindings.stream().filter(binding -> !binding.isUnbound()).forEach(binding -> {
             this.idToButtonList.put(binding.getButton(), binding);
         });
     }
@@ -251,7 +251,7 @@ public class BindingRegistry
                             KeyAdapterBinding keyAdapter = new KeyAdapterBinding(button, mapping);
                             if(this.keyAdapters.putIfAbsent(keyAdapter.getDescription(), keyAdapter) == null) {
                                 this.bindings.add(keyAdapter);
-                                if(keyAdapter.getButton() != -1) {
+                                if(!keyAdapter.isUnbound()) {
                                     this.idToButtonList.put(keyAdapter.getButton(), keyAdapter);
                                 }
                             }
