@@ -1,14 +1,15 @@
 import net.minecraftforge.gradle.common.tasks.SignJar
 
 plugins {
-    id 'java'
-    id 'eclipse'
+    id 'idea'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id("org.spongepowered.mixin") version "0.7-SNAPSHOT"
+    id 'net.minecraftforge.gradle'
+    id 'org.spongepowered.mixin'
 }
 
-archivesBaseName = "${mod_id}-forge"
+base {
+    archivesName = "${mod_id}-forge"
+}
 version = "${minecraft_version}-${mod_version}"
 
 jarJar.enable()
@@ -16,16 +17,15 @@ jarJar.enable()
 mixin {
     add sourceSets.main, "controllable.refmap.json"
     config 'controllable.common.mixins.json'
-    config 'controllable.mixins.json'
+    config 'controllable.forge.mixins.json'
 }
 
 minecraft {
     mappings channel: 'official', version: minecraft_version
     copyIdeResources = true
 
-    if (project.hasProperty('forge_ats_enabled') && project.findProperty('forge_ats_enabled').toBoolean()) {
+    if (file('src/main/resources/META-INF/accesstransformer.cfg').exists()) {
         accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-        project.logger.debug('Forge Access Transformers are enabled for this project.')
     }
 
     runs {
@@ -182,4 +182,4 @@ task signJar(type: SignJar, dependsOn: jar) {
 }
 
 jar.finalizedBy 'signJar'
-signJar.mustRunAfter tasks.reobfJar
+signJar.mustRunAfter 'reobfJar'

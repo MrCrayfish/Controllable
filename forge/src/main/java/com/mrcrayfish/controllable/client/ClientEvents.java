@@ -23,6 +23,6 @@ public class ClientEvents
     @SubscribeEvent(receiveCanceled = true)
     public void onPlayerUsingItem(LivingEntityUseItemEvent.Tick event)
     {
-        RumbleHandler.onPlayerUsingItem(event.getEntity(), event.getItem(), event.getDuration());
+        //RumbleHandler.onPlayerUsingItem(event.getEntity(), event.getItem(), event.getDuration());
     }
 }

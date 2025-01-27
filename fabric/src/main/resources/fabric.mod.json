@@ -20,7 +20,7 @@
     },
     "mixins": [
         "controllable.common.mixins.json",
-        "controllable.mixins.json"
+        "controllable.fabric.mixins.json"
     ],
     "accessWidener": "controllable.accesswidener",
     "depends": {
