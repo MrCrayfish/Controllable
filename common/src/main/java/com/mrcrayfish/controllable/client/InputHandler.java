@@ -154,12 +154,12 @@ public class InputHandler
 
                 ButtonBinding.setButtonState(binding, false);
 
-                if(!(handler instanceof BindingReleased released))
-                    continue;
-
                 // Cancel the handler if context is no longer valid
                 if(!binding.getContext().isActive())
-                    break;
+                    return;
+
+                if(!(handler instanceof BindingReleased released))
+                    continue;
 
                 Minecraft mc = Minecraft.getInstance();
                 Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, false);
