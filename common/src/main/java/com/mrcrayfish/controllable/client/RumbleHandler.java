@@ -26,6 +26,12 @@ public class RumbleHandler
         instance = this;
     }
 
+    /**
+     * Called when the player is damaged and rumbles the controller based on the amount of damage.
+     *
+     * @param player the player that was damaged
+     * @param damage the amount of damage the player took
+     */
     @ApiStatus.Internal
     public void onDamage(LocalPlayer player, float damage)
     {
@@ -43,6 +49,11 @@ public class RumbleHandler
         controller.rumble(minFreq, maxFreq, time);
     }
 
+    /**
+     * Tailors specific use animations with a custom controller rumble.
+     *
+     * @param player the player using the item
+     */
     private void onUseItem(Player player)
     {
         if(!Config.CLIENT.options.rumble.get())
