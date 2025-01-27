@@ -154,33 +154,17 @@ public class InputHandler
 
                 ButtonBinding.setButtonState(binding, false);
 
+                if(!(handler instanceof BindingReleased released))
+                    continue;
+
                 // Cancel the handler if context is no longer valid
                 if(!binding.getContext().isActive())
-                    return;
-
-                if(!(handler instanceof BindingReleased released))
                     continue;
 
                 Minecraft mc = Minecraft.getInstance();
                 Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, false);
                 released.handleReleased(context);
                 return;
-            }
-
-            for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
-            {
-                ButtonHandler handler = binding.getHandler();
-                if(!(handler instanceof BindingReleased released))
-                    continue;
-
-                if(!binding.getContext().isActive())
-                    continue;
-
-                ButtonBinding.setButtonState(binding, false);
-                Minecraft mc = Minecraft.getInstance();
-                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, false);
-                if(released.handleReleased(context))
-                    break;
             }
         }
     }
