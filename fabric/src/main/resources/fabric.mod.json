@@ -14,8 +14,11 @@
     "icon": "${mod_id}_icon.png",
     "environment": "client",
     "entrypoints": {
-        "client": [
+        "main": [
             "com.mrcrayfish.controllable.ControllableMod"
+        ],
+        "client": [
+            "com.mrcrayfish.controllable.client.ClientControllableMod"
         ]
     },
     "mixins": [
