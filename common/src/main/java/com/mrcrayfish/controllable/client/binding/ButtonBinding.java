@@ -91,6 +91,11 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         this.pressed = false;
     }
 
+    public boolean isUnbound()
+    {
+        return this.button == -1;
+    }
+
     @ApiStatus.Internal
     public void resetMappedButton()
     {

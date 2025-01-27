@@ -321,6 +321,10 @@ public class ActionHintOverlay implements IOverlay
                 }
             }
         }
-        actionMap.forEach((binding, action) -> this.actions.put(binding.getButton(), action));
+        actionMap.forEach((binding, action) -> {
+            if(!binding.isUnbound()) {
+                this.actions.put(binding.getButton(), action);
+            }
+        });
     }
 }
