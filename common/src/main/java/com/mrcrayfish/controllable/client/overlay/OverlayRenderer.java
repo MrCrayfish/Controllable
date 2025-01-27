@@ -18,7 +18,7 @@ public class OverlayRenderer
         builder.add(new TabNavigationOverlay());
         builder.add(new RecipeBookOverlay());
         builder.add(new ActionHintOverlay());
-        builder.add(new PlayerOverlay());
+        builder.add(new PaperDollPlayerOverlay());
         builder.add(new VirtualCursorOverlay());
         return builder.build();
     });

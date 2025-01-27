@@ -12,7 +12,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 /**
  * Author: MrCrayfish
  */
-public class PlayerOverlay implements IOverlay
+public class PaperDollPlayerOverlay implements IOverlay
 {
     @Override
     public boolean isVisible()
@@ -25,12 +25,11 @@ public class PlayerOverlay implements IOverlay
     public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.player != null && mc.screen == null && Config.CLIENT.options.renderMiniPlayer.get())
+        if(mc.player != null && mc.screen == null && Config.CLIENT.options.paperDoll.get())
         {
             if(!EventHelper.postRenderMiniPlayer())
             {
-                // TODO test
-                InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, 20, 45, 20, 0, 0, 0, 0, 0, mc.player);
+                InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, -25, 0, 100, 78, 20, 0.0625F, 60, 35, mc.player);
             }
         }
     }

@@ -309,7 +309,7 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.showButtonHints));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.drawHintBackground));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.consoleHotbar));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.renderMiniPlayer));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.paperDoll));
 
             // Controller options
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.controller").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));

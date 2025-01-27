@@ -46,8 +46,8 @@ public class Config
             @ConfigProperty(name = "autoSelect", comment = "If enabled, controller will be automatically selected on start up or when plugged in")
             public final BoolProperty autoSelect = BoolProperty.create(true);
 
-            @ConfigProperty(name = "renderMiniPlayer", comment = "If enabled, the player will render in the top left corner likes Bedrock Edition")
-            public final BoolProperty renderMiniPlayer = BoolProperty.create(true);
+            @ConfigProperty(name = "paperDoll", comment = "If enabled, the player will render in the top left corner likes Bedrock Edition")
+            public final BoolProperty paperDoll = BoolProperty.create(true);
 
             @ConfigProperty(name = "consoleHotbar", comment = "If enabled, hotbar will render closer to the center of the screen like on console.")
             public final BoolProperty consoleHotbar = BoolProperty.create(true);
