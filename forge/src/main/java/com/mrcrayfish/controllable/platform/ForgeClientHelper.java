@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.platform;
 
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ForgeCompatBindingContext;
 import com.mrcrayfish.controllable.client.binding.IBindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
@@ -139,7 +140,7 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public List<NavigationPoint> getJeiNavigationPoints()
     {
-        if(!ModList.get().isLoaded("jei"))
+        if(!Controllable.isJeiLoaded())
             return Collections.emptyList();
         return JeiSupport.getNavigationPoints();
     }

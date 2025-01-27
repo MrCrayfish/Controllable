@@ -18,12 +18,14 @@ public class Controllable
     private static ControllerManager manager;
     private static File configFolder;
     private static boolean jeiLoaded;
+    private static boolean emiLoaded;
     private static RumbleHandler rumbleHandler;
 
     public static void init()
     {
         configFolder = com.mrcrayfish.framework.platform.Services.CONFIG.getConfigPath().toFile();
         jeiLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("jei");
+        emiLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("emi");
         ControllerProperties.load(configFolder);
         getManager().init();
         rumbleHandler = new RumbleHandler();
@@ -41,7 +43,13 @@ public class Controllable
 
     public static boolean isJeiLoaded()
     {
-        return jeiLoaded;
+        // EMI creates a stub JEI, so we need to do this to prevent a crash
+        return jeiLoaded && !emiLoaded;
+    }
+
+    public static boolean isEmiLoaded()
+    {
+        return emiLoaded;
     }
 
     public static RumbleHandler getRumbleHandler()

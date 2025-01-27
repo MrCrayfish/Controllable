@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.platform;
 
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingContext;
 import com.mrcrayfish.controllable.client.binding.IBindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
@@ -91,7 +92,7 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public List<NavigationPoint> getJeiNavigationPoints()
     {
-        if(!FabricLoader.getInstance().isModLoaded("jei"))
+        if(!Controllable.isJeiLoaded())
             return Collections.emptyList();
         return JeiSupport.getNavigationPoints();
     }
