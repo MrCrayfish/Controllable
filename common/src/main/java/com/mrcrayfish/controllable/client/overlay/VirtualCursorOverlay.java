@@ -38,7 +38,7 @@ public class VirtualCursorOverlay implements IOverlay
             double guiScale = mc.getWindow().getGuiScale();
             double cursorX = Controllable.getCursor().getRenderX();
             double cursorY = Controllable.getCursor().getRenderY();
-            double zIndex = Services.PLATFORM.isNeoForge() ? 300 : 3000; // Hack until I make Forge/Fabric calls the same
+            double zIndex = 3000;
             pose.translate(cursorX / guiScale, cursorY / guiScale, zIndex);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             boolean isHoveringSlot = false; // TODO fix
