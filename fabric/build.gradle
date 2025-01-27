@@ -82,7 +82,7 @@ remapJar {
     addNestedDependencies = false
 }
 
-task releaseJar(type: RemapJarTask) {
+tasks.register('releaseJar', RemapJarTask) {
     dependsOn tasks.jar
     input = tasks.jar.archiveFile
     addNestedDependencies = true
@@ -91,7 +91,7 @@ task releaseJar(type: RemapJarTask) {
 
 build.finalizedBy(releaseJar)
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     source(project(":common").sourceSets.main.allSource)
 }
 

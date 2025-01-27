@@ -86,12 +86,14 @@ subprojects {
     // Disables Gradle's custom module metadata from being published to maven. The
     // metadata includes mapped dependencies which are not reasonably consumable by
     // other mod developers.
-    tasks.withType(GenerateModuleMetadata) {
-        enabled = false
+    tasks.withType(GenerateModuleMetadata).tap {
+        configureEach {
+            enabled = false
+        }
     }
 }
 
-task incrementBuild {
+tasks.register('incrementBuild') {
     doLast {
         int version = file('/release_build').text.toInteger()
         file('/release_build').text = version + 1

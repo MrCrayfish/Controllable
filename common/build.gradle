@@ -30,7 +30,7 @@ dependencies {
     library "io.github.libsdl4j:libsdl4j:2.26.5-1.2"
 }
 
-task downloadMappings(type: Download) {
+tasks.register('downloadMappings', Download) {
     src 'https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt'
     dest 'src/main/resources/gamecontrollerdb.txt'
 }

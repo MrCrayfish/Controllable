@@ -171,7 +171,8 @@ signing {
     sign publishing.publications.mavenJava
 }
 
-task signJar(type: SignJar, dependsOn: jar) {
+tasks.register('signJar', SignJar) {
+    dependsOn jar
     onlyIf {
         project.hasProperty('keyStore') || System.getenv("KEYSTORE")
     }
