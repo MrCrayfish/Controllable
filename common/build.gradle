@@ -29,6 +29,7 @@ dependencies {
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-common:${jei_version}"
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-gui:${jei_version}"
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-lib:${jei_version}"
+    compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
     library "com.mrcrayfish:controllable-sdl:2.30.10-1.0"
 }
 

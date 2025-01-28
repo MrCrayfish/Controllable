@@ -21,6 +21,8 @@ import com.mrcrayfish.controllable.client.util.EventHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.event.Value;
+import com.mrcrayfish.controllable.integration.EmiSupport;
+import com.mrcrayfish.controllable.integration.JeiSupport;
 import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
@@ -411,6 +413,16 @@ public class ControllerInput
                     double lastMouseEventTime = ClientServices.CLIENT.getLastMouseEventTime();
                     if(activeMouseButton != -1 && lastMouseEventTime > 0.0D)
                     {
+                        if(screen instanceof AbstractContainerScreen<?>)
+                        {
+                            if(Controllable.isEmiLoaded())
+                            {
+                                if(EmiSupport.invokeMouseDragged(activeMouseButton, finalCursorX, finalCursorY, dragX, dragY))
+                                {
+                                    return;
+                                }
+                            }
+                        }
                         ClientServices.CLIENT.sendMouseDrag(screen, dragX, dragY, finalCursorX, finalCursorY, activeMouseButton);
                     }
                 }
@@ -1220,7 +1232,12 @@ public class ControllerInput
 
         if(Controllable.isJeiLoaded() && ClientHelper.isPlayingGame())
         {
-            points.addAll(ClientServices.CLIENT.getJeiNavigationPoints());
+            points.addAll(JeiSupport.getNavigationPoints());
+        }
+
+        if(Controllable.isEmiLoaded() && ClientHelper.isPlayingGame())
+        {
+            points.addAll(EmiSupport.getNavigationPoints());
         }
 
         return points;
@@ -1501,6 +1518,13 @@ public class ControllerInput
         {
             double cursorX = this.getCursorX();
             double cursorY = this.getCursorY();
+            if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
+            {
+                if(EmiSupport.invokeMouseClick(button, cursorX, cursorY))
+                {
+                    return;
+                }
+            }
             this.invokeMouseClick(screen, button, cursorX, cursorY);
         }
     }
@@ -1528,6 +1552,13 @@ public class ControllerInput
         {
             double cursorX = this.getCursorX();
             double cursorY = this.getCursorY();
+            if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
+            {
+                if(EmiSupport.invokeMouseReleased(button, cursorX, cursorY))
+                {
+                    return;
+                }
+            }
             this.invokeMouseReleased(screen, button, cursorX, cursorY);
         }
     }

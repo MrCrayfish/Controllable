@@ -88,6 +88,7 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     implementation fg.deobf("com.mrcrayfish:framework-forge:${minecraft_version}-${framework_version}")
     implementation fg.deobf("mezz.jei:jei-${jei_minecraft_version}-forge:${jei_version}")
+    implementation fg.deobf("dev.emi:emi-forge:${emi_version}")
     library jarJar("com.mrcrayfish:controllable-sdl:2.30.10-1.0") {
         jarJar.ranged(it, "[2.30.10-1.0,)")
         transitive(false)
