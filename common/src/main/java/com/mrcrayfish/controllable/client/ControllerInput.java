@@ -314,7 +314,7 @@ public class ControllerInput
 
             this.cursorX += cursorSpeed * this.cursorSpeedX;
             this.cursorY += cursorSpeed * this.cursorSpeedY;
-            // TODO reimplement clamping to window size
+            this.clampCursorToWindowBounds();
             this.setControllerInUse();
             this.moved = true;
             this.hideVirtualCursor = false;
@@ -1503,6 +1503,16 @@ public class ControllerInput
             cursorY = this.virtualCursorY;
         }
         return cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
+    }
+
+    /**
+     * Clamps the position of the cursor to the bounds of the window
+     */
+    private void clampCursorToWindowBounds()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        this.cursorX = Math.max(0, Math.min(this.cursorX, mc.getWindow().getWidth()));
+        this.cursorY = Math.max(0, Math.min(this.cursorY, mc.getWindow().getHeight()));
     }
 
     /**
