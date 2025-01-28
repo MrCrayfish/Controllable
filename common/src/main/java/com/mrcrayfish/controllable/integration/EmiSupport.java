@@ -6,9 +6,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.Bounds;
-import dev.emi.emi.api.widget.ButtonWidget;
 import dev.emi.emi.api.widget.DrawableWidget;
-import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.TextureWidget;
 import dev.emi.emi.api.widget.Widget;
 import dev.emi.emi.screen.EmiScreenManager;
@@ -62,15 +60,17 @@ public class EmiSupport
         addWidget(points, EmiScreenManager.emi);
         addWidget(points, EmiScreenManager.tree);
 
-        getPanels().forEach(panel -> {
+        for(EmiScreenManager.SidebarPanel panel : getPanels())
+        {
             if(!panel.isVisible())
-                return;
+                continue;
 
             addWidget(points, panel.pageLeft);
             addWidget(points, panel.pageRight);
             addWidget(points, panel.cycle);
 
-            panel.getSpaces().forEach(space -> {
+            for(EmiScreenManager.ScreenSpace space : panel.getSpaces())
+            {
                 int startIndex = (panel.space == space) ? space.pageSize * panel.page : 0;
                 List<? extends EmiIngredient> stacks = space.getStacks();
                 main: for (int y = 0; y < space.th; y++)
@@ -84,8 +84,8 @@ public class EmiSupport
                         points.add(new BasicNavigationPoint(slotX, slotY));
                     }
                 }
-            });
-        });
+            }
+        }
 
         if(screen instanceof RecipeScreen recipeScreen)
         {
@@ -97,7 +97,8 @@ public class EmiSupport
             int x = getInt(recipeScreen, xField);
             int y = getInt(recipeScreen, yField);
             int offset = getInt(recipeScreen, tabOffsetField);
-            tabs.forEach(recipeTab -> {
+            for(RecipeTab recipeTab : tabs)
+            {
                 int nextOffset = 0;
                 int startIndex = page * count;
                 for(int i = startIndex; i < tabs.size() && i < startIndex + count; i++, nextOffset++)
@@ -106,8 +107,8 @@ public class EmiSupport
                     int tabY = y - 24 + 27 / 2;
                     points.add(new BasicNavigationPoint(tabX, tabY));
                 }
-            });
-
+            }
+   
             // Add the workstations at the bottom
             RecipeTab recipeTab = tabs.get(tab);
             int size = EmiApi.getRecipeManager().getWorkstations(recipeTab.category).size();
@@ -118,16 +119,19 @@ public class EmiSupport
             }
 
             // Add slots from current page
-            getWidgetGroups(recipeScreen).forEach(group -> {
-                group.widgets.forEach(widget -> {
-                    if(isValidWidget(widget)) {
-                        Bounds box = widget.getBounds();
-                        int widgetX = group.x + (int) (box.x() + box.width() / 2.0);
-                        int widgetY = group.y + (int) (box.y() + box.height() / 2.0);
-                        points.add(new BasicNavigationPoint(widgetX, widgetY));
-                    }
-                });
-            });
+            for(WidgetGroup group : getWidgetGroups(recipeScreen))
+            {
+                for(Widget widget : group.widgets)
+                {
+                    if(!isValidWidget(widget))
+                        continue;
+
+                    Bounds box = widget.getBounds();
+                    int widgetX = group.x + (int) (box.x() + box.width() / 2.0);
+                    int widgetY = group.y + (int) (box.y() + box.height() / 2.0);
+                    points.add(new BasicNavigationPoint(widgetX, widgetY));
+                }
+            }
         }
 
         return points;
