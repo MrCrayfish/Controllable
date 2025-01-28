@@ -6,9 +6,6 @@ import com.mrcrayfish.controllable.client.InputProcessor;
 import com.mrcrayfish.controllable.client.RumbleHandler;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.ControllerManager;
-import com.mrcrayfish.controllable.client.input.glfw.GLFWControllerManager;
-import com.mrcrayfish.controllable.client.input.sdl2.SDL2ControllerManager;
-import net.minecraft.client.Minecraft;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -67,14 +64,7 @@ public class Controllable
     {
         if(manager == null)
         {
-            if(!Minecraft.ON_OSX)
-            {
-                manager = new SDL2ControllerManager();
-            }
-            else
-            {
-                manager = new GLFWControllerManager();
-            }
+            manager = Config.CLIENT.inputLibrary.get().createManager();
         }
         return manager;
     }
