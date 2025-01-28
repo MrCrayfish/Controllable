@@ -1,0 +1,26 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "com.mrcrayfish.controllable.mixin",
+    "plugin": "com.mrcrayfish.controllable.mixin.ControllableMixinPlugin",
+    "compatibilityLevel": "JAVA_17",
+    "refmap": "controllable.refmap.json",
+    "client": [
+        "client.ForgeGameRendererMixin",
+        "client.ForgeGuiMixin",
+        "client.ForgeMinecraftMixin",
+        "client.ForgeRecipeBookPageMixin",
+        "client.ForgeHooksClientMixin",
+        "client.KeyMappingMixin",
+        "client.jei.GuiIconToggleButtonMixin",
+        "client.jei.IngredientGridMixin",
+        "client.jei.IngredientGridWithNavigationMixin",
+        "client.jei.IngredientListOverlayMixin",
+        "client.jei.MouseUtilMixin",
+        "client.jei.PageNavigationMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
+  

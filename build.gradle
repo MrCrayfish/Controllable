@@ -1,3 +1,10 @@
+plugins {
+    id 'fabric-loom' version '1.6-SNAPSHOT' apply(false)
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)' apply(false)
+    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT' apply(false)
+    id 'org.spongepowered.mixin' version "0.7-SNAPSHOT" apply(false)
+}
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'signing'
@@ -14,19 +21,19 @@ subprojects {
         from(rootProject.file("LICENSE")) {
             rename { "${it}_${mod_name}" }
         }
-        from(rootProject.file("LICENSE_LibSDL4J"))
+        from(rootProject.file("LICENSE_ControllableSDL"))
         manifest {
             attributes([
-                    'Specification-Title'     : mod_name,
-                    'Specification-Vendor'    : mod_author,
-                    'Specification-Version'   : project.jar.archiveVersion,
-                    'Implementation-Title'    : project.name,
-                    'Implementation-Version'  : project.jar.archiveVersion,
-                    'Implementation-Vendor'   : mod_author,
-                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                    'Timestamp'               : System.currentTimeMillis(),
-                    'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
-                    'Built-On-Minecraft'      : minecraft_version
+                'Specification-Title'     : mod_name,
+                'Specification-Vendor'    : mod_author,
+                'Specification-Version'   : project.jar.archiveVersion,
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_author,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'Timestamp'               : System.currentTimeMillis(),
+                'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
+                'Built-On-Minecraft'      : minecraft_version
             ])
         }
     }
@@ -35,7 +42,7 @@ subprojects {
         from(rootProject.file("LICENSE")) {
             rename { "${it}_${mod_name}" }
         }
-        from(rootProject.file("LICENSE_LibSDL4J"))
+        from(rootProject.file("LICENSE_ControllableSDL"))
     }
 
     repositories {
@@ -66,6 +73,11 @@ subprojects {
         }
     }
 
+    // Mute javadoc warnings
+    tasks.withType(Javadoc).configureEach {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+
     tasks.withType(JavaCompile).configureEach {
         it.options.encoding = 'UTF-8'
         it.options.release = 17
@@ -74,12 +86,14 @@ subprojects {
     // Disables Gradle's custom module metadata from being published to maven. The
     // metadata includes mapped dependencies which are not reasonably consumable by
     // other mod developers.
-    tasks.withType(GenerateModuleMetadata) {
-        enabled = false
+    tasks.withType(GenerateModuleMetadata).tap {
+        configureEach {
+            enabled = false
+        }
     }
 }
 
-task incrementBuild {
+tasks.register('incrementBuild') {
     doLast {
         int version = file('/release_build').text.toInteger()
         file('/release_build').text = version + 1

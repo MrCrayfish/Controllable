@@ -1,0 +1,186 @@
+import net.minecraftforge.gradle.common.tasks.SignJar
+
+plugins {
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle'
+    id 'org.spongepowered.mixin'
+}
+
+base {
+    archivesName = "${mod_id}-forge"
+}
+version = "${minecraft_version}-${mod_version}"
+
+jarJar.enable()
+
+mixin {
+    add sourceSets.main, "controllable.refmap.json"
+    config 'controllable.common.mixins.json'
+    config 'controllable.forge.mixins.json'
+}
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+    copyIdeResources = true
+
+    if (file('src/main/resources/META-INF/accesstransformer.cfg').exists()) {
+        accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    }
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Client'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                modClientRun {
+                    source sourceSets.main
+                    source sourceSets.test
+                    source project(":common").sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Server'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                modServerRun {
+                    source sourceSets.main
+                    source sourceSets.test
+                    source project(":common").sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+            ideaModule "${rootProject.name}.${project.name}.main"
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            taskName 'Data'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                modDataRun {
+                    source sourceSets.main
+                    source project(":common").sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+configurations {
+    minecraftLibrary.extendsFrom library
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    implementation fg.deobf("com.mrcrayfish:framework-forge:${minecraft_version}-${framework_version}")
+    implementation "mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}"
+    compileOnly fg.deobf("mezz.jei:jei-${jei_minecraft_version}-forge:${jei_version}")
+    library jarJar("com.mrcrayfish:controllable-sdl:2.30.10-1.0") {
+        jarJar.ranged(it, "[2.30.10-1.0,)")
+        transitive(false)
+    }
+    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
+    compileOnly project(":common")
+    testCompileOnly project(":common")
+}
+
+tasks.withType(JavaCompile) {
+    source(project(":common").sourceSets.main.allSource)
+}
+
+processResources {
+    from project(":common").sourceSets.main.resources
+    inputs.property "version", project.version
+
+    filesMatching("META-INF/mods.toml") {
+        expand project.properties
+    }
+}
+
+tasks.jarJar.configure {
+    archiveClassifier = 'release'
+    from(rootProject.file("LICENSE_LibSDL4J"))
+    from(rootProject.file("LICENSE")) {
+        rename { "${it}_${mod_name}" }
+    }
+}
+
+jar.finalizedBy('reobfJar')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+
+            artifact jar
+            artifact sourcesJar
+
+            pom.withXml {
+                def depsNode = asNode().appendNode('dependencies')
+                [this.configurations.library].each {
+                    it.allDependencies.each {
+                        def depNode = depsNode.appendNode('dependency')
+                        depNode.appendNode('groupId', it.group)
+                        depNode.appendNode('artifactId', it.name)
+                        depNode.appendNode('version', it.version)
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        if (System.getenv("CI")) {
+            maven {
+                name = "GitHubPackages"
+                url = "https://maven.pkg.github.com/MrCrayfish/Maven"
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
+                    password = project.findProperty("gpr.key") ?: System.getenv("GPR_KEY")
+                }
+            }
+        } else {
+            maven {
+                url "file://" + System.getenv("LOCAL_MAVEN")
+            }
+        }
+    }
+}
+
+signing {
+    if (System.getenv("SIGNING_KEY")) {
+        def signingKey = System.getenv("SIGNING_KEY")
+        def signingPassword = System.getenv("SIGNING_PASSPHRASE")
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    }
+    sign publishing.publications.mavenJava
+}
+
+tasks.register('signJar', SignJar) {
+    dependsOn jar
+    onlyIf {
+        project.hasProperty('keyStore') || System.getenv("KEYSTORE")
+    }
+    keyStore = project.findProperty('keyStore') ?: System.getenv("KEYSTORE")
+    alias = project.findProperty('keyStoreAlias') ?: System.getenv("KEYSTORE_ALIAS")
+    storePass = project.findProperty('keyStorePass') ?: System.getenv("KEYSTORE_PASS")
+    inputFile = outputFile = tasks.jarJar.archiveFile
+}
+
+jar.finalizedBy 'signJar'
+signJar.mustRunAfter 'reobfJar'
