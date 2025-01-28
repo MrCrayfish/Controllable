@@ -1237,7 +1237,7 @@ public class ControllerInput
 
         if(Controllable.isEmiLoaded() && ClientHelper.isPlayingGame())
         {
-            points.addAll(EmiSupport.getNavigationPoints());
+            points.addAll(EmiSupport.getNavigationPoints(screen));
         }
 
         return points;
