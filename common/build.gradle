@@ -26,7 +26,8 @@ dependencies {
     compileOnly "org.spongepowered:mixin:0.8.5"
     implementation "com.google.code.findbugs:jsr305:3.0.2"
     compileOnly "com.mrcrayfish:framework-common:${minecraft_version}-${framework_version}"
-    implementation "mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${jei_minecraft_version}-common:${jei_version}"
+    compileOnly "mezz.jei:jei-${jei_minecraft_version}-gui:${jei_version}"
     library "com.mrcrayfish:controllable-sdl:2.30.10-1.0"
 }
 

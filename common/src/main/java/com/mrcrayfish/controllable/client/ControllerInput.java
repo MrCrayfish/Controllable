@@ -1210,9 +1210,7 @@ public class ControllerInput
         {
             if(widget == null || widget.isHovered() || !widget.visible || !widget.active)
                 continue;
-            int posX = widget.getX() + widget.getWidth() / 2;
-            int posY = widget.getY() + widget.getHeight() / 2;
-            points.add(new WidgetNavigationPoint(posX, posY, widget));
+            points.add(new WidgetNavigationPoint(widget));
         }
 
         if(screen instanceof CreativeModeInventoryScreen creativeScreen)
@@ -1268,15 +1266,13 @@ public class ControllerInput
     {
         if(widget == null || widget.isHovered() || !widget.visible || !widget.active)
             return;
-        int posX = widget.getX() + widget.getWidth() / 2;
-        int posY = widget.getY() + widget.getHeight() / 2;
         if(list != null && entry != null)
         {
             points.add(new ListWidgetNavigationPoint(widget, list, entry));
         }
         else
         {
-            points.add(new WidgetNavigationPoint(posX, posY, widget));
+            points.add(new WidgetNavigationPoint(widget));
         }
     }
 

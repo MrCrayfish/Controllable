@@ -11,13 +11,7 @@
         "client.ForgeMinecraftMixin",
         "client.ForgeRecipeBookPageMixin",
         "client.ForgeHooksClientMixin",
-        "client.KeyMappingMixin",
-        "client.jei.GuiIconToggleButtonMixin",
-        "client.jei.IngredientGridMixin",
-        "client.jei.IngredientGridWithNavigationMixin",
-        "client.jei.IngredientListOverlayMixin",
-        "client.jei.MouseUtilMixin",
-        "client.jei.PageNavigationMixin"
+        "client.KeyMappingMixin"
     ],
     "injectors": {
         "defaultRequire": 1

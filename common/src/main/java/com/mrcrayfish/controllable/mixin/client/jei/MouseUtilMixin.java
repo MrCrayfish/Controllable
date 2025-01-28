@@ -7,6 +7,7 @@ import mezz.jei.gui.input.MouseUtil;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -26,7 +27,7 @@ public class MouseUtilMixin
     private static void controllableGetX(CallbackInfoReturnable<Double> cir)
     {
         ControllerInput input = Controllable.getInput();
-        if(isVirtualMouseActive(input))
+        if(controllable$isVirtualMouseActive(input))
         {
             Minecraft minecraft = Minecraft.getInstance();
             double mouseX = input.getVirtualCursorX() * (double) minecraft.getWindow().getGuiScaledWidth() / (double) minecraft.getWindow().getScreenWidth();
@@ -38,7 +39,7 @@ public class MouseUtilMixin
     private static void controllableGetY(CallbackInfoReturnable<Double> cir)
     {
         ControllerInput input = Controllable.getInput();
-        if(isVirtualMouseActive(input))
+        if(controllable$isVirtualMouseActive(input))
         {
             Minecraft minecraft = Minecraft.getInstance();
             double mouseY = input.getVirtualCursorY() * (double) minecraft.getWindow().getGuiScaledHeight() / (double) minecraft.getWindow().getScreenHeight();
@@ -46,7 +47,8 @@ public class MouseUtilMixin
         }
     }
 
-    private static boolean isVirtualMouseActive(ControllerInput input)
+    @Unique
+    private static boolean controllable$isVirtualMouseActive(ControllerInput input)
     {
         return Controllable.getController() != null && Config.CLIENT.client.options.virtualCursor.get() && input.getLastUse() > 0;
     }
