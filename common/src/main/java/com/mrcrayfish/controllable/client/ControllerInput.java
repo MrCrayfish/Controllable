@@ -114,6 +114,7 @@ public class ControllerInput
     private double cursorSpeedX;
     private double cursorSpeedY;
     private boolean moved;
+    private boolean snapToSlot;
     private float targetPitch;
     private float targetYaw;
     private long lastMerchantScroll;
@@ -192,6 +193,8 @@ public class ControllerInput
     {
         this.prevCursorX = this.cursorX;
         this.prevCursorY = this.cursorY;
+        this.cursorSpeedX = 0;
+        this.cursorSpeedY = 0;
 
         if(this.lastUse > 0)
         {
@@ -245,11 +248,7 @@ public class ControllerInput
         }
 
         if(this.lastUse <= 0)
-        {
-            this.cursorSpeedX = 0F;
-            this.cursorSpeedY = 0F;
             return;
-        }
 
         if(Math.abs(this.cursorSpeedX) > 0F || Math.abs(this.cursorSpeedY) > 0F)
         {
@@ -317,10 +316,14 @@ public class ControllerInput
             this.clampCursorToWindowBounds();
             this.setControllerInUse();
             this.moved = true;
+            this.snapToSlot = true;
             this.hideVirtualCursor = false;
         }
-
-        this.moveCursorToClosestSlot(this.moving, mc.screen);
+        else if(this.snapToSlot)
+        {
+            this.snapToContainerSlot();
+            this.snapToSlot = false;
+        }
 
         if(mc.screen instanceof CreativeModeInventoryScreen)
         {
@@ -1357,61 +1360,6 @@ public class ControllerInput
         }
     }
 
-    private void moveCursorToClosestSlot(boolean moving, Screen screen)
-    {
-        /* Makes the mouse attracted to slots. This helps with selecting items when using
-         * a controller. */
-        if(screen instanceof AbstractContainerScreen<?> containerScreen)
-        {
-            /* Prevents cursor from moving until at least some input is detected */
-            if(!this.moved)
-                return;
-
-            if(this.nearSlot != null)
-            {
-                Minecraft mc = Minecraft.getInstance();
-                int guiLeft = ClientServices.CLIENT.getScreenLeft(containerScreen);
-                int guiTop = ClientServices.CLIENT.getScreenTop(containerScreen);
-                double guiScale = mc.getWindow().getGuiScale();
-                int slotCenterXScaled = guiLeft + this.nearSlot.x + 8;
-                int slotCenterYScaled = guiTop + this.nearSlot.y + 8;
-                int slotCenterX = (int) (slotCenterXScaled * guiScale);
-                int slotCenterY = (int) (slotCenterYScaled * guiScale);
-                double deltaX = slotCenterX - this.cursorX;
-                double deltaY = slotCenterY - this.cursorY;
-
-                if(!moving)
-                {
-                    if(deltaX > 0.05 || deltaY > 0.05)
-                    {
-                        this.cursorX += deltaX * 0.9;
-                        this.cursorY += deltaY * 0.9;
-                    }
-                    else
-                    {
-                        this.cursorX = slotCenterX;
-                        this.cursorY = slotCenterY;
-                        this.cursorSpeedX = 0.0F;
-                        this.cursorSpeedY = 0.0F;
-                    }
-                }
-
-                this.cursorSpeedX *= 0.75F;
-                this.cursorSpeedY *= 0.75F;
-            }
-            else
-            {
-                this.cursorSpeedX = 0.0F;
-                this.cursorSpeedY = 0.0F;
-            }
-        }
-        else
-        {
-            this.cursorSpeedX = 0.0F;
-            this.cursorSpeedY = 0.0F;
-        }
-    }
-
     private void setCursorPosition(double cursorX, double cursorY)
     {
         if(Config.CLIENT.client.options.virtualCursor.get())
@@ -1513,6 +1461,32 @@ public class ControllerInput
         Minecraft mc = Minecraft.getInstance();
         this.cursorX = Math.max(0, Math.min(this.cursorX, mc.getWindow().getWidth()));
         this.cursorY = Math.max(0, Math.min(this.cursorY, mc.getWindow().getHeight()));
+    }
+
+    /**
+     * Snaps the cursor to center of the currently hovered container slot, only if the slot has an
+     * item or the cursor is currently carrying an item.
+     */
+    private void snapToContainerSlot()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.player != null && mc.screen instanceof AbstractContainerScreen<?> screen)
+        {
+            Slot slot = ClientServices.CLIENT.getSlotUnderMouse(screen);
+            if(slot != null && slot.isActive() && (slot.hasItem() || !screen.getMenu().getCarried().isEmpty()))
+            {
+                int slotX = ClientServices.CLIENT.getScreenLeft(screen) + slot.x + 8;
+                int slotY = ClientServices.CLIENT.getScreenTop(screen) + slot.y + 8;
+                slotX *= (int) mc.getWindow().getGuiScale();
+                slotY *= (int) mc.getWindow().getGuiScale();
+                this.cursorX = slotX;
+                this.cursorY = slotY;
+                this.clampCursorToWindowBounds();
+                this.prevCursorX = slotX;
+                this.prevCursorY = slotY;
+                this.setCursorPosition(slotX, slotY);
+            }
+        }
     }
 
     /**
