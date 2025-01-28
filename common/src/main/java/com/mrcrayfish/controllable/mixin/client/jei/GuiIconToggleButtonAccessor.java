@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  */
 @Pseudo
 @Mixin(GuiIconToggleButton.class)
-public interface GuiIconToggleButtonMixin
+public interface GuiIconToggleButtonAccessor
 {
     @Accessor(value = "button", remap = false)
     GuiIconButton controllableGetButton();

@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  */
 @Pseudo
 @Mixin(IngredientGridWithNavigation.class)
-public interface IngredientGridWithNavigationMixin
+public interface IngredientGridWithNavigationAccessor
 {
     @Accessor(value = "navigation", remap = false)
     PageNavigation controllableGetNavigation();

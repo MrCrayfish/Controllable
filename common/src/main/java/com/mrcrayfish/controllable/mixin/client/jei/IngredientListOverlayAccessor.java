@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  */
 @Pseudo
 @Mixin(IngredientListOverlay.class)
-public interface IngredientListOverlayMixin
+public interface IngredientListOverlayAccessor
 {
     @Accessor(value = "contents", remap = false)
     IngredientGridWithNavigation controllableGetContents();

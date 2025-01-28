@@ -17,12 +17,16 @@
         "client.RecipeBookComponentAccessor",
         "client.RecipeBookPageAccessor",
         "client.RecipeBookPageMixin",
-        "client.jei.GuiIconToggleButtonMixin",
-        "client.jei.IngredientGridMixin",
-        "client.jei.IngredientGridWithNavigationMixin",
-        "client.jei.IngredientListOverlayMixin",
+        "client.jei.GuiIconToggleButtonAccessor",
+        "client.jei.IngredientGridAccessor",
+        "client.jei.IngredientGridWithNavigationAccessor",
+        "client.jei.IngredientListOverlayAccessor",
         "client.jei.MouseUtilMixin",
-        "client.jei.PageNavigationMixin"
+        "client.jei.PageNavigationAccessor",
+        "client.jei.RecipeCatalystsAccessor",
+        "client.jei.RecipeGuiTabsAccessor",
+        "client.jei.RecipesGuiAccessor",
+        "client.jei.RecipeGuiTabAccessor"
     ],
     "injectors": {
         "defaultRequire": 1
