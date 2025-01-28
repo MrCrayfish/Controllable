@@ -3,15 +3,7 @@ package com.mrcrayfish.controllable.integration;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
-import com.mrcrayfish.controllable.mixin.client.jei.GuiIconToggleButtonAccessor;
-import com.mrcrayfish.controllable.mixin.client.jei.IngredientGridAccessor;
-import com.mrcrayfish.controllable.mixin.client.jei.IngredientGridWithNavigationAccessor;
-import com.mrcrayfish.controllable.mixin.client.jei.IngredientListOverlayAccessor;
-import com.mrcrayfish.controllable.mixin.client.jei.PageNavigationAccessor;
-import com.mrcrayfish.controllable.mixin.client.jei.RecipeCatalystsAccessor;
-import com.mrcrayfish.controllable.mixin.client.jei.RecipeGuiTabAccessor;
-import com.mrcrayfish.controllable.mixin.client.jei.RecipeGuiTabsAccessor;
-import com.mrcrayfish.controllable.mixin.client.jei.RecipesGuiAccessor;
+import com.mrcrayfish.controllable.mixin.client.jei.*;
 import mezz.jei.api.gui.IRecipeLayoutDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotDrawable;
 import mezz.jei.api.runtime.IJeiRuntime;
@@ -23,8 +15,10 @@ import mezz.jei.gui.overlay.IngredientGrid;
 import mezz.jei.gui.overlay.IngredientGridWithNavigation;
 import mezz.jei.gui.overlay.IngredientListRenderer;
 import mezz.jei.gui.recipes.RecipeCatalysts;
+import mezz.jei.gui.recipes.RecipeGuiLayouts;
 import mezz.jei.gui.recipes.RecipeGuiTab;
 import mezz.jei.gui.recipes.RecipeGuiTabs;
+import mezz.jei.gui.recipes.RecipeLayoutWithButtons;
 import mezz.jei.gui.recipes.RecipeTransferButton;
 import mezz.jei.gui.recipes.RecipesGui;
 import mezz.jei.library.gui.recipes.RecipeLayout;
@@ -42,6 +36,7 @@ import java.util.stream.Stream;
  */
 public class JeiSupport
 {
+    @SuppressWarnings("removal")
     public static List<NavigationPoint> getNavigationPoints()
     {
         List<NavigationPoint> points = new ArrayList<>();
@@ -66,11 +61,6 @@ public class JeiSupport
                 GuiIconButton configButton = ((GuiIconToggleButtonAccessor) configToggleButton).controllableGetButton();
                 points.add(new WidgetNavigationPoint(configButton));
 
-                // Add the transfer buttons
-                getRecipeTransferButtons(runtime).forEach(button -> {
-                    addWidget(points, button);
-                });
-
                 // Add the recipe slots on the left side of the recipes gui
                 getRecipeSlots(runtime).forEach(drawable -> {
                     Rect2i area = drawable.getRect();
@@ -90,14 +80,32 @@ public class JeiSupport
                 });
 
                 // Add the slots added by layouts
-                getLayoutRecipeSlots(runtime).forEach(layout -> {
-                    Rect2i pos = layout.getRect();
-                    int layoutX = pos.getX();
-                    int layoutY = pos.getY();
-                    layout.getRecipeSlots().getSlots().forEach(slot -> {
-                        Rect2i area = slot.getRect();
-                        points.add(new BasicNavigationPoint(layoutX + area.getX() + area.getWidth() / 2.0, layoutY + area.getY() + area.getHeight() / 2.0));
-                    });
+                getRecipeLayouts(runtime).forEach(layout -> {
+
+                    // Transfer button
+                    ImmutableRect2i transferArea = ((GuiIconToggleButtonAccessor) layout.transferButton()).controllableGetArea();
+                    if(!transferArea.isEmpty()) {
+                        points.add(new BasicNavigationPoint(transferArea.getX() + transferArea.getWidth() / 2.0, transferArea.getY() + transferArea.getHeight() / 2.0));
+                    }
+
+                    // Bookmark button
+                    ImmutableRect2i bookmarkArea = ((GuiIconToggleButtonAccessor) layout.bookmarkButton()).controllableGetArea();
+                    if(!bookmarkArea.isEmpty()) {
+                        points.add(new BasicNavigationPoint(bookmarkArea.getX() + bookmarkArea.getWidth() / 2.0, bookmarkArea.getY() + bookmarkArea.getHeight() / 2.0));
+                    }
+
+                    // Add slots added by layouts
+                    if(layout.recipeLayout() instanceof RecipeLayout<?> recipeLayout)
+                    {
+                        Rect2i pos = recipeLayout.getRect();
+                        int layoutX = pos.getX();
+                        int layoutY = pos.getY();
+                        for(IRecipeSlotDrawable drawable : recipeLayout.getRecipeSlots().getSlots())
+                        {
+                            Rect2i area = drawable.getRect();
+                            points.add(new BasicNavigationPoint(layoutX + area.getX() + area.getWidth() / 2.0, layoutY + area.getY() + area.getHeight() / 2.0));
+                        }
+                    }
                 });
             }
         });
@@ -140,15 +148,6 @@ public class JeiSupport
         return Collections.emptyList();
     }
 
-    private static List<RecipeTransferButton> getRecipeTransferButtons(IJeiRuntime runtime)
-    {
-        if(runtime.getRecipesGui() instanceof RecipesGui gui)
-        {
-            return ((RecipesGuiAccessor) gui).controllableRecipeTransferButtons();
-        }
-        return Collections.emptyList();
-    }
-
     private static List<RecipeGuiTab> getRecipeTabs(IJeiRuntime runtime)
     {
         if(runtime.getRecipesGui() instanceof RecipesGui gui)
@@ -173,17 +172,13 @@ public class JeiSupport
         return Optional.empty();
     }
 
-    private static Stream<RecipeLayout<?>> getLayoutRecipeSlots(IJeiRuntime runtime)
+    private static List<RecipeLayoutWithButtons<?>> getRecipeLayouts(IJeiRuntime runtime)
     {
         if(runtime.getRecipesGui() instanceof RecipesGui gui)
         {
-            List<IRecipeLayoutDrawable<?>> layouts = ((RecipesGuiAccessor) gui).controllableGetLayouts();
-            return layouts.stream().filter(drawable -> {
-                return drawable instanceof RecipeLayout;
-            }).map(drawable -> {
-                return (RecipeLayout<?>) drawable;
-            });
+            RecipeGuiLayouts layouts = ((RecipesGuiAccessor) gui).controllableGetLayouts();
+            return ((RecipeGuiLayoutsAccessor) layouts).controllableGetRecipeLayouts();
         }
-        return Stream.empty();
+        return Collections.emptyList();
     }
 }
