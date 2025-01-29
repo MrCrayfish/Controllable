@@ -59,13 +59,13 @@ public class RecipeBookOverlay implements IOverlay
         RecipeBookPage page = ((RecipeBookComponentAccessor) this.recipeBook).controllableGetRecipeBookPage();
 
         StateSwitchingButton forwardButton = ((RecipeBookPageAccessor) page).controllableGetForwardButton();
-        if(forwardButton.visible)
+        if(forwardButton != null && forwardButton.visible)
         {
             graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.getX() + 24 - 5, forwardButton.getY() + 4, 0xFFFFFF);
         }
 
         StateSwitchingButton backButton = ((RecipeBookPageAccessor) page).controllableGetBackButton();
-        if(backButton.visible)
+        if(backButton != null && backButton.visible)
         {
             graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.getX() - 24 + 12 - 5, backButton.getY() + 4, 0xFFFFFF);
         }
