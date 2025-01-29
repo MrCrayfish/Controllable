@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.platform.services.IClientHelper;
+import dev.architectury.event.events.client.ClientScreenInputEvent;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
@@ -42,20 +43,21 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
-        boolean[] cancelled = new boolean[]{false};
-        Screen.wrapScreenError(() ->
-        {
-            if(action == GLFW.GLFW_RELEASE)
-            {
-                cancelled[0] = screen.keyReleased(key, -1, modifiers);
-            }
-            else if(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT)
-            {
+        boolean[] handled = new boolean[]{false};
+        Screen.wrapScreenError(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            if(action == GLFW.GLFW_RELEASE) {
+                handled[0] = ClientScreenInputEvent.KEY_RELEASED_PRE.invoker().keyReleased(mc, screen, key, -1, modifiers).isPresent();
+                if(!handled[0]) handled[0] = screen.keyReleased(key, -1, modifiers);
+                if(!handled[0]) handled[0] = ClientScreenInputEvent.KEY_RELEASED_POST.invoker().keyReleased(mc, screen, key, -1, modifiers).isPresent();
+            } else if(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT) {
                 screen.afterKeyboardAction();
-                cancelled[0] = screen.keyPressed(key, -1, modifiers);
+                handled[0] = ClientScreenInputEvent.KEY_PRESSED_PRE.invoker().keyPressed(mc, screen, key, -1, modifiers).isPresent();
+                if(!handled[0]) handled[0] = screen.keyPressed(key, -1, modifiers);
+                if(!handled[0]) handled[0] = ClientScreenInputEvent.KEY_PRESSED_POST.invoker().keyPressed(mc, screen, key, -1, modifiers).isPresent();
             }
         }, "keyPressed event handler", screen.getClass().getCanonicalName());
-        return cancelled[0];
+        return handled[0];
     }
 
     @Override
@@ -64,19 +66,33 @@ public class FabricClientHelper implements IClientHelper
         Minecraft mc = Minecraft.getInstance();
         double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
         double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
-        Screen.wrapScreenError(() -> screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY), "mouseDragged event handler", screen.getClass().getCanonicalName());
+        Screen.wrapScreenError(() -> {
+            boolean handled = ClientScreenInputEvent.MOUSE_DRAGGED_PRE.invoker().mouseDragged(mc, screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY).isPresent();
+            if(!handled) handled = screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
+            if(!handled) ClientScreenInputEvent.MOUSE_DRAGGED_POST.invoker().mouseDragged(mc, screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
+        }, "mouseDragged event handler", screen.getClass().getCanonicalName());
     }
 
     @Override
     public void sendScreenMouseClickPre(Screen screen, double mouseX, double mouseY, int button)
     {
-        Screen.wrapScreenError(() -> screen.mouseClicked(mouseX, mouseY, button), "mouseClicked event handler", screen.getClass().getCanonicalName());
+        Screen.wrapScreenError(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            boolean handled = ClientScreenInputEvent.MOUSE_CLICKED_PRE.invoker().mouseClicked(mc, screen, mouseX, mouseY, button).isPresent();
+            if(!handled) handled = screen.mouseClicked(mouseX, mouseY, button);
+            if(!handled) ClientScreenInputEvent.MOUSE_CLICKED_POST.invoker().mouseClicked(mc, screen, mouseX, mouseY, button);
+        }, "mouseClicked event handler", screen.getClass().getCanonicalName());
     }
 
     @Override
     public void sendScreenMouseReleasedPre(Screen screen, double mouseX, double mouseY, int button)
     {
-        Screen.wrapScreenError(() -> screen.mouseReleased(mouseX, mouseY, button), "mouseReleased event handler", screen.getClass().getCanonicalName());
+        Screen.wrapScreenError(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            boolean handled = ClientScreenInputEvent.MOUSE_RELEASED_PRE.invoker().mouseReleased(mc, screen, mouseX, mouseY, button).isPresent();
+            if(!handled) handled = screen.mouseReleased(mouseX, mouseY, button);
+            if(!handled) ClientScreenInputEvent.MOUSE_RELEASED_POST.invoker().mouseReleased(mc, screen, mouseX, mouseY, button);
+        }, "mouseReleased event handler", screen.getClass().getCanonicalName());
     }
 
     @Override
