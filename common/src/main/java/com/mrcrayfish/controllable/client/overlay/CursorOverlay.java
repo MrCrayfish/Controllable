@@ -12,6 +12,7 @@ import com.mrcrayfish.controllable.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.inventory.Slot;
 
 /**
@@ -42,12 +43,15 @@ public class CursorOverlay implements IOverlay
             double zIndex = Services.PLATFORM.isForge() ? 300 : 3000; // Hack until I make Forge/Fabric calls the same
             pose.translate(virtualCursorX / guiScale, virtualCursorY / guiScale, zIndex);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
             boolean isHoveringSlot = input.getNearSlot() != null;
             if(isHoveringSlot && type.isScaleHover())
             {
                 pose.scale(1.33F, 1.33F, 1.33F);
             }
             graphics.blit(CursorType.TEXTURE, -8, -8, 16, 16, isHoveringSlot ? 32 : 0, type.ordinal() * 32, 32, 32, 64, CursorType.values().length * 32);
+            RenderSystem.disableBlend();
         }
         pose.popPose();
     }
