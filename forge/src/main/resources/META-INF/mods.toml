@@ -35,6 +35,27 @@ description="${mod_desc}"
     ordering="NONE"
     side="BOTH"
 
+[[dependencies."${mod_id}"]]
+    modId="jei"
+    mandatory=false
+    versionRange="[${jei_version},)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies."${mod_id}"]]
+    modId="emi"
+    mandatory=false
+    versionRange="[${emi_version},)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies."${mod_id}"]]
+    modId="roughlyenoughitems"
+    mandatory=false
+    versionRange="[${rei_version},)"
+    ordering="NONE"
+    side="CLIENT"
+
 [modproperties."${mod_id}"]
     catalogueImageIcon="${mod_id}_icon.png"
     catalogueBackground="${mod_id}_background.png"

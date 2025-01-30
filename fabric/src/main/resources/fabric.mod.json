@@ -33,6 +33,11 @@
         "java": ">=17",
         "framework": ">=${framework_version}"
     },
+    "breaks": {
+        "jei": "<${jei_version}",
+        "emi": "<${emi_version}",
+        "roughlyenoughitems": "<${rei_version}"
+    },
     "custom": {
         "framework": {
             "configs": [
