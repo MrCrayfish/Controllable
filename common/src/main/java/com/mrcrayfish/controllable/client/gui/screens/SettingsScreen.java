@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
@@ -143,7 +144,9 @@ public class SettingsScreen extends Screen
         super.render(graphics, !waitingForInput ? mouseX : -1, !waitingForInput ? mouseY : -1, partialTick);
         if(waitingForInput)
         {
-            RenderSystem.disableDepthTest();
+            PoseStack stack = graphics.pose();
+            stack.pushPose();
+            stack.translate(0, 0, 100);
             graphics.fillGradient(0, 0, this.width, this.height, 0xE0101010, 0xF0101010);
             ScreenHelper.drawRoundedBox(graphics, (int) (this.width * 0.125), this.height / 4, (int) (this.width * 0.75), this.height / 2, 0x99000000);
             Component pressButtonLabel = Component.translatable("controllable.gui.waiting_for_input").withStyle(ChatFormatting.YELLOW);
@@ -151,7 +154,7 @@ public class SettingsScreen extends Screen
             Component time = Component.literal(Integer.toString((int) Math.ceil(this.remainingTime / 20.0)));
             Component inputCancelLabel = Component.translatable("controllable.gui.input_cancel", time);
             graphics.drawCenteredString(this.font, inputCancelLabel, this.width / 2, this.height / 2 + 3, 0xFFFFFFFF);
-            RenderSystem.enableDepthTest();
+            stack.popPose();
         }
     }
 
