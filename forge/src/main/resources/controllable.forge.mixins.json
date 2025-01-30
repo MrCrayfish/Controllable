@@ -10,7 +10,6 @@
         "client.ForgeGuiMixin",
         "client.ForgeMinecraftMixin",
         "client.ForgeRecipeBookPageMixin",
-        "client.ForgeHooksClientMixin",
         "client.KeyMappingMixin"
     ],
     "injectors": {

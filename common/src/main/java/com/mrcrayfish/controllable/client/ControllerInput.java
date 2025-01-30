@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client;
 
 import com.mojang.blaze3d.Blaze3D;
+import com.mojang.blaze3d.platform.Window;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
@@ -138,6 +139,23 @@ public class ControllerInput
     public double getVirtualCursorY()
     {
         return this.virtualCursorY;
+    }
+
+    public int getScaledCursorX()
+    {
+        Window window = Minecraft.getInstance().getWindow();
+        return (int) (this.virtualCursorX * (double) window.getGuiScaledWidth() / (double) window.getWidth());
+    }
+
+    public int getScaledCursorY()
+    {
+        Window window = Minecraft.getInstance().getWindow();
+        return (int) (this.virtualCursorY * (double) window.getGuiScaledHeight() / (double) window.getHeight());
+    }
+
+    public boolean isVirtualCursorActive()
+    {
+        return Controllable.getController() != null && this.lastUse > 0 && Config.CLIENT.client.options.virtualCursor.get();
     }
 
     private void setControllerInUse()
