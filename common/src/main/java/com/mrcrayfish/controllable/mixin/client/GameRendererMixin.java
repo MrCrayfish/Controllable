@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.mixin.client;
 
 import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.ControllerInput;
 import net.minecraft.client.Minecraft;
@@ -24,8 +25,8 @@ public class GameRendererMixin
             mc.pauseGame(false);
         }
     }
-
-    @ModifyVariable(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;viewport(IIII)V", remap = false), index = 5, ordinal = 0, require = 1)
+    
+    @ModifyVariable(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;clear(IZ)V", ordinal = 0, remap = false), index = 5, ordinal = 0, require = 1)
     private int controllableModifyMouseX(int original)
     {
         ControllerInput input = Controllable.getInput();
@@ -36,7 +37,7 @@ public class GameRendererMixin
         return original;
     }
 
-    @ModifyVariable(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;viewport(IIII)V", remap = false), index = 6, ordinal = 1, require = 1)
+    @ModifyVariable(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;clear(IZ)V", ordinal = 0, remap = false), index = 6, ordinal = 1, require = 1)
     private int controllableModifyMouseY(int original)
     {
         ControllerInput input = Controllable.getInput();
