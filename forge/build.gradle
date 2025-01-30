@@ -82,17 +82,30 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 configurations {
     minecraftLibrary.extendsFrom library
+    testCompileOnly.extendsFrom compileOnly
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     implementation fg.deobf("com.mrcrayfish:framework-forge:${minecraft_version}-${framework_version}")
-    implementation fg.deobf("mezz.jei:jei-${jei_minecraft_version}-forge:${jei_version}")
-    implementation fg.deobf("dev.emi:emi-forge:${emi_version}")
+
+    // Just Enough Items
+    compileOnly fg.deobf("mezz.jei:jei-${jei_minecraft_version}-forge:${jei_version}")
+
+    // EMI
+    compileOnly fg.deobf("dev.emi:emi-forge:${emi_version}")
+
+    // Roughly Enough Items (fg.deobf isn't transitive)
+    implementation fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
+    implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}")
+    implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:${rei_version}")
+
+    // SDL2 Library
     library jarJar("com.mrcrayfish:controllable-sdl:2.30.10-1.0") {
         jarJar.ranged(it, "[2.30.10-1.0,)")
         transitive(false)
     }
+
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
     compileOnly project(":common")
     testCompileOnly project(":common")

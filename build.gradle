@@ -60,6 +60,10 @@ subprojects {
             url = "https://maven.terraformersmc.com/"
         }
         maven {
+            name = "RoughlyEnoughItems"
+            url = "https://maven.shedaniel.me"
+        }
+        maven {
             name = "MrCrayfish (GitHub)"
             url = "https://maven.pkg.github.com/MrCrayfish/Maven"
             credentials {

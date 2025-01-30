@@ -24,6 +24,7 @@ import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.event.Value;
 import com.mrcrayfish.controllable.integration.EmiSupport;
 import com.mrcrayfish.controllable.integration.JeiSupport;
+import com.mrcrayfish.controllable.integration.ReiSupport;
 import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
@@ -141,16 +142,16 @@ public class ControllerInput
         return this.virtualCursorY;
     }
 
-    public int getScaledCursorX()
+    public double getScaledCursorX()
     {
         Window window = Minecraft.getInstance().getWindow();
-        return (int) (this.virtualCursorX * (double) window.getGuiScaledWidth() / (double) window.getWidth());
+        return this.virtualCursorX * (double) window.getGuiScaledWidth() / (double) window.getWidth();
     }
 
-    public int getScaledCursorY()
+    public double getScaledCursorY()
     {
         Window window = Minecraft.getInstance().getWindow();
-        return (int) (this.virtualCursorY * (double) window.getGuiScaledHeight() / (double) window.getHeight());
+        return this.virtualCursorY * (double) window.getGuiScaledHeight() / (double) window.getHeight();
     }
 
     public boolean isVirtualCursorActive()
@@ -1259,6 +1260,11 @@ public class ControllerInput
         if(Controllable.isEmiLoaded() && ClientHelper.isPlayingGame())
         {
             points.addAll(EmiSupport.getNavigationPoints(screen));
+        }
+
+        if(Controllable.isReiLoaded() && ClientHelper.isPlayingGame())
+        {
+            points.addAll(ReiSupport.getNavigationPoints(screen));
         }
 
         return points;

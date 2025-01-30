@@ -30,6 +30,7 @@ dependencies {
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-gui:${jei_version}"
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-lib:${jei_version}"
     compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-forge:${rei_version}" // Forge because mojmap
     library "com.mrcrayfish:controllable-sdl:2.30.10-1.0"
 }
 

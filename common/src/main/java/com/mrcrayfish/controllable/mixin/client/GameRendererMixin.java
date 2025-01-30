@@ -31,7 +31,7 @@ public class GameRendererMixin
         ControllerInput input = Controllable.getInput();
         if(input.isVirtualCursorActive())
         {
-            return input.getScaledCursorX();
+            return (int) input.getScaledCursorX();
         }
         return original;
     }
@@ -42,7 +42,7 @@ public class GameRendererMixin
         ControllerInput input = Controllable.getInput();
         if(input.isVirtualCursorActive())
         {
-            return input.getScaledCursorY();
+            return (int) input.getScaledCursorY();
         }
         return original;
     }

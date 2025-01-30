@@ -31,8 +31,9 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     modImplementation "com.mrcrayfish:framework-fabric:${minecraft_version}-${framework_version}"
-    modImplementation "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
-    modImplementation "dev.emi:emi-fabric:${emi_version}"
+    modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
+    modCompileOnly "dev.emi:emi-fabric:${emi_version}"
+    modImplementation "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
     library include("com.mrcrayfish:controllable-sdl:2.30.10-1.0") {
         transitive(false)
     }
