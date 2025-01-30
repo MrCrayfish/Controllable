@@ -22,8 +22,14 @@
         ]
     },
     "mixins": [
-        "controllable.common.mixins.json",
-        "controllable.fabric.mixins.json"
+        {
+            "config": "controllable.common.mixins.json",
+            "environment": "client"
+        },
+        {
+            "config": "controllable.fabric.mixins.json",
+            "environment": "client"
+        }
     ],
     "accessWidener": "controllable.accesswidener",
     "depends": {
