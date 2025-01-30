@@ -12,6 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -31,7 +32,7 @@ public class MinecraftMixin
     @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;continueAttack(Z)V"), index = 0)
     private boolean controllableSendClickBlockToController(boolean original)
     {
-        return original || isLeftClicking();
+        return original || controllable$IsLeftClicking();
     }
 
     /*@Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"), slice = @Slice(
@@ -46,7 +47,8 @@ public class MinecraftMixin
      * Checks if a controller is connected and if the attack button is down. A special except is
      * added when virtual mouse is enabled and it will ignore if the mouse is grabbed or not.
      */
-    private static boolean isLeftClicking()
+    @Unique
+    private static boolean controllable$IsLeftClicking()
     {
         Minecraft mc = Minecraft.getInstance();
         Controller controller = Controllable.getController();
@@ -79,7 +81,6 @@ public class MinecraftMixin
     }
 
     // Note: Minecraft Development plugin is failing to process this correctly.
-    @SuppressWarnings("InvalidInjectorMethodSignature")
     @ModifyVariable(method = "runTick", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/Minecraft;getFramerateLimit()I"), index = 8)
     private int controllableModifyFramerate(int originalFps)
     {

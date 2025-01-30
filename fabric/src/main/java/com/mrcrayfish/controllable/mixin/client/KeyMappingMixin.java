@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.client.binding.KeyAdapterBinding;
 import net.minecraft.client.KeyMapping;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -35,14 +36,13 @@ public abstract class KeyMappingMixin
     }
 
     // TODO needs testing
+    @Unique
     private boolean controllableIsActiveAndMatches(InputConstants.Key keyCode)
     {
         String customKey = this.getName() + ".custom";
         KeyAdapterBinding adapter = BindingRegistry.getInstance().getKeyAdapters().get(customKey);
         if(adapter != null && adapter.isButtonDown())
-        {
             return true;
-        }
         return keyCode != InputConstants.UNKNOWN && keyCode.equals(this.key);
     }
 }

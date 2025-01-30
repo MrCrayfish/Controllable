@@ -18,15 +18,11 @@ public class GuiMixin
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"))
     private boolean controllableRenderPlayerList(KeyMapping mapping)
     {
-        return mapping.isDown() || canShowPlayerList();
-    }
-
-    /**
-     * Checks if a controller is connected and the player list button is down
-     */
-    private static boolean canShowPlayerList()
-    {
         Controller controller = Controllable.getController();
-        return controller != null && ButtonBindings.PLAYER_LIST.isButtonDown();
+        if(controller != null && ButtonBindings.PLAYER_LIST.isButtonDown())
+        {
+            return true;
+        }
+        return mapping.isDown();
     }
 }

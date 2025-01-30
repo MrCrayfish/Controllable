@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -25,7 +26,7 @@ public abstract class ContainerScreenMixin
     @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V", ordinal = 1))
     private void controllableOnClicked(AbstractContainerScreen<?> screen, Slot slot, int slotId, int button, ClickType type)
     {
-        if(slotId != -999 && canQuickMove())
+        if(slotId != -999 && controllable$CanQuickMove())
         {
             this.lastQuickMoved = slot != null && slot.hasItem() ? slot.getItem().copy() : ItemStack.EMPTY;
             type = ClickType.QUICK_MOVE;
@@ -36,7 +37,7 @@ public abstract class ContainerScreenMixin
     @Redirect(method = "mouseReleased", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V", ordinal = 9))
     private void controllableOnReleased(AbstractContainerScreen<?> screen, Slot slot, int slotId, int button, ClickType type)
     {
-        if(slotId != -999 && canQuickMove())
+        if(slotId != -999 && controllable$CanQuickMove())
         {
             this.lastQuickMoved = slot != null && slot.hasItem() ? slot.getItem().copy() : ItemStack.EMPTY;
             type = ClickType.QUICK_MOVE;
@@ -47,7 +48,8 @@ public abstract class ContainerScreenMixin
     /**
      * Checks if a controller is connected and the quick move button is down
      */
-    private static boolean canQuickMove()
+    @Unique
+    private static boolean controllable$CanQuickMove()
     {
         Controller controller = Controllable.getController();
         return controller != null && ButtonBindings.QUICK_MOVE.isButtonPressed();
