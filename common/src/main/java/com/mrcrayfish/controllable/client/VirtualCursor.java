@@ -107,7 +107,7 @@ public final class VirtualCursor
     public int getScreenX()
     {
         Minecraft mc = Minecraft.getInstance();
-        return (int) (this.x * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth());
+        return (int) (this.x * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth());
     }
 
     /**
@@ -116,7 +116,7 @@ public final class VirtualCursor
     public int getScreenY()
     {
         Minecraft mc = Minecraft.getInstance();
-        return (int) (this.y * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight());
+        return (int) (this.y * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight());
     }
 
     /**
@@ -141,7 +141,7 @@ public final class VirtualCursor
     public double getRenderScreenX()
     {
         Minecraft mc = Minecraft.getInstance();
-        return this.renderX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth();
+        return this.renderX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
     }
 
     /**
@@ -150,7 +150,7 @@ public final class VirtualCursor
     public double getRenderScreenY()
     {
         Minecraft mc = Minecraft.getInstance();
-        return this.renderY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight();
+        return this.renderY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
     }
 
     /**
@@ -294,8 +294,8 @@ public final class VirtualCursor
     private void clampCursorToWindowBounds()
     {
         Minecraft mc = Minecraft.getInstance();
-        this.x = Math.max(0, Math.min(this.x, mc.getWindow().getScreenWidth()));
-        this.y = Math.max(0, Math.min(this.y, mc.getWindow().getScreenHeight()));
+        this.x = Math.max(0, Math.min(this.x, mc.getWindow().getWidth()));
+        this.y = Math.max(0, Math.min(this.y, mc.getWindow().getHeight()));
     }
 
     /**
@@ -350,8 +350,8 @@ public final class VirtualCursor
         if(mc.screen == null)
             return false;
         // Convert the position to screen space before passing off
-        double cursorScreenX = this.x * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth();
-        double cursorScreenY = this.y * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight();
+        double cursorScreenX = this.x * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
+        double cursorScreenY = this.y * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
         return ScreenHelper.findHoveredEventListenerExcludeList(mc.screen, cursorScreenX, cursorScreenY).isPresent();
     }
 

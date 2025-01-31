@@ -60,8 +60,8 @@ public class FabricClientHelper implements IClientHelper
     public void sendMouseDrag(Screen screen, double dragX, double dragY, double finalMouseX, double finalMouseY, int activeButton)
     {
         Minecraft mc = Minecraft.getInstance();
-        double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth();
-        double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight();
+        double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
+        double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
         Screen.wrapScreenError(() -> {
             screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
         }, "Controllable mouseDragged event handler", screen.getClass().getCanonicalName());

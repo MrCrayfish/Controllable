@@ -88,8 +88,8 @@ public class ForgeClientHelper implements IClientHelper
     {
         Screen.wrapScreenError(() -> {
             Minecraft mc = screen.getMinecraft();
-            double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth();
-            double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight();
+            double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
+            double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
             if(ClientHooks.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
                 return;
             if(screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))

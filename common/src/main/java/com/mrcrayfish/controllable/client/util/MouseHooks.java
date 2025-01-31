@@ -88,8 +88,8 @@ public class MouseHooks
         if(screen != null && mc.getOverlay() == null)
         {
             // Send mouse moved event to screen
-            double screenCursorX = cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getScreenWidth();
-            double screenCursorY = cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getScreenHeight();
+            double screenCursorX = cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
+            double screenCursorY = cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
             Screen.wrapScreenError(() -> {
                 screen.mouseMoved(screenCursorX, screenCursorY);
             }, "Controllable mouseMoved event handler", screen.getClass().getCanonicalName());
