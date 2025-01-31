@@ -56,6 +56,21 @@ public class MinecraftMixin
         return original;
     }
 
+    /*
+     * Modifies the return value of keyUse.isDown() when checking before releasing using item
+     */
+    @ModifyExpressionValue(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 2))
+    private boolean modifyReleaseUseKeyDown(boolean original)
+    {
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.isBeingUsed() && ButtonBindings.USE_ITEM.isButtonDown())
+        {
+            controller.updateInputTime();
+            return true;
+        }
+        return original;
+    }
+
     @ModifyExpressionValue(method = "shouldEntityAppearGlowing", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"))
     private boolean controllableIsEntityGlowing(boolean original)
     {
