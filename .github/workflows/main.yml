@@ -15,7 +15,7 @@ jobs:
       uses: actions/setup-java@v4.7.0
       with:
         java-version: '17'
-        distribution: 'adopt'
+        distribution: 'temurin'
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v3.5.0
     - name: Read modid from gradle.properties
