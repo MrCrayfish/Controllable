@@ -29,7 +29,7 @@ public class PaperDollPlayerOverlay implements IOverlay
         {
             if(!EventHelper.postRenderMiniPlayer())
             {
-                InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, -25, 0, 100, 78, 20, 0.0625F, 60, 35, mc.player);
+                InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, 0, 0, 50, 70, 20, 0.0625F, 25, 35, mc.player);
             }
         }
     }
