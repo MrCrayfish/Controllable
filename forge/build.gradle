@@ -126,7 +126,7 @@ processResources {
 
 tasks.jarJar.configure {
     archiveClassifier = 'release'
-    from(rootProject.file("LICENSE_LibSDL4J"))
+    from(rootProject.file("LICENSE_ControllableSDL"))
     from(rootProject.file("LICENSE")) {
         rename { "${it}_${mod_name}" }
     }
