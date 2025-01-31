@@ -15,6 +15,7 @@ dependencies {
     library include("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
         transitive(false)
     }
+    implementation "com.google.code.findbugs:jsr305:3.0.1"
 }
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
