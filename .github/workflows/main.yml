@@ -1,12 +1,14 @@
-name: Build and Sign Mod
+name: Build Controllable
 on:
   push:
-    paths:
-      - 'release_build'
+    tags:
+      - 'v*'
 jobs:
   build:
     runs-on: ubuntu-latest
     environment: Build
+    permissions:
+      contents: write
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -103,13 +105,18 @@ jobs:
       with:
         gpg_private_key: ${{ env.SIGNING_KEY }}
         passphrase: ${{ env.SIGNING_PASSPHRASE }}
-    - name: Sign JAR
+    - name: GPG Sign
       env:
         SIGNING_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       if: ${{ env.SIGNING_PASSPHRASE != '' }}
       run: |
         gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.forge }}
         gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.fabric }}
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        name: '${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
+        artifacts: "${{ steps.artifacts.outputs.forge }},${{ steps.artifacts.outputs.forge }}.asc,${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.fabric }}.asc"
     - name: Upload Forge Artifacts
       uses: actions/upload-artifact@v4
       with:
