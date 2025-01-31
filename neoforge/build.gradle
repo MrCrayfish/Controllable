@@ -67,7 +67,7 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 
     // Controllable SDL (https://github.com/MrCrayfish/ControllableSDL)
-    library jarJar("com.mrcrayfish:controllable-sdl:2.30.10-1.0") {
+    library jarJar("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
         transitive(false)
     }
 

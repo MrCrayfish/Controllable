@@ -12,7 +12,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     modImplementation "com.mrcrayfish:framework-fabric:${minecraft_version}-${framework_version}"
     modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
-    library include("com.mrcrayfish:controllable-sdl:2.30.10-1.0") {
+    library include("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
         transitive(false)
     }
 }
