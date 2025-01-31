@@ -2,8 +2,8 @@ package com.mrcrayfish.controllable.mixin.client;
 
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.InputProcessor;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.Minecraft;
@@ -20,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import javax.annotation.Nullable;
+
 /**
  * Author: MrCrayfish
  */
@@ -27,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MinecraftMixin
 {
     @Shadow
+    @Nullable
     public LocalPlayer player;
 
     @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;continueAttack(Z)V"), index = 0)
