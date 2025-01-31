@@ -101,8 +101,8 @@ dependencies {
     implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:${rei_version}")
 
     // SDL2 Library
-    library jarJar("com.mrcrayfish:controllable-sdl:2.30.10-1.0") {
-        jarJar.ranged(it, "[2.30.10-1.0,)")
+    library jarJar("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
+        jarJar.ranged(it, "[${controllable_sdl_version},)")
         transitive(false)
     }
 
