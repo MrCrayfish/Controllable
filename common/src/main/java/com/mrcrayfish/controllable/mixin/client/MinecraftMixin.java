@@ -7,11 +7,9 @@ import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,18 +18,12 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nullable;
-
 /**
  * Author: MrCrayfish
  */
 @Mixin(Minecraft.class)
 public class MinecraftMixin
 {
-    @Shadow
-    @Nullable
-    public LocalPlayer player;
-
     @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;continueAttack(Z)V"), index = 0)
     private boolean controllableSendClickBlockToController(boolean original)
     {
@@ -66,7 +58,8 @@ public class MinecraftMixin
     @Inject(method = "shouldEntityAppearGlowing", at = @At(value = "HEAD"), cancellable = true)
     private void controllableIsEntityGlowing(Entity entity, CallbackInfoReturnable<Boolean> cir)
     {
-        if(this.player != null && this.player.isSpectator() && ButtonBindings.HIGHLIGHT_PLAYERS.isButtonDown() && entity.getType() == EntityType.PLAYER)
+        Minecraft mc = (Minecraft) (Object) this;
+        if(mc.player != null && mc.player.isSpectator() && ButtonBindings.HIGHLIGHT_PLAYERS.isButtonDown() && entity.getType() == EntityType.PLAYER)
         {
             cir.setReturnValue(true);
         }
@@ -76,8 +69,8 @@ public class MinecraftMixin
     @Inject(method = "isWindowActive", at = @At(value = "HEAD"), cancellable = true)
     private void controllableIsWindowActiveHead(CallbackInfoReturnable<Boolean> cir)
     {
-        // Only apply when in game
-        if(this.player != null && Controllable.getController() != null)
+        Minecraft mc = (Minecraft) (Object) this;
+        if(mc.player != null && Controllable.getController() != null)
         {
             cir.setReturnValue(true);
         }
