@@ -106,7 +106,7 @@ dependencies {
         transitive(false)
     }
 
-    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
+    annotationProcessor("org.spongepowered:mixin:0.8.7:processor")
     compileOnly project(":common")
     testCompileOnly project(":common")
 }

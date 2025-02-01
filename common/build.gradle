@@ -23,7 +23,7 @@ configurations {
 }
 
 dependencies {
-    compileOnly "org.spongepowered:mixin:0.8.5"
+    compileOnly "org.spongepowered:mixin:0.8.7"
     implementation "com.google.code.findbugs:jsr305:3.0.2"
     compileOnly "com.mrcrayfish:framework-common:${minecraft_version}-${framework_version}"
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-common:${jei_version}"
