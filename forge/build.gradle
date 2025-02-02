@@ -196,4 +196,4 @@ tasks.register('signJar', SignJar) {
 }
 
 jar.finalizedBy 'signJar'
-signJar.mustRunAfter 'reobfJar'
+signJar.mustRunAfter 'reobfJarJar'
