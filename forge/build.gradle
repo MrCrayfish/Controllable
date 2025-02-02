@@ -196,4 +196,8 @@ tasks.register('signJar', SignJar) {
 }
 
 jar.finalizedBy 'signJar'
+
+// Ensure singing always happens after these tasks
 signJar.mustRunAfter 'reobfJarJar'
+signJar.mustRunAfter 'reobfJar'
+signJar.mustRunAfter 'jar'
