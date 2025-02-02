@@ -55,11 +55,6 @@ jobs:
         echo "KEYSTORE_PASS=${{ secrets.MRCRAYFISH_JKS_PASSPHRASE }}" >> $GITHUB_ENV
     - name: Make gradlew executable
       run: chmod +x ./gradlew
-    - name: Build (Common)
-      env:
-        GPR_USER: "MrCrayfish"
-        GPR_KEY: ${{ secrets.GPR_TOKEN }}
-      run: ./gradlew :common:build
     - name: Build (Forge)
       env:
         GPR_USER: "MrCrayfish"
@@ -67,10 +62,13 @@ jobs:
       run: ./gradlew :forge:build
     - name: Stop Gradle
       run: ./gradlew --stop
+    - name: Construct artifact files
+      id: artifacts
+      run: |
+        echo "forge=forge/build/libs/${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}-release.jar" >> "$GITHUB_OUTPUT"
     - name: Upload Forge Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: '${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
         path: |
-          "forge/build/libs/${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}.jar"
-          "forge/build/libs/${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}-release.jar"
+          ${{ steps.artifacts.outputs.forge }}
