@@ -67,13 +67,10 @@ jobs:
       run: ./gradlew :forge:build
     - name: Stop Gradle
       run: ./gradlew --stop
-    - name: Construct artifact files
-      id: artifacts
-      run: |
-        echo "forge=forge/build/libs/${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}-release.jar" >> "$GITHUB_OUTPUT"
     - name: Upload Forge Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: '${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
         path: |
-          ${{ steps.artifacts.outputs.forge }}
+          "forge/build/libs/${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}.jar"
+          "forge/build/libs/${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}-release.jar"
