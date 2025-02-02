@@ -55,6 +55,11 @@ jobs:
         echo "KEYSTORE_PASS=${{ secrets.MRCRAYFISH_JKS_PASSPHRASE }}" >> $GITHUB_ENV
     - name: Make gradlew executable
       run: chmod +x ./gradlew
+    - name: Build (Common)
+      env:
+        GPR_USER: "MrCrayfish"
+        GPR_KEY: ${{ secrets.GPR_TOKEN }}
+      run: ./gradlew :common:build
     - name: Build (Forge)
       env:
         GPR_USER: "MrCrayfish"
@@ -66,9 +71,25 @@ jobs:
       id: artifacts
       run: |
         echo "forge=forge/build/libs/${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}-release.jar" >> "$GITHUB_OUTPUT"
+    - name: Import GPG
+      env:
+        SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+        SIGNING_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      if: ${{ env.SIGNING_KEY != '' && env.SIGNING_PASSPHRASE != '' }}
+      uses: crazy-max/ghaction-import-gpg@v6.2.0
+      with:
+        gpg_private_key: ${{ env.SIGNING_KEY }}
+        passphrase: ${{ env.SIGNING_PASSPHRASE }}
+    - name: GPG Sign
+      env:
+        SIGNING_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      if: ${{ env.SIGNING_PASSPHRASE != '' }}
+      run: |
+        gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.forge }}
     - name: Upload Forge Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: '${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
         path: |
           ${{ steps.artifacts.outputs.forge }}
+          ${{ steps.artifacts.outputs.forge }}.asc
