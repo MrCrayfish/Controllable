@@ -86,6 +86,7 @@ jobs:
       env:
         GPR_USER: "MrCrayfish"
         GPR_KEY: ${{ secrets.GPR_TOKEN }}
+        PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
         SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
         SIGNING_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       run: ./gradlew publish
