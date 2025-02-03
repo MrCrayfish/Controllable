@@ -73,6 +73,11 @@ jobs:
         GPR_USER: "MrCrayfish"
         GPR_KEY: ${{ secrets.GPR_TOKEN }}
       run: ./gradlew :fabric:build
+    - name: Build (NeoForge)
+      env:
+        GPR_USER: "MrCrayfish"
+        GPR_KEY: ${{ secrets.GPR_TOKEN }}
+      run: ./gradlew :neoforge:build
     - name: Publish to GitHub Packages
       env:
         GPR_USER: "MrCrayfish"
@@ -87,6 +92,7 @@ jobs:
       run: |
         echo "forge=forge/build/libs/${{ steps.mod_id.outputs.value }}-forge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}-release.jar" >> "$GITHUB_OUTPUT"
         echo "fabric=fabric/build/libs/${{ steps.mod_id.outputs.value }}-fabric-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}-release.jar" >> "$GITHUB_OUTPUT"
+        echo "neoforge=neoforge/build/libs/${{ steps.mod_id.outputs.value }}-neoforge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}-release.jar" >> "$GITHUB_OUTPUT"
     - name: Import GPG
       env:
         SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
@@ -103,11 +109,12 @@ jobs:
       run: |
         gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.forge }}
         gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.fabric }}
+        gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.neoforge }}
     - name: Create Release
       uses: ncipollo/release-action@v1
       with:
         name: '${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
-        artifacts: "${{ steps.artifacts.outputs.forge }},${{ steps.artifacts.outputs.forge }}.asc,${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.fabric }}.asc"
+        artifacts: "${{ steps.artifacts.outputs.forge }},${{ steps.artifacts.outputs.forge }}.asc,${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.fabric }}.asc,${{ steps.artifacts.outputs.neoforge }},${{ steps.artifacts.outputs.neoforge }}.asc"
     - name: Upload Forge Artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -122,3 +129,10 @@ jobs:
         path: |
           ${{ steps.artifacts.outputs.fabric }}
           ${{ steps.artifacts.outputs.fabric }}.asc
+    - name: Upload NeoForge Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: '${{ steps.mod_id.outputs.value }}-neoforge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
+        path: |
+          ${{ steps.artifacts.outputs.neoforge }}
+          ${{ steps.artifacts.outputs.neoforge }}.asc
