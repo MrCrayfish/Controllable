@@ -53,8 +53,16 @@ public class LazySlider extends AbstractSliderButton
         {
             this.onChange.accept(this.getValue());
             this.pressed = false;
+            this.onRelease(mouseX, mouseY);
+            return true;
         }
-        return super.mouseReleased(mouseX, mouseY, button);
+        return false;
+    }
+
+    @Override
+    public boolean mouseDragged(double p_93645_, double p_93646_, int p_93647_, double p_93648_, double p_93649_)
+    {
+        return this.pressed && super.mouseDragged(p_93645_, p_93646_, p_93647_, p_93648_, p_93649_);
     }
 
     public double getValue()

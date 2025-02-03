@@ -97,4 +97,10 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
             }
         }
     }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button)
+    {
+        return this.slider.mouseReleased(mouseX, mouseY, button);
+    }
 }
