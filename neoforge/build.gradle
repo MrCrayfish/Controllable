@@ -1,4 +1,5 @@
 import net.neoforged.gradle.common.tasks.PotentiallySignJar
+import org.apache.commons.io.FilenameUtils
 
 plugins {
     id 'multiloader-loader'
@@ -52,21 +53,16 @@ dependencies {
     }
 }
 
-jar {
-    finalizedBy('reobfJar')
-}
-
 tasks.named('jarJar') {
-    archiveClassifier = 'release'
+    archiveClassifier = 'all'
     from(rootProject.file("LICENSE_ControllableSDL"))
     from(rootProject.file("LICENSE")) {
         rename { "${it}_${mod_name}" }
     }
-    finalizedBy('reobfJarJar')
 }
 
 tasks.register('signJar', PotentiallySignJar) {
-    dependsOn 'reobfJarJar'
+    dependsOn 'jarJar'
     onlyIf {
         project.hasProperty('keyStore') || System.getenv("KEYSTORE")
     }
@@ -74,12 +70,10 @@ tasks.register('signJar', PotentiallySignJar) {
     alias = project.findProperty('keyStoreAlias') ?: System.getenv("KEYSTORE_ALIAS")
     storePass = project.findProperty('keyStorePass') ?: System.getenv("KEYSTORE_PASS")
     input = tasks.jarJar.archiveFile
-    //inputFile = outputFile = tasks.jarJar.archiveFile
+    def name = FilenameUtils.removeExtension(tasks.jarJar.archiveFile.get().getAsFile().getName())
+    name = name.replace("-all", "")
+    output = layout.buildDirectory.file("libs/%s-release.jar".formatted(name))
 }
 
 jar.finalizedBy 'signJar'
-
-// Ensure singing always happens after these tasks
-signJar.mustRunAfter 'reobfJarJar'
-signJar.mustRunAfter 'reobfJar'
-signJar.mustRunAfter 'jar'
+signJar.mustRunAfter 'jarJar'
