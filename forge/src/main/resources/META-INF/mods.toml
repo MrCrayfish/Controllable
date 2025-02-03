@@ -43,13 +43,6 @@ description="${mod_desc}"
     side="CLIENT"
 
 [[dependencies."${mod_id}"]]
-    modId="emi"
-    mandatory=false
-    versionRange="[${emi_version},)"
-    ordering="NONE"
-    side="CLIENT"
-
-[[dependencies."${mod_id}"]]
     modId="roughlyenoughitems"
     mandatory=false
     versionRange="[${rei_version},)"
