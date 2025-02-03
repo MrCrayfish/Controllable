@@ -6,12 +6,12 @@ pluginManagement {
             forRepository {
                 maven {
                     name = 'Fabric'
-                    url = uri('https://maven.fabricmc.net')
+                    url = uri("https://maven.fabricmc.net")
                 }
             }
             filter {
-                includeGroup('net.fabricmc')
-                includeGroup('fabric-loom')
+                includeGroup("net.fabricmc")
+                includeGroup("fabric-loom")
             }
         }
         exclusiveContent {
@@ -29,23 +29,23 @@ pluginManagement {
         exclusiveContent {
             forRepository {
                 maven {
-                    name = 'Sponge'
-                    url = uri('https://repo.spongepowered.org/repository/maven-public')
+                    name = 'Forge'
+                    url = uri("https://maven.minecraftforge.net")
                 }
             }
             filter {
-                includeGroupAndSubgroups("org.spongepowered")
+                includeGroupAndSubgroups("net.minecraftforge")
             }
         }
         exclusiveContent {
             forRepository {
                 maven {
-                    name = 'Forge'
-                    url = uri('https://maven.minecraftforge.net')
+                    name = 'Sponge Snapshots'
+                    url = uri("https://repo.spongepowered.org/repository/maven-public")
                 }
             }
             filter {
-                includeGroupAndSubgroups('net.minecraftforge')
+                includeGroupAndSubgroups("org.spongepowered")
             }
         }
     }
@@ -67,4 +67,4 @@ rootProject.name = 'Controllable'
 include("common")
 includeModloader("forge")
 includeModloader("fabric")
-//includeModloader("neoforge")
+includeModloader("neoforge")

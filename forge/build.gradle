@@ -2,8 +2,8 @@ import net.minecraftforge.gradle.common.tasks.SignJar
 
 plugins {
     id 'multiloader-loader'
-    id 'net.minecraftforge.gradle'
-    id 'org.spongepowered.mixin'
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
 }
 
 jarJar.enable()

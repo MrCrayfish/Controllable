@@ -1,0 +1,85 @@
+import net.neoforged.gradle.common.tasks.PotentiallySignJar
+
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.gradle.userdev' version '7.0.142'
+}
+
+jarJar.enable()
+
+def at = file('src/main/resources/META-INF/accesstransformer.cfg')
+if (at.exists()) {
+    minecraft.accessTransformers.file at
+}
+
+runs {
+    configureEach {
+        modSource project.sourceSets.main
+        dependencies {
+            runtime project.configurations.library
+        }
+    }
+    client {
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+configurations {
+    testCompileOnly.extendsFrom compileOnly
+}
+
+dependencies {
+    implementation "net.neoforged:neoforge:${neoforge_version}"
+    implementation "com.mrcrayfish:framework-neoforge:${minecraft_version}-${framework_version}"
+
+    // Just Enough Items
+    compileOnly "mezz.jei:jei-${jei_minecraft_version}-neoforge:${jei_version}"
+
+    // EMI
+    compileOnly "dev.emi:emi-neoforge:${emi_version}"
+
+    // Roughly Enough Items
+    implementation "dev.architectury:architectury-neoforge:${architectury_version}"
+    implementation "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
+    implementation "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
+
+    // SDL2 Library
+    library jarJar("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
+        jarJar.ranged(it, "[${controllable_sdl_version},)")
+        transitive(false)
+    }
+}
+
+jar {
+    finalizedBy('reobfJar')
+}
+
+tasks.named('jarJar') {
+    archiveClassifier = 'release'
+    from(rootProject.file("LICENSE_ControllableSDL"))
+    from(rootProject.file("LICENSE")) {
+        rename { "${it}_${mod_name}" }
+    }
+    finalizedBy('reobfJarJar')
+}
+
+tasks.register('signJar', PotentiallySignJar) {
+    dependsOn 'reobfJarJar'
+    onlyIf {
+        project.hasProperty('keyStore') || System.getenv("KEYSTORE")
+    }
+    keyStore = project.findProperty('keyStore') ?: System.getenv("KEYSTORE")
+    alias = project.findProperty('keyStoreAlias') ?: System.getenv("KEYSTORE_ALIAS")
+    storePass = project.findProperty('keyStorePass') ?: System.getenv("KEYSTORE_PASS")
+    input = tasks.jarJar.archiveFile
+    //inputFile = outputFile = tasks.jarJar.archiveFile
+}
+
+jar.finalizedBy 'signJar'
+
+// Ensure singing always happens after these tasks
+signJar.mustRunAfter 'reobfJarJar'
+signJar.mustRunAfter 'reobfJar'
+signJar.mustRunAfter 'jar'

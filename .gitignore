@@ -21,6 +21,4 @@ build
 # other
 eclipse
 run
-
-
-neoforge/
+/neoforge/runs
