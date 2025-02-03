@@ -8,7 +8,6 @@
     "client": [
         "client.ForgeGameRendererMixin",
         "client.ForgeGuiMixin",
-        "client.ForgeMinecraftMixin",
         "client.ForgeRecipeBookPageMixin",
         "client.KeyMappingMixin"
     ],

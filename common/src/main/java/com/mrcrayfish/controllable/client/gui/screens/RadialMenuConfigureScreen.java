@@ -5,6 +5,9 @@ import com.mrcrayfish.controllable.client.gui.ButtonBindingData;
 import com.mrcrayfish.controllable.client.gui.RadialItemList;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -20,6 +23,7 @@ import java.util.Objects;
 public class RadialMenuConfigureScreen extends Screen
 {
     private final List<ButtonBindingData> bindings;
+    protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private RadialItemList list;
 
     public RadialMenuConfigureScreen(LinkedHashSet<ButtonBindingData> bindings)
@@ -31,27 +35,39 @@ public class RadialMenuConfigureScreen extends Screen
     @Override
     protected void init()
     {
+        LinearLayout headerLayout = this.layout.addToHeader(LinearLayout.vertical().spacing(4));
+        headerLayout.addChild(new StringWidget(this.title, this.font));
+
         this.list = new RadialItemList(this.minecraft, this.width, this.height, 45, this.height - 44, this.bindings);
-        this.addWidget(this.list);
-        this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 100, 20, CommonComponents.GUI_DONE, buttons -> {
+        this.layout.addToContents(this.list);
+
+        LinearLayout footerLayout = this.layout.addToFooter(LinearLayout.horizontal().spacing(4));
+        footerLayout.addChild(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 100, 20, CommonComponents.GUI_DONE, buttons -> {
             RadialMenuHandler.instance().setBindings(new LinkedHashSet<>(this.bindings));
             Objects.requireNonNull(this.minecraft).setScreen(null);
         }));
-        this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 50, this.height - 29, 100, 20, Component.translatable("controllable.gui.add_binding"), buttons -> {
+        footerLayout.addChild(ScreenHelper.button(this.width / 2 - 50, this.height - 29, 100, 20, Component.translatable("controllable.gui.add_binding"), buttons -> {
             Objects.requireNonNull(this.minecraft).setScreen(new SelectButtonBindingScreen(this));
         }));
-        this.addRenderableWidget(ScreenHelper.button(this.width / 2 + 55, this.height - 29, 100, 20, CommonComponents.GUI_CANCEL, buttons -> {
+        footerLayout.addChild(ScreenHelper.button(this.width / 2 + 55, this.height - 29, 100, 20, CommonComponents.GUI_CANCEL, buttons -> {
             Objects.requireNonNull(this.minecraft).setScreen(null);
         }));
+
+        this.layout.visitWidgets(this::addRenderableWidget);
+        this.repositionElements();
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    protected void repositionElements()
     {
-        this.renderBackground(graphics);
-        this.list.render(graphics, mouseX, mouseY, partialTicks);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
-        super.render(graphics, mouseX, mouseY, partialTicks);
+        this.list.setSize(this.width, this.height - this.layout.getFooterHeight() - this.layout.getHeaderHeight());
+        this.layout.arrangeElements();
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    {
+        super.renderDirtBackground(graphics);
     }
 
     public List<ButtonBindingData> getBindings()

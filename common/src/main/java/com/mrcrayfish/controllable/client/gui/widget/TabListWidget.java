@@ -11,7 +11,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.CommonComponents;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -73,9 +73,9 @@ public class TabListWidget extends AbstractWidget implements ContainerEventHandl
     }
 
     @Override
-    public boolean mouseScrolled(double $$0, double $$1, double $$2)
+    public boolean mouseScrolled(double mouseX, double mouseY, double xScroll, double yScroll)
     {
-        return this.list.mouseScrolled($$0, $$1, $$2);
+        return this.list.mouseScrolled(mouseX, mouseY, xScroll, yScroll);
     }
 
     @Override

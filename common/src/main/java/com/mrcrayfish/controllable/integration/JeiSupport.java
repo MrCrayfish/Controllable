@@ -15,10 +15,8 @@ import mezz.jei.gui.overlay.IngredientGrid;
 import mezz.jei.gui.overlay.IngredientGridWithNavigation;
 import mezz.jei.gui.overlay.IngredientListRenderer;
 import mezz.jei.gui.recipes.RecipeCatalysts;
-import mezz.jei.gui.recipes.RecipeGuiLayouts;
 import mezz.jei.gui.recipes.RecipeGuiTab;
 import mezz.jei.gui.recipes.RecipeGuiTabs;
-import mezz.jei.gui.recipes.RecipeLayoutWithButtons;
 import mezz.jei.gui.recipes.RecipeTransferButton;
 import mezz.jei.gui.recipes.RecipesGui;
 import mezz.jei.library.gui.recipes.RecipeLayout;
@@ -82,30 +80,19 @@ public class JeiSupport
                 // Add the slots added by layouts
                 getRecipeLayouts(runtime).forEach(layout -> {
 
-                    // Transfer button
-                    ImmutableRect2i transferArea = ((GuiIconToggleButtonAccessor) layout.transferButton()).controllableGetArea();
-                    if(!transferArea.isEmpty()) {
-                        points.add(new BasicNavigationPoint(transferArea.getX() + transferArea.getWidth() / 2.0, transferArea.getY() + transferArea.getHeight() / 2.0));
-                    }
-
-                    // Bookmark button
-                    ImmutableRect2i bookmarkArea = ((GuiIconToggleButtonAccessor) layout.bookmarkButton()).controllableGetArea();
-                    if(!bookmarkArea.isEmpty()) {
-                        points.add(new BasicNavigationPoint(bookmarkArea.getX() + bookmarkArea.getWidth() / 2.0, bookmarkArea.getY() + bookmarkArea.getHeight() / 2.0));
-                    }
-
-                    // Add slots added by layouts
-                    if(layout.recipeLayout() instanceof RecipeLayout<?> recipeLayout)
+                    Rect2i pos = layout.getRect();
+                    int layoutX = pos.getX();
+                    int layoutY = pos.getY();
+                    for(IRecipeSlotDrawable drawable : layout.getRecipeSlots().getSlots())
                     {
-                        Rect2i pos = recipeLayout.getRect();
-                        int layoutX = pos.getX();
-                        int layoutY = pos.getY();
-                        for(IRecipeSlotDrawable drawable : recipeLayout.getRecipeSlots().getSlots())
-                        {
-                            Rect2i area = drawable.getRect();
-                            points.add(new BasicNavigationPoint(layoutX + area.getX() + area.getWidth() / 2.0, layoutY + area.getY() + area.getHeight() / 2.0));
-                        }
+                        Rect2i area = drawable.getRect();
+                        points.add(new BasicNavigationPoint(layoutX + area.getX() + area.getWidth() / 2.0, layoutY + area.getY() + area.getHeight() / 2.0));
                     }
+                });
+
+                // Transfer buttons
+                getTransferButtons(runtime).forEach(button -> {
+                    addWidget(points, button);
                 });
             }
         });
@@ -172,13 +159,27 @@ public class JeiSupport
         return Optional.empty();
     }
 
-    private static List<RecipeLayoutWithButtons<?>> getRecipeLayouts(IJeiRuntime runtime)
+    private static Stream<RecipeLayout<?>> getRecipeLayouts(IJeiRuntime runtime)
     {
         if(runtime.getRecipesGui() instanceof RecipesGui gui)
         {
-            RecipeGuiLayouts layouts = ((RecipesGuiAccessor) gui).controllableGetLayouts();
-            return ((RecipeGuiLayoutsAccessor) layouts).controllableGetRecipeLayouts();
+            return ((RecipesGuiAccessor) gui).controllableGetLayouts().stream()
+                .filter(drawable -> {
+                    return drawable instanceof RecipeLayout<?>;
+                }).map(drawable -> {
+                    return (RecipeLayout<?>) drawable;
+                });
+        }
+        return Stream.empty();
+    }
+
+    private static List<RecipeTransferButton> getTransferButtons(IJeiRuntime runtime)
+    {
+        if(runtime.getRecipesGui() instanceof RecipesGui gui)
+        {
+            return ((RecipesGuiAccessor) gui).getTransferButtons();
         }
         return Collections.emptyList();
     }
+
 }

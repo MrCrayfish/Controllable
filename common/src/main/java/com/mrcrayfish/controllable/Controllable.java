@@ -7,7 +7,7 @@ import com.mrcrayfish.controllable.client.RumbleHandler;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.ControllerManager;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 public class Controllable

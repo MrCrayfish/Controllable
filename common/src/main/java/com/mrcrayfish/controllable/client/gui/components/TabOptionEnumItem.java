@@ -83,7 +83,7 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
                 if(this.canChange)
                 {
                     Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK.value(), 0.7F, 0.25F));
-                    this.cycle.mouseScrolled(0, 0, 1);
+                    this.cycle.mouseScrolled(0, 0, 0, 1);
                     this.canChange = false;
                 }
             }
@@ -92,7 +92,7 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
                 if(this.canChange)
                 {
                     Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK.value(), 0.75F, 0.25F));
-                    this.cycle.mouseScrolled(0, 0, -1);
+                    this.cycle.mouseScrolled(0, 0, 0, -1);
                     this.canChange = false;
                 }
             }

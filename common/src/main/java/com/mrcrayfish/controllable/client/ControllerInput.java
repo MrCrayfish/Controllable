@@ -82,7 +82,7 @@ import net.minecraft.world.level.block.entity.BannerPattern;
 import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -308,8 +308,8 @@ public class ControllerInput
                 {
                     int rowTop = ClientServices.CLIENT.getAbstractListRowTop(list, i);
                     int rowBottom = ClientServices.CLIENT.getAbstractListRowBottom(list, i);
-                    int listTop = ClientServices.CLIENT.getAbstractListTop(list);
-                    int listBottom = ClientServices.CLIENT.getAbstractListBottom(list);
+                    int listTop = list.getY();
+                    int listBottom = list.getBottom();
                     if(rowTop < listTop && rowBottom > listBottom) // Is visible
                         continue;
 
@@ -800,7 +800,7 @@ public class ControllerInput
                 }
                 else if(ButtonBindings.DEBUG_INFO.isButtonPressed())
                 {
-                    mc.options.renderDebug = !mc.options.renderDebug;
+                    mc.getDebugOverlay().toggleOverlay();
                 }
                 else if(ButtonBindings.RADIAL_MENU.isButtonPressed() && !virtual)
                 {
@@ -1450,7 +1450,7 @@ public class ControllerInput
         long scrollTime = Util.getMillis();
         if(dir != 0 && scrollTime - this.lastMerchantScroll >= 150)
         {
-            screen.mouseScrolled(this.getCursorX(), this.getCursorY(), Math.signum(dir));
+            screen.mouseScrolled(this.getCursorX(), this.getCursorY(), 0, Math.signum(dir));
             this.lastMerchantScroll = scrollTime;
         }
     }

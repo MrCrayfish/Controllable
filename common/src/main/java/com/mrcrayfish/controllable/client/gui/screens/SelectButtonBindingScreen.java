@@ -12,6 +12,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
@@ -34,10 +35,9 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
     }
 
     @Override
-    protected void init()
+    protected void setupFooter(LinearLayout layout)
     {
-        super.init();
-        this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 150, 20, Component.translatable("controllable.gui.restore_defaults"), (button) -> {
+        layout.addChild(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 150, 20, Component.translatable("controllable.gui.restore_defaults"), (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     ((RadialMenuConfigureScreen) this.parent).getBindings().clear();
@@ -47,7 +47,7 @@ public class SelectButtonBindingScreen extends ButtonBindingListMenuScreen
                 return true;
             }));
         }));
-        this.addRenderableWidget(ScreenHelper.button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_DONE, (button) -> {
+        layout.addChild(ScreenHelper.button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_DONE, (button) -> {
             Objects.requireNonNull(this.minecraft).setScreen(this.parent);
         }));
     }

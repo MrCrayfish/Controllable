@@ -8,7 +8,7 @@ import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
 import com.mrcrayfish.controllable_sdl.api.rwops.SDL_RWops;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;

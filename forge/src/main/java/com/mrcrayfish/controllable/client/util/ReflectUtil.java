@@ -4,6 +4,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
@@ -14,7 +15,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,15 +26,15 @@ import java.util.List;
  */
 public class ReflectUtil
 {
-    private static final Method ABSTRACT_SELECTION_LIST_GET_ROW_TOP = ObfuscationReflectionHelper.findMethod(AbstractSelectionList.class, "m_7610_", int.class);
-    private static final Method ABSTRACT_SELECTION_LIST_GET_ROW_BOTTOM = ObfuscationReflectionHelper.findMethod(AbstractSelectionList.class, "m_93485_", int.class);
-    private static final Method ABSTRACT_CONTAINER_SCREEN_CLICK_SLOT = ObfuscationReflectionHelper.findMethod(AbstractContainerScreen.class, "m_6597_", Slot.class, int.class, int.class, ClickType.class);
-    private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ObfuscationReflectionHelper.findField(AbstractSelectionList.class, "f_93387_");
-    private static final Field IMAGE_BUTTON_RESOURCE = ObfuscationReflectionHelper.findField(ImageButton.class, "f_94223_");
-    private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ObfuscationReflectionHelper.findField(CreativeModeInventoryScreen.class, "f_98508_");
-    private static final Field KEY_MAPPING_PRESS_TIME = ObfuscationReflectionHelper.findField(KeyMapping.class, "f_90818_");
-    private static final Field STONE_CUTTER_INDEX = ObfuscationReflectionHelper.findField(StonecutterScreen.class, "f_99306_");
-    private static final Field LOOM_START_ROW = ObfuscationReflectionHelper.findField(LoomScreen.class, "f_232823_");
+    private static final Method ABSTRACT_SELECTION_LIST_GET_ROW_TOP = ObfuscationReflectionHelper.findMethod(AbstractSelectionList.class, "getRowTop", int.class);
+    private static final Method ABSTRACT_SELECTION_LIST_GET_ROW_BOTTOM = ObfuscationReflectionHelper.findMethod(AbstractSelectionList.class, "getRowBottom", int.class);
+    private static final Method ABSTRACT_CONTAINER_SCREEN_CLICK_SLOT = ObfuscationReflectionHelper.findMethod(AbstractContainerScreen.class, "slotClicked", Slot.class, int.class, int.class, ClickType.class);
+    private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ObfuscationReflectionHelper.findField(AbstractSelectionList.class, "itemHeight");
+    private static final Field IMAGE_BUTTON_RESOURCE = ObfuscationReflectionHelper.findField(ImageButton.class, "sprites");
+    private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ObfuscationReflectionHelper.findField(CreativeModeInventoryScreen.class, "scrollOffs");
+    private static final Field KEY_MAPPING_PRESS_TIME = ObfuscationReflectionHelper.findField(KeyMapping.class, "clickCount");
+    private static final Field STONE_CUTTER_INDEX = ObfuscationReflectionHelper.findField(StonecutterScreen.class, "startIndex");
+    private static final Field LOOM_START_ROW = ObfuscationReflectionHelper.findField(LoomScreen.class, "startRow");
 
     public static int getAbstractListRowTop(AbstractSelectionList<?> list, int index)
     {
@@ -74,11 +75,11 @@ public class ReflectUtil
     }
 
     @Nullable
-    public static ResourceLocation getImageButtonResource(ImageButton button)
+    public static WidgetSprites getImageButtonResource(ImageButton button)
     {
         try
         {
-            return (ResourceLocation) IMAGE_BUTTON_RESOURCE.get(button);
+            return (WidgetSprites) IMAGE_BUTTON_RESOURCE.get(button);
         }
         catch(IllegalAccessException e)
         {

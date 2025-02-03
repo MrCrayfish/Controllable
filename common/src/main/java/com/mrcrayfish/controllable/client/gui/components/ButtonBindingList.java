@@ -134,28 +134,6 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             });
         }
 
-        private List<Component> getBindingTooltip(ButtonBinding binding)
-        {
-            if(Controllable.getInput().isControllerInUse())
-            {
-                List<Component> components = new ArrayList<>();
-                components.add(Component.translatable("controllable.gui.change_binding", ClientHelper.getButtonComponent(Buttons.A)).withStyle(ChatFormatting.YELLOW));
-                if(binding.getButton() != -1)
-                {
-                    components.add(Component.translatable("controllable.gui.clear_binding", ClientHelper.getButtonComponent(Buttons.X)).withStyle(ChatFormatting.YELLOW));
-                }
-                return components;
-            }
-
-            List<Component> components = new ArrayList<>();
-            components.add(Component.translatable("controllable.gui.change_binding", InputConstants.Type.MOUSE.getOrCreate(0).getDisplayName().copy().withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW));
-            if(binding.getButton() != -1)
-            {
-                components.add(Component.translatable("controllable.gui.clear_binding", InputConstants.Type.MOUSE.getOrCreate(1).getDisplayName().copy().withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW));
-            }
-            return components;
-        }
-
         @Override
         public Component getLabel()
         {
@@ -174,8 +152,6 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         {
             this.setLabelColor(this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor());
             super.render(graphics, index, top, left, width, itemHeight, mouseX, mouseY, selected, partialTick);
-            this.bindingButton.setTooltip(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
-            this.bindingButton.setTooltipDelay(400);
             this.bindingButton.setX(left + width - 65);
             this.bindingButton.setY(top - 1);
             this.bindingButton.render(graphics, mouseX, mouseY, partialTick);

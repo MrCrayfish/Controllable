@@ -24,7 +24,6 @@
         "client.jei.MouseUtilMixin",
         "client.jei.PageNavigationAccessor",
         "client.jei.RecipeCatalystsAccessor",
-        "client.jei.RecipeGuiLayoutsAccessor",
         "client.jei.RecipeGuiTabAccessor",
         "client.jei.RecipeGuiTabsAccessor",
         "client.jei.RecipesGuiAccessor",

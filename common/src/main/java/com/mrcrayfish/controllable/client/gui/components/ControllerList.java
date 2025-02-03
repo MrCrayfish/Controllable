@@ -25,7 +25,7 @@ import java.util.Objects;
  */
 public class ControllerList extends TabSelectionList<ControllerList.ControllerEntry>
 {
-    private static final ResourceLocation BEACON_TEXTURE = new ResourceLocation("textures/gui/container/beacon.png");
+    private static final ResourceLocation CHECKMARK = new ResourceLocation("container/beacon/confirm");
 
     private final ControllerManager manager;
     private final MutableComponent footerSubText;
@@ -94,7 +94,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             Font font = this.minecraft.font;
             int footerWidth = font.width(this.footerText);
             int footerSubWidth = font.width(this.footerSubText);
-            if(ScreenHelper.isMouseWithin(this.x0 + (this.width + footerWidth) / 2 - footerSubWidth, this.y1 + 4, footerSubWidth, 14, (int) mouseX, (int) mouseY))
+            if(ScreenHelper.isMouseWithin(this.getX() + (this.width + footerWidth) / 2 - footerSubWidth, this.getBottom() + 4, footerSubWidth, 14, (int) mouseX, (int) mouseY))
             {
                 Objects.requireNonNull(Minecraft.getInstance().screen).handleComponentClicked(this.footerSubText.getStyle());
             }
@@ -131,7 +131,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             if(ControllerList.this.getSelected() == this)
             {
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-                graphics.blit(BEACON_TEXTURE, left + 3, top + 3, 91, 224, 14, 12, 256, 256);
+                graphics.blitSprite(CHECKMARK, left + 3, top + 1, 18, 18);
             }
             else if(slotIndex % 2 != 0)
             {

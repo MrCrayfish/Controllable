@@ -10,7 +10,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -39,6 +42,7 @@ public abstract class ListMenuScreen extends Screen
     protected final Screen parent;
     protected final int itemHeight;
     protected EntryList list;
+    protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     protected List<Item> entries;
     protected FocusedEditBox activeTextField;
     protected FocusedEditBox searchTextField;
@@ -74,46 +78,66 @@ public abstract class ListMenuScreen extends Screen
         // Constructs a list of entries and adds them to an option list
         List<Item> entries = new ArrayList<>();
         this.constructEntries(entries);
-        this.entries = ImmutableList.copyOf(entries); //Should this still be immutable?
-        this.list = new EntryList(this.entries, this.calculateTop());
-        this.list.setRenderBackground(!ClientHelper.isPlayingGame());
-        this.addWidget(this.list);
+        this.list = new EntryList(entries);
+        this.layout.addToContents(this.list);
+        this.entries = entries;
 
-        // Adds a search text field to the top of the screen
-        this.searchTextField = new FocusedEditBox(this.font, this.width / 2 - 110, this.calculateSearchBarY(), 220, 20, Component.literal("Search"));
-        this.searchTextField.setResponder(s ->
-        {
-            this.updateSearchTextFieldSuggestion(s);
-            this.list.replaceEntries(s.isEmpty() ? this.entries : this.entries.stream().filter(item -> {
-                return item instanceof ISearchable searchable && searchable.getLabel().plainCopy().toString().toLowerCase(Locale.ENGLISH).contains(s.toLowerCase(Locale.ENGLISH));
-            }).collect(Collectors.toList()));
-            if(!s.isEmpty())
-            {
-                this.list.setScrollAmount(0);
-            }
-        });
-        this.addWidget(this.searchTextField);
-        this.searchTextField.visible = this.searchBarVisible;
+        LinearLayout headerLayout = this.layout.addToHeader(LinearLayout.vertical().spacing(4));
+        headerLayout.defaultCellSetting().alignHorizontallyCenter();
+        this.setupHeader(headerLayout);
+
+        LinearLayout footerLayout = this.layout.addToFooter(LinearLayout.horizontal().spacing(4));
+        footerLayout.defaultCellSetting().alignVerticallyMiddle();
+        this.setupFooter(footerLayout);
+
+        // Set the height according the layout height
+        headerLayout.arrangeElements();
+        this.layout.setHeaderHeight(headerLayout.getHeight() + 12);
+
+        footerLayout.arrangeElements();
+        this.layout.setFooterHeight(footerLayout.getHeight() + 11);
+
         this.updateSearchTextFieldSuggestion("");
+        this.layout.visitWidgets(this::addRenderableWidget);
+        this.repositionElements();
     }
 
-    private int calculateTop()
+    @Override
+    protected void repositionElements()
     {
-        int top = 30;
-        if(this.searchBarVisible)
-        {
-            top += 20;
-        }
+        this.list.setSize(this.width, this.height - this.layout.getFooterHeight() - this.layout.getHeaderHeight());
+        this.layout.arrangeElements();
+    }
+
+    protected void setupHeader(LinearLayout headerLayout)
+    {
+        headerLayout.addChild(new StringWidget(this.getTitle(), this.font));
         if(this.subTitle != null)
         {
-            top += 14;
+            headerLayout.addChild(new StringWidget(this.subTitle, this.font));
         }
-        return top;
+        // Adds a search text field to the top of the screen
+        this.searchTextField = headerLayout.addChild(new FocusedEditBox(this.font, 0, 0, 220, 20, Component.literal("Search")));
+        this.searchTextField.setResponder(s -> {
+            this.updateSearchTextFieldSuggestion(s);
+            this.filterItems(s);
+        });
     }
 
-    private int calculateSearchBarY()
+    protected void setupFooter(LinearLayout footerLayout) {}
+
+    private void filterItems(String s)
     {
-        return this.subTitle != null ? 36 : 22;
+        this.list.replaceEntries(s.isEmpty() ? this.entries : this.entries.stream()
+            .filter(item -> item instanceof ISearchable searchable && searchable.getLabel()
+                .getString()
+                .toLowerCase(Locale.ENGLISH)
+                .contains(s.toLowerCase(Locale.ENGLISH)))
+            .collect(Collectors.toList()));
+        if(!s.isEmpty())
+        {
+            this.list.setScrollAmount(0);
+        }
     }
 
     protected abstract void constructEntries(List<Item> entries);
@@ -143,27 +167,15 @@ public abstract class ListMenuScreen extends Screen
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        // Draws the background texture (dirt or custom texture)
-        this.renderBackground(graphics);
-
-        // Draws widgets manually since they are not buttons
-        this.list.render(graphics, mouseX, mouseY, partialTicks);
-        this.searchTextField.render(graphics, mouseX, mouseY, partialTicks);
-
-        // Draw title
-        int titleY = 7 + (!this.searchBarVisible && this.subTitle == null ? 5 : 0);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, titleY, 0xFFFFFF);
-
-        // Draw sub title
-        if(this.subTitle != null)
-        {
-            graphics.drawCenteredString(this.font, this.subTitle, this.width / 2, 21, 0xFFFFFF);
-        }
-
         super.render(graphics, mouseX, mouseY, partialTicks);
-
         // Gives a chance for child classes to set the active tooltip
         this.updateTooltip(mouseX, mouseY);
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    {
+        super.renderDirtBackground(graphics);
     }
 
     @Override
@@ -180,9 +192,9 @@ public abstract class ListMenuScreen extends Screen
 
     protected class EntryList extends ContainerObjectSelectionList<Item>
     {
-        public EntryList(List<Item> entries, int top)
+        public EntryList(List<Item> entries)
         {
-            super(Objects.requireNonNull(ListMenuScreen.this.minecraft), ListMenuScreen.this.width, ListMenuScreen.this.height, top, ListMenuScreen.this.height - 44, ListMenuScreen.this.itemHeight);
+            super(Objects.requireNonNull(ListMenuScreen.this.minecraft), 0, 0, 0, ListMenuScreen.this.itemHeight);
             entries.forEach(this::addEntry);
         }
 
@@ -220,10 +232,10 @@ public abstract class ListMenuScreen extends Screen
         }
 
         @Override
-        public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
         {
-            super.render(graphics, mouseX, mouseY, partialTicks);
-            this.renderToolTips(graphics, mouseX, mouseY);
+            super.renderWidget(graphics, mouseX, mouseY, partialTick);
+            this.renderToolTips(graphics, mouseX, mouseY); // TODO test
         }
 
         private void renderToolTips(GuiGraphics graphics, int mouseX, int mouseY)
@@ -236,17 +248,6 @@ public abstract class ListMenuScreen extends Screen
                     ListMenuScreen.this.setActiveTooltip(item.tooltip);
                 }
             }
-            this.children().forEach(item ->
-            {
-                item.children().forEach(o ->
-                {
-                    if(o instanceof Button)
-                    {
-                        //TODO figure out tooltips?
-                        //((Button) o).renderToolTip(poseStack, mouseX, mouseY);
-                    }
-                });
-            });
         }
 
         @Override

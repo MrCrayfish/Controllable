@@ -16,6 +16,7 @@ import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -30,6 +31,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.event.ForgeEventFactoryClient;
 import net.minecraftforge.client.gui.CreativeTabsScreenPage;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
@@ -57,72 +59,55 @@ public class ForgeClientHelper implements IClientHelper
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
         boolean[] cancelled = new boolean[]{false};
-        Screen.wrapScreenError(() ->
-        {
-            if(action == GLFW.GLFW_RELEASE)
-            {
+        Screen.wrapScreenError(() -> {
+            if(action == GLFW.GLFW_RELEASE) {
                 cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onScreenKeyReleasedPre(screen, key, -1, modifiers);
                 if(!cancelled[0]) cancelled[0] = screen.keyReleased(key, -1, modifiers);
                 if(!cancelled[0]) cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onScreenKeyReleasedPost(screen, key, -1, modifiers);
-            }
-            else if(action == GLFW.GLFW_PRESS)
-            {
+            } else if(action == GLFW.GLFW_PRESS) {
                 cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onScreenKeyPressedPre(screen, key, -1, modifiers);
                 if(!cancelled[0])  cancelled[0] = screen.keyPressed(key, -1, modifiers);
                 if(!cancelled[0]) cancelled[0] = net.minecraftforge.client.ForgeHooksClient.onScreenKeyPressedPost(screen, key, -1, modifiers);
             }
-
         }, "keyPressed event handler", screen.getClass().getCanonicalName());
         return cancelled[0];
     }
 
     @Override
-    @SuppressWarnings("UnstableApiUsage")
     public void sendMouseDrag(Screen screen, double dragX, double dragY, double finalMouseX, double finalMouseY, int activeButton)
     {
-        Screen.wrapScreenError(() ->
-        {
+        Screen.wrapScreenError(() -> {
             Minecraft mc = screen.getMinecraft();
             double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
             double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
-            if(net.minecraftforge.client.ForgeHooksClient.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
-            {
+            if(ForgeEventFactoryClient.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
                 return;
-            }
-            if(((GuiEventListener) screen).mouseDragged(finalMouseX, finalMouseY, mc.mouseHandler.activeButton, finalDragX, finalDragY))
-            {
+            if(screen.mouseDragged(finalMouseX, finalMouseY, mc.mouseHandler.activeButton, finalDragX, finalDragY))
                 return;
-            }
-            net.minecraftforge.client.ForgeHooksClient.onScreenMouseDragPost(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
+            ForgeEventFactoryClient.onScreenMouseDragPost(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
         }, "mouseDragged event handler", ((GuiEventListener) screen).getClass().getCanonicalName());
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     @Override
     public void sendScreenMouseClickPre(Screen screen, double mouseX, double mouseY, int button)
     {
-        Screen.wrapScreenError(() ->
-        {
-            boolean cancelled = ForgeHooksClient.onScreenMouseClickedPre(screen, mouseX, mouseY, button);
-            if(!cancelled)
-            {
+        Screen.wrapScreenError(() -> {
+            boolean cancelled = ForgeEventFactoryClient.onScreenMouseClickedPre(screen, mouseX, mouseY, button);
+            if(!cancelled) {
                 cancelled = screen.mouseClicked(mouseX, mouseY, button);
-                ForgeHooksClient.onScreenMouseClickedPost(screen, mouseX, mouseY, button, cancelled);
+                ForgeEventFactoryClient.onScreenMouseClickedPost(screen, mouseX, mouseY, button, cancelled);
             }
         }, "mouseClicked event handler", screen.getClass().getCanonicalName());
     }
 
     @Override
-    @SuppressWarnings("UnstableApiUsage")
     public void sendScreenMouseReleasedPre(Screen screen, double mouseX, double mouseY, int button)
     {
-        Screen.wrapScreenError(() ->
-        {
-            boolean cancelled = ForgeHooksClient.onScreenMouseReleasedPre(screen, mouseX, mouseY, button);
-            if(!cancelled)
-            {
+        Screen.wrapScreenError(() -> {
+            boolean cancelled = ForgeEventFactoryClient.onScreenMouseReleasedPre(screen, mouseX, mouseY, button);
+            if(!cancelled) {
                 cancelled = screen.mouseReleased(mouseX, mouseY, button);
-                ForgeHooksClient.onScreenMouseReleasedPost(screen, mouseX, mouseY, button, cancelled);
+                ForgeEventFactoryClient.onScreenMouseReleasedPost(screen, mouseX, mouseY, button, cancelled);
             }
         }, "mouseReleased event handler", screen.getClass().getCanonicalName());
     }
@@ -148,7 +133,7 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public int getAbstractListTop(AbstractSelectionList<?> list)
     {
-        return list.getTop();
+        return list.getY();
     }
 
     @Override
@@ -291,7 +276,7 @@ public class ForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public ResourceLocation getImageButtonResource(ImageButton btn)
+    public WidgetSprites getImageButtonResource(ImageButton btn)
     {
         return ReflectUtil.getImageButtonResource(btn);
     }

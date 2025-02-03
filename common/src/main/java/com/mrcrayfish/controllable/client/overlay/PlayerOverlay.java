@@ -26,7 +26,7 @@ public class PlayerOverlay implements IOverlay
         {
             if(!EventHelper.postRenderMiniPlayer())
             {
-                InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, 20, 45, 20, 0, 0, mc.player);
+                InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, 0, 0, 50, 70, 20, 0.0625F, 25, 35, mc.player);
             }
         }
     }

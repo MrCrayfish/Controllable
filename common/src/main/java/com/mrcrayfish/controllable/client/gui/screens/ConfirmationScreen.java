@@ -14,7 +14,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Function;
 
@@ -72,7 +72,6 @@ public class ConfirmationScreen extends Screen
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, partialTicks);
 
         List<FormattedCharSequence> lines = this.font.split(this.message, 300);

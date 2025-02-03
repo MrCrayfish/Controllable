@@ -1,14 +1,13 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.binding.BindingRegistry;
-import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.Icons;
 import com.mrcrayfish.controllable.client.SneakMode;
 import com.mrcrayfish.controllable.client.SprintMode;
+import com.mrcrayfish.controllable.client.binding.BindingRegistry;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.components.ButtonBindingList;
 import com.mrcrayfish.controllable.client.gui.components.ControllerList;
 import com.mrcrayfish.controllable.client.gui.components.TabOptionEnumItem;
@@ -36,9 +35,9 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -51,6 +50,7 @@ public class SettingsScreen extends Screen
     @Nullable
     private final Screen parent;
     private final TabManager tabManager = new TabManager(this::addRenderableWidget, this::removeWidget);
+    private final List<Runnable> tickers = new ArrayList<>();
     private ScreenRectangle tabArea;
     private TabNavigationBar navigationBar;
     private Button doneButton;
@@ -80,7 +80,8 @@ public class SettingsScreen extends Screen
     @Override
     protected void init()
     {
-        this.navigationBar = TabNavigationBar.builder(this.tabManager, this.width).addTabs(new ControllerTab(), new SettingsTab(), new BindingsTab()).build();
+        this.tickers.clear();
+        this.navigationBar = TabNavigationBar.builder(this.tabManager, this.width).addTabs(new ControllerTab(this), new SettingsTab(), new BindingsTab()).build();
         this.addRenderableWidget(this.navigationBar);
         this.navigationBar.selectTab(this.initialTab, false);
         this.doneButton = this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (btn) -> this.minecraft.setScreen(this.parent)).pos((this.width - 200) / 2, this.height - 25).width(200).build());
@@ -106,9 +107,9 @@ public class SettingsScreen extends Screen
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scroll)
+    public boolean mouseScrolled(double mouseX, double mouseY, double xScroll, double yScroll)
     {
-        if(super.mouseScrolled(mouseX, mouseY, scroll)) {
+        if(super.mouseScrolled(mouseX, mouseY, xScroll, yScroll)) {
             return true;
         }
 
@@ -118,14 +119,13 @@ public class SettingsScreen extends Screen
 
         List<AbstractWidget> widgets = new ArrayList<>();
         currentTab.visitChildren(widgets::add);
-        return widgets.stream().filter(widget -> widget.isMouseOver(mouseX, mouseY) && widget.mouseScrolled(mouseX, mouseY, scroll)).count() > 0;
+        return widgets.stream().filter(widget -> widget.isMouseOver(mouseX, mouseY) && widget.mouseScrolled(mouseX, mouseY, xScroll, yScroll)).count() > 0;
     }
 
     @Override
     public void tick()
     {
-        this.tabManager.tickCurrent();
-
+        this.tickers.forEach(Runnable::run);
         if(this.isWaitingForButtonInput())
         {
             this.remainingTime--;
@@ -139,7 +139,6 @@ public class SettingsScreen extends Screen
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
-        this.renderDirtBackground(graphics);
         boolean waitingForInput = this.isWaitingForButtonInput();
         super.render(graphics, !waitingForInput ? mouseX : -1, !waitingForInput ? mouseY : -1, partialTick);
         if(waitingForInput)
@@ -156,6 +155,12 @@ public class SettingsScreen extends Screen
             graphics.drawCenteredString(this.font, inputCancelLabel, this.width / 2, this.height / 2 + 3, 0xFFFFFFFF);
             stack.popPose();
         }
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    {
+        super.renderDirtBackground(graphics);
     }
 
     @Override
@@ -211,18 +216,13 @@ public class SettingsScreen extends Screen
 
         private final ControllerList list;
 
-        public ControllerTab()
+        public ControllerTab(SettingsScreen screen)
         {
             super(TITLE);
             GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
             this.list = new ControllerList(SettingsScreen.this.minecraft, 24);
             rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, this.list));
-        }
-
-        @Override
-        public void tick()
-        {
-            this.list.tick();
+            screen.tickers.add(list::tick);
         }
     }
 
