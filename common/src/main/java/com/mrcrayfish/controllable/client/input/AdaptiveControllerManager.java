@@ -46,6 +46,7 @@ public abstract class AdaptiveControllerManager
     protected Controller activeController;
     protected Map<Number, Pair<Integer, String>> controllers = new HashMap<>();
     protected List<DeviceInfo> lastDevices = new ArrayList<>();
+    protected boolean ready = false;
 
     public abstract void init();
 
@@ -93,7 +94,7 @@ public abstract class AdaptiveControllerManager
         }
 
         // If no controller is active and auto select is enabled, connect to the first controller
-        if(activeController == null && Config.CLIENT.options.autoSelect.get())
+        if(this.ready && activeController == null && Config.CLIENT.options.autoSelect.get())
         {
             activeController = this.connectToBestGameController();
             this.sendControllerToast(true, activeController);
@@ -244,6 +245,7 @@ public abstract class AdaptiveControllerManager
         {
             this.connectToBestGameController();
         }
+        this.ready = true;
     }
 
     public List<DeviceInfo> getLastDevices()
