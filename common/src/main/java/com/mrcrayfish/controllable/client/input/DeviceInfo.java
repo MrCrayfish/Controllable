@@ -16,10 +16,12 @@ public record DeviceInfo(@Nullable String name,
                          int type,
                          int vendor,
                          int product,
+                         int productVersion,
+                         int firmware,
                          int buttons,
                          int axes)
 {
-    public static final DeviceInfo EMPTY = new DeviceInfo(null, null, null, -1, -1, -1, -1, -1);
+    public static final DeviceInfo EMPTY = new DeviceInfo(null, null, null, -1, -1, -1, -1, -1, -1, -1);
 
     public static @Nullable DeviceInfo fromJson(JsonElement element)
     {
@@ -33,9 +35,11 @@ public record DeviceInfo(@Nullable String name,
         int type = GsonHelper.getAsInt(object, "type", -1);
         int vendor = GsonHelper.getAsInt(object, "vendor", -1);
         int product = GsonHelper.getAsInt(object, "product", -1);
+        int productVersion = GsonHelper.getAsInt(object, "product_version", -1);
+        int firmware = GsonHelper.getAsInt(object, "firmware", -1);
         int buttons = GsonHelper.getAsInt(object, "buttons", -1);
         int axes = GsonHelper.getAsInt(object, "axes", -1);
-        return new DeviceInfo(name, guid, serial, type, vendor, product, buttons, axes);
+        return new DeviceInfo(name, guid, serial, type, vendor, product, productVersion, firmware, buttons, axes);
     }
 
     public JsonObject toJson()
@@ -47,6 +51,8 @@ public record DeviceInfo(@Nullable String name,
         if(this.type != -1) object.addProperty("type", this.type);
         if(this.vendor != -1) object.addProperty("vendor", this.vendor);
         if(this.product != -1) object.addProperty("product", this.product);
+        if(this.productVersion != -1) object.addProperty("product_version", this.productVersion);
+        if(this.firmware != -1) object.addProperty("firmware", this.firmware);
         if(this.buttons != -1) object.addProperty("buttons", this.buttons);
         if(this.axes != -1) object.addProperty("axes", this.axes);
         return object;
@@ -68,6 +74,12 @@ public record DeviceInfo(@Nullable String name,
             return false;
 
         if(this.product != that.product)
+            return false;
+
+        if(this.productVersion != that.productVersion)
+            return false;
+
+        if(this.firmware != that.firmware)
             return false;
 
         if(this.buttons != that.buttons)

@@ -165,7 +165,7 @@ public class GLFWController extends Controller
         {
             String name = GLFW.glfwGetGamepadName(this.deviceIndex);
             String guid = GLFW.glfwGetJoystickGUID(this.deviceIndex);
-            this.info = new DeviceInfo(name, guid, null, -1, -1, -1, -1, -1);
+            this.info = new DeviceInfo(name, guid, null, -1, -1, -1, -1, -1, -1, -1);
         }
         return this.info;
     }

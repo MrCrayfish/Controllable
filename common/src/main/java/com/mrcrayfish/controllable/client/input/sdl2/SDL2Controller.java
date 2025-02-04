@@ -198,9 +198,11 @@ public class SDL2Controller extends Controller
             int type = SDL_GameControllerGetType(this.controller);
             short vendor = SDL_GameControllerGetVendor(this.controller);
             short product = SDL_GameControllerGetProduct(this.controller);
+            short productVersion = SDL_GameControllerGetProductVersion(this.controller);
+            short firmware = SDL_GameControllerGetFirmwareVersion(this.controller);
             int buttons = SDL_JoystickNumButtons(joystick);
             int axes = SDL_JoystickNumAxes(joystick);
-            this.info = new DeviceInfo(name, guid, serial, type, vendor, product, buttons, axes);
+            this.info = new DeviceInfo(name, guid, serial, type, vendor, product, productVersion, firmware, buttons, axes);
         }
         return this.info;
     }
