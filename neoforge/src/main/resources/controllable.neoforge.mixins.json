@@ -7,7 +7,6 @@
     "refmap": "controllable.refmap.json",
     "client": [
         "client.NeoForgeRecipeBookPageMixin",
-        "client.NeoForgeClientHooksMixin",
         "client.NeoForgeKeyMappingMixin"
     ],
     "injectors": {

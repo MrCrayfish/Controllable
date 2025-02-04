@@ -6,7 +6,6 @@
     "compatibilityLevel": "JAVA_21",
     "refmap": "controllable.refmap.json",
     "client": [
-        "client.FabricGameRendererMixin",
         "client.FabricGuiMixin",
         "client.FabricKeyMappingMixin",
         "client.FabricMinecraftMixin",
