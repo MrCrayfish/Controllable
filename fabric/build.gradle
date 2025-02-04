@@ -13,7 +13,8 @@ dependencies {
     modImplementation "com.mrcrayfish:framework-fabric:${minecraft_version}-${framework_version}"
     modImplementation "dev.architectury:architectury-fabric:${architectury_api_version}"
     modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
-    modImplementation "dev.emi:emi-fabric:${emi_version}"
+    modCompileOnly "dev.emi:emi-fabric:${emi_version}"
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
     library include("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
         transitive(false)
     }

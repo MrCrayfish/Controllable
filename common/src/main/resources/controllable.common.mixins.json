@@ -22,7 +22,8 @@
         "client.jei.IngredientGridWithNavigationMixin",
         "client.jei.IngredientListOverlayMixin",
         "client.jei.MouseUtilMixin",
-        "client.jei.PageNavigationMixin"
+        "client.jei.PageNavigationMixin",
+        "client.rei.PointHelperMixin"
     ],
     "injectors": {
         "defaultRequire": 1

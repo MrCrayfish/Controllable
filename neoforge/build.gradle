@@ -67,7 +67,10 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 
     // EMI
-    implementation "dev.emi:emi-neoforge:${emi_version}"
+    compileOnly "dev.emi:emi-neoforge:${emi_version}"
+
+    // Roughly Enough Items
+    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
 
     // Controllable SDL (https://github.com/MrCrayfish/ControllableSDL)
     library jarJar("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {

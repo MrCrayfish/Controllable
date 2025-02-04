@@ -33,6 +33,7 @@ import com.mrcrayfish.controllable.client.util.MouseHooks;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.integration.EmiSupport;
 import com.mrcrayfish.controllable.integration.JeiSupport;
+import com.mrcrayfish.controllable.integration.ReiSupport;
 import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
@@ -637,6 +638,11 @@ public class InputHandler
             points.addAll(EmiSupport.getNavigationPoints(screen));
         }
 
+        if(Controllable.isReiLoaded() && ClientHelper.isPlayingGame())
+        {
+            points.addAll(ReiSupport.getNavigationPoints(screen));
+        }
+
         // Gather any additional points from event
         ControllerEvents.GATHER_NAVIGATION_POINTS.post().handle(points);
 
@@ -683,8 +689,6 @@ public class InputHandler
     {
         if(widget == null || widget.isHovered() || !widget.visible || !widget.active)
             return;
-        int posX = widget.getX() + widget.getWidth() / 2;
-        int posY = widget.getY() + widget.getHeight() / 2;
         if(list != null && entry != null)
         {
             points.add(new ListWidgetNavigationPoint(widget, list, entry));

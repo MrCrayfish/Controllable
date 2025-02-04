@@ -22,6 +22,7 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-lib:${jei_version}"
     compileOnly "com.mrcrayfish:controllable-sdl:${controllable_sdl_version}"
     compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.7'
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.4.1'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.4.1'
