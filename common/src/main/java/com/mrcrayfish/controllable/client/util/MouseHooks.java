@@ -2,9 +2,11 @@ package com.mrcrayfish.controllable.client.util;
 
 import com.mojang.blaze3d.Blaze3D;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.integration.EmiSupport;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 
 /**
  * Author: MrCrayfish
@@ -24,6 +26,13 @@ public class MouseHooks
         {
             int screenCursorX = Controllable.getCursor().getScreenX();
             int screenCursorY = Controllable.getCursor().getScreenY();
+            if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
+            {
+                if(EmiSupport.invokeMouseClick(button, screenCursorX, screenCursorY))
+                {
+                    return;
+                }
+            }
             invokeMouseClick(screen, button, screenCursorX, screenCursorY);
         }
     }
@@ -60,6 +69,13 @@ public class MouseHooks
         {
             int screenCursorX = Controllable.getCursor().getScreenX();
             int screenCursorY = Controllable.getCursor().getScreenY();
+            if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
+            {
+                if(EmiSupport.invokeMouseReleased(button, screenCursorX, screenCursorY))
+                {
+                    return;
+                }
+            }
             invokeMouseReleased(screen, button, screenCursorX, screenCursorY);
         }
     }
@@ -99,6 +115,16 @@ public class MouseHooks
             double lastMouseEventTime = ClientServices.CLIENT.getLastMouseEventTime();
             if(activeMouseButton != -1 && lastMouseEventTime > 0)
             {
+                if(screen instanceof AbstractContainerScreen<?>)
+                {
+                    if(Controllable.isEmiLoaded())
+                    {
+                        if(EmiSupport.invokeMouseDragged(activeMouseButton, screenCursorX, screenCursorY, deltaX, deltaY))
+                        {
+                            return;
+                        }
+                    }
+                }
                 ClientServices.CLIENT.sendMouseDrag(screen, deltaX, deltaY, screenCursorX, screenCursorY, activeMouseButton);
             }
         }

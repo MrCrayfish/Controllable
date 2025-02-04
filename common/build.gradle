@@ -17,9 +17,11 @@ neoForge {
 
 dependencies {
     compileOnly "com.mrcrayfish:framework-common:${minecraft_version}-${framework_version}"
-    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-common:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-gui:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-lib:${jei_version}"
     compileOnly "com.mrcrayfish:controllable-sdl:${controllable_sdl_version}"
-
+    compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.7'
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.4.1'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.4.1'

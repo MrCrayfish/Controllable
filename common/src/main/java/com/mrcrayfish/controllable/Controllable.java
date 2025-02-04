@@ -28,7 +28,8 @@ public class Controllable
     private static final ScrollingHandler SCROLLING_HANDLER = new ScrollingHandler();
     private static final RumbleHandler RUMBLE_HANDLER = new RumbleHandler();
 
-    private static final boolean JEI_LOADED = Utils.isModLoaded("jei");
+    private static final boolean EMI_LOADED = Utils.isModLoaded("emi");
+    private static final boolean JEI_LOADED = Utils.isModLoaded("jei") && !EMI_LOADED;
 
     public static void init()
     {
@@ -74,6 +75,11 @@ public class Controllable
     public static boolean isJeiLoaded()
     {
         return JEI_LOADED;
+    }
+
+    public static boolean isEmiLoaded()
+    {
+        return EMI_LOADED;
     }
 
     public static AdaptiveControllerManager getControllerManager()

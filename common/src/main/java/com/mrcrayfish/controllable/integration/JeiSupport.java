@@ -46,13 +46,13 @@ public class JeiSupport
 
                 PageNavigation navigation = ((IngredientGridWithNavigationMixin) ingredientGridWithNavigation).controllableGetNavigation();
                 GuiIconButton backButton = ((PageNavigationMixin) navigation).controllableGetBackButton();
-                points.add(new WidgetNavigationPoint(backButton.getX() + backButton.getWidth() / 2.0, backButton.getY() + backButton.getHeight() / 2.0, backButton));
+                points.add(new WidgetNavigationPoint(backButton));
                 GuiIconButton nextButton = ((PageNavigationMixin) navigation).controllableGetNextButton();
-                points.add(new WidgetNavigationPoint(nextButton.getX() + nextButton.getWidth() / 2.0, nextButton.getY() + nextButton.getHeight() / 2.0, nextButton));
+                points.add(new WidgetNavigationPoint(nextButton));
 
                 GuiIconToggleButton configToggleButton = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).controllableGetConfigButton();
                 GuiIconButton configButton = ((GuiIconToggleButtonMixin) configToggleButton).controllableGetButton();
-                points.add(new WidgetNavigationPoint(configButton.getX() + configButton.getWidth() / 2.0, configButton.getY() + configButton.getHeight() / 2.0, nextButton));
+                points.add(new WidgetNavigationPoint(nextButton));
             }
         });
         return points;

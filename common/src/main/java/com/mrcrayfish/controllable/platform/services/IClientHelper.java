@@ -19,7 +19,6 @@ import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
@@ -45,8 +44,6 @@ public interface IClientHelper
     void sendScreenMouseReleasedPre(Screen screen, double mouseX, double mouseY, int button);
 
     List<GuiMessage.Line> getChatTrimmedMessages(ChatComponent chat);
-
-    List<NavigationPoint> getJeiNavigationPoints();
 
     int getMinecraftFramerateLimit();
 

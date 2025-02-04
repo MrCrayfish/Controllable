@@ -134,7 +134,7 @@ public class RadialMenu
         }
         else
         {
-            this.actions.addAll(this.getActions());
+            this.actions.addAll(this.createDefaultActions());
             this.save();
         }
 

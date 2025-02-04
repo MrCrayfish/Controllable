@@ -31,6 +31,8 @@ import com.mrcrayfish.controllable.client.util.EventHelper;
 import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable.client.util.MouseHooks;
 import com.mrcrayfish.controllable.event.ControllerEvents;
+import com.mrcrayfish.controllable.integration.EmiSupport;
+import com.mrcrayfish.controllable.integration.JeiSupport;
 import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
@@ -617,9 +619,7 @@ public class InputHandler
         {
             if(widget == null || widget.isHovered() || !widget.visible || !widget.active)
                 continue;
-            int posX = widget.getX() + widget.getWidth() / 2;
-            int posY = widget.getY() + widget.getHeight() / 2;
-            points.add(new WidgetNavigationPoint(posX, posY, widget));
+            points.add(new WidgetNavigationPoint(widget));
         }
 
         if(screen instanceof CreativeModeInventoryScreen creativeScreen)
@@ -629,7 +629,12 @@ public class InputHandler
 
         if(Controllable.isJeiLoaded() && ClientHelper.isPlayingGame())
         {
-            points.addAll(ClientServices.CLIENT.getJeiNavigationPoints());
+            points.addAll(JeiSupport.getNavigationPoints());
+        }
+
+        if(Controllable.isEmiLoaded() && ClientHelper.isPlayingGame())
+        {
+            points.addAll(EmiSupport.getNavigationPoints(screen));
         }
 
         // Gather any additional points from event
@@ -686,7 +691,7 @@ public class InputHandler
         }
         else
         {
-            points.add(new WidgetNavigationPoint(posX, posY, widget));
+            points.add(new WidgetNavigationPoint(widget));
         }
     }
 

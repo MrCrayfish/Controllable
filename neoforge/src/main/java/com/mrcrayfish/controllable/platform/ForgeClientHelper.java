@@ -5,7 +5,6 @@ import com.mrcrayfish.controllable.client.binding.context.BindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
-import com.mrcrayfish.controllable.integration.JeiSupport;
 import com.mrcrayfish.controllable.platform.services.IClientHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.GuiMessage;
@@ -26,18 +25,15 @@ import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.gui.CreativeTabsScreenPage;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -124,14 +120,6 @@ public class ForgeClientHelper implements IClientHelper
     public List<GuiMessage.Line> getChatTrimmedMessages(ChatComponent chat)
     {
         return chat.trimmedMessages;
-    }
-
-    @Override
-    public List<NavigationPoint> getJeiNavigationPoints()
-    {
-        if(!ModList.get().isLoaded("jei"))
-            return Collections.emptyList();
-        return JeiSupport.getNavigationPoints();
     }
 
     @Override

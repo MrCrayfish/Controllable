@@ -5,11 +5,9 @@ import com.mrcrayfish.controllable.client.binding.context.GlobalContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
-import com.mrcrayfish.controllable.integration.JeiSupport;
 import com.mrcrayfish.controllable.platform.services.IClientHelper;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -27,7 +25,6 @@ import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
@@ -35,7 +32,6 @@ import net.minecraft.world.item.CreativeModeTabs;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -87,14 +83,6 @@ public class FabricClientHelper implements IClientHelper
     public List<GuiMessage.Line> getChatTrimmedMessages(ChatComponent chat)
     {
         return chat.trimmedMessages;
-    }
-
-    @Override
-    public List<NavigationPoint> getJeiNavigationPoints()
-    {
-        if(!FabricLoader.getInstance().isModLoaded("jei"))
-            return Collections.emptyList();
-        return JeiSupport.getNavigationPoints();
     }
 
     @Override

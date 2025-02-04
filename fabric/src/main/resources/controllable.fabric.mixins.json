@@ -10,13 +10,7 @@
         "client.FabricGuiMixin",
         "client.FabricKeyMappingMixin",
         "client.FabricMinecraftMixin",
-        "client.FabricRecipeBookPageMixin",
-        "client.jei.GuiIconToggleButtonMixin",
-        "client.jei.IngredientGridMixin",
-        "client.jei.IngredientGridWithNavigationMixin",
-        "client.jei.IngredientListOverlayMixin",
-        "client.jei.MouseUtilMixin",
-        "client.jei.PageNavigationMixin"
+        "client.FabricRecipeBookPageMixin"
     ],
     "injectors": {
         "defaultRequire": 1

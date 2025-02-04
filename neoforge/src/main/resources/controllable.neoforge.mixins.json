@@ -8,13 +8,7 @@
     "client": [
         "client.NeoForgeRecipeBookPageMixin",
         "client.NeoForgeClientHooksMixin",
-        "client.NeoForgeKeyMappingMixin",
-        "client.jei.GuiIconToggleButtonMixin",
-        "client.jei.IngredientGridMixin",
-        "client.jei.IngredientGridWithNavigationMixin",
-        "client.jei.IngredientListOverlayMixin",
-        "client.jei.MouseUtilMixin",
-        "client.jei.PageNavigationMixin"
+        "client.NeoForgeKeyMappingMixin"
     ],
     "injectors": {
         "defaultRequire": 1

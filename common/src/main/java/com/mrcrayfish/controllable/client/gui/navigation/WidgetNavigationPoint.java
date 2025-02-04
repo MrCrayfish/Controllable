@@ -12,9 +12,9 @@ public class WidgetNavigationPoint extends NavigationPoint
 {
     private final AbstractWidget widget;
 
-    public WidgetNavigationPoint(double x, double y, AbstractWidget widget)
+    public WidgetNavigationPoint(AbstractWidget widget)
     {
-        super(x, y, Type.WIDGET);
+        super(widget.getX() + widget.getWidth() / 2.0, widget.getY() + widget.getHeight() / 2.0, Type.WIDGET);
         this.widget = widget;
     }
 

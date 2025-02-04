@@ -16,7 +16,13 @@
         "client.RecipeBookComponentAccessor",
         "client.RecipeBookPageAccessor",
         "client.RecipeBookPageMixin",
-        "client.TimerAccessor"
+        "client.TimerAccessor",
+        "client.jei.GuiIconToggleButtonMixin",
+        "client.jei.IngredientGridMixin",
+        "client.jei.IngredientGridWithNavigationMixin",
+        "client.jei.IngredientListOverlayMixin",
+        "client.jei.MouseUtilMixin",
+        "client.jei.PageNavigationMixin"
     ],
     "injectors": {
         "defaultRequire": 1
