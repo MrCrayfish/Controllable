@@ -134,7 +134,6 @@ public abstract class AdaptiveControllerManager
                 this.activeController = controller;
             }
         }
-        this.updateLastDevices();
         return true;
     }
 
@@ -252,7 +251,7 @@ public abstract class AdaptiveControllerManager
         return this.lastDevices;
     }
 
-    private void updateLastDevices()
+    public void updateLastDevices()
     {
         this.lastDevices.clear();
         if(this.activeController != null)

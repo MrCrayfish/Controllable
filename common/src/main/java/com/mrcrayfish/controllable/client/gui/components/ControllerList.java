@@ -246,6 +246,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             {
                 // TODO toast
             }
+            manager.updateLastDevices();
         }
 
         private State getState()
