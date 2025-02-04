@@ -52,7 +52,7 @@ public class MouseHooks
         {
             ClientServices.CLIENT.setActiveMouseButton(button);
             ClientServices.CLIENT.setLastMouseEventTime(Blaze3D.getTime());
-            ClientServices.CLIENT.sendScreenMouseClickPre(screen, cursorScreenX, cursorScreenY, button);
+            ClientServices.CLIENT.sendScreenMouseClick(screen, cursorScreenX, cursorScreenY, button);
         }
     }
 
@@ -94,7 +94,7 @@ public class MouseHooks
         if(screen != null)
         {
             ClientServices.CLIENT.setActiveMouseButton(-1);
-            ClientServices.CLIENT.sendScreenMouseReleasedPre(screen, cursorScreenX, cursorScreenY, button);
+            ClientServices.CLIENT.sendScreenMouseReleased(screen, cursorScreenX, cursorScreenY, button);
         }
     }
 

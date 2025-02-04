@@ -64,6 +64,10 @@ repositories {
         name = "TerraformersMC"
         url = "https://maven.terraformersmc.com/"
     }
+    maven {
+        name = "RoughlyEnoughItems"
+        url = "https://maven.shedaniel.me"
+    }
 }
 
 configurations {

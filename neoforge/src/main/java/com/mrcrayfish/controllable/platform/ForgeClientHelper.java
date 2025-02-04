@@ -95,7 +95,7 @@ public class ForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public void sendScreenMouseClickPre(Screen screen, double mouseX, double mouseY, int button)
+    public void sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button)
     {
         Screen.wrapScreenError(() -> {
             if(!ClientHooks.onScreenMouseClickedPre(screen, mouseX, mouseY, button)){
@@ -106,7 +106,7 @@ public class ForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public void sendScreenMouseReleasedPre(Screen screen, double mouseX, double mouseY, int button)
+    public void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
     {
         Screen.wrapScreenError(() -> {
             if(!ClientHooks.onScreenMouseReleasedPre(screen, mouseX, mouseY, button)) {
