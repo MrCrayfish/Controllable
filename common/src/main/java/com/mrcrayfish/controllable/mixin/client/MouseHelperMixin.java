@@ -37,7 +37,7 @@ public abstract class MouseHelperMixin
      * normally possible. To fix that, as soon as we detect movement from the mouse, we make it
      * appear again.
      */
-    @Inject(method = "handleAccumulatedMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;turnPlayer(D)V"), cancellable = true)
+    @Inject(method = "handleAccumulatedMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MouseHandler;isMouseGrabbed()Z"), cancellable = true)
     private void controllableBeforeUpdateLook(CallbackInfo ci)
     {
         Minecraft minecraft = Minecraft.getInstance();
