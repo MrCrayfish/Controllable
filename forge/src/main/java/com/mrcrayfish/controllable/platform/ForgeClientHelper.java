@@ -99,7 +99,7 @@ public class ForgeClientHelper implements IClientHelper
 
     @SuppressWarnings("UnstableApiUsage")
     @Override
-    public void sendScreenMouseClickPre(Screen screen, double mouseX, double mouseY, int button)
+    public void sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button)
     {
         Screen.wrapScreenError(() ->
         {
@@ -114,7 +114,7 @@ public class ForgeClientHelper implements IClientHelper
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
-    public void sendScreenMouseReleasedPre(Screen screen, double mouseX, double mouseY, int button)
+    public void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
     {
         Screen.wrapScreenError(() ->
         {

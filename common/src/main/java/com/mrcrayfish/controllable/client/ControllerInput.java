@@ -1543,7 +1543,7 @@ public class ControllerInput
         {
             ClientServices.CLIENT.setActiveMouseButton(button);
             ClientServices.CLIENT.setLastMouseEventTime(Blaze3D.getTime());
-            ClientServices.CLIENT.sendScreenMouseClickPre(screen, cursorX, cursorY, button);
+            ClientServices.CLIENT.sendScreenMouseClick(screen, cursorX, cursorY, button);
         }
     }
 
@@ -1576,7 +1576,7 @@ public class ControllerInput
         if(screen != null)
         {
             ClientServices.CLIENT.setActiveMouseButton(-1);
-            ClientServices.CLIENT.sendScreenMouseReleasedPre(screen, cursorX, cursorY, button);
+            ClientServices.CLIENT.sendScreenMouseReleased(screen, cursorX, cursorY, button);
         }
     }
 

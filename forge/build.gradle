@@ -96,9 +96,9 @@ dependencies {
     compileOnly fg.deobf("dev.emi:emi-forge:${emi_version}")
 
     // Roughly Enough Items (fg.deobf isn't transitive)
-    implementation fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
-    implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}")
-    implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:${rei_version}")
+    compileOnly fg.deobf("dev.architectury:architectury-forge:${architectury_api_version}")
+    compileOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}")
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:${rei_version}")
 
     // SDL2 Library
     library jarJar("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
