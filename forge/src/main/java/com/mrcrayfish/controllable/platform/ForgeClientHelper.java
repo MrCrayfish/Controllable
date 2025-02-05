@@ -89,7 +89,7 @@ public class ForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public void sendScreenMouseClickPre(Screen screen, double mouseX, double mouseY, int button)
+    public void sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button)
     {
         Screen.wrapScreenError(() -> {
             boolean cancelled = ForgeEventFactoryClient.onScreenMouseClickedPre(screen, mouseX, mouseY, button);
@@ -101,7 +101,8 @@ public class ForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public void sendScreenMouseReleasedPre(Screen screen, double mouseX, double mouseY, int button)
+    @SuppressWarnings("UnstableApiUsage")
+    public void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
     {
         Screen.wrapScreenError(() -> {
             boolean cancelled = ForgeEventFactoryClient.onScreenMouseReleasedPre(screen, mouseX, mouseY, button);

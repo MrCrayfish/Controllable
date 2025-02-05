@@ -1,13 +1,16 @@
 package com.mrcrayfish.controllable.platform;
 
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingContext;
 import com.mrcrayfish.controllable.client.binding.IBindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
+import com.mrcrayfish.controllable.integration.ArchitecturySupport;
 import com.mrcrayfish.controllable.platform.services.IClientHelper;
-import dev.architectury.event.events.client.ClientScreenInputEvent;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
 import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
@@ -28,7 +31,6 @@ import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
@@ -38,27 +40,47 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FabricClientHelper implements IClientHelper
 {
     @Override
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
-        boolean[] handled = new boolean[]{false};
+        AtomicBoolean handled = new AtomicBoolean(false);
         Screen.wrapScreenError(() -> {
-            Minecraft mc = Minecraft.getInstance();
             if(action == GLFW.GLFW_RELEASE) {
-                handled[0] = ClientScreenInputEvent.KEY_RELEASED_PRE.invoker().keyReleased(mc, screen, key, -1, modifiers).isPresent();
-                if(!handled[0]) handled[0] = screen.keyReleased(key, -1, modifiers);
-                if(!handled[0]) handled[0] = ClientScreenInputEvent.KEY_RELEASED_POST.invoker().keyReleased(mc, screen, key, -1, modifiers).isPresent();
+                if(!ScreenKeyboardEvents.allowKeyRelease(screen).invoker().allowKeyRelease(screen, key, -1, modifiers)) {
+                    handled.set(true);
+                    return;
+                }
+                ScreenKeyboardEvents.beforeKeyRelease(screen).invoker().beforeKeyRelease(screen, key, -1, modifiers);
+                if(Controllable.isArchitecturyLoaded()) {
+                    if(ArchitecturySupport.sendScreenKeyReleased(screen, key, -1, modifiers)) {
+                        handled.set(true);
+                    }
+                } else if(screen.keyReleased(key, -1, modifiers)) {
+                    handled.set(true);
+                }
+                ScreenKeyboardEvents.afterKeyRelease(screen).invoker().afterKeyRelease(screen, key, -1, modifiers);
             } else if(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT) {
                 screen.afterKeyboardAction();
-                handled[0] = ClientScreenInputEvent.KEY_PRESSED_PRE.invoker().keyPressed(mc, screen, key, -1, modifiers).isPresent();
-                if(!handled[0]) handled[0] = screen.keyPressed(key, -1, modifiers);
-                if(!handled[0]) handled[0] = ClientScreenInputEvent.KEY_PRESSED_POST.invoker().keyPressed(mc, screen, key, -1, modifiers).isPresent();
+                if(!ScreenKeyboardEvents.allowKeyPress(screen).invoker().allowKeyPress(screen, key, -1, modifiers)) {
+                    handled.set(true);
+                    return;
+                }
+                ScreenKeyboardEvents.beforeKeyPress(screen).invoker().beforeKeyPress(screen, key, -1, modifiers);
+                if(Controllable.isArchitecturyLoaded()) {
+                    if(ArchitecturySupport.sendScreenKeyPressed(screen, key, -1, modifiers)) {
+                        handled.set(true);
+                    }
+                } else if(screen.keyPressed(key, -1, modifiers)) {
+                    handled.set(true);
+                }
+                ScreenKeyboardEvents.afterKeyPress(screen).invoker().afterKeyPress(screen, key, -1, modifiers);
             }
-        }, "keyPressed event handler", screen.getClass().getCanonicalName());
-        return handled[0];
+        }, "Controllable keyPressed event handler", screen.getClass().getCanonicalName());
+        return handled.get();
     }
 
     @Override
@@ -68,32 +90,46 @@ public class FabricClientHelper implements IClientHelper
         double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
         double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
         Screen.wrapScreenError(() -> {
-            boolean handled = ClientScreenInputEvent.MOUSE_DRAGGED_PRE.invoker().mouseDragged(mc, screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY).isPresent();
-            if(!handled) handled = screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
-            if(!handled) ClientScreenInputEvent.MOUSE_DRAGGED_POST.invoker().mouseDragged(mc, screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
-        }, "mouseDragged event handler", screen.getClass().getCanonicalName());
+            if(Controllable.isArchitecturyLoaded()) {
+                ArchitecturySupport.sendMouseDrag(screen, finalMouseX, finalMouseY, finalDragX, finalDragY, activeButton);
+            } else {
+                screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
+            }
+        }, "Controllable mouseDragged event handler", screen.getClass().getCanonicalName());
     }
 
     @Override
-    public void sendScreenMouseClickPre(Screen screen, double mouseX, double mouseY, int button)
+    public void sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button)
     {
         Screen.wrapScreenError(() -> {
-            Minecraft mc = Minecraft.getInstance();
-            boolean handled = ClientScreenInputEvent.MOUSE_CLICKED_PRE.invoker().mouseClicked(mc, screen, mouseX, mouseY, button).isPresent();
-            if(!handled) handled = screen.mouseClicked(mouseX, mouseY, button);
-            if(!handled) ClientScreenInputEvent.MOUSE_CLICKED_POST.invoker().mouseClicked(mc, screen, mouseX, mouseY, button);
-        }, "mouseClicked event handler", screen.getClass().getCanonicalName());
+            if(!ScreenMouseEvents.allowMouseClick(screen).invoker().allowMouseClick(screen, mouseX, mouseY, button)) {
+                return;
+            }
+            ScreenMouseEvents.beforeMouseClick(screen).invoker().beforeMouseClick(screen, mouseX, mouseY, button);
+            if(Controllable.isArchitecturyLoaded()) {
+                ArchitecturySupport.sendScreenMouseClick(screen, mouseX, mouseY, button);
+            } else {
+                screen.mouseClicked(mouseX, mouseY, button);
+            }
+            ScreenMouseEvents.afterMouseClick(screen).invoker().afterMouseClick(screen, mouseX, mouseY, button);
+        }, "Controllable mouseClicked event handler", screen.getClass().getCanonicalName());
     }
 
     @Override
-    public void sendScreenMouseReleasedPre(Screen screen, double mouseX, double mouseY, int button)
+    public void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
     {
         Screen.wrapScreenError(() -> {
-            Minecraft mc = Minecraft.getInstance();
-            boolean handled = ClientScreenInputEvent.MOUSE_RELEASED_PRE.invoker().mouseReleased(mc, screen, mouseX, mouseY, button).isPresent();
-            if(!handled) handled = screen.mouseReleased(mouseX, mouseY, button);
-            if(!handled) ClientScreenInputEvent.MOUSE_RELEASED_POST.invoker().mouseReleased(mc, screen, mouseX, mouseY, button);
-        }, "mouseReleased event handler", screen.getClass().getCanonicalName());
+            if(!ScreenMouseEvents.allowMouseRelease(screen).invoker().allowMouseRelease(screen, mouseX, mouseY, button)) {
+                return;
+            }
+            ScreenMouseEvents.beforeMouseRelease(screen).invoker().beforeMouseRelease(screen, mouseX, mouseY, button);
+            if(Controllable.isArchitecturyLoaded()) {
+                ArchitecturySupport.sendScreenMouseReleased(screen, mouseX, mouseY, button);
+            } else {
+                screen.mouseReleased(mouseX, mouseY, button);
+            }
+            ScreenMouseEvents.afterMouseRelease(screen).invoker().afterMouseRelease(screen, mouseX, mouseY, button);
+        }, "Controllable mouseReleased event handler", screen.getClass().getCanonicalName());
     }
 
     @Override

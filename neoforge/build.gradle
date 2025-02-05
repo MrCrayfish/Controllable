@@ -42,7 +42,7 @@ dependencies {
     compileOnly "dev.emi:emi-neoforge:${emi_version}"
 
     // Roughly Enough Items
-    implementation "dev.architectury:architectury-neoforge:${architectury_version}"
+    implementation "dev.architectury:architectury-neoforge:${architectury_api_version}"
     implementation "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
     implementation "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
 

@@ -14,6 +14,7 @@ public class Controllable
 {
     private static ControllerManager manager;
     private static File configFolder;
+    private static boolean architecturyLoaded;
     private static boolean jeiLoaded;
     private static boolean emiLoaded;
     private static boolean reiLoaded;
@@ -22,6 +23,7 @@ public class Controllable
     public static void init()
     {
         configFolder = com.mrcrayfish.framework.platform.Services.CONFIG.getConfigPath().toFile();
+        architecturyLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("architectury");
         jeiLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("jei");
         emiLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("emi");
         reiLoaded = com.mrcrayfish.framework.platform.Services.PLATFORM.isModLoaded("roughlyenoughitems");
@@ -38,6 +40,11 @@ public class Controllable
     public static File getConfigFolder()
     {
         return configFolder;
+    }
+
+    public static boolean isArchitecturyLoaded()
+    {
+        return architecturyLoaded;
     }
 
     public static boolean isJeiLoaded()
