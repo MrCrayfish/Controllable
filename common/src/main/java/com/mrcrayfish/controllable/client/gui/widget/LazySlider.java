@@ -57,6 +57,12 @@ public class LazySlider extends AbstractSliderButton
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY)
+    {
+        return this.pressed && super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
     public double getValue()
     {
         double scale = 1.0 / this.step;
