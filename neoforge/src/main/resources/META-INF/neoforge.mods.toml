@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "${neoforge_loader_version_range}"
 license = "${mod_license}"
-issueTrackerURL="${mod_issues}"
+issueTrackerURL = "${mod_issues}"
 
 [[mods]]
 modId = "${mod_id}"
@@ -10,7 +10,7 @@ displayName = "${mod_name}"
 updateJSONURL = "https://mrcrayfish.com/modupdatejson?id=${mod_id}"
 displayURL = "${mod_homepage}"
 logoFile = "assets/${mod_id}/icon.png"
-logoBlur=false
+logoBlur = false
 authors = "${mod_author}"
 description = '''${mod_desc}'''
 
@@ -20,28 +20,49 @@ config = "${mod_id}.common.mixins.json"
 [[mixins]]
 config = "${mod_id}.neoforge.mixins.json"
 
-[[dependencies.${mod_id}]]
+[[dependencies.${ mod_id }]]
 modId = "neoforge"
 type = "required"
 versionRange = "${neoforge_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies.${ mod_id }]]
 modId = "minecraft"
 type = "required"
 versionRange = "[${minecraft_version},)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies.${ mod_id }]]
 modId = "framework"
 type = "required"
 versionRange = "[${framework_version},)"
 ordering = "NONE"
 side = "BOTH"
 
+[[dependencies.${ mod_id }]]
+modId = "jei"
+type = "optional"
+versionRange = "[${jei_version},)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.${ mod_id }]]
+modId = "emi"
+type = "optional"
+versionRange = "[${emi_version},)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.${ mod_id }]]
+modId = "roughlyenoughitems"
+type = "optional"
+versionRange = "[${rei_version},)"
+ordering = "NONE"
+side = "CLIENT"
+
 [modproperties."${mod_id}"]
-catalogueImageIcon="assets/${mod_id}/icon.png"
-catalogueBackground="assets/${mod_id}/background.png"
-configuredBackground="minecraft:textures/block/stone.png"
+catalogueImageIcon = "assets/${mod_id}/icon.png"
+catalogueBackground = "assets/${mod_id}/background.png"
+configuredBackground = "minecraft:textures/block/stone.png"

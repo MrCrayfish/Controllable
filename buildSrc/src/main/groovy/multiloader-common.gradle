@@ -124,6 +124,8 @@ processResources {
         "neoforge_loader_version_range": neoforge_loader_version_range,
         "framework_version"            : framework_version,
         "jei_version"                  : jei_version,
+        "emi_version"                  : emi_version,
+        "rei_version"                  : rei_version,
         "mod_name"                     : mod_name,
         "mod_version"                  : mod_version,
         "mod_author"                   : mod_author,
