@@ -85,7 +85,7 @@ public class NeoForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public void sendScreenMouseClickPre(Screen screen, double mouseX, double mouseY, int button)
+    public void sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button)
     {
         Screen.wrapScreenError(() -> {
             boolean cancelled = ClientHooks.onScreenMouseClickedPre(screen, mouseX, mouseY, button);
@@ -97,7 +97,7 @@ public class NeoForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public void sendScreenMouseReleasedPre(Screen screen, double mouseX, double mouseY, int button)
+    public void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
     {
         Screen.wrapScreenError(() -> {
             boolean cancelled = ClientHooks.onScreenMouseReleasedPre(screen, mouseX, mouseY, button);
