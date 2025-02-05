@@ -107,11 +107,22 @@ jobs:
         run: |
           gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.neoforge }}
           gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.fabric }}
+      - name: Create Changelog Files
+        run: |
+          echo "### Technical Changelog:" >> RELEASE_BODY.md
+          latest_tag=$(git describe --tags --abbrev=0)
+          previous_tag=$(git describe --tags --abbrev=0 --exclude=$latest_tag)
+          git log "$previous_tag..$latest_tag^" --oneline --pretty="- %s (%H)" >> RELEASE_BODY.md
+          echo "### Download:" >> RELEASE_BODY.md
+          echo "- Official Website: https://mrcrayfish.com/mods/${{ steps.mod_id.outputs.value }}" >> RELEASE_BODY.md
+          echo "- CurseForge: https://curseforge.com/minecraft/mc-mods/controllable" >> RELEASE_BODY.md
+          git log "$previous_tag..$latest_tag^" --oneline --pretty="%s" > CHANGELOG.txt
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
           name: '${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
-          artifacts: "${{ steps.artifacts.outputs.neoforge }},${{ steps.artifacts.outputs.neoforge }}.asc,${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.fabric }}.asc"
+          artifacts: "${{ steps.artifacts.outputs.neoforge }},${{ steps.artifacts.outputs.neoforge }}.asc,${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.fabric }}.asc,CHANGELOG.txt"
+          bodyFile: "RELEASE_BODY.md"
       - name: Upload NeoForge Artifacts
         uses: actions/upload-artifact@v4
         with:
