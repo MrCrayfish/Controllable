@@ -50,8 +50,9 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
         try
         {
             Path natives = Utils.getGamePath().resolve("controllable_natives");
-            Files.createDirectories(natives);
-            SdlNativeLibraryLoader.setExtractionPath(Utils.getGamePath());
+            Path sdl = natives.resolve("SDL");
+            Files.createDirectories(sdl);
+            SdlNativeLibraryLoader.setExtractionPath(sdl);
         }
         catch(IOException e)
         {
