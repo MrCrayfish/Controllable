@@ -1,8 +1,10 @@
 package com.mrcrayfish.controllable.client;
 
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ControllerButton;
+import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.framework.api.event.ScreenEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -29,6 +31,17 @@ public class ControllerEvents
     private static void onScreenInit(Screen screen)
     {
         ButtonBinding.resetButtonStates();
+
+        // Fixes an issue where using item is not stopped after opening a screen
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.isBeingUsed())
+        {
+            Minecraft mc = Minecraft.getInstance();
+            if(mc.gameMode != null && mc.player != null && mc.player.isUsingItem())
+            {
+                mc.gameMode.releaseUsingItem(mc.player);
+            }
+        }
     }
 
     private static void onModifyScreenWidgets(Screen screen, List<AbstractWidget> widgets, Consumer<AbstractWidget> add, Consumer<AbstractWidget> remove)
