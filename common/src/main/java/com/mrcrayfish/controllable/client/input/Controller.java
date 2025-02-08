@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.input;
 
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 
 /**
  * Author: MrCrayfish
@@ -149,6 +150,8 @@ public abstract class Controller
     public final void updateInputTime()
     {
         this.lastInputTime = Util.getMillis();
+        // Prevents the AFK framerate limit
+        Minecraft.getInstance().getFramerateLimitTracker().onInputReceived();
     }
 
     /**
