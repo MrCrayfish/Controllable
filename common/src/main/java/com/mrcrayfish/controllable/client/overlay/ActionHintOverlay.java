@@ -5,10 +5,10 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Action;
 import com.mrcrayfish.controllable.client.ActionDescriptions;
 import com.mrcrayfish.controllable.client.ActionVisibility;
-import com.mrcrayfish.controllable.client.binding.ButtonBinding;
-import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.ButtonIcons;
 import com.mrcrayfish.controllable.client.RadialMenuHandler;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.platform.ClientServices;
@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -202,7 +203,8 @@ public class ActionHintOverlay implements IOverlay
                     switch(currentItem.getUseAnimation())
                     {
                         case EAT:
-                            if(mc.player.getFoodData().needsFood())
+                            FoodProperties properties = currentItem.getItem().getFoodProperties();
+                            if(properties != null && mc.player.canEat(properties.canAlwaysEat()))
                             {
                                 actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.EAT, Action.Side.RIGHT));
                             }
