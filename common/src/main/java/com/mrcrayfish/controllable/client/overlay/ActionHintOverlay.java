@@ -17,7 +17,9 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -260,7 +262,8 @@ public class ActionHintOverlay implements IOverlay
                     switch(currentItem.getUseAnimation())
                     {
                         case EAT:
-                            if(mc.player.getFoodData().needsFood())
+                            FoodProperties properties = currentItem.get(DataComponents.FOOD);
+                            if(properties != null && mc.player.canEat(properties.canAlwaysEat()))
                             {
                                 actionMap.put(ButtonBindings.USE_ITEM, new Action(ActionDescriptions.EAT, Action.Side.RIGHT));
                             }
