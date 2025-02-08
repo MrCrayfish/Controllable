@@ -253,7 +253,7 @@ public class ActionHintOverlay implements IOverlay
                     }
                 }
 
-                ItemStack currentItem = mc.player.containerMenu.getCarried(); //TODO fix to mainhand
+                ItemStack currentItem = mc.player.getMainHandItem();
                 if(currentItem.getUseAnimation() != ItemUseAnimation.NONE)
                 {
                     switch(currentItem.getUseAnimation())
