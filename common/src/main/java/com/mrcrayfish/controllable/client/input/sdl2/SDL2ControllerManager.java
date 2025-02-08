@@ -7,7 +7,9 @@ import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.DeviceInfo;
 import com.mrcrayfish.controllable.client.input.MultiController;
+import com.mrcrayfish.controllable.util.Utils;
 import com.mrcrayfish.controllable_sdl.api.gamecontroller.SdlGamecontroller;
+import com.mrcrayfish.controllable_sdl.jna.SdlNativeLibraryLoader;
 import com.sun.jna.Memory;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
 import com.mrcrayfish.controllable_sdl.api.rwops.SDL_RWops;
@@ -16,6 +18,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,6 +45,32 @@ import static com.mrcrayfish.controllable_sdl.api.rwops.SdlRWops.SDL_RWFromConst
  */
 public class SDL2ControllerManager extends AdaptiveControllerManager
 {
+    static
+    {
+        try
+        {
+            Path natives = Utils.getGamePath().resolve("controllable_natives");
+            Path sdl = natives.resolve("SDL");
+            Files.createDirectories(sdl);
+            SdlNativeLibraryLoader.setExtractionPath(sdl);
+
+            // Add a readme to the natives directory for users
+            Path readMeFile = natives.resolve("README.txt");
+            if(!Files.exists(readMeFile))
+            {
+                Files.writeString(readMeFile, """
+                    This directory holds the natives for Controllable, which are used to interface
+                    with game controllers and read their inputs. It is safe to delete, just make sure
+                    the game is closed as the natives may be loaded; preventing you from deleting them.
+                    If you are developing a modpack, make sure to exclude this directory.""");
+            }
+        }
+        catch(IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void init()
     {
