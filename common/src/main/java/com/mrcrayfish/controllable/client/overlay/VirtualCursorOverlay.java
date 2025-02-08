@@ -11,6 +11,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.inventory.Slot;
 
 /**
@@ -40,13 +41,12 @@ public class VirtualCursorOverlay implements IOverlay
             double cursorY = Controllable.getCursor().getRenderY();
             double zIndex = 3000;
             pose.translate(cursorX / guiScale, cursorY / guiScale, zIndex);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             boolean isHoveringSlot = this.isHoveringFilledContainerSlot();
             if(isHoveringSlot && type.isScaleHover())
             {
                 pose.scale(1.33F, 1.33F, 1.33F);
             }
-            graphics.blit(CursorStyle.TEXTURE, -8, -8, 16, 16, isHoveringSlot ? 32 : 0, type.ordinal() * 32, 32, 32, 64, CursorStyle.values().length * 32);
+            graphics.blit(RenderType::guiTextured, CursorStyle.TEXTURE, -8, -8, isHoveringSlot ? 32 : 0, type.ordinal() * 32, 16, 16, 32, 32, 64, CursorStyle.values().length * 32);
         }
         pose.popPose();
     }

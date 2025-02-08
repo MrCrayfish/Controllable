@@ -28,7 +28,7 @@ public class SneakHandler extends MovementInputHandler
     {
         if(!context.minecraft().options.toggleCrouch().get())
         {
-            context.input().shiftKeyDown = true;
+            context.mutableInput().setShift(true);
             context.controller().updateInputTime();
         }
     }

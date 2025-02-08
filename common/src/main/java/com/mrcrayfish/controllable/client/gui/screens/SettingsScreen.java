@@ -143,7 +143,7 @@ public class SettingsScreen extends Screen
         super.render(graphics, !waitingForInput ? mouseX : -1, !waitingForInput ? mouseY : -1, partialTick);
         if(waitingForInput)
         {
-            this.renderBlurredBackground(partialTick);
+            this.renderBlurredBackground();
             PoseStack stack = graphics.pose();
             stack.pushPose();
             stack.translate(0, 0, 100);

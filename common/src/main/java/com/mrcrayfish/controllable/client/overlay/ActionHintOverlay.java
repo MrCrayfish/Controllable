@@ -5,11 +5,11 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.Action;
 import com.mrcrayfish.controllable.client.ActionDescriptions;
-import com.mrcrayfish.controllable.client.settings.ActionVisibility;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
-import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.settings.ActionVisibility;
+import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.platform.ClientServices;
@@ -17,18 +17,17 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -87,7 +86,7 @@ public class ActionHintOverlay implements IOverlay
             // Draw button
             int buttonU = button * BUTTON_SIZE;
             int buttonV = Config.CLIENT.options.controllerIcons.get().ordinal() * BUTTON_SIZE;
-            graphics.blit(ButtonIcons.TEXTURE, 0, 0, BUTTON_SIZE, BUTTON_SIZE, buttonU, buttonV, BUTTON_SIZE, BUTTON_SIZE, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
+            graphics.blit(RenderType::guiTextured, ButtonIcons.TEXTURE, 0, 0, buttonU, buttonV, BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
 
             // Draw text and background
             int textWidth = mc.font.width(action.getDescription());
@@ -127,7 +126,7 @@ public class ActionHintOverlay implements IOverlay
         int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * BUTTON_SIZE;
         int x = side == Action.Side.LEFT ? 5 : mc.getWindow().getGuiScaledWidth() - 5 - BUTTON_SIZE;
         int y = mc.getWindow().getGuiScaledHeight() + position * -15 - BUTTON_SIZE - 5;
-        graphics.blit(ButtonIcons.TEXTURE, x, y, texU, texV, BUTTON_SIZE, BUTTON_SIZE, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
+        graphics.blit(RenderType::guiTextured, ButtonIcons.TEXTURE, x, y, texU, texV, BUTTON_SIZE, BUTTON_SIZE, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
 
         // Draw label
         int textWidth = mc.font.width(action.getDescription());
@@ -232,7 +231,7 @@ public class ActionHintOverlay implements IOverlay
                 }
 
                 ItemStack offHandStack = mc.player.getOffhandItem();
-                if(offHandStack.getUseAnimation() != UseAnim.NONE)
+                if(offHandStack.getUseAnimation() != ItemUseAnimation.NONE)
                 {
                     switch(offHandStack.getUseAnimation())
                     {
@@ -254,11 +253,12 @@ public class ActionHintOverlay implements IOverlay
                     }
                 }
 
-                ItemStack currentItem = mc.player.containerMenu.getCarried(); //TODO test
-                if(currentItem.getUseAnimation() != UseAnim.NONE)
+                ItemStack currentItem = mc.player.containerMenu.getCarried(); //TODO fix to mainhand
+                if(currentItem.getUseAnimation() != ItemUseAnimation.NONE)
                 {
                     switch(currentItem.getUseAnimation())
                     {
+                        // TODO cover more animations
                         case EAT:
                             if(mc.player.getFoodData().needsFood())
                             {

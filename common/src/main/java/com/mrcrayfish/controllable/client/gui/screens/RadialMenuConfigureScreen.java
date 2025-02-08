@@ -78,7 +78,7 @@ public class RadialMenuConfigureScreen extends Screen
 
     public void scrollToBottomAndSelectLast()
     {
-        this.list.setScrollAmount(this.list.getMaxScroll());
+        this.list.setScrollAmount(this.list.maxScrollAmount());
         this.list.setSelected(this.list.children().getLast());
     }
 }

@@ -104,7 +104,7 @@ public class ScrollingHandler
             {
                 input = InputHelper.applyDeadzone(input, SCROLL_THRESHOLD);
                 input = this.scaleInputForScreen(screen, input);
-                input *= Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
+                input *= Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks();
                 screen.mouseScrolled(screenCursorX, screenCursorY, 0, -input);
             }
             else
@@ -193,8 +193,8 @@ public class ScrollingHandler
             if(hoveredListener instanceof AbstractSelectionList<?> list)
             {
                 double direction = InputHelper.applyDeadzone(input, ABSTRACT_LIST_SCROLL_THRESHOLD);
-                direction *= Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
-                list.setScrollAmount(list.getScrollAmount() + direction * Config.CLIENT.options.listScrollSpeed.get());
+                direction *= Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks();
+                list.setScrollAmount(list.scrollAmount() + direction * Config.CLIENT.options.listScrollSpeed.get());
                 controller.updateInputTime();
                 return true;
             }

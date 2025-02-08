@@ -121,7 +121,7 @@ public class InputProcessor
     public void queueInputsWait()
     {
         Minecraft mc = Minecraft.getInstance();
-        int fps = mc.level != null || mc.screen == null && mc.getOverlay() == null ? mc.getWindow().getFramerateLimit() : 60;
+        int fps = mc.level != null || mc.screen == null && mc.getOverlay() == null ? mc.options.framerateLimit().get() : 60;
         int captureCount = 4; // The amount of times to capture controller input while waiting
         for(int i = 0; i < captureCount; i++)
         {

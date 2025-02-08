@@ -25,7 +25,7 @@ public class GameRendererMixin
         OverlayRenderer.draw(graphics, mouseX, mouseY, tracker);
     }
 
-    @ModifyVariable(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;clear(IZ)V", remap = false, ordinal = 0), index = 4, ordinal = 0, require = 1)
+    @ModifyVariable(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;clear(I)V", remap = false, ordinal = 0), index = 4, ordinal = 0, require = 1)
     private int controllableModifyMouseX(int original)
     {
         Controller controller = Controllable.getController();
@@ -36,7 +36,7 @@ public class GameRendererMixin
         return original;
     }
 
-    @ModifyVariable(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;clear(IZ)V", remap = false, ordinal = 0), index = 5, ordinal = 1, require = 1)
+    @ModifyVariable(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;clear(I)V", remap = false, ordinal = 0), index = 5, ordinal = 1, require = 1)
     private int controllableModifyMouseY(int original)
     {
         Controller controller = Controllable.getController();

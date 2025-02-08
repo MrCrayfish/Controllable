@@ -5,8 +5,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
 
 /**
  * Author: MrCrayfish
@@ -39,9 +41,6 @@ public class ImageButton extends Button
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
         super.renderWidget(graphics, mouseX, mouseY, partialTicks);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        if(!this.active) RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 1.0F);
-        graphics.blit(this.texture, this.getX() + (this.width - this.imageWidth) / 2, this.getY() + (this.height - this.imageHeight) / 2, this.imageU, this.imageV, this.imageWidth, this.imageHeight, this.textureWidth, this.textureHeight);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        graphics.blit(RenderType::guiTextured, this.texture, this.getX() + (this.width - this.imageWidth) / 2, this.getY() + (this.height - this.imageHeight) / 2, this.imageU, this.imageV, this.imageWidth, this.imageHeight, this.textureWidth, this.textureHeight, !this.active ? ARGB.white(0.5F) : ARGB.white(1));
     }
 }

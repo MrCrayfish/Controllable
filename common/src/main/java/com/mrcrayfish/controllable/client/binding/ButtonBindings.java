@@ -20,11 +20,13 @@ import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
+import net.minecraft.client.ScrollWheelHandler;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.client.gui.screens.social.SocialInteractionsScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -36,6 +38,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Inventory;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
@@ -46,7 +49,7 @@ import java.util.Optional;
 public class ButtonBindings
 {
     public static final ButtonBinding JUMP = new ButtonBinding(Buttons.A, "key.jump", "key.categories.movement", InGameContext.INSTANCE, MovementInputHandler.create(context -> {
-        context.input().jumping = true;
+        context.mutableInput().setJump(true);
         context.controller().updateInputTime();
     }));
 
@@ -147,7 +150,9 @@ public class ButtonBindings
     public static final ButtonBinding SCROLL_HOTBAR_LEFT = new ButtonBinding(Buttons.LEFT_BUMPER, "controllable.key.previous_hotbar_item", "key.categories.gameplay", InGameContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
             context.player().ifPresent(player -> {
-                player.getInventory().swapPaint(1);
+                Inventory inventory = player.getInventory();
+                int nextSlot = ScrollWheelHandler.getNextScrollWheelSelection(1, inventory.selected, Inventory.getSelectionSize());
+                player.getInventory().setSelectedHotbarSlot(nextSlot);
             });
         });
     }));
@@ -155,19 +160,13 @@ public class ButtonBindings
     public static final ButtonBinding SCROLL_HOTBAR_RIGHT = new ButtonBinding(Buttons.RIGHT_BUMPER, "controllable.key.next_hotbar_item", "key.categories.gameplay", InGameContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
             context.player().ifPresent(player -> {
-                player.getInventory().swapPaint(-1);
+                Inventory inventory = player.getInventory();
+                int nextSlot = ScrollWheelHandler.getNextScrollWheelSelection(-1, inventory.selected, Inventory.getSelectionSize());
+                player.getInventory().setSelectedHotbarSlot(nextSlot);
             });
         });
     }));
 
-    /*
-        TODO implement unpause
-
-        if(context.screen().get() instanceof PauseScreen) {
-            context.minecraft().setScreen(null);
-            return true;
-        }
-     */
     public static final ButtonBinding PAUSE_GAME = new ButtonBinding(Buttons.START, "controllable.key.pause_game", "key.categories.misc", InGameContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
             context.minecraft().pauseGame(false);
@@ -190,8 +189,8 @@ public class ButtonBindings
                 if(screen instanceof CreativeModeInventoryScreen) {
                     InputHandler.navigateCreativeTabs((CreativeModeInventoryScreen) screen, -1);
                     context.minecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-                } else if(screen instanceof RecipeUpdateListener listener) {
-                    InputHandler.navigateRecipePage(listener.getRecipeBookComponent(), -1);
+                } else if(screen instanceof RecipeUpdateListener) {
+                    InputHandler.navigateRecipePage(screen, -1);
                 }
             });
         });
@@ -203,8 +202,8 @@ public class ButtonBindings
                 if(screen instanceof CreativeModeInventoryScreen) {
                     InputHandler.navigateCreativeTabs((CreativeModeInventoryScreen) screen, 1);
                     context.minecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-                } else if(screen instanceof RecipeUpdateListener listener) {
-                    InputHandler.navigateRecipePage(listener.getRecipeBookComponent(), 1);
+                } else if(screen instanceof RecipeUpdateListener) {
+                    InputHandler.navigateRecipePage(screen, 1);
                 }
             });
         });
@@ -215,8 +214,8 @@ public class ButtonBindings
             context.screen().ifPresent(screen -> {
                 if(screen.children().stream().anyMatch(listener -> listener instanceof TabNavigationBar)) {
                     InputHandler.navigateTabBar(screen, -1);
-                } else if(screen instanceof RecipeUpdateListener listener) {
-                    InputHandler.navigateRecipeTab(listener.getRecipeBookComponent(), -1);
+                } else {
+                    InputHandler.navigateRecipeTab(screen, -1);
                 }
             });
         });
@@ -227,8 +226,8 @@ public class ButtonBindings
             context.screen().ifPresent(screen -> {
                 if(screen.children().stream().anyMatch(listener -> listener instanceof TabNavigationBar)) {
                     InputHandler.navigateTabBar(screen, 1);
-                } else if(screen instanceof RecipeUpdateListener listener) {
-                    InputHandler.navigateRecipeTab(listener.getRecipeBookComponent(), 1);
+                } else {
+                    InputHandler.navigateRecipeTab(screen, 1);
                 }
             });
         });

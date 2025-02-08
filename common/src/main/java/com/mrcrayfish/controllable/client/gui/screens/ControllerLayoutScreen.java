@@ -16,6 +16,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -104,7 +105,7 @@ public class ControllerLayoutScreen extends Screen
         int height = 24 * 5;
         int x = this.width / 2 - width / 2;
         int y = this.height / 2 - 50 - 35;
-        graphics.blit(TEXTURE, x, y, width, height, 50, 0, 38, 24, 256, 256);
+        graphics.blit(RenderType::guiTextured, TEXTURE, x, y, width, height, 50, 0, 38, 24, 256, 256);
         this.controllerButtons.forEach(controllerButton -> controllerButton.draw(graphics, x, y, mouseX, mouseY, this.configureButton == controllerButton.getButton()));
         graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
         this.drawMultiLineCenteredString(graphics, this.font, Component.translatable("controllable.gui.layout.info").withStyle(ChatFormatting.GRAY), x + width / 2, y + 135, width + 190, 0xFFFFFFFF);

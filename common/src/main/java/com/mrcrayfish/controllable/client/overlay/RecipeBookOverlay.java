@@ -1,9 +1,11 @@
 package com.mrcrayfish.controllable.client.overlay;
 
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import net.minecraft.client.DeltaTracker;
@@ -24,7 +26,8 @@ import java.util.List;
  */
 public class RecipeBookOverlay implements IOverlay
 {
-    private RecipeBookComponent recipeBook;
+    private Screen currentScreen;
+    private RecipeBookComponent<?> recipeBook;
 
     @Override
     public boolean isVisible()
@@ -36,12 +39,17 @@ public class RecipeBookOverlay implements IOverlay
     @Override
     public void tick()
     {
-        this.recipeBook = null;
         Minecraft mc = Minecraft.getInstance();
-        Screen screen = mc.screen;
-        if(screen instanceof RecipeUpdateListener listener)
+        if(this.currentScreen != mc.screen) // TODO test 1.21.4
         {
-            this.recipeBook = listener.getRecipeBookComponent();
+            this.recipeBook = null;
+            if(mc.screen instanceof RecipeUpdateListener)
+            {
+                ScreenHelper.findRecipeBookComponent(mc.screen).ifPresent(component -> {
+                    this.recipeBook = component;
+                });
+            }
+            this.currentScreen = mc.screen;
         }
     }
 

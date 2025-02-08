@@ -32,8 +32,11 @@ public interface RecipeBookComponentAccessor
     void controllableSetCurrentTab(RecipeBookTabButton tab);
 
     @Invoker("updateCollections")
-    void controllableUpdateCollections(boolean resetPages);
+    void controllableUpdateCollections(boolean resetPages, boolean filtering);
 
     @Accessor("tabButtons")
     List<RecipeBookTabButton> controllableGetTabButtons();
+
+    @Invoker("isFiltering")
+    boolean controllableIsFiltering();
 }

@@ -137,13 +137,14 @@ public class ScreenHelper
 
     private static Optional<GuiEventListener> findHoveredEventListenerInRecipeBook(ContainerEventHandler handler, double mouseX, double mouseY)
     {
-        if(handler instanceof RecipeUpdateListener listener)
+        Optional<RecipeBookComponent<?>> optional = ScreenHelper.findRecipeBookComponent(handler);
+        if(optional.isPresent())
         {
-            RecipeBookComponent recipeBook = listener.getRecipeBookComponent();
-            if(recipeBook.isVisible())
+            RecipeBookComponent<?> component = optional.get();
+            if(component.isVisible())
             {
                 List<GuiEventListener> listeners = new ArrayList<>();
-                RecipeBookComponentAccessor bookAccessor = (RecipeBookComponentAccessor) recipeBook;
+                RecipeBookComponentAccessor bookAccessor = (RecipeBookComponentAccessor) component;
                 listeners.add(bookAccessor.controllableGetFilterButton());
                 listeners.addAll(bookAccessor.controllableGetRecipeTabs());
                 RecipeBookPageAccessor pageAccessor = (RecipeBookPageAccessor) bookAccessor.controllableGetRecipeBookPage();
@@ -151,6 +152,18 @@ public class ScreenHelper
                 listeners.add(pageAccessor.controllableGetForwardButton());
                 listeners.add(pageAccessor.controllableGetBackButton());
                 return listeners.stream().filter(o -> o != null && o.isMouseOver(mouseX, mouseY)).findFirst();
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<RecipeBookComponent<?>> findRecipeBookComponent(ContainerEventHandler handler)
+    {
+        for(GuiEventListener listener : handler.children())
+        {
+            if(listener instanceof RecipeBookComponent<?> component)
+            {
+                return Optional.of(component);
             }
         }
         return Optional.empty();

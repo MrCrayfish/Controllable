@@ -17,8 +17,9 @@ public class OverlayRenderer
         ImmutableList.Builder<IOverlay> builder = new ImmutableList.Builder<>();
         builder.add(new TabNavigationOverlay());
         builder.add(new RecipeBookOverlay());
-        builder.add(new ActionHintOverlay());
         builder.add(new PaperDollPlayerOverlay());
+        builder.add(new RadialMenuOverlay());
+        builder.add(new ActionHintOverlay());
         builder.add(new VirtualCursorOverlay());
         return builder.build();
     });

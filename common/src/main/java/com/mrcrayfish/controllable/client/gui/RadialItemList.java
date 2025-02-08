@@ -70,7 +70,7 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     }
 
     @Override
-    protected int getScrollbarPosition()
+    protected int scrollBarX()
     {
         return super.getRowRight() + 2;
     }
@@ -123,7 +123,7 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
             this.deleteButton = Button.builder(ClientHelper.getIconComponent(Icons.CROSS), button -> {
                 RadialItemList.this.bindings.remove(data);
                 RadialItemList.this.removeEntry(this);
-                RadialItemList.this.clampScrollAmount();
+                RadialItemList.this.setScrollAmount(RadialItemList.this.scrollAmount());
                 RadialItemList.this.children().forEach(ButtonBindingEntry::updateButtons);
             }).size(20, 20).build();
             this.deleteButton.setTooltip(Tooltip.create(Component.translatable("controllable.gui.delete")));

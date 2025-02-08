@@ -31,13 +31,15 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
@@ -94,7 +96,6 @@ public class RadialMenu
         {
             TickEvents.START_CLIENT.register(this::onClientTickStart);
             TickEvents.END_CLIENT.register(this::onClientTickEnd);
-            TickEvents.END_RENDER.register(this::onRenderEnd);
             this.initialized = true;
         }
     }
@@ -284,7 +285,7 @@ public class RadialMenu
         }
     }
 
-    private void onRenderEnd(DeltaTracker tracker)
+    public void onRenderEnd(GuiGraphics graphics, DeltaTracker tracker)
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.options.hideGui || mc.screen != null)
@@ -292,12 +293,9 @@ public class RadialMenu
 
         if(Controllable.getController() != null)
         {
-            /*if(Controllable.getInput().getLastUse() <= 0)
-                return;*/
-
             if(this.visible || this.animateTicks > 0 || this.prevAnimateTicks > 0)
             {
-                this.renderRadialMenu(tracker);
+                this.renderRadialMenu(graphics, tracker);
             }
         }
     }
@@ -319,19 +317,13 @@ public class RadialMenu
         }
     }
 
-    private void renderRadialMenu(DeltaTracker tracker)
+    private void renderRadialMenu(GuiGraphics graphics, DeltaTracker tracker)
     {
         this.updateSelected();
-        
-        Matrix4fStack modelStack = RenderSystem.getModelViewStack();
-        modelStack.pushMatrix();
-        modelStack.identity();
-        modelStack.translate(0, 0, 1000F - ClientServices.CLIENT.getGuiFarPlane());
-        RenderSystem.applyModelViewMatrix();
-        Lighting.setupFor3DItems();
+
         Minecraft mc = Minecraft.getInstance();
-        GuiGraphics graphics = new GuiGraphics(mc, mc.renderBuffers().bufferSource());
         PoseStack poseStack = graphics.pose();
+        poseStack.pushPose();
 
         float animation = Mth.lerp(tracker.getGameTimeDeltaPartialTick(false), this.prevAnimateTicks, this.animateTicks) / 5F;
         float c1 = 1.70158F;
@@ -357,8 +349,7 @@ public class RadialMenu
         this.drawRadialItems(this.rightItems, graphics, mc, animation);
         this.drawRadialItems(this.leftItems, graphics, mc, animation);
 
-        modelStack.popMatrix();
-        RenderSystem.applyModelViewMatrix();
+        poseStack.popPose();
     }
 
     // TODO draw minimised version if too many entries (aka only draw the action name, not the category too)
@@ -502,15 +493,14 @@ public class RadialMenu
         protected void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation)
         {
             int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
-            float alpha = FastColor.ARGB32.alpha(color) / 255F;
-            float red = FastColor.ARGB32.red(color) / 255F;
-            float green = FastColor.ARGB32.green(color) / 255F;
-            float blue = FastColor.ARGB32.blue(color) / 255F;
+            float alpha = ARGB.alpha(color) / 255F;
+            float red = ARGB.red(color) / 255F;
+            float green = ARGB.green(color) / 255F;
+            float blue = ARGB.blue(color) / 255F;
 
             PoseStack poseStack = graphics.pose();
-            poseStack.translate(0, 90, 0);
+            poseStack.translate(0, 100, 0);
 
-            //RenderSystem.disableTexture(); //TODO test this
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
@@ -518,7 +508,8 @@ public class RadialMenu
             alpha = Math.min(1.0F, alpha * animation);
 
             // Draw background
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShader(CoreShaders.POSITION_COLOR);
             BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             // Top (reduced width by 2)
             buffer.addVertex(poseStack.last().pose(), -14, -15, 0).setColor(red, green, blue, alpha);
@@ -546,12 +537,11 @@ public class RadialMenu
             //RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            graphics.blit(TEXTURE, -10, -10, 20, 20, 98, 15, 10, 10, 256, 256);
+            graphics.blit(RenderType::guiTextured, TEXTURE, -10, -10, 98, 15, 20, 20, 10, 10, 256, 256);
 
             if(selected)
             {
-                graphics.drawCenteredString(mc.font, LABEL, 0, -30, 0xFFFFFF);
+                graphics.drawCenteredString(mc.font, LABEL, 0, -30, 0xFFFFFFFF);
             }
         }
     }
@@ -580,15 +570,14 @@ public class RadialMenu
         protected void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation)
         {
             int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
-            float alpha = FastColor.ARGB32.alpha(color) / 255F;
-            float red = FastColor.ARGB32.red(color) / 255F;
-            float green = FastColor.ARGB32.green(color) / 255F;
-            float blue = FastColor.ARGB32.blue(color) / 255F;
+            float alpha = ARGB.alpha(color) / 255F;
+            float red = ARGB.red(color) / 255F;
+            float green = ARGB.green(color) / 255F;
+            float blue = ARGB.blue(color) / 255F;
 
             PoseStack poseStack = graphics.pose();
             poseStack.translate(0, -90, 0);
 
-            //RenderSystem.disableTexture(); //TODO test
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
@@ -596,7 +585,8 @@ public class RadialMenu
             alpha = Math.min(1.0F, alpha * animation);
 
             // Draw background
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShader(CoreShaders.POSITION_COLOR);
             BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             // Top (reduced width by 2)
             buffer.addVertex(poseStack.last().pose(), -14, -15, 0).setColor(red, green, blue, alpha);
@@ -621,15 +611,14 @@ public class RadialMenu
             }
 
             RenderSystem.disableBlend();
-            //RenderSystem.enableTexture();
             RenderSystem.enableCull();
 
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            graphics.blit(TEXTURE, -10, -10, 20, 20, 88, 15, 10, 10, 256, 256);
+            graphics.blit(RenderType::guiTextured, TEXTURE, -10, -10, 88, 15, 20, 20, 10, 10, 256, 256);
 
             if(selected)
             {
-                graphics.drawCenteredString(mc.font, LABEL, 0, 21, 0xFFFFFF);
+                graphics.drawCenteredString(mc.font, LABEL, 0, 21, 0xFFFFFFFF);
             }
         }
     }
@@ -668,10 +657,10 @@ public class RadialMenu
             poseStack.pushPose();
 
             int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
-            float alpha = FastColor.ARGB32.alpha(color) / 255F;
-            float red = FastColor.ARGB32.red(color) / 255F;
-            float green = FastColor.ARGB32.green(color) / 255F;
-            float blue = FastColor.ARGB32.blue(color) / 255F;
+            float alpha = ARGB.alpha(color) / 255F;
+            float red = ARGB.red(color) / 255F;
+            float green = ARGB.green(color) / 255F;
+            float blue = ARGB.blue(color) / 255F;
 
             float start = left ? -1 : 1;
             float end = (left ? -150F : 150F) * animation;
@@ -683,7 +672,7 @@ public class RadialMenu
             RenderSystem.disableCull();
 
             // Draw background
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            RenderSystem.setShader(CoreShaders.POSITION_COLOR);
             BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
             // Top (offset by 1)

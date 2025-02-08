@@ -187,14 +187,14 @@ public abstract class ListMenuScreen extends Screen
             items.forEach(this::addEntry);
         }
 
-        @Override
+        /*@Override
         protected void setRenderHeader(boolean p_93474_, int p_93475_)
         {
             super.setRenderHeader(p_93474_, p_93475_);
-        }
+        }*/
 
         @Override
-        protected int getScrollbarPosition()
+        protected int scrollBarX()
         {
             return this.width / 2 + ListMenuScreen.this.rowWidth / 2 + 10;
         }

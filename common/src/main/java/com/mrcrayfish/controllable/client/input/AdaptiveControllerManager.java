@@ -106,7 +106,7 @@ public abstract class AdaptiveControllerManager
         Minecraft mc = Minecraft.getInstance();
         if(mc.player != null && controller != null)
         {
-            mc.getToasts().addToast(new ConnectionToast(connected, controller.getName()));
+            mc.getToastManager().addToast(new ConnectionToast(connected, controller.getName()));
         }
     }
 

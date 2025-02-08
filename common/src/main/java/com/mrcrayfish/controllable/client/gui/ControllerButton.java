@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 
 /**
  * Author: MrCrayfish
@@ -52,7 +53,7 @@ public class ControllerButton
         {
             buttonV += this.height;
         }
-        graphics.blit(ControllerLayoutScreen.TEXTURE, buttonX, buttonY, this.width * this.scale, this.height * this.scale, buttonU, buttonV, this.width, this.height, 256, 256);
+        graphics.blit(RenderType::guiTextured, ControllerLayoutScreen.TEXTURE, buttonX, buttonY, buttonU, buttonV, this.width * this.scale, this.height * this.scale, this.width, this.height, 256, 256);
         RenderSystem.disableBlend();
     }
 

@@ -45,8 +45,6 @@ public interface IClientHelper
 
     List<GuiMessage.Line> getChatTrimmedMessages(ChatComponent chat);
 
-    int getMinecraftFramerateLimit();
-
     @Nullable
     Slot getSlotUnderMouse(AbstractContainerScreen<?> screen);
 

@@ -16,6 +16,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -158,7 +159,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
 
                 int iconTop = lineTop + (lineEnd - lineTop) / 2 - 7;
                 int iconLeft = rowLeft - 30;
-                graphics.blit(Icons.TEXTURE, iconLeft, iconTop, 14, 14, 110, 0, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
+                graphics.blit(RenderType::guiTextured, Icons.TEXTURE, iconLeft, iconTop, 110, 0, 14, 14, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
 
                 for(int i : matchedEntries)
                 {
@@ -202,17 +203,16 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
         @Override
         public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTicks)
         {
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             State state = this.getState();
             if(state != State.NONE)
             {
                 ScreenHelper.drawRoundedBox(graphics, left - 1, top - 1, listWidth + 2, slotHeight + 2, 0xFFFFFFFF);
                 ScreenHelper.drawRoundedBox(graphics, left, top, listWidth, slotHeight, 0xFF000000);
-                graphics.blitSprite(CHECKMARK, left + 2, top, 18, 18);
+                graphics.blitSprite(RenderType::guiTextured, CHECKMARK, left + 2, top, 18, 18);
             }
             else if(Controllable.getController() != null && hovered)
             {
-                graphics.blit(Icons.TEXTURE, left + 4, top + 4, 11, 11, 110, 0, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
+                graphics.blit(RenderType::guiTextured, Icons.TEXTURE, left + 4, top + 4, 110, 0, 11, 11, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
                 holder.setTooltipForNextRenderPass(Component.translatable("controllable.gui.link").withStyle(ChatFormatting.AQUA));
             }
             Font font = Minecraft.getInstance().font;

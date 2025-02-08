@@ -5,15 +5,15 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
+import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
+import com.mrcrayfish.controllable.client.binding.handlers.ButtonHandler;
 import com.mrcrayfish.controllable.client.binding.handlers.action.BindingMovementInput;
 import com.mrcrayfish.controllable.client.binding.handlers.action.BindingOnRender;
 import com.mrcrayfish.controllable.client.binding.handlers.action.BindingOnTick;
 import com.mrcrayfish.controllable.client.binding.handlers.action.BindingPressed;
 import com.mrcrayfish.controllable.client.binding.handlers.action.BindingReleased;
-import com.mrcrayfish.controllable.client.binding.handlers.ButtonHandler;
 import com.mrcrayfish.controllable.client.binding.handlers.action.context.Context;
-import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.binding.handlers.action.context.MovementInputContext;
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.ListEntryNavigationPoint;
@@ -63,15 +63,18 @@ import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.player.Input;
+import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.inventory.FurnaceResultSlot;
 import net.minecraft.world.inventory.RecipeBookMenu;
+import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.StonecutterMenu;
 import net.minecraft.world.level.block.entity.BannerPattern;
@@ -273,7 +276,7 @@ public class InputHandler
         });
     }
 
-    private void updateInput(Player player, Input input)
+    private void updateInput(Player player, ClientInput input)
     {
         LocalPlayer localPlayer = (LocalPlayer) player;
         if(localPlayer == null)
@@ -289,6 +292,7 @@ public class InputHandler
                 return true;
             MovementInputContext context = new MovementInputContext(handler.binding, controller, mc, mc.player, mc.level, mc.screen, false, input);
             handler.handler().handleMovementInput(context);
+            context.mutableInput().apply();
             return false;
         });
 
@@ -312,23 +316,43 @@ public class InputHandler
                     }
                 }
 
+                boolean up = false;
+                boolean down = false;
+                boolean left = false;
+                boolean right = false;
+
                 if(Math.abs(inputY) > 0)
                 {
-                    input.up = inputY < 0;
-                    input.down = inputY > 0;
+                    up = inputY < 0;
+                    down = inputY > 0;
                     input.forwardImpulse = -inputY;
                     input.forwardImpulse *= sneakBonus;
                     controller.updateInputTime();
                 }
 
+
                 float threshold = localPlayer.getVehicle() instanceof Boat ? 0.5F : 0;
                 if(Math.abs(inputX) > threshold)
                 {
-                    input.right = inputX > 0;
-                    input.left = inputX < 0;
+                    right = inputX > 0;
+                    left = inputX < 0;
                     input.leftImpulse = -inputX;
                     input.leftImpulse *= sneakBonus;
                     controller.updateInputTime();
+                }
+
+                // Update key presses if there is a change
+                if(up || down || left || right)
+                {
+                    input.keyPresses = new Input(
+                        input.keyPresses.forward() || up,
+                        input.keyPresses.backward() || down,
+                        input.keyPresses.left() || left,
+                        input.keyPresses.right() || right,
+                        input.keyPresses.jump(),
+                        input.keyPresses.shift(),
+                        input.keyPresses.sprint()
+                    );
                 }
             }
         }
@@ -346,16 +370,17 @@ public class InputHandler
     public static void toggleCraftBook(Context context)
     {
         context.screen().ifPresent(screen -> {
-            if(screen instanceof RecipeUpdateListener listener) {
-                // Since no reference to craft book button, instead search for it and invoke press.
-                ClientServices.CLIENT.getScreenRenderables(screen).stream().filter(widget -> {
-                    return widget instanceof ImageButton btn && RecipeBookComponent.RECIPE_BUTTON_SPRITES.equals(ClientServices.CLIENT.getImageButtonResource(btn));
-                }).findFirst().ifPresent(btn -> ((Button) btn).onPress());
-                boolean visible = listener.getRecipeBookComponent().isVisible();
-                Minecraft.getInstance()
-                    .getSoundManager()
-                    .play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, visible ? 1.0F : 0.95F));
-            }
+            Optional<RecipeBookComponent<?>> optional = findRecipeBookComponent(screen);
+            if(optional.isEmpty())
+                return;
+            // Since no reference to craft book button, instead search for it and invoke press.
+            ClientServices.CLIENT.getScreenRenderables(screen).stream().filter(widget -> {
+                return widget instanceof ImageButton btn && RecipeBookComponent.RECIPE_BUTTON_SPRITES.equals(ClientServices.CLIENT.getImageButtonResource(btn));
+            }).findFirst().ifPresent(btn -> ((Button) btn).onPress());
+            boolean visible = optional.get().isVisible();
+            Minecraft.getInstance()
+                .getSoundManager()
+                .play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, visible ? 1.0F : 0.95F));
         });
     }
 
@@ -378,52 +403,70 @@ public class InputHandler
         ClientServices.CLIENT.scrollCreativeTabs(screen, dir);
     }
 
-    public static void navigateRecipeTab(RecipeBookComponent recipeBook, int dir)
+    private static Optional<RecipeBookComponent<?>> findRecipeBookComponent(Screen screen)
     {
-        if(!recipeBook.isVisible())
+        if(screen instanceof RecipeUpdateListener)
+        {
+            for(GuiEventListener listener : screen.children())
+            {
+                if(listener instanceof RecipeBookComponent<?> component)
+                {
+                    return Optional.of(component);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static void navigateRecipeTab(Screen screen, int dir)
+    {
+        Optional<RecipeBookComponent<?>> optional = findRecipeBookComponent(screen);
+        if(optional.isEmpty())
             return;
-        RecipeBookComponentAccessor recipeBookMixin = ((RecipeBookComponentAccessor) recipeBook);
-        RecipeBookTabButton currentTab = recipeBookMixin.controllableGetCurrentTab();
-        List<RecipeBookTabButton> tabs = recipeBookMixin.controllableGetRecipeTabs();
+
+        RecipeBookComponent<?> component = optional.get();
+        if(!component.isVisible())
+            return;
+
+        RecipeBookComponentAccessor accessor = ((RecipeBookComponentAccessor) component);
+        RecipeBookTabButton currentTab = accessor.controllableGetCurrentTab();
+        List<RecipeBookTabButton> tabs = accessor.controllableGetRecipeTabs();
         int currentTabIndex = tabs.indexOf(currentTab);
+
         RecipeBookTabButton newTab = null;
-        if(dir > 0)
+        currentTabIndex += dir;
+        while(currentTabIndex >= 0 && currentTabIndex < tabs.size())
         {
-            for(int i = currentTabIndex + 1; i < tabs.size(); i++)
+            if(tabs.get(currentTabIndex).visible)
             {
-                if(tabs.get(i).visible)
-                {
-                    newTab = tabs.get(i);
-                    break;
-                }
+                newTab = tabs.get(currentTabIndex);
+                break;
             }
+            currentTabIndex += dir;
         }
-        else
-        {
-            for(int i = currentTabIndex - 1; i >= 0; i--)
-            {
-                if(tabs.get(i).visible)
-                {
-                    newTab = tabs.get(i);
-                    break;
-                }
-            }
-        }
+
         if(newTab != null)
         {
             currentTab.setStateTriggered(false);
-            recipeBookMixin.controllableSetCurrentTab(newTab);
+            accessor.controllableSetCurrentTab(newTab);
             newTab.setStateTriggered(true);
-            recipeBookMixin.controllableUpdateCollections(true);
+            boolean filtering = accessor.controllableIsFiltering();
+            accessor.controllableUpdateCollections(true, filtering);
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
         }
     }
 
-    public static void navigateRecipePage(RecipeBookComponent recipeBook, int dir)
+    public static void navigateRecipePage(Screen screen, int dir)
     {
-        if(!recipeBook.isVisible())
+        Optional<RecipeBookComponent<?>> optional = findRecipeBookComponent(screen);
+        if(optional.isEmpty())
             return;
-        RecipeBookPageAccessor page = (RecipeBookPageAccessor)((RecipeBookComponentAccessor) recipeBook).controllableGetRecipeBookPage();
+
+        RecipeBookComponent<?> component = optional.get();
+        if(!component.isVisible())
+            return;
+
+        RecipeBookPageAccessor page = (RecipeBookPageAccessor)((RecipeBookComponentAccessor) component).controllableGetRecipeBookPage();
         if(dir > 0 && page.controllableGetForwardButton().visible || dir < 0 && page.controllableGetBackButton().visible)
         {
             int currentPage = page.controllableGetCurrentPage();
@@ -487,7 +530,7 @@ public class InputHandler
             NavigationPoint targetPoint = targetPointOptional.get();
             targetPoint.onNavigate();
             Minecraft mc = Minecraft.getInstance();
-            mc.tell(() -> // Run next frame to allow lists to update widget positions
+            mc.schedule(() -> // Run next frame to allow lists to update widget positions
             {
                 VirtualCursor cursor = Controllable.getCursor();
 
@@ -539,24 +582,28 @@ public class InputHandler
 
         if(screen instanceof RecipeUpdateListener)
         {
-            RecipeBookComponent recipeBook = ((RecipeUpdateListener) screen).getRecipeBookComponent();
-            if(recipeBook.isVisible())
+            Optional<RecipeBookComponent<?>> optional = findRecipeBookComponent(screen);
+            if(optional.isPresent())
             {
-                widgets.add(((RecipeBookComponentAccessor) recipeBook).controllableGetFilterButton());
-                widgets.addAll(((RecipeBookComponentAccessor) recipeBook).controllableGetRecipeTabs());
+                RecipeBookComponent<?> component = optional.get();
+                if(component.isVisible())
+                {
+                    widgets.add(((RecipeBookComponentAccessor) component).controllableGetFilterButton());
+                    widgets.addAll(((RecipeBookComponentAccessor) component).controllableGetRecipeTabs());
 
-                RecipeBookPage page = ((RecipeBookComponentAccessor) recipeBook).controllableGetRecipeBookPage();
-                OverlayRecipeComponent overlay = ((RecipeBookPageAccessor) page).controllableGetOverlay();
-                if(overlay.isVisible())
-                {
-                    widgets.addAll(((OverlayRecipeComponentAccessor) overlay).controllableGetRecipeButtons());
-                }
-                else
-                {
-                    RecipeBookPage recipeBookPage = ((RecipeBookComponentAccessor) recipeBook).controllableGetRecipeBookPage();
-                    widgets.addAll(((RecipeBookPageAccessor) recipeBookPage).controllableGetButtons());
-                    widgets.add(((RecipeBookPageAccessor) recipeBookPage).controllableGetForwardButton());
-                    widgets.add(((RecipeBookPageAccessor) recipeBookPage).controllableGetBackButton());
+                    RecipeBookPage page = ((RecipeBookComponentAccessor) component).controllableGetRecipeBookPage();
+                    OverlayRecipeComponent overlay = ((RecipeBookPageAccessor) page).controllableGetOverlay();
+                    if(overlay.isVisible())
+                    {
+                        widgets.addAll(((OverlayRecipeComponentAccessor) overlay).controllableGetRecipeButtons());
+                    }
+                    else
+                    {
+                        RecipeBookPage recipeBookPage = ((RecipeBookComponentAccessor) component).controllableGetRecipeBookPage();
+                        widgets.addAll(((RecipeBookPageAccessor) recipeBookPage).controllableGetButtons());
+                        widgets.add(((RecipeBookPageAccessor) recipeBookPage).controllableGetForwardButton());
+                        widgets.add(((RecipeBookPageAccessor) recipeBookPage).controllableGetBackButton());
+                    }
                 }
             }
         }
@@ -585,7 +632,7 @@ public class InputHandler
             int buttonWidth = 16;
             int buttonHeight = 18;
             int offsetIndex = ClientServices.CLIENT.getStonecutterStartIndex(stonecutter);
-            for(int index = offsetIndex; index < offsetIndex + 12 && index < menu.getNumRecipes(); index++)
+            for(int index = offsetIndex; index < offsetIndex + 12 && index < menu.getVisibleRecipes().size(); index++)
             {
                 int buttonIndex = index - offsetIndex;
                 int buttonX = startX + buttonIndex % 4 * buttonWidth;
@@ -738,28 +785,34 @@ public class InputHandler
         if(!(mc.screen instanceof AbstractContainerScreen<?> screen) || !(mc.screen instanceof RecipeUpdateListener listener))
             return;
 
-        if(!listener.getRecipeBookComponent().isVisible())
+        Optional<RecipeBookComponent<?>> optional = findRecipeBookComponent(mc.screen);
+        if(optional.isEmpty())
             return;
 
-        if(!(screen.getMenu() instanceof RecipeBookMenu<?, ?>))
+        RecipeBookComponent<?> component = optional.get();
+        if(!component.isVisible())
             return;
 
-        RecipeBookPage recipeBookPage = ((RecipeBookComponentAccessor) listener.getRecipeBookComponent()).controllableGetRecipeBookPage();
-        RecipeButton recipeButton = ((RecipeBookPageAccessor) recipeBookPage).controllableGetButtons().stream().filter(RecipeButton::isHoveredOrFocused).findFirst().orElse(null);
-        if(recipeButton != null)
+        if(!(screen.getMenu() instanceof RecipeBookMenu))
+            return;
+
+        RecipeBookPage page = ((RecipeBookComponentAccessor) component).controllableGetRecipeBookPage();
+        RecipeButton button = ((RecipeBookPageAccessor) page).controllableGetButtons().stream().filter(RecipeButton::isHoveredOrFocused).findFirst().orElse(null);
+        if(button != null)
         {
-            RecipeBookMenu<?, ?> menu = (RecipeBookMenu<?, ?>) screen.getMenu();
-            Slot slot = menu.getSlot(menu.getResultSlotIndex());
-            int screenLeft = ClientServices.CLIENT.getScreenLeft(screen);
-            int screenTop = ClientServices.CLIENT.getScreenTop(screen);
-            if(menu.getCarried().isEmpty())
-            {
-                MouseHooks.invokeMouseClick(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
-            }
-            else
-            {
-                MouseHooks.invokeMouseReleased(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
-            }
+            RecipeBookMenu menu = (RecipeBookMenu) screen.getMenu();
+            Optional<Slot> result = menu.slots.stream()
+                .filter(slot -> slot instanceof ResultSlot || slot instanceof FurnaceResultSlot) // TODO find a better solution
+                .findFirst();
+            result.ifPresent(slot -> {
+                int screenLeft = ClientServices.CLIENT.getScreenLeft(screen);
+                int screenTop = ClientServices.CLIENT.getScreenTop(screen);
+                if(menu.getCarried().isEmpty()) {
+                    MouseHooks.invokeMouseClick(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
+                } else {
+                    MouseHooks.invokeMouseReleased(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
+                }
+            });
         }
     }
 

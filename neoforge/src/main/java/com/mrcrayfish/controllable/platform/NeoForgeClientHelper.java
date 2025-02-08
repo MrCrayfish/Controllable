@@ -17,7 +17,6 @@ import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -36,12 +35,11 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Author: MrCrayfish
  */
-public class ForgeClientHelper implements IClientHelper
+public class NeoForgeClientHelper implements IClientHelper
 {
     public final Map<IKeyConflictContext, BindingContext> keyContextMap = new Object2ObjectOpenHashMap<>();
 
@@ -54,78 +52,69 @@ public class ForgeClientHelper implements IClientHelper
     @Override
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
-        AtomicBoolean handled = new AtomicBoolean();
-        Screen.wrapScreenError(() -> {
-            if(action == GLFW.GLFW_RELEASE) {
-                if(!ClientHooks.onScreenKeyReleasedPre(screen, key, -1, modifiers)) {
-                    if(!screen.keyReleased(key, -1, modifiers)) {
-                        if(!ClientHooks.onScreenKeyReleasedPost(screen, key, -1, modifiers)) {
-                            return;
-                        }
-                    }
+        if(action == GLFW.GLFW_RELEASE)
+        {
+            if(!ClientHooks.onScreenKeyReleasedPre(screen, key, -1, modifiers))
+            {
+                if(!screen.keyReleased(key, -1, modifiers))
+                {
+                    return ClientHooks.onScreenKeyReleasedPost(screen, key, -1, modifiers);
                 }
-                handled.set(true);
-            } else if(action == GLFW.GLFW_PRESS) {
-                if(!ClientHooks.onScreenKeyPressedPre(screen, key, -1, modifiers)) {
-                    if(!screen.keyPressed(key, -1, modifiers)) {
-                        if(!ClientHooks.onScreenKeyPressedPost(screen, key, -1, modifiers)) {
-                            return;
-                        }
-                    }
-                }
-                handled.set(true);
             }
-        }, "Controllable keyPressed event handler", screen.getClass().getCanonicalName());
-        return handled.get();
+            return true;
+        }
+        else if(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT)
+        {
+            screen.afterKeyboardAction();
+            if(!ClientHooks.onScreenKeyPressedPre(screen, key, -1, modifiers))
+            {
+                if(!screen.keyPressed(key, -1, modifiers))
+                {
+                    return ClientHooks.onScreenKeyPressedPost(screen, key, -1, modifiers);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void sendMouseDrag(Screen screen, double dragX, double dragY, double finalMouseX, double finalMouseY, int activeButton)
     {
-        Screen.wrapScreenError(() -> {
-            Minecraft mc = screen.getMinecraft();
-            double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
-            double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
-            if(ClientHooks.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
-                return;
-            if(screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
-                return;
-            ClientHooks.onScreenMouseDragPost(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
-        }, "Controllable mouseDragged event handler", ((GuiEventListener) screen).getClass().getCanonicalName());
+        Minecraft mc = screen.getMinecraft();
+        double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
+        double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
+        if(ClientHooks.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
+            return;
+        if(screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
+            return;
+        ClientHooks.onScreenMouseDragPost(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
     }
 
     @Override
     public void sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button)
     {
-        Screen.wrapScreenError(() -> {
-            if(!ClientHooks.onScreenMouseClickedPre(screen, mouseX, mouseY, button)){
-                boolean handled = screen.mouseClicked(mouseX, mouseY, button);
-                ClientHooks.onScreenMouseClickedPost(screen, mouseX, mouseY, button, handled);
-            }
-        }, "Controllable mouseClicked event handler", screen.getClass().getCanonicalName());
+        if(!ClientHooks.onScreenMouseClickedPre(screen, mouseX, mouseY, button))
+        {
+            boolean handled = screen.mouseClicked(mouseX, mouseY, button);
+            ClientHooks.onScreenMouseClickedPost(screen, mouseX, mouseY, button, handled);
+        }
     }
 
     @Override
     public void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
     {
-        Screen.wrapScreenError(() -> {
-            if(!ClientHooks.onScreenMouseReleasedPre(screen, mouseX, mouseY, button)) {
-                boolean handled = screen.mouseReleased(mouseX, mouseY, button);
-                ClientHooks.onScreenMouseReleasedPost(screen, mouseX, mouseY, button, handled);
-            }
-        }, "Controllable mouseReleased event handler", screen.getClass().getCanonicalName());
+        if(!ClientHooks.onScreenMouseReleasedPre(screen, mouseX, mouseY, button))
+        {
+            boolean handled = screen.mouseReleased(mouseX, mouseY, button);
+            ClientHooks.onScreenMouseReleasedPost(screen, mouseX, mouseY, button, handled);
+        }
     }
 
     @Override
     public List<GuiMessage.Line> getChatTrimmedMessages(ChatComponent chat)
     {
         return chat.trimmedMessages;
-    }
-
-    @Override
-    public int getMinecraftFramerateLimit()
-    {
-        return Minecraft.getInstance().getFramerateLimit();
     }
 
     @Override

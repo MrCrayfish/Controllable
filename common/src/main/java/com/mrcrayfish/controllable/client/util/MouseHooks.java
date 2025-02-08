@@ -106,9 +106,7 @@ public class MouseHooks
             // Send mouse moved event to screen
             double screenCursorX = cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
             double screenCursorY = cursorY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
-            Screen.wrapScreenError(() -> {
-                screen.mouseMoved(screenCursorX, screenCursorY);
-            }, "Controllable mouseMoved event handler", screen.getClass().getCanonicalName());
+            screen.mouseMoved(screenCursorX, screenCursorY);
 
             // Invoke a mouse drag if possible
             int activeMouseButton = ClientServices.CLIENT.getActiveMouseButton();

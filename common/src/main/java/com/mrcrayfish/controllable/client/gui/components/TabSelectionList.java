@@ -35,8 +35,7 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
 
     public TabSelectionList(Minecraft mc, int itemHeight)
     {
-        super(mc, 0, 0, 0, itemHeight); // TODO test
-        //this.setRenderTopAndBottom(false);
+        super(mc, 0, 0, 0, itemHeight);
     }
 
     public TabSelectionList<E> setHeaderText(Component headerText)
@@ -58,7 +57,7 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
     }
 
     @Override
-    protected int getScrollbarPosition()
+    protected int scrollBarX()
     {
         return this.getRowLeft() + this.getRowWidth() + 4;
     }
@@ -114,9 +113,9 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
     public void visitWidgets(Consumer<AbstractWidget> consumer) {}
 
     @Override
-    protected boolean isValidMouseClick(int button)
+    protected boolean isValidClickButton(int button)
     {
-        return super.isValidMouseClick(button) || button == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+        return super.isValidClickButton(button) || button == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
     }
 
     public abstract static class Item<T extends ContainerObjectSelectionList.Entry<T>> extends ContainerObjectSelectionList.Entry<T>

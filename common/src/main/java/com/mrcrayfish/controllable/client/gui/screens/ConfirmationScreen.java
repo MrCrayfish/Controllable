@@ -81,8 +81,7 @@ public class ConfirmationScreen extends Screen
 
         List<FormattedCharSequence> lines = this.font.split(this.message, 300);
 
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        graphics.blit(ControllerLayoutScreen.TEXTURE, this.width / 2 - 10, this.startY - 30, 20, 20, this.icon.ordinal() * 10, 21, 10, 10, 256, 256);
+        graphics.blit(RenderType::guiTextured, ControllerLayoutScreen.TEXTURE, this.width / 2 - 10, this.startY - 30, this.icon.ordinal() * 10, 21, 20, 20, 10, 10, 256, 256);
 
         this.drawListBackground(graphics, 0, this.width, this.startY, this.endY);
 
@@ -130,9 +129,9 @@ public class ConfirmationScreen extends Screen
         ResourceLocation backgroundTexture = !inGame ? MENU_LIST_BACKGROUND : IN_GAME_MENU_LIST_BACKGROUND;
         ResourceLocation headerTexture = !inGame ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR;
         ResourceLocation footerTexture = !inGame ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR;
-        graphics.blit(backgroundTexture, startX, startY, (float) endX, (float) endY, endX - startX, endY - startY, 32, 32);
-        graphics.blit(headerTexture, startX, startY - 2, 0, 0, endX - startX, 2, 32, 2);
-        graphics.blit(footerTexture, startX, endY, 0, 0, endX - startX, 2, 32, 2);
+        graphics.blit(RenderType::guiTextured, backgroundTexture, startX, startY, (float) endX, (float) endY, endX - startX, endY - startY, 32, 32);
+        graphics.blit(RenderType::guiTextured, headerTexture, startX, startY - 2, 0, 0, endX - startX, 2, 32, 2);
+        graphics.blit(RenderType::guiTextured, footerTexture, startX, endY, 0, 0, endX - startX, 2, 32, 2);
         RenderSystem.disableBlend();
     }
 

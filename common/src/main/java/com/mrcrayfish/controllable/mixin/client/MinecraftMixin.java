@@ -91,14 +91,13 @@ public class MinecraftMixin
         }
     }
 
-    // Note: Minecraft Development plugin is failing to process this correctly.
-    @ModifyVariable(method = "runTick", at = @At(value = "STORE", target = "Lnet/minecraft/client/Minecraft;getFramerateLimit()I"), index = 7)
+    @ModifyVariable(method = "runTick", at = @At(value = "STORE", target = "Lcom/mojang/blaze3d/platform/FramerateLimitTracker;getFramerateLimit()I"), index = 5)
     private int controllableModifyFramerate(int originalFps)
     {
         Minecraft mc = (Minecraft) (Object) this;
         if(mc.getOverlay() == null)
         {
-            if(Config.CLIENT.options.fpsPollingFix.get() && ClientServices.CLIENT.getMinecraftFramerateLimit() < 40)
+            if(Config.CLIENT.options.fpsPollingFix.get() && mc.options.framerateLimit().get() < 40)
             {
                 return 260; // To bypass "fps < 260" condition
             }
@@ -106,13 +105,13 @@ public class MinecraftMixin
         return originalFps;
     }
 
-    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getFramerateLimit()I"))
+    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/FramerateLimitTracker;getFramerateLimit()I"))
     private void controllableWaitEvents(boolean outOfMemory, CallbackInfo ci)
     {
         Minecraft mc = (Minecraft) (Object) this;
         if(mc.getOverlay() == null)
         {
-            if(Config.CLIENT.options.fpsPollingFix.get() && ClientServices.CLIENT.getMinecraftFramerateLimit() < 40)
+            if(Config.CLIENT.options.fpsPollingFix.get() && mc.options.framerateLimit().get() < 40)
             {
                 Controllable.getInputProcessor().queueInputsWait();
             }

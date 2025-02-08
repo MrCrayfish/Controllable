@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 
 /**
@@ -38,14 +39,13 @@ public class ButtonBindingButton extends Button
         int texU = this.binding.getButton() * 13;
         int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
         int size = 13;
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        graphics.blit(ButtonIcons.TEXTURE, this.getX() + (this.width - size) / 2 + 1, this.getY() + 3, texU, texV, size, size, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
+        graphics.blit(RenderType::guiTextured, ButtonIcons.TEXTURE, this.getX() + (this.width - size) / 2 + 1, this.getY() + 3, texU, texV, size, size, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        if(this.active && this.visible && this.clicked(mouseX, mouseY))
+        if(this.active && this.visible && this.isMouseOver(mouseX, mouseY))
         {
             if(this.onPress.onPress(button))
             {

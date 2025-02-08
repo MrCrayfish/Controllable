@@ -37,22 +37,7 @@ runs {
             runtime project.configurations.library
         }
     }
-    client {
-        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-    }
-    server {
-        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        programArgument '--nogui'
-    }
-    gameTestServer {
-        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-    }
-    data {
-        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-    }
-    junit {
-
-    }
+    client {}
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
@@ -63,8 +48,8 @@ dependencies {
     implementation "com.mrcrayfish:framework-neoforge:${minecraft_version}-${framework_version}"
 
     // JEI
-    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
-    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+    compileOnly "mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${jei_minecraft_version}-neoforge:${jei_version}"
 
     // EMI
     compileOnly "dev.emi:emi-neoforge:${emi_version}"

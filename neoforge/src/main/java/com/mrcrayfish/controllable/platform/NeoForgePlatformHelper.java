@@ -5,7 +5,7 @@ import com.mrcrayfish.controllable.platform.services.IPlatformHelper;
 /**
  * Author: MrCrayfish
  */
-public class ForgePlatformHelper implements IPlatformHelper
+public class NeoForgePlatformHelper implements IPlatformHelper
 {
     @Override
     public boolean isNeoForge()
