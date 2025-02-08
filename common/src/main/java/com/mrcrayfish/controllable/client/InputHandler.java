@@ -194,6 +194,9 @@ public class InputHandler
         if(action.isEmpty())
             return false;
 
+        /* TODO Reconsider to enqueue the action, and then run at the same time keyboard actions are
+                handled. This will better align with the time actions are expected to run. */
+
         ButtonBinding.setButtonState(binding, true);
         action.get().run();
 
