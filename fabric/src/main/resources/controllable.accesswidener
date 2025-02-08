@@ -16,7 +16,6 @@ accessible field net/minecraft/client/KeyMapping clickCount I
 accessible field net/minecraft/client/gui/components/Tooltip cachedTooltip Ljava/util/List;
 accessible field net/minecraft/client/gui/screens/inventory/StonecutterScreen startIndex I
 accessible field net/minecraft/client/gui/screens/inventory/LoomScreen startRow I
-accessible method net/minecraft/client/Minecraft getFramerateLimit ()I
 accessible method net/minecraft/client/Minecraft startUseItem ()V
 accessible method net/minecraft/client/Minecraft startAttack ()Z
 accessible method net/minecraft/client/Minecraft pickBlock ()V
