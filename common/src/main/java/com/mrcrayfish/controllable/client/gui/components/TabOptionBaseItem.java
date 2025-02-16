@@ -4,16 +4,20 @@ import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.navigation.HideCursor;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.config.AbstractProperty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
 
 import java.util.List;
 
@@ -76,13 +80,20 @@ public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implem
         });
     }
 
-    protected static Component createTooltip(AbstractProperty<?> property)
+    protected static Component createTooltipMessage(AbstractProperty<?> property)
     {
         String tooltipKey = property.getTranslationKey() + ".tooltip";
         if(I18n.exists(tooltipKey))
         {
             return Component.translatable(tooltipKey);
         }
-        return Component.empty();
+        return Component.literal(property.getComment());
+    }
+
+    protected static Tooltip createTooltipWithWidth(Component message, int width)
+    {
+        Minecraft mc = Minecraft.getInstance();
+        List<FormattedText> lines = mc.font.getSplitter().splitLines(message, width, Style.EMPTY);
+        return ClientHelper.createListTooltip(lines);
     }
 }
