@@ -314,4 +314,11 @@ public class BindingRegistry
             Constants.LOG.error("Failed to save key_adapters.json", e);
         }
     }
+
+    // Patches old Iron Jetpacks versions
+    @Deprecated(forRemoval = true, since = "1.21.1")
+    public static BindingRegistry getInstance()
+    {
+        return Controllable.getBindingRegistry();
+    }
 }
