@@ -3,7 +3,6 @@ package com.mrcrayfish.controllable.client;
 import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.input.ButtonStates;
@@ -51,6 +50,7 @@ public class InputProcessor
     private void pollControllerInput(boolean process)
     {
         this.gatherAndQueueControllerInput();
+
         if(process)
         {
             this.processButtonStates();
@@ -61,8 +61,9 @@ public class InputProcessor
     {
         AdaptiveControllerManager manager = Controllable.getControllerManager();
         manager.tick();
+
         Controller currentController = manager.getActiveController();
-        if(currentController == null)
+        if(currentController == null || !currentController.isAccessible())
             return;
 
         this.inputQueue.offer(currentController.captureButtonStates());

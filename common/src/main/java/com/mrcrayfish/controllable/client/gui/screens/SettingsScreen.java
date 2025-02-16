@@ -315,6 +315,7 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.controller").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.analogMovement));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.autoSelect));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.backgroundInput));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.thumbstickDeadZone, 0.01));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.triggerDeadZone, 0.01));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.cursorSpeed, 1.0));

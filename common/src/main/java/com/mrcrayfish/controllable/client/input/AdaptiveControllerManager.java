@@ -63,7 +63,12 @@ public abstract class AdaptiveControllerManager
 
     protected abstract Map<Number, Pair<Integer, String>> createRawControllerMap();
 
-    public final void tick()
+    public void tick()
+    {
+        this.updateControllers();
+    }
+
+    private void updateControllers()
     {
         if(this.getRawControllerCount() == this.controllers.size())
             return;
