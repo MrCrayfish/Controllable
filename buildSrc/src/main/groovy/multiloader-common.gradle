@@ -68,6 +68,10 @@ repositories {
         name = "RoughlyEnoughItems"
         url = "https://maven.shedaniel.me"
     }
+    maven {
+        name = "AppleSkin"
+        url = "https://maven.ryanliptak.com/"
+    }
 }
 
 configurations {

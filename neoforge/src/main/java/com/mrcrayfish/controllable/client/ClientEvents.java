@@ -34,12 +34,6 @@ public class ClientEvents
         set.add(VanillaGuiLayers.HOTBAR);
         set.add(VanillaGuiLayers.JUMP_METER);
         set.add(VanillaGuiLayers.EXPERIENCE_BAR);
-        set.add(VanillaGuiLayers.PLAYER_HEALTH);
-        set.add(VanillaGuiLayers.ARMOR_LEVEL);
-        set.add(VanillaGuiLayers.FOOD_LEVEL);
-        set.add(VanillaGuiLayers.VEHICLE_HEALTH);
-        set.add(VanillaGuiLayers.AIR_LEVEL);
-        set.add(VanillaGuiLayers.SELECTED_ITEM_NAME);
         set.add(VanillaGuiLayers.SPECTATOR_TOOLTIP);
         set.add(VanillaGuiLayers.EXPERIENCE_LEVEL);
     });
@@ -67,6 +61,16 @@ public class ClientEvents
         if(Config.CLIENT.options.consoleHotbar.get() && OFFSET_LAYERS.contains(event.getName()))
         {
             event.getGuiGraphics().pose().popPose();
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onRenderGui(RenderGuiEvent.Pre event)
+    {
+        if(Config.CLIENT.options.consoleHotbar.get())
+        {
+            Minecraft.getInstance().gui.leftHeight += CONSOLE_HOTBAR_OFFSET;
+            Minecraft.getInstance().gui.rightHeight += CONSOLE_HOTBAR_OFFSET;
         }
     }
 }

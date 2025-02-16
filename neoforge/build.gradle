@@ -37,7 +37,6 @@ runs {
             runtime project.configurations.library
         }
     }
-    client {}
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
@@ -56,6 +55,9 @@ dependencies {
 
     // Roughly Enough Items
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
+
+    // AppleSkin
+    //rumtimeOnly "squeek.appleskin:appleskin-neoforge:mc1.21.3-3.0.6"
 
     // Controllable SDL (https://github.com/MrCrayfish/ControllableSDL)
     library jarJar("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
