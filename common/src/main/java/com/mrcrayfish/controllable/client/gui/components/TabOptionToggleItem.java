@@ -36,7 +36,7 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
 
     public TabOptionToggleItem(BoolProperty property)
     {
-        this(Component.translatable(property.getTranslationKey()), Tooltip.create(Component.literal(property.getComment())), property::get, property::set);
+        this(Component.translatable(property.getTranslationKey()), Tooltip.create(createTooltip(property)), property::get, property::set);
     }
 
     public TabOptionToggleItem(OptionInstance<Boolean> option)

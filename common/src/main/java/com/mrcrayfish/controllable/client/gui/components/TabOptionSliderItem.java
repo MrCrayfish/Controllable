@@ -38,7 +38,7 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
         if(!(property.getValidator() instanceof NumberRange<Double>(Double minValue, Double maxValue)))
             throw new IllegalArgumentException("Double property must have a number range");
         this.slider = new LazySlider(0, 0, 100, 20, this.label, property.get(), minValue, maxValue, stepSize, property::set);
-        this.slider.setTooltip(Tooltip.create(Component.literal(property.getComment()))); // TODO trim valid values and whitespace
+        this.slider.setTooltip(Tooltip.create(createTooltip(property))); // TODO trim valid values and whitespace
         this.slider.setTooltipDelay(Duration.ofMillis(500));
         this.slider.valueOnly();
     }
