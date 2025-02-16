@@ -15,6 +15,7 @@ dependencies {
     modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
     modCompileOnly "dev.emi:emi-fabric:${emi_version}"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
+    //modRuntimeOnly "squeek.appleskin:appleskin-fabric:mc1.21.3-3.0.6"
     library include("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
         transitive(false)
     }
