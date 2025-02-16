@@ -3,7 +3,6 @@ package com.mrcrayfish.controllable.client.gui.components;
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
-import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.settings.SettingEnum;
@@ -13,7 +12,6 @@ import com.mrcrayfish.framework.api.config.EnumProperty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.CycleButton;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -36,7 +34,7 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
 
     public TabOptionEnumItem(EnumProperty<T> property)
     {
-        this(Component.translatable(property.getTranslationKey()), createTooltip(property), property::get, property::set);
+        this(Component.translatable(property.getTranslationKey()), createTooltipMessage(property), property::get, property::set);
     }
 
     @SuppressWarnings("unchecked")
@@ -47,7 +45,7 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
         this.cycle = CycleButton.builder(T::getLabel)
                 .withValues(values)
                 .withInitialValue(getter.get())
-                .withTooltip(value -> Tooltip.create(tooltip))
+                .withTooltip(value -> createTooltipWithWidth(tooltip, 250))
                 .displayOnlyValue()
                 .create(0, 0, 100, 20, this.label, (button, value) -> {
                     setter.accept(value);

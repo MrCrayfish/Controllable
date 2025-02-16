@@ -3,7 +3,6 @@ package com.mrcrayfish.controllable.client.gui.components;
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
-import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.gui.navigation.Navigatable;
 import com.mrcrayfish.controllable.client.gui.widget.LazySlider;
 import com.mrcrayfish.controllable.client.input.Controller;
@@ -13,7 +12,6 @@ import com.mrcrayfish.framework.api.config.DoubleProperty;
 import com.mrcrayfish.framework.api.config.validate.NumberRange;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -38,7 +36,7 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
         if(!(property.getValidator() instanceof NumberRange<Double>(Double minValue, Double maxValue)))
             throw new IllegalArgumentException("Double property must have a number range");
         this.slider = new LazySlider(0, 0, 100, 20, this.label, property.get(), minValue, maxValue, stepSize, property::set);
-        this.slider.setTooltip(Tooltip.create(createTooltip(property))); // TODO trim valid values and whitespace
+        this.slider.setTooltip(createTooltipWithWidth(createTooltipMessage(property), 250)); // TODO trim valid values and whitespace
         this.slider.setTooltipDelay(Duration.ofMillis(500));
         this.slider.valueOnly();
     }
