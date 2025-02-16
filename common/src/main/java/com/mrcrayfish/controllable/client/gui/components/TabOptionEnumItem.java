@@ -36,7 +36,7 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
 
     public TabOptionEnumItem(EnumProperty<T> property)
     {
-        this(Component.translatable(property.getTranslationKey()), Component.literal(property.getComment()), property::get, property::set);
+        this(Component.translatable(property.getTranslationKey()), createTooltip(property), property::get, property::set);
     }
 
     @SuppressWarnings("unchecked")
