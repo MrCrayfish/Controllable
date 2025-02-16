@@ -189,7 +189,7 @@
     "controllable.tooltip.craft": "Press %s to Craft Item",
     "controllable.tooltip.more_recipes": "Press %s to View More",
     "framework_config.controllable.client.options.analogMovement": "Analog Movement",
-    "framework_config.controllable.client.options.analogMovement.tooltip": "Allows you to control the settings of analog movement",
+    "framework_config.controllable.client.options.analogMovement.tooltip": "Allows you to control the settings of analog movement. §6Disabled§f means player movement will behave like a keyboard. §6Local Only§f means player movement depends on how much input is applied to the thumbstick, giving you precise control over direction and speed. However, this will only work in Singleplayer and LAN servers. §6Always§f is the same as §6Local Only§f but allows you to use the feature on remote servers. §cIt is recommended to keep this set to Local Only",
     "framework_config.controllable.client.options.autoSelect": "Auto Select",
     "framework_config.controllable.client.options.autoSelect.tooltip": "If enabled, controller will be automatically selected on start up or when plugged in",
     "framework_config.controllable.client.options.consoleHotbar": "Console Hotbar",
