@@ -1,19 +1,23 @@
 package com.mrcrayfish.controllable.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.gui.GuiLayerManager;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.event.GameShuttingDownEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +28,8 @@ import java.util.Set;
 @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public class ClientEvents
 {
+    private static final int CONSOLE_HOTBAR_OFFSET = 25;
+
     private static final Set<ResourceLocation> OFFSET_LAYERS = Util.make(new HashSet<>(), set -> {
         set.add(VanillaGuiLayers.HOTBAR);
         set.add(VanillaGuiLayers.JUMP_METER);
@@ -44,21 +50,21 @@ public class ClientEvents
         Controllable.getControllerManager().dispose();
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onRenderLayer(RenderGuiLayerEvent.Pre event)
+    @SuppressWarnings("UnstableApiUsage")
+    public static void beforeRenderLayer(GuiGraphics graphics, GuiLayerManager.NamedLayer layer)
     {
-        if(OFFSET_LAYERS.contains(event.getName()))
+        if(Config.CLIENT.options.consoleHotbar.get() && OFFSET_LAYERS.contains(layer.name()))
         {
-            PoseStack pose = event.getGuiGraphics().pose();
+            PoseStack pose = graphics.pose();
             pose.pushPose();
-            pose.translate(0, -25, 0);
+            pose.translate(0, -CONSOLE_HOTBAR_OFFSET, 0);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onRenderLayer(RenderGuiLayerEvent.Post event)
     {
-        if(OFFSET_LAYERS.contains(event.getName()))
+        if(Config.CLIENT.options.consoleHotbar.get() && OFFSET_LAYERS.contains(event.getName()))
         {
             event.getGuiGraphics().pose().popPose();
         }
