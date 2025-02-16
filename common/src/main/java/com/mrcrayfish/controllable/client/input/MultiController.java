@@ -76,13 +76,13 @@ public final class MultiController extends Controller
     }
 
     @Override
-    public boolean rumble(float lowFrequency, float highFrequency, int timeInMs)
+    protected boolean internalRumble(float lowFrequency, float highFrequency, int timeInMs)
     {
         for(Controller controller : this.controllers)
         {
             if(controller.supportsRumble())
             {
-                controller.rumble(lowFrequency, highFrequency, timeInMs);
+                controller.internalRumble(lowFrequency, highFrequency, timeInMs);
             }
         }
         return false;
@@ -105,39 +105,39 @@ public final class MultiController extends Controller
     }
 
     @Override
-    public float getLTriggerValue()
+    protected float internalGetLTriggerValue()
     {
-        return this.averageOfInput(Controller::getLTriggerValue);
+        return this.averageOfInput(Controller::internalGetLTriggerValue);
     }
 
     @Override
-    public float getRTriggerValue()
+    protected float internalGetRTriggerValue()
     {
-        return this.averageOfInput(Controller::getRTriggerValue);
+        return this.averageOfInput(Controller::internalGetRTriggerValue);
     }
 
     @Override
-    public float getLThumbStickXValue()
+    protected float internalGetLThumbStickXValue()
     {
-        return this.averageOfInput(Controller::getLThumbStickXValue);
+        return this.averageOfInput(Controller::internalGetLThumbStickXValue);
     }
 
     @Override
-    public float getLThumbStickYValue()
+    protected float internalGetLThumbStickYValue()
     {
-        return this.averageOfInput(Controller::getLThumbStickYValue);
+        return this.averageOfInput(Controller::internalGetLThumbStickYValue);
     }
 
     @Override
-    public float getRThumbStickXValue()
+    protected float internalGetRThumbStickXValue()
     {
-        return this.averageOfInput(Controller::getRThumbStickXValue);
+        return this.averageOfInput(Controller::internalGetRThumbStickXValue);
     }
 
     @Override
-    public float getRThumbStickYValue()
+    protected float internalGetRThumbStickYValue()
     {
-        return this.averageOfInput(Controller::getRThumbStickYValue);
+        return this.averageOfInput(Controller::internalGetRThumbStickYValue);
     }
 
     @Override

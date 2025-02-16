@@ -126,6 +126,11 @@ public class Config
                 You should set this to DISABLED or LOCAL_ONLY if you are playing on public
                 servers (e.g Hypixel) as analog movement may be detected by anti-cheat software.""")
             public final EnumProperty<AnalogMovement> analogMovement = EnumProperty.create(AnalogMovement.LOCAL_ONLY);
+
+            @ConfigProperty(name = "backgroundInput", comment = """
+                If enabled, allows reading controller input even if the window is not in focus. This option will also
+                prevent the game from auto pausing if the window loses focus.""")
+            public final BoolProperty backgroundInput = BoolProperty.create(true);
         }
     }
 }

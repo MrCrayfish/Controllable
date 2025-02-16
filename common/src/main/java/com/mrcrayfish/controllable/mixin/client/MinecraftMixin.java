@@ -85,7 +85,7 @@ public class MinecraftMixin
     private void controllableIsWindowActiveHead(CallbackInfoReturnable<Boolean> cir)
     {
         // Only apply when in game
-        if(this.player != null && Controllable.getController() != null)
+        if(this.player != null && Controllable.getController() != null && Config.CLIENT.options.backgroundInput.get())
         {
             cir.setReturnValue(true);
         }

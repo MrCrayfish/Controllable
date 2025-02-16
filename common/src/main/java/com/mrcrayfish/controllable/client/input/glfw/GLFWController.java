@@ -111,51 +111,45 @@ public class GLFWController extends Controller
     }
 
     @Override
-    public boolean rumble(float lowFrequency, float highFrequency, int timeInMs)
+    protected boolean internalRumble(float lowFrequency, float highFrequency, int timeInMs)
     {
         return false;
     }
 
     @Override
-    public float getLTriggerValue()
+    protected float internalGetLTriggerValue()
     {
-        float input = Mth.clamp((this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) + 1.0F) / 2.0F, 0, 1);
-        return InputHelper.applyDeadzone(input, Config.CLIENT.options.triggerDeadZone.get().floatValue());
+        return Mth.clamp((this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) + 1.0F) / 2.0F, 0, 1);
     }
 
     @Override
-    public float getRTriggerValue()
+    protected float internalGetRTriggerValue()
     {
-        float input = Mth.clamp((this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER) + 1.0F) / 2.0F, 0, 1);
-        return InputHelper.applyDeadzone(input, Config.CLIENT.options.triggerDeadZone.get().floatValue());
+        return Mth.clamp((this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER) + 1.0F) / 2.0F, 0, 1);
     }
 
     @Override
-    public float getLThumbStickXValue()
+    protected float internalGetLThumbStickXValue()
     {
-        float input = Mth.clamp(this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X), -1, 1);
-        return InputHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
+        return Mth.clamp(this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_X), -1, 1);
     }
 
     @Override
-    public float getLThumbStickYValue()
+    protected float internalGetLThumbStickYValue()
     {
-        float input = Mth.clamp(this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y), -1, 1);
-        return InputHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
+        return Mth.clamp(this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y), -1, 1);
     }
 
     @Override
-    public float getRThumbStickXValue()
+    protected float internalGetRThumbStickXValue()
     {
-        float input = Mth.clamp(this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X), -1, 1);
-        return InputHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
+        return Mth.clamp(this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X), -1, 1);
     }
 
     @Override
-    public float getRThumbStickYValue()
+    protected float internalGetRThumbStickYValue()
     {
-        float input = Mth.clamp(this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y), -1, 1);
-        return InputHelper.applyDeadzone(input, Config.CLIENT.options.thumbstickDeadZone.get().floatValue());
+        return Mth.clamp(this.controller.axes(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y), -1, 1);
     }
 
     @Override

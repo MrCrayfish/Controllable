@@ -1,6 +1,8 @@
 package com.mrcrayfish.controllable.client.input;
 
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.util.InputHelper;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 
@@ -64,49 +66,84 @@ public abstract class Controller
      * @param timeInMs      the time length in milliseconds
      * @return false if the controller doesn't support rumbling
      */
-    public abstract boolean rumble(float lowFrequency, float highFrequency, int timeInMs);
+    public final boolean rumble(float lowFrequency, float highFrequency, int timeInMs)
+    {
+        return this.isAccessible() && this.internalRumble(lowFrequency, highFrequency, timeInMs);
+    }
+
+    protected abstract boolean internalRumble(float lowFrequency, float highFrequency, int timeInMs);
 
     /**
      * Gets the value of the left trigger
      *
      * @return the left trigger value
      */
-    public abstract float getLTriggerValue();
+    public final float getLTriggerValue()
+    {
+        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetLTriggerValue(), this.getTriggerDeadzone()) : 0;
+    }
+
+    protected abstract float internalGetLTriggerValue();
 
     /**
      * Gets the value of the right trigger
      *
      * @return the right trigger value
      */
-    public abstract float getRTriggerValue();
+    public final float getRTriggerValue()
+    {
+        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetRTriggerValue(), this.getTriggerDeadzone()) : 0;
+    }
+
+    protected abstract float internalGetRTriggerValue();
 
     /**
      * Gets the left thumb stick x value
      *
      * @return the left thumb stick x value
      */
-    public abstract float getLThumbStickXValue();
+    public final float getLThumbStickXValue()
+    {
+        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetLThumbStickXValue(), this.getThumbstickDeadzone()) : 0;
+    }
+
+    protected abstract float internalGetLThumbStickXValue();
 
     /**
      * Gets the left thumb stick y value
      *
      * @return the left thumb stick y value
      */
-    public abstract float getLThumbStickYValue();
+    public final float getLThumbStickYValue()
+    {
+        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetLThumbStickYValue(), this.getThumbstickDeadzone()) : 0;
+    }
+
+    protected abstract float internalGetLThumbStickYValue();
 
     /**
      * Gets the right thumb stick x value
      *
      * @return the right thumb stick x value
      */
-    public abstract float getRThumbStickXValue();
+    public final float getRThumbStickXValue()
+    {
+        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetRThumbStickXValue(), this.getThumbstickDeadzone()) : 0;
+    }
+
+    protected abstract float internalGetRThumbStickXValue();
 
     /**
      * Gets the right thumb stick y value
      *
      * @return the right thumb stick y value
      */
-    public abstract float getRThumbStickYValue();
+    public final float getRThumbStickYValue()
+    {
+        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetRThumbStickYValue(), this.getThumbstickDeadzone()) : 0;
+    }
+
+    protected abstract float internalGetRThumbStickYValue();
 
     /**
      * Gets the device information about this controller
@@ -133,7 +170,7 @@ public abstract class Controller
      */
     public boolean isButtonPressed(int button)
     {
-        return this.states.getState(button);
+        return this.isAccessible() && this.states.getState(button);
     }
 
     /**
@@ -208,5 +245,27 @@ public abstract class Controller
             }
             default -> button != -1 && this.isButtonPressed(button) ? 1 : 0;
         };
+    }
+
+    public final boolean isAccessible()
+    {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.isWindowActive() || Config.CLIENT.options.backgroundInput.get();
+    }
+
+    /**
+     * @return The deadzone value for triggers
+     */
+    protected float getTriggerDeadzone()
+    {
+        return Config.CLIENT.options.triggerDeadZone.get().floatValue();
+    }
+
+    /**
+     * @return The deadzone value for thumbsticks
+     */
+    protected float getThumbstickDeadzone()
+    {
+        return Config.CLIENT.options.thumbstickDeadZone.get().floatValue();
     }
 }

@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.input.sdl2;
 
 import com.google.common.io.ByteStreams;
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
@@ -49,6 +50,7 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
     {
         try
         {
+            // Updates the extract path of natives so it's tied to the game directory
             Path natives = Utils.getGamePath().resolve("controllable_natives");
             Path sdl = natives.resolve("SDL");
             Files.createDirectories(sdl);
@@ -71,11 +73,17 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
         }
     }
 
+    private boolean lastBackgroundInput;
+
     @Override
     public void init()
     {
+        if(Config.CLIENT.options.backgroundInput.get())
+        {
+            SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+            this.lastBackgroundInput = true;
+        }
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_VERTICAL_JOY_CONS, "1");
-        SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
         SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
     }
 
@@ -190,5 +198,19 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
             }
         }
         Constants.LOG.info("No gamepad mappings were updated");
+    }
+
+    @Override
+    public void tick()
+    {
+        super.tick();
+
+        // Updates the sdl hint for background events
+        if(this.lastBackgroundInput != Config.CLIENT.options.backgroundInput.get())
+        {
+            this.lastBackgroundInput = Config.CLIENT.options.backgroundInput.get();
+            String value = this.lastBackgroundInput ? "1" : "0";
+            SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, value);
+        }
     }
 }
