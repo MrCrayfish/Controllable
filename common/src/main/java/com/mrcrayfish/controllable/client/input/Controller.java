@@ -245,6 +245,9 @@ public abstract class Controller
         };
     }
 
+    /**
+     * @return True if the controller is accessible for interaction (reading inputs, rumble, etc)
+     */
     public final boolean isAccessible()
     {
         Minecraft mc = Minecraft.getInstance();
