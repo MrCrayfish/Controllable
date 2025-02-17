@@ -4,6 +4,7 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.util.InputHelper;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 
 /**
  * Author: MrCrayfish
