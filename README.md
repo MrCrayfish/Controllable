@@ -8,9 +8,7 @@
 [![Download](https://img.shields.io/static/v1?label=&message=Official%20Website&color=2d2d2d&labelColor=dddddd&style=for-the-badge&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAALEQAACxEBf2RfkQAAAAd0SU1FB98BHA41LJJkRpIAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMvvhp8YAAAGGSURBVDhPjZK9SgNBFIVHBEUE8QeMhLAzdzdYBFL7CmnstEjjO4iFjWClFiGJm42VFpYSUptKRfABFBQE7UUI2AmGmPXM5k6cjFE8cJjZ3fPduTOzIiJarvl+bPmuLuWS+K/KmcwUoK4pEGoTnetvYTY7GUpZOCTa0sZi+QRyhQ83pkBShKjDUBvzGKNxr6rU8W4uN8FoX4CKEcB6EMR61OZOEtApEqNIndFvAbiNuAB30QeU+sDYBXSCdw3MrzHvlnx/kdFkC3kU6NkwF3iM0ukFnNM8R0UplZquKHWE85nhV0Kg4o4GrDMwre5x5G9h9aaBHL/VPI849rtqRFfwqALaIcd+F87gYnDy1ha0sY12VcoiR0cLq5/ae3e3gyLbHB2tMAgKQ1fXh+z5a1mpDXQyy8hPIdgyAEMDW8+fWOQJHbfgzXUhxhkXYh/3jcC9C7s2V43c+9DPpHXgeXMIXbqQbV7gAV5hbFixEGMVolUEmvjjXuBeRcoOnp/R/hm81hi0LsQX8OcRBvBjZ8YAAAAASUVORK5CYII=)](https://mrcrayfish.com/mods?id=controllable) [![Curseforge](http://cf.way2muchnoise.eu/full_controllable_downloads.svg?badge_style=for_the_badge)](https://www.curseforge.com/minecraft/mc-mods/controllable)
 
 # Controllable
-Minecraft: Java Edition has long been missing native controller support, but that's where Controllable comes in. Controllable brings full gamepad functionality, letting you play with Xbox, PlayStation, or other controllers in an experience comparable to Bedrock Edition.
-
-TODO
+Minecraft: Java Edition has long been missing native controller support. Controllable aims to let players enjoy Java Edition without the limitation of a keyboard and mouse. Start playing Java Edition with full gamepad functionality, letting you play with Xbox, PlayStation, or other controllers in an experience comparable to Bedrock Edition. Controllable includes a range controller-specific features and enhancements to ensure you have seamless controller experience.
 
 ### Features:
 * **Lots of Settings** - Adjust button mappings, sensistivity, and the plethora of options Controllable offers to fit your exact play style.
