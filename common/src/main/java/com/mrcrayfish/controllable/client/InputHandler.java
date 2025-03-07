@@ -303,8 +303,6 @@ public class InputHandler
         {
             if((!Controllable.getRadialMenu().isVisible() || Config.CLIENT.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent())
             {
-                float sneakSpeed = (float) localPlayer.getAttributeValue(Attributes.SNEAKING_SPEED);
-                float sneakBonus = localPlayer.isMovingSlowly() ? sneakSpeed : 1.0F;
                 float inputX = InputHelper.getCombinedPressedValue(controller, ButtonBindings.STRAFE_LEFT, ButtonBindings.STRAFE_RIGHT);
                 float inputY = InputHelper.getCombinedPressedValue(controller, ButtonBindings.WALK_FORWARDS, ButtonBindings.WALK_BACKWARDS);
 
@@ -329,10 +327,8 @@ public class InputHandler
                     up = inputY < 0;
                     down = inputY > 0;
                     input.forwardImpulse = -inputY;
-                    input.forwardImpulse *= sneakBonus;
                     controller.updateInputTime();
                 }
-
 
                 float threshold = localPlayer.getVehicle() instanceof Boat ? 0.5F : 0;
                 if(Math.abs(inputX) > threshold)
@@ -340,7 +336,6 @@ public class InputHandler
                     right = inputX > 0;
                     left = inputX < 0;
                     input.leftImpulse = -inputX;
-                    input.leftImpulse *= sneakBonus;
                     controller.updateInputTime();
                 }
 
