@@ -1,10 +1,11 @@
 package com.mrcrayfish.controllable.client.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import com.mrcrayfish.controllable.client.gui.Icons;
+import com.mrcrayfish.controllable.mixin.client.OverlayRecipeButtonAccessor;
+import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.ChatFormatting;
@@ -12,8 +13,9 @@ import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.player.ClientInput;
+import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
@@ -23,6 +25,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -101,5 +104,23 @@ public class ClientHelper
     {
         Minecraft mc = Minecraft.getInstance();
         return mc.options.showSubtitles().get() && mc.screen == null;
+    }
+
+    public static List<AbstractWidget> mixinGetRecipeButtons(OverlayRecipeComponent overlay)
+    {
+        if(overlay instanceof OverlayRecipeComponentAccessor accessor)
+        {
+            return accessor.controllableGetRecipeButtons();
+        }
+        return Collections.emptyList();
+    }
+
+    public static boolean mixinIsCraftable(AbstractWidget widget)
+    {
+        if(widget instanceof OverlayRecipeButtonAccessor accessor)
+        {
+            return accessor.controllableIsCraftable();
+        }
+        return false;
     }
 }
