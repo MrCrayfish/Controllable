@@ -44,9 +44,9 @@ public class RecipeBookPageMixin
         if(this.minecraft.screen == null || !this.overlay.isVisible())
             return;
 
-        List<AbstractWidget> recipeButtons = ((OverlayRecipeComponentAccessor) this.overlay).controllableGetRecipeButtons();
+        List<AbstractWidget> recipeButtons = ClientHelper.mixinGetRecipeButtons(this.overlay);
         recipeButtons.stream().filter(AbstractWidget::isHoveredOrFocused).findFirst().ifPresent(btn -> {
-            if(((OverlayRecipeButtonAccessor) btn).controllableIsCraftable()) {
+            if(ClientHelper.mixinIsCraftable(btn)) {
                 Component craftText = Component.translatable("controllable.tooltip.craft", ClientHelper.getButtonComponent(ButtonBindings.PICKUP_ITEM.getButton())).withStyle(ChatFormatting.YELLOW);
                 graphics.renderTooltip(this.minecraft.font, craftText, mouseX, mouseY);
             }
