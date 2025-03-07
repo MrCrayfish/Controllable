@@ -71,7 +71,7 @@ public class Config
             public final DoubleProperty triggerDeadZone = DoubleProperty.create(0.05, 0.0, 1.0);
 
             @ConfigProperty(name = "rotationSpeed", comment = "The speed which the camera turns in game")
-            public final DoubleProperty rotationSpeed = DoubleProperty.create(50.0, 0.0, 100.0);
+            public final DoubleProperty rotationSpeed = DoubleProperty.create(50.0, 0.0, 150.0);
 
             @ConfigProperty(name = "pitchSensitivity", comment = "The sensitivity of the camera's pitch rotation when applying the rotation speed. Setting to 1.0 would mean applying 100% of the rotation speed.")
             public final DoubleProperty pitchSensitivity = DoubleProperty.create(0.75, 0.0, 1.0);
