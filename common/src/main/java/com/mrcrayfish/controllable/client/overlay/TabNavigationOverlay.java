@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client.overlay;
 
+import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Buttons;
@@ -38,7 +39,7 @@ public class TabNavigationOverlay implements IOverlay
     public boolean isVisible()
     {
         Controller controller = Controllable.getController();
-        return controller != null && controller.isBeingUsed() && this.navigationBar != null;
+        return controller != null && (!Config.CLIENT.options.overlayTimeout.get() || controller.isBeingUsed()) && this.navigationBar != null;
     }
 
     @Override

@@ -49,7 +49,7 @@ public class ActionHintOverlay implements IOverlay
     public boolean isVisible()
     {
         Controller controller = Controllable.getController();
-        return !Minecraft.getInstance().options.hideGui && controller != null && controller.isBeingUsed();
+        return !Minecraft.getInstance().options.hideGui && controller != null && (!Config.CLIENT.options.overlayTimeout.get() || controller.isBeingUsed());
     }
 
     @Override
