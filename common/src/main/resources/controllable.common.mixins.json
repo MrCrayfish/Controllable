@@ -1,31 +1,32 @@
 {
-    "required": true,
-    "package": "com.mrcrayfish.controllable.mixin",
-    "compatibilityLevel": "JAVA_21",
-    "minVersion": "0.8",
-    "refmap": "controllable.refmap.json",
-    "client": [
-        "client.ContainerScreenMixin",
-        "client.GameRendererMixin",
-        "client.GuiMixin",
-        "client.LocalPlayerMixin",
-        "client.MinecraftMixin",
-        "client.MouseHelperMixin",
-        "client.OverlayRecipeButtonAccessor",
-        "client.OverlayRecipeComponentAccessor",
-        "client.RecipeBookComponentAccessor",
-        "client.RecipeBookPageAccessor",
-        "client.RecipeBookPageMixin",
-        "client.TimerAccessor",
-        "client.jei.GuiIconToggleButtonMixin",
-        "client.jei.IngredientGridMixin",
-        "client.jei.IngredientGridWithNavigationMixin",
-        "client.jei.IngredientListOverlayMixin",
-        "client.jei.MouseUtilMixin",
-        "client.jei.PageNavigationMixin",
-        "client.rei.PointHelperMixin"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+  "required": true,
+  "package": "com.mrcrayfish.controllable.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "refmap": "controllable.refmap.json",
+  "client": [
+    "client.ContainerScreenMixin",
+    "client.GameRendererMixin",
+    "client.GuiMixin",
+    "client.LocalPlayerMixin",
+    "client.MinecraftMixin",
+    "client.MouseHandlerMixin",
+    "client.MouseHelperMixin",
+    "client.OverlayRecipeButtonAccessor",
+    "client.OverlayRecipeComponentAccessor",
+    "client.RecipeBookComponentAccessor",
+    "client.RecipeBookPageAccessor",
+    "client.RecipeBookPageMixin",
+    "client.TimerAccessor",
+    "client.jei.GuiIconToggleButtonMixin",
+    "client.jei.IngredientGridMixin",
+    "client.jei.IngredientGridWithNavigationMixin",
+    "client.jei.IngredientListOverlayMixin",
+    "client.jei.MouseUtilMixin",
+    "client.jei.PageNavigationMixin",
+    "client.rei.PointHelperMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

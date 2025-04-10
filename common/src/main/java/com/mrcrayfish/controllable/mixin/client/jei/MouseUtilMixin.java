@@ -25,7 +25,7 @@ public class MouseUtilMixin
     private static void controllableGetX(CallbackInfoReturnable<Double> cir)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed())
+        if(controller != null && controller.isUsingVirtualCursor())
         {
             cir.setReturnValue(Controllable.getCursor().getRenderScreenX());
         }
@@ -35,7 +35,7 @@ public class MouseUtilMixin
     private static void controllableGetY(CallbackInfoReturnable<Double> cir)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed())
+        if(controller != null && controller.isUsingVirtualCursor())
         {
             cir.setReturnValue(Controllable.getCursor().getRenderScreenY());
         }

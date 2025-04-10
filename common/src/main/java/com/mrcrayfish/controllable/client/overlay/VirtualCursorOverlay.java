@@ -22,7 +22,7 @@ public class VirtualCursorOverlay implements IOverlay
     public boolean isVisible()
     {
         Controller controller = Controllable.getController();
-        return Minecraft.getInstance().getOverlay() == null && Minecraft.getInstance().screen != null && controller != null && controller.isBeingUsed() && Controllable.getCursor().isVisible();
+        return Minecraft.getInstance().getOverlay() == null && Minecraft.getInstance().screen != null && controller != null && controller.isUsingVirtualCursor() && Controllable.getCursor().isVisible();
     }
 
     @Override
