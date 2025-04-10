@@ -9,12 +9,15 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
+import net.minecraft.client.player.ClientInput;
 import net.minecraft.locale.Language;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.phys.Vec2;
 import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2f;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -35,6 +38,7 @@ public class ReflectUtil
     private static final Field STONE_CUTTER_INDEX = ObfuscationReflectionHelper.findField(StonecutterScreen.class, "startIndex");
     private static final Field LOOM_START_ROW = ObfuscationReflectionHelper.findField(LoomScreen.class, "startRow");
     private static final Field IMAGE_BUTTON_SPRITES = ObfuscationReflectionHelper.findField(ImageButton.class, "sprites");
+    private static final Field MOVE_VECTOR = ObfuscationReflectionHelper.findField(ClientInput.class, "moveVector");
 
     public static int getAbstractListRowTop(AbstractSelectionList<?> list, int index)
     {
@@ -164,6 +168,18 @@ public class ReflectUtil
         catch(IllegalAccessException e)
         {
             return null;
+        }
+    }
+
+    public static void updateMoveVector(ClientInput input, Vector2f vec)
+    {
+        try
+        {
+            MOVE_VECTOR.set(input, new Vec2(vec.x, vec.y));
+        }
+        catch(IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
         }
     }
 }

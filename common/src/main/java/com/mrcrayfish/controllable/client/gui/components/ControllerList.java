@@ -29,6 +29,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +57,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
         this.manager = Controllable.getControllerManager();
         this.setHeaderText(Component.translatable("controllable.gui.title.select_controller").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW));
         this.footerSubText = Component.translatable("controllable.gui.controller_missing_2").withStyle(ChatFormatting.UNDERLINE, ChatFormatting.GOLD);
-        this.footerSubText.setStyle(this.footerSubText.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://mrcrayfish.gitbook.io/controllable-documentation/")));
+        this.footerSubText.setStyle(this.footerSubText.getStyle().withClickEvent(new ClickEvent.OpenUrl(URI.create("https://mrcrayfish.gitbook.io/controllable-documentation/"))));
         this.setFooterText(Component.translatable("controllable.gui.controller_missing", this.footerSubText));
         this.reloadControllers();
     }

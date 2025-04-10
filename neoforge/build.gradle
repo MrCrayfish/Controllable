@@ -2,7 +2,7 @@ import net.neoforged.gradle.common.tasks.PotentiallySignJar
 
 plugins {
     id 'multiloader-loader'
-    id 'net.neoforged.gradle.userdev' version '7.0.167'
+    id 'net.neoforged.gradle.userdev' version '7.0.184'
 }
 
 def at = file('src/main/resources/META-INF/accesstransformer.cfg')

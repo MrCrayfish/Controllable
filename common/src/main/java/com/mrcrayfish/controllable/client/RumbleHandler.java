@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.framework.api.event.TickEvents;
+import com.mrcrayfish.framework.api.event.FrameworkTickEvents;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +22,7 @@ public class RumbleHandler
     public RumbleHandler()
     {
         Preconditions.checkState(instance == null, "Only one instance of RumbleHandler is allowed");
-        TickEvents.START_PLAYER.register(this::onUseItem);
+        FrameworkTickEvents.START_PLAYER.register(this::onUseItem);
         instance = this;
     }
 

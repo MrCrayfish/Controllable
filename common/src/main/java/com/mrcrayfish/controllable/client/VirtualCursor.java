@@ -11,8 +11,8 @@ import com.mrcrayfish.controllable.client.util.MouseHooks;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.mixin.client.TimerAccessor;
 import com.mrcrayfish.controllable.platform.ClientServices;
-import com.mrcrayfish.framework.api.event.ScreenEvents;
-import com.mrcrayfish.framework.api.event.TickEvents;
+import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
+import com.mrcrayfish.framework.api.event.client.FrameworkScreenEvents;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -51,9 +51,9 @@ public final class VirtualCursor
     {
         if(!this.initialized)
         {
-            TickEvents.START_CLIENT.register(this::updateMovement);
-            TickEvents.START_RENDER.register(this::updateRenderPosition);
-            ScreenEvents.OPENED.register(this::onScreenOpened);
+            FrameworkClientTickEvents.START_CLIENT.register(this::updateMovement);
+            FrameworkClientTickEvents.START_RENDER.register(this::updateRenderPosition);
+            FrameworkScreenEvents.OPENED.register(this::onScreenOpened);
             this.initialized = true;
         }
     }

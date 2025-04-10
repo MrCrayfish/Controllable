@@ -61,12 +61,7 @@ public class ButtonBindings
                 if(context.minecraft().options.toggleSprint().get()) {
                     context.minecraft().options.keySprint.setDown(true);
                 } else {
-                    boolean canSprint = !player.isSprinting() && !player.hasEffect(MobEffects.BLINDNESS);
-                    boolean hasRequiredFood = (float) player.getFoodData().getFoodLevel() > 6.0F || player.getAbilities().mayfly;
-                    boolean hasImpulse = player.isUnderWater() ? player.input.hasForwardImpulse() : (double) player.input.forwardImpulse >= 0.8D;
-                    boolean canSwimInFluid = ClientServices.CLIENT.canLocalPlayerSwimInFluid(player);
-                    boolean usingItem = player.isUsingItem();
-                    if(canSprint && canSwimInFluid && hasImpulse && hasRequiredFood && !usingItem) {
+                    if(ClientServices.CLIENT.canLocalPlayerStartSprinting(player)) {
                         player.setSprinting(true);
                     }
                 }
@@ -151,8 +146,8 @@ public class ButtonBindings
         return Optional.of(() -> {
             context.player().ifPresent(player -> {
                 Inventory inventory = player.getInventory();
-                int nextSlot = ScrollWheelHandler.getNextScrollWheelSelection(1, inventory.selected, Inventory.getSelectionSize());
-                player.getInventory().setSelectedHotbarSlot(nextSlot);
+                int nextSlot = ScrollWheelHandler.getNextScrollWheelSelection(1, inventory.getSelectedSlot(), Inventory.getSelectionSize());
+                player.getInventory().setSelectedSlot(nextSlot);
             });
         });
     }));
@@ -161,8 +156,8 @@ public class ButtonBindings
         return Optional.of(() -> {
             context.player().ifPresent(player -> {
                 Inventory inventory = player.getInventory();
-                int nextSlot = ScrollWheelHandler.getNextScrollWheelSelection(-1, inventory.selected, Inventory.getSelectionSize());
-                player.getInventory().setSelectedHotbarSlot(nextSlot);
+                int nextSlot = ScrollWheelHandler.getNextScrollWheelSelection(-1, inventory.getSelectedSlot(), Inventory.getSelectionSize());
+                player.getInventory().setSelectedSlot(nextSlot);
             });
         });
     }));

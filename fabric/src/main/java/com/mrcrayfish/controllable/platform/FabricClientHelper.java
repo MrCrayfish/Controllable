@@ -27,12 +27,14 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
+import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -350,6 +352,18 @@ public class FabricClientHelper implements IClientHelper
     public int getLoomStartRow(LoomScreen screen)
     {
         return ReflectUtil.getLoomStartRow(screen);
+    }
+
+    @Override
+    public void updateMoveVector(ClientInput input, Vector2f vec)
+    {
+        ReflectUtil.updateMoveVector(input, vec);
+    }
+
+    @Override
+    public boolean canLocalPlayerStartSprinting(LocalPlayer player)
+    {
+        return player.canStartSprinting();
     }
 
     private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeModeTab tab)

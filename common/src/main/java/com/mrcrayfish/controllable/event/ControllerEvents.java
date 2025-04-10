@@ -7,7 +7,6 @@ import com.mrcrayfish.controllable.client.RadialMenu;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.framework.api.event.FrameworkEvent;
-import com.mrcrayfish.framework.api.event.IFrameworkEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -84,55 +83,55 @@ public class ControllerEvents
     });
 
     @FunctionalInterface
-    public interface Input extends IFrameworkEvent
+    public interface Input
     {
         boolean handle(Controller controller, Value<Integer> newButton, int originalButton, boolean state);
     }
 
     @FunctionalInterface
-    public interface Button extends IFrameworkEvent
+    public interface Button
     {
         boolean handle(Controller controller);
     }
 
     @FunctionalInterface
-    public interface UpdateMovement extends IFrameworkEvent
+    public interface UpdateMovement
     {
         boolean handle();
     }
 
     @FunctionalInterface
-    public interface UpdateCamera extends IFrameworkEvent
+    public interface UpdateCamera
     {
         boolean handle(Value<Float> yawSpeed, Value<Float> pitchSpeed);
     }
 
     @FunctionalInterface
-    public interface GatherActions extends IFrameworkEvent
+    public interface GatherActions
     {
         void handle(Map<ButtonBinding, Action> actions, ActionVisibility visibility);
     }
 
     @FunctionalInterface
-    public interface GatherNavigationPoints extends IFrameworkEvent
+    public interface GatherNavigationPoints
     {
         void handle(List<NavigationPoint> points);
     }
 
     @FunctionalInterface
-    public interface GatherRadialMenuItems extends IFrameworkEvent
+    public interface GatherRadialMenuItems
     {
         void handle(List<RadialMenu.AbstractRadialItem> items);
     }
 
     @FunctionalInterface
-    public interface RenderHints extends IFrameworkEvent
+    public interface RenderHints
     {
         boolean handle();
     }
 
     @FunctionalInterface
-    public interface RenderMiniPlayer extends IFrameworkEvent
+    public interface RenderMiniPlayer
     {
         boolean handle();
     }

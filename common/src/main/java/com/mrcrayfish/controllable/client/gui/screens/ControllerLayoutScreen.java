@@ -100,7 +100,6 @@ public class ControllerLayoutScreen extends Screen
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.enableBlend();
         int width = 38 * 5;
         int height = 24 * 5;
         int x = this.width / 2 - width / 2;
@@ -113,10 +112,8 @@ public class ControllerLayoutScreen extends Screen
 
         if(this.configureButton != -1)
         {
-            RenderSystem.disableDepthTest();
             graphics.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
             graphics.drawCenteredString(this.font, Component.translatable("controllable.gui.layout.press_button"), this.width / 2, this.height / 2, 0xFFFFFFFF);
-            RenderSystem.enableDepthTest();
             return;
         }
 

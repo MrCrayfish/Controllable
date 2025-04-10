@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client.overlay;
 
 import com.google.common.collect.ImmutableList;
-import com.mrcrayfish.framework.api.event.TickEvents;
+import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
 import net.minecraft.Util;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
@@ -26,7 +26,7 @@ public class OverlayRenderer
 
     public static void init()
     {
-        TickEvents.START_CLIENT.register(() -> OVERLAYS.forEach(IOverlay::tick));
+        FrameworkClientTickEvents.START_CLIENT.register(() -> OVERLAYS.forEach(IOverlay::tick));
     }
 
     public static void draw(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)

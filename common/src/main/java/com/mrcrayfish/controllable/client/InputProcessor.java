@@ -9,7 +9,7 @@ import com.mrcrayfish.controllable.client.input.ButtonStates;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
-import com.mrcrayfish.framework.api.event.TickEvents;
+import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.ApiStatus;
@@ -39,10 +39,10 @@ public class InputProcessor
     {
         if(!this.initialized)
         {
-            TickEvents.START_RENDER.register((partialTick) -> this.pollControllerInput(false));
-            TickEvents.END_RENDER.register((partialTick) -> this.pollControllerInput(false));
-            TickEvents.START_CLIENT.register(() -> this.pollControllerInput(true));
-            TickEvents.END_CLIENT.register(() -> this.pollControllerInput(false));
+            FrameworkClientTickEvents.START_RENDER.register((partialTick) -> this.pollControllerInput(false));
+            FrameworkClientTickEvents.END_RENDER.register((partialTick) -> this.pollControllerInput(false));
+            FrameworkClientTickEvents.START_CLIENT.register(() -> this.pollControllerInput(true));
+            FrameworkClientTickEvents.END_CLIENT.register(() -> this.pollControllerInput(false));
             this.initialized = true;
         }
     }

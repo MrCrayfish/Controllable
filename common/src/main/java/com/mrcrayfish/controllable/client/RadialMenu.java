@@ -6,15 +6,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
@@ -24,15 +17,12 @@ import com.mrcrayfish.controllable.client.gui.RadialMenuAction;
 import com.mrcrayfish.controllable.client.gui.screens.RadialMenuConfigureScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.settings.Thumbstick;
-import com.mrcrayfish.controllable.platform.ClientServices;
 import com.mrcrayfish.controllable.util.Utils;
-import com.mrcrayfish.framework.api.event.TickEvents;
+import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.CoreShaders;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -43,9 +33,8 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
-import org.joml.Matrix4fStack;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -53,12 +42,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Author: MrCrayfish
@@ -94,8 +78,8 @@ public class RadialMenu
     {
         if(!this.initialized)
         {
-            TickEvents.START_CLIENT.register(this::onClientTickStart);
-            TickEvents.END_CLIENT.register(this::onClientTickEnd);
+            FrameworkClientTickEvents.START_CLIENT.register(this::onClientTickStart);
+            FrameworkClientTickEvents.END_CLIENT.register(this::onClientTickEnd);
             this.initialized = true;
         }
     }
@@ -501,41 +485,25 @@ public class RadialMenu
             PoseStack poseStack = graphics.pose();
             poseStack.translate(0, 100, 0);
 
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.disableCull();
-
             alpha = Math.min(1.0F, alpha * animation);
 
             // Draw background
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.setShader(CoreShaders.POSITION_COLOR);
-            BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            VertexConsumer consumer = mc.renderBuffers().bufferSource().getBuffer(RenderType.gui());
             // Top (reduced width by 2)
-            buffer.addVertex(poseStack.last().pose(), -14, -15, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), -14, -14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 14, -14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 14, -15, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), -14, -15, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), -14, -14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 14, -14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 14, -15, 0).setColor(red, green, blue, alpha);
             // Middle
-            buffer.addVertex(poseStack.last().pose(), -15, -14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), -15, 14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 15, 14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 15, -14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), -15, -14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), -15, 14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 15, 14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 15, -14, 0).setColor(red, green, blue, alpha);
             // Bottom (reduced width by 2)
-            buffer.addVertex(poseStack.last().pose(), -14, 14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), -14, 15, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 14, 15, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 14, 14, 0).setColor(red, green, blue, alpha);
-
-            MeshData data = buffer.build();
-            if(data != null)
-            {
-                BufferUploader.drawWithShader(data);
-            }
-
-            RenderSystem.disableBlend();
-            //RenderSystem.enableTexture();
-            RenderSystem.enableCull();
+            consumer.addVertex(poseStack.last().pose(), -14, 14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), -14, 15, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 14, 15, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 14, 14, 0).setColor(red, green, blue, alpha);
 
             graphics.blit(RenderType::guiTextured, TEXTURE, -10, -10, 98, 15, 20, 20, 10, 10, 256, 256);
 
@@ -578,42 +546,26 @@ public class RadialMenu
             PoseStack poseStack = graphics.pose();
             poseStack.translate(0, -90, 0);
 
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.disableCull();
-
             alpha = Math.min(1.0F, alpha * animation);
 
             // Draw background
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.setShader(CoreShaders.POSITION_COLOR);
-            BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            VertexConsumer consumer = mc.renderBuffers().bufferSource().getBuffer(RenderType.gui());
             // Top (reduced width by 2)
-            buffer.addVertex(poseStack.last().pose(), -14, -15, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), -14, -14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 14, -14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 14, -15, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), -14, -15, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), -14, -14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 14, -14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 14, -15, 0).setColor(red, green, blue, alpha);
             // Middle
-            buffer.addVertex(poseStack.last().pose(), -15, -14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), -15, 14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 15, 14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 15, -14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), -15, -14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), -15, 14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 15, 14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 15, -14, 0).setColor(red, green, blue, alpha);
             // Bottom (reduced width by 2)
-            buffer.addVertex(poseStack.last().pose(), -14, 14, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), -14, 15, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 14, 15, 0).setColor(red, green, blue, alpha);
-            buffer.addVertex(poseStack.last().pose(), 14, 14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), -14, 14, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), -14, 15, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 14, 15, 0).setColor(red, green, blue, alpha);
+            consumer.addVertex(poseStack.last().pose(), 14, 14, 0).setColor(red, green, blue, alpha);
 
-            MeshData data = buffer.build();
-            if(data != null)
-            {
-                BufferUploader.drawWithShader(data);
-            }
-
-            RenderSystem.disableBlend();
-            RenderSystem.enableCull();
-
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             graphics.blit(RenderType::guiTextured, TEXTURE, -10, -10, 88, 15, 20, 20, 10, 10, 256, 256);
 
             if(selected)
@@ -662,45 +614,41 @@ public class RadialMenu
             float green = ARGB.green(color) / 255F;
             float blue = ARGB.blue(color) / 255F;
 
-            float start = left ? -1 : 1;
-            float end = (left ? -150F : 150F) * animation;
+            float start = 0;
+            float end = 150F;
+            alpha *= animation;
+
+            if(left)
+            {
+                start -= 150;
+                end -= 150;
+            }
+
+            start *= (left ? animation : 1);
+            end *= (left ? 1 : animation);
 
             poseStack.translate((1.0F - animation) * (left ? -20 : 20), 0, 0);
 
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.disableCull();
-
             // Draw background
-            RenderSystem.setShader(CoreShaders.POSITION_COLOR);
-            BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            VertexConsumer consumer = mc.renderBuffers().bufferSource().getBuffer(RenderType.gui());
 
             // Top (offset by 1)
-            buffer.addVertex(poseStack.last().pose(), start, -15, 0).setColor(red, green, blue, alpha * animation);
-            buffer.addVertex(poseStack.last().pose(), start, -14, 0).setColor(red, green, blue, alpha * animation);
-            buffer.addVertex(poseStack.last().pose(), end, -14, 0).setColor(red, green, blue, 0.0F);
-            buffer.addVertex(poseStack.last().pose(), end, -15, 0).setColor(red, green, blue, 0.0F);
+            consumer.addVertex(poseStack.last().pose(), start + 1, -15, 0).setColor(red, green, blue, left ? 0 : alpha);
+            consumer.addVertex(poseStack.last().pose(), start + 1, -14, 0).setColor(red, green, blue, left ? 0 : alpha);
+            consumer.addVertex(poseStack.last().pose(), end - 1, -14, 0).setColor(red, green, blue, left ? alpha : 0);
+            consumer.addVertex(poseStack.last().pose(), end - 1, -15, 0).setColor(red, green, blue, left ? alpha : 0);
 
             // Middle
-            buffer.addVertex(poseStack.last().pose(), 0, -14, 0).setColor(red, green, blue, alpha * animation);
-            buffer.addVertex(poseStack.last().pose(), 0, 14, 0).setColor(red, green, blue, alpha * animation);
-            buffer.addVertex(poseStack.last().pose(), end, 14, 0).setColor(red, green, blue, 0.0F);
-            buffer.addVertex(poseStack.last().pose(), end, -14, 0).setColor(red, green, blue, 0.0F);
+            consumer.addVertex(poseStack.last().pose(), start, -14, 0).setColor(red, green, blue, left ? 0 : alpha);
+            consumer.addVertex(poseStack.last().pose(), start, 14, 0).setColor(red, green, blue, left ? 0 : alpha);
+            consumer.addVertex(poseStack.last().pose(), end, 14, 0).setColor(red, green, blue, left ? alpha : 0);
+            consumer.addVertex(poseStack.last().pose(), end, -14, 0).setColor(red, green, blue, left ? alpha : 0);
 
             // Bottom (offset by 1)
-            buffer.addVertex(poseStack.last().pose(), start, 14, 0).setColor(red, green, blue, alpha * animation);
-            buffer.addVertex(poseStack.last().pose(), start, 15, 0).setColor(red, green, blue, alpha * animation);
-            buffer.addVertex(poseStack.last().pose(), end, 15, 0).setColor(red, green, blue, 0.0F);
-            buffer.addVertex(poseStack.last().pose(), end, 14, 0).setColor(red, green, blue, 0.0F);
-
-            MeshData data = buffer.build();
-            if(data != null)
-            {
-                BufferUploader.drawWithShader(data);
-            }
-
-            RenderSystem.disableBlend();
-            RenderSystem.enableCull();
+            consumer.addVertex(poseStack.last().pose(), start + 1, 14, 0).setColor(red, green, blue, left ? 0 : alpha);
+            consumer.addVertex(poseStack.last().pose(), start + 1, 15, 0).setColor(red, green, blue, left ? 0 : alpha);
+            consumer.addVertex(poseStack.last().pose(), end - 1, 15, 0).setColor(red, green, blue, left ? alpha : 0);
+            consumer.addVertex(poseStack.last().pose(), end - 1, 14, 0).setColor(red, green, blue, left ? alpha : 0);
 
             if(this.label != null)
             {

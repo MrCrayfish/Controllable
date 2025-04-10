@@ -8,7 +8,7 @@ import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.EventHelper;
 import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable.event.Value;
-import com.mrcrayfish.framework.api.event.TickEvents;
+import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.ApiStatus;
@@ -36,8 +36,8 @@ public class CameraHandler
     {
         if(!this.initialized)
         {
-            TickEvents.START_CLIENT.register(this::updateRotationDelta);
-            TickEvents.START_RENDER.register(this::updateCamera);
+            FrameworkClientTickEvents.START_CLIENT.register(this::updateRotationDelta);
+            FrameworkClientTickEvents.START_RENDER.register(this::updateCamera);
             this.initialized = true;
         }
     }

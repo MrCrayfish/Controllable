@@ -26,10 +26,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.settings.AnalogMovement;
 import com.mrcrayfish.controllable.client.settings.Thumbstick;
-import com.mrcrayfish.controllable.client.util.ClientHelper;
-import com.mrcrayfish.controllable.client.util.EventHelper;
-import com.mrcrayfish.controllable.client.util.InputHelper;
-import com.mrcrayfish.controllable.client.util.MouseHooks;
+import com.mrcrayfish.controllable.client.util.*;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.integration.EmiSupport;
 import com.mrcrayfish.controllable.integration.JeiSupport;
@@ -38,8 +35,9 @@ import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import com.mrcrayfish.controllable.platform.ClientServices;
-import com.mrcrayfish.framework.api.event.ClientEvents;
-import com.mrcrayfish.framework.api.event.TickEvents;
+import com.mrcrayfish.framework.api.event.FrameworkTickEvents;
+import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
+import com.mrcrayfish.framework.api.event.client.FrameworkInputEvents;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractSelectionList;
@@ -116,11 +114,11 @@ public class InputHandler
     {
         if(!this.initialized)
         {
-            TickEvents.START_CLIENT.register(this::onStartClickTick);
-            TickEvents.END_CLIENT.register(this::onEndClickTick);
-            TickEvents.START_PLAYER.register(this::onStartPlayerTick);
-            TickEvents.END_PLAYER.register(this::onEndPlayerTick);
-            ClientEvents.PLAYER_INPUT_UPDATE.register(this::updateInput);
+            FrameworkClientTickEvents.START_CLIENT.register(this::onStartClickTick);
+            FrameworkClientTickEvents.END_CLIENT.register(this::onEndClickTick);
+            FrameworkTickEvents.START_PLAYER.register(this::onStartPlayerTick);
+            FrameworkTickEvents.END_PLAYER.register(this::onEndPlayerTick);
+            FrameworkInputEvents.CLIENT_INPUT_UPDATE.register(this::updateInput);
             this.initialized = true;
         }
     }
@@ -317,6 +315,7 @@ public class InputHandler
                     }
                 }
 
+                MutableClientInput mutableInput = new MutableClientInput(input);
                 boolean up = false;
                 boolean down = false;
                 boolean left = false;
@@ -326,7 +325,7 @@ public class InputHandler
                 {
                     up = inputY < 0;
                     down = inputY > 0;
-                    input.forwardImpulse = -inputY;
+                    mutableInput.setForwardImpulse(-inputY);
                     controller.updateInputTime();
                 }
 
@@ -335,23 +334,20 @@ public class InputHandler
                 {
                     right = inputX > 0;
                     left = inputX < 0;
-                    input.leftImpulse = -inputX;
+                    mutableInput.setLeftImpulse(-inputX);
                     controller.updateInputTime();
                 }
 
                 // Update key presses if there is a change
                 if(up || down || left || right)
                 {
-                    input.keyPresses = new Input(
-                        input.keyPresses.forward() || up,
-                        input.keyPresses.backward() || down,
-                        input.keyPresses.left() || left,
-                        input.keyPresses.right() || right,
-                        input.keyPresses.jump(),
-                        input.keyPresses.shift(),
-                        input.keyPresses.sprint()
-                    );
+                    mutableInput.setForward(up);
+                    mutableInput.setBackward(down);
+                    mutableInput.setLeft(left);
+                    mutableInput.setRight(right);
                 }
+
+                mutableInput.apply();
             }
         }
     }
@@ -360,7 +356,7 @@ public class InputHandler
     {
         if(context.screen().isEmpty()) {
             context.player().ifPresent(player -> {
-                player.getInventory().selected = index;
+                player.getInventory().setSelectedSlot(index);
             });
         }
     }
