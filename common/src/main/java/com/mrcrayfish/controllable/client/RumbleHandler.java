@@ -56,6 +56,9 @@ public class RumbleHandler
      */
     private void onUseItem(Player player)
     {
+        if(!player.isLocalPlayer())
+            return;
+
         if(!Config.CLIENT.options.rumble.get())
             return;
 
