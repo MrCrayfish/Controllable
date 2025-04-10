@@ -131,6 +131,10 @@ public class Config
                 If enabled, allows reading controller input even if the window is not in focus. This option will also
                 prevent the game from auto pausing if the window loses focus.""")
             public final BoolProperty backgroundInput = BoolProperty.create(true);
+
+            @ConfigProperty(name = "overlayTimeout", comment = """
+                If enabled, after four seconds, any overlays related to the controller will be hidden if no input is detected""")
+            public final BoolProperty overlayTimeout = BoolProperty.create(true);
         }
     }
 }
