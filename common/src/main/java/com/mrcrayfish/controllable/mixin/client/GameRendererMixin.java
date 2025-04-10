@@ -29,7 +29,7 @@ public class GameRendererMixin
     private int controllableModifyMouseX(int original)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed())
+        if(controller != null && controller.isUsingVirtualCursor())
         {
             return (int) Controllable.getCursor().getRenderScreenX();
         }
@@ -40,7 +40,7 @@ public class GameRendererMixin
     private int controllableModifyMouseY(int original)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed())
+        if(controller != null && controller.isUsingVirtualCursor())
         {
             return (int) Controllable.getCursor().getRenderScreenY();
         }

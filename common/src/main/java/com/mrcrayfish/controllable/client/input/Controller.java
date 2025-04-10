@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.input;
 
 import com.mrcrayfish.controllable.Config;
+import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.util.InputHelper;
 import net.minecraft.Util;
@@ -197,6 +198,14 @@ public abstract class Controller
     public final boolean isBeingUsed()
     {
         return Util.getMillis() - this.lastInputTime < 4000;
+    }
+
+    /**
+     * @return True if controller input has been used recently
+     */
+    public final boolean isUsingVirtualCursor()
+    {
+        return this.isBeingUsed() && Controllable.getCursor().getMode().isController();
     }
 
     /**

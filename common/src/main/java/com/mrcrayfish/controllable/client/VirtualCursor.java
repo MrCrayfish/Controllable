@@ -38,6 +38,7 @@ public final class VirtualCursor
     private boolean visible;
     private boolean snapIfNoMove;
     private boolean initialized;
+    private CursorMode mode = CursorMode.CONTROLLER;
 
     @ApiStatus.Internal
     public VirtualCursor()
@@ -71,7 +72,7 @@ public final class VirtualCursor
      */
     public boolean isVisible()
     {
-        return this.visible;
+        return this.mode.isController() && this.visible;
     }
 
     /**
@@ -154,6 +155,25 @@ public final class VirtualCursor
     }
 
     /**
+     * @return The current cursor mode
+     */
+    public CursorMode getMode()
+    {
+        return this.mode;
+    }
+
+    /**
+     * Sets the cursor mode.
+     *
+     * @param mode the new cursor mode
+     */
+    @ApiStatus.Internal
+    public void setMode(CursorMode mode)
+    {
+        this.mode = mode;
+    }
+
+    /**
      * Updates the movement of the cursor.
      */
     private void updateMovement()
@@ -200,6 +220,7 @@ public final class VirtualCursor
 
             // Let the next update know to try snapping if no input detected
             this.snapIfNoMove = true;
+            this.mode = CursorMode.CONTROLLER;
         }
         else if(this.snapIfNoMove)
         {
@@ -390,6 +411,21 @@ public final class VirtualCursor
                 this.y = slotY;
                 this.clampCursorToWindowBounds();
             }
+        }
+    }
+
+    public enum CursorMode
+    {
+        CONTROLLER, MOUSE;
+
+        public boolean isController()
+        {
+            return this == CONTROLLER;
+        }
+
+        public boolean isMouse()
+        {
+            return this == MOUSE;
         }
     }
 }

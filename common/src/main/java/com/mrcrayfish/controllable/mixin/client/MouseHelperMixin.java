@@ -64,7 +64,7 @@ public abstract class MouseHelperMixin
     private void controllableGrabCursor(CallbackInfo ci)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed() && !this.controllable$releaseBypass)
+        if(controller != null && controller.isUsingVirtualCursor() && !this.controllable$releaseBypass)
         {
             ci.cancel();
         }

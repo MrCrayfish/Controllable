@@ -21,7 +21,7 @@ public class PointHelperMixin
     private static void controllableMouse(CallbackInfoReturnable<Point> cir)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed())
+        if(controller != null && controller.isUsingVirtualCursor())
         {
             double mouseX = Controllable.getCursor().getRenderScreenX();
             double mouseY = Controllable.getCursor().getRenderScreenY();
@@ -33,7 +33,7 @@ public class PointHelperMixin
     private static void controllableFloatMouse(CallbackInfoReturnable<FloatingPoint> cir)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed())
+        if(controller != null && controller.isUsingVirtualCursor())
         {
             double mouseX = Controllable.getCursor().getRenderScreenX();
             double mouseY = Controllable.getCursor().getRenderScreenY();
