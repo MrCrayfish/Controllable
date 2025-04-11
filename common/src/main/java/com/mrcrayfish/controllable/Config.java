@@ -73,6 +73,8 @@ public class Config
             @ConfigProperty(name = "rotationSpeed", comment = "The speed which the camera turns in game")
             public final DoubleProperty rotationSpeed = DoubleProperty.create(50.0, 0.0, 150.0);
 
+            // TODO rotation curve option (linear, cubic, etc)
+
             @ConfigProperty(name = "pitchSensitivity", comment = "The sensitivity of the camera's pitch rotation when applying the rotation speed. Setting to 1.0 would mean applying 100% of the rotation speed.")
             public final DoubleProperty pitchSensitivity = DoubleProperty.create(0.75, 0.0, 1.0);
 
@@ -127,6 +129,8 @@ public class Config
                 servers (e.g Hypixel) as analog movement may be detected by anti-cheat software.""")
             public final EnumProperty<AnalogMovement> analogMovement = EnumProperty.create(AnalogMovement.LOCAL_ONLY);
 
+            // TODO movement curve option (linear, cubic, etc)
+
             @ConfigProperty(name = "backgroundInput", comment = """
                 If enabled, allows reading controller input even if the window is not in focus. This option will also
                 prevent the game from auto pausing if the window loses focus.""")
@@ -135,6 +139,23 @@ public class Config
             @ConfigProperty(name = "overlayTimeout", comment = """
                 If enabled, after four seconds, any overlays related to the controller will be hidden if no input is detected""")
             public final BoolProperty overlayTimeout = BoolProperty.create(true);
+
+            @ConfigProperty(name = "advanced", comment = """
+                Advanced related options. "advancedMode" option must be enabled""")
+            public final Advanced advanced = new Advanced();
+
+            public static class Advanced
+            {
+                @ConfigProperty(name = "advancedMode", comment = """
+                If enabled, shows more advanced options for finer tuning""")
+                public final BoolProperty advancedMode = BoolProperty.create(true);
+
+                @ConfigProperty(name = "leftThumbstickDeadZone", comment = "The distance you have to move the left thumbstick before it's input is registered. This fixes drifting as some thumbsticks don't center to zero.")
+                public final DoubleProperty leftThumbstickDeadZone = DoubleProperty.create(0.1, 0.0, 1.0);
+
+                @ConfigProperty(name = "rightThumbstickDeadZone", comment = "The distance you have to move the right thumbstick before it's input is registered. This fixes drifting as some thumbsticks don't center to zero.")
+                public final DoubleProperty rightThumbstickDeadZone = DoubleProperty.create(0.1, 0.0, 1.0);
+            }
         }
     }
 }

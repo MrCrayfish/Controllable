@@ -69,12 +69,13 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
     public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
         super.render(graphics, slotIndex, top, left, listWidth, slotHeight, mouseX, mouseY, hovered, partialTick);
+        this.cycle.active = this.dependentOption == null || this.dependentOption.isEnabled();
         this.cycle.setX(left + listWidth - this.cycle.getWidth() - 20);
         this.cycle.setY(top);
         this.cycle.render(graphics, mouseX, mouseY, partialTick);
 
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
+        if(this.cycle.active && controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
         {
             ClientHelper.drawButton(graphics, left + listWidth - this.cycle.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, ButtonBindings.NEXT_CREATIVE_TAB.getButton());
             ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton());

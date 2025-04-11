@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.input;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
+import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.client.util.InputHelper;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -105,7 +106,7 @@ public abstract class Controller
      */
     public final float getLThumbStickXValue()
     {
-        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetLThumbStickXValue(), this.getThumbstickDeadzone()) : 0;
+        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetLThumbStickXValue(), this.getThumbstickDeadzone(Thumbstick.LEFT)) : 0;
     }
 
     protected abstract float internalGetLThumbStickXValue();
@@ -117,7 +118,7 @@ public abstract class Controller
      */
     public final float getLThumbStickYValue()
     {
-        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetLThumbStickYValue(), this.getThumbstickDeadzone()) : 0;
+        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetLThumbStickYValue(), this.getThumbstickDeadzone(Thumbstick.LEFT)) : 0;
     }
 
     protected abstract float internalGetLThumbStickYValue();
@@ -129,7 +130,7 @@ public abstract class Controller
      */
     public final float getRThumbStickXValue()
     {
-        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetRThumbStickXValue(), this.getThumbstickDeadzone()) : 0;
+        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetRThumbStickXValue(), this.getThumbstickDeadzone(Thumbstick.RIGHT)) : 0;
     }
 
     protected abstract float internalGetRThumbStickXValue();
@@ -141,7 +142,7 @@ public abstract class Controller
      */
     public final float getRThumbStickYValue()
     {
-        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetRThumbStickYValue(), this.getThumbstickDeadzone()) : 0;
+        return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetRThumbStickYValue(), this.getThumbstickDeadzone(Thumbstick.RIGHT)) : 0;
     }
 
     protected abstract float internalGetRThumbStickYValue();
@@ -271,10 +272,27 @@ public abstract class Controller
     }
 
     /**
-     * @return The deadzone value for thumbsticks
+     * @return The deadzone value for the thumbsticks
      */
+    @Deprecated
     protected float getThumbstickDeadzone()
     {
+        return Config.CLIENT.options.thumbstickDeadZone.get().floatValue();
+    }
+
+    /**
+     * @return The deadzone value for a thumbstick
+     */
+    protected float getThumbstickDeadzone(Thumbstick thumbstick)
+    {
+        if(Config.CLIENT.options.advanced.advancedMode.get())
+        {
+            return switch(thumbstick)
+            {
+                case LEFT -> Config.CLIENT.options.advanced.leftThumbstickDeadZone.get().floatValue();
+                case RIGHT -> Config.CLIENT.options.advanced.rightThumbstickDeadZone.get().floatValue();
+            };
+        }
         return Config.CLIENT.options.thumbstickDeadZone.get().floatValue();
     }
 }

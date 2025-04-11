@@ -6,15 +6,9 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.Icons;
+import com.mrcrayfish.controllable.client.gui.components.*;
 import com.mrcrayfish.controllable.client.settings.SneakMode;
 import com.mrcrayfish.controllable.client.settings.SprintMode;
-import com.mrcrayfish.controllable.client.gui.components.ButtonBindingList;
-import com.mrcrayfish.controllable.client.gui.components.ControllerList;
-import com.mrcrayfish.controllable.client.gui.components.TabOptionEnumItem;
-import com.mrcrayfish.controllable.client.gui.components.TabOptionSliderItem;
-import com.mrcrayfish.controllable.client.gui.components.TabOptionTitleItem;
-import com.mrcrayfish.controllable.client.gui.components.TabOptionToggleItem;
-import com.mrcrayfish.controllable.client.gui.components.TabSelectionList;
 import com.mrcrayfish.controllable.client.gui.widget.TabListWidget;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
@@ -239,7 +233,7 @@ public class SettingsScreen extends Screen
             super(TITLE);
             Minecraft mc = Objects.requireNonNull(SettingsScreen.this.minecraft);
             GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
-            TabSelectionList<TabSelectionList.BaseItem> optionsList = new TabSelectionList<>(SettingsScreen.this.minecraft, 24);
+            FilteredTabSelectionList<TabSelectionList.BaseItem> optionsList = new FilteredTabSelectionList<>(SettingsScreen.this.minecraft, 24);
 
             // Restore button
             // Update mappings and restore button
@@ -317,7 +311,19 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.analogMovement));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.autoSelect));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.backgroundInput));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.thumbstickDeadZone, 0.01));
+
+            TabOptionSliderItem deadzoneOption = new TabOptionSliderItem(Config.CLIENT.options.thumbstickDeadZone, 0.01);
+            deadzoneOption.setVisibilityCondition(() -> !Config.CLIENT.options.advanced.advancedMode.get());
+            optionsList.addEntry(deadzoneOption);
+
+            TabOptionSliderItem leftDeadzoneOption = new TabOptionSliderItem(Config.CLIENT.options.advanced.leftThumbstickDeadZone, 0.01);
+            leftDeadzoneOption.setVisibilityCondition(Config.CLIENT.options.advanced.advancedMode::get);
+            optionsList.addEntry(leftDeadzoneOption);
+
+            TabOptionSliderItem rightDeadzoneOption = new TabOptionSliderItem(Config.CLIENT.options.advanced.rightThumbstickDeadZone, 0.01);
+            rightDeadzoneOption.setVisibilityCondition(Config.CLIENT.options.advanced.advancedMode::get);
+            optionsList.addEntry(rightDeadzoneOption);
+
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.triggerDeadZone, 0.01));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.cursorSpeed, 1.0));
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.cursorType));
@@ -331,8 +337,13 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.other").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.navigateSound));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.fpsPollingFix));
+            TabOptionToggleItem advancedModeOption = new TabOptionToggleItem(Config.CLIENT.options.advanced.advancedMode);
+            advancedModeOption.setChangeCallback(aBoolean -> optionsList.rebuildList(true));
+            optionsList.addEntry(advancedModeOption);
 
             rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, optionsList));
+
+            optionsList.rebuildList(false);
         }
     }
 
