@@ -18,19 +18,44 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Author: MrCrayfish
  */
-public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implements HideCursor
+public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implements HideCursor, FilteredItem
 {
     private int labelColor = 0xFFFFFFFF;
+    protected @Nullable TabOptionBaseItem dependentOption;
+    protected Supplier<Boolean> visibilityCondition = () -> true;
 
     public TabOptionBaseItem(Component label)
     {
         super(label);
+    }
+
+    public boolean isEnabled()
+    {
+        return true;
+    }
+
+    public void setDependentOption(@Nullable TabOptionBaseItem required)
+    {
+        this.dependentOption = required;
+    }
+
+    public void setVisibilityCondition(Supplier<Boolean> visibilityCondition)
+    {
+        this.visibilityCondition = visibilityCondition;
+    }
+
+    @Override
+    public boolean isVisible()
+    {
+        return this.visibilityCondition.get();
     }
 
     public TabOptionBaseItem setLabel(Component label)
@@ -79,7 +104,6 @@ public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implem
             }
         });
     }
-
     protected static Component createTooltipMessage(AbstractProperty<?> property)
     {
         String tooltipKey = property.getTranslationKey() + ".tooltip";

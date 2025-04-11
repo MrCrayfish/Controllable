@@ -85,12 +85,13 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
     public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
         super.render(graphics, slotIndex, top, left, listWidth, slotHeight, mouseX, mouseY, hovered, partialTick);
+        this.toggle.active = this.dependentOption == null || this.dependentOption.isEnabled();
         this.toggle.setX(left + listWidth - this.toggle.getWidth() - 20);
         this.toggle.setY(top);
         this.toggle.render(graphics, mouseX, mouseY, partialTick);
 
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
+        if(this.toggle.active && controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
         {
             ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, Buttons.A);
         }
