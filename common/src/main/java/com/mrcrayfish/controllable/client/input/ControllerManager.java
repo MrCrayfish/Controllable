@@ -71,7 +71,23 @@ public abstract class ControllerManager
 
         if(controller == null && Config.CLIENT.client.options.autoSelect.get())
         {
-            controller = this.connectToFirstGameController();
+            double targetIndex = Config.CLIENT.client.options.autoSelectIndex.get();
+            if(targetIndex < 0) {
+                controller = this.connectToFirstGameController();
+            } else {
+                // Try to connect to the specified index
+                for(Map.Entry<Number, Pair<Integer, String>> entry : this.controllers.entrySet()) {
+                    if(entry.getValue().getLeft() == (int)targetIndex) {
+                        controller = this.createController(entry.getValue().getLeft(), entry.getKey());
+                        if(controller != null && this.setActiveController(controller)) {
+                            break;
+                        }
+                    }
+                }
+                if(controller == null) {
+                    Constants.LOG.warn("Could not connect to controller at index {}", (int)targetIndex);
+                }
+            }
             this.sendControllerToast(true, controller);
         }
     }
@@ -155,7 +171,21 @@ public abstract class ControllerManager
         /* Attempts to load the first game controller connected if auto select is enabled */
         if(Config.CLIENT.client.options.autoSelect.get())
         {
-            this.connectToFirstGameController();
+            double targetIndex = Config.CLIENT.client.options.autoSelectIndex.get();
+            if(targetIndex < 0) {
+                this.connectToFirstGameController();
+            } else {
+                // Try to connect to the specified index
+                for(Map.Entry<Number, Pair<Integer, String>> entry : this.controllers.entrySet()) {
+                    if(entry.getValue().getLeft() == (int)targetIndex) {
+                        Controller controller = this.createController(entry.getValue().getLeft(), entry.getKey());
+                        if(controller != null && this.setActiveController(controller)) {
+                            this.sendControllerToast(true, controller);
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 

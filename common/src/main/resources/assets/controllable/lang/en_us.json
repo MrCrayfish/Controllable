@@ -160,6 +160,8 @@
     "controllable.tooltip.more_recipes": "Press %s to View More",
     "framework_config.controllable.client.client.options.autoSelect": "Auto Select",
     "framework_config.controllable.client.client.options.autoSelect.tooltip": "If enabled, controller will be automatically selected on start up or when plugged in",
+    "framework_config.controllable.client.client.options.autoSelectIndex": "Controller Index",
+    "framework_config.controllable.client.client.options.autoSelectIndex.tooltip": "The index of the controller to auto-select (-1 for first available)",
     "framework_config.controllable.client.client.options.consoleHotbar": "Console Hotbar",
     "framework_config.controllable.client.client.options.consoleHotbar.tooltip": "If enabled, hotbar will render closer to the center of the screen like on console.",
     "framework_config.controllable.client.client.options.controllerIcons": "Button Icons",
