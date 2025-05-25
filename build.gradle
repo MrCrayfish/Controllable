@@ -74,7 +74,7 @@ subprojects {
                 includeGroup "com.mrcrayfish"
             }
         }
-        if (!System.getenv("CI")) {
+        if (!System.getenv("CI") && System.getenv("LOCAL_MAVEN")) {
             maven {
                 url "file://" + System.getenv("LOCAL_MAVEN")
             }

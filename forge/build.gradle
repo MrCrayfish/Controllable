@@ -170,7 +170,7 @@ publishing {
                     password = project.findProperty("gpr.key") ?: System.getenv("GPR_KEY")
                 }
             }
-        } else {
+        } else if(System.getenv("LOCAL_MAVEN")) {
             maven {
                 url "file://" + System.getenv("LOCAL_MAVEN")
             }
