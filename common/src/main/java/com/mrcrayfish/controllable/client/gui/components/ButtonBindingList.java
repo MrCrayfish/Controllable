@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
-import com.mrcrayfish.controllable.client.gui.screens.RadialMenuConfigureScreen;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
 import com.mrcrayfish.controllable.client.gui.Icons;
@@ -178,7 +177,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         @SuppressWarnings("ConstantConditions")
         public void render(GuiGraphics graphics, int index, int top, int left, int width, int itemHeight, int mouseX, int mouseY, boolean selected, float partialTick)
         {
-            this.updateTooltip(mouseX, mouseY);
+            this.updateTooltip(graphics, mouseX, mouseY);
             this.setLabelColor(this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor());
             super.render(graphics, index, top, left, width, itemHeight, mouseX, mouseY, selected, partialTick);
             this.bindingButton.setTooltip(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
@@ -192,7 +191,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             this.resetButton.render(graphics, mouseX, mouseY, partialTick);
         }
 
-        private void updateTooltip(double mouseX, double mouseY)
+        private void updateTooltip(GuiGraphics graphics, double mouseX, double mouseY)
         {
             Controller controller = Controllable.getController();
             if(!this.bindingButton.isHovered() && !this.resetButton.isHovered() && this.isMouseOver(mouseX, mouseY) && controller != null && controller.isBeingUsed())
@@ -203,7 +202,8 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             {
                 this.tooltip.set(null);
             }
-            this.tooltip.refreshTooltipForNextRenderPass(true, false, this.getRectangle());
+            // TODO 1.21.6
+            this.tooltip.refreshTooltipForNextRenderPass(graphics, (int) mouseX, (int) mouseY, true, false, this.getRectangle());
         }
 
         @Override

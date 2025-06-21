@@ -17,6 +17,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -69,12 +70,11 @@ public class ActionHintOverlay implements IOverlay
 
     private void drawConsoleHints(GuiGraphics graphics)
     {
-        PoseStack pose = graphics.pose();
-        pose.pushPose();
-        pose.translate(0, 0, 400);
+        graphics.pose().pushMatrix();
+        //graphics.pose().translate(0, 0, 400); // TODO 1.21.6
 
         Minecraft mc = Minecraft.getInstance();
-        pose.translate(5, mc.getWindow().getGuiScaledHeight() - BUTTON_SIZE - 5, 0);
+        graphics.pose().translate(5, mc.getWindow().getGuiScaledHeight() - BUTTON_SIZE - 5);
 
         List<Pair<Integer, Action>> sortedActions = this.actions.entrySet().stream()
             .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
@@ -88,7 +88,7 @@ public class ActionHintOverlay implements IOverlay
             // Draw button
             int buttonU = button * BUTTON_SIZE;
             int buttonV = Config.CLIENT.options.controllerIcons.get().ordinal() * BUTTON_SIZE;
-            graphics.blit(RenderType::guiTextured, ButtonIcons.TEXTURE, 0, 0, buttonU, buttonV, BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, ButtonIcons.TEXTURE, 0, 0, buttonU, buttonV, BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
 
             // Draw text and background
             int textWidth = mc.font.width(action.getDescription());
@@ -96,10 +96,10 @@ public class ActionHintOverlay implements IOverlay
             this.drawHintLabel(graphics, action.getDescription(), BUTTON_SIZE + 5, 3);
 
             // Finally translate for next action to be positioned correctly
-            pose.translate(BUTTON_SIZE + 5 + textWidth + 10, 0, 0);
+            graphics.pose().translate(BUTTON_SIZE + 5 + textWidth + 10, 0);
         }
 
-        pose.popPose();
+        graphics.pose().popMatrix();
     }
 
     private void drawSidedHints(GuiGraphics graphics)
@@ -128,7 +128,7 @@ public class ActionHintOverlay implements IOverlay
         int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * BUTTON_SIZE;
         int x = side == Action.Side.LEFT ? 5 : mc.getWindow().getGuiScaledWidth() - 5 - BUTTON_SIZE;
         int y = mc.getWindow().getGuiScaledHeight() + position * -15 - BUTTON_SIZE - 5;
-        graphics.blit(RenderType::guiTextured, ButtonIcons.TEXTURE, x, y, texU, texV, BUTTON_SIZE, BUTTON_SIZE, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, ButtonIcons.TEXTURE, x, y, texU, texV, BUTTON_SIZE, BUTTON_SIZE, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
 
         // Draw label
         int textWidth = mc.font.width(action.getDescription());
@@ -150,10 +150,10 @@ public class ActionHintOverlay implements IOverlay
     private void drawHintLabel(GuiGraphics graphics, Component label, int x, int y)
     {
         Minecraft mc = Minecraft.getInstance();
-        graphics.pose().pushPose();
-        graphics.pose().translate(0, 0, 400F);
+        graphics.pose().pushMatrix();
+        //graphics.pose().translate(0, 0, 400F); // TODO 1.21.6
         graphics.drawString(mc.font, label, x, y, 0xFFFFFFFF);
-        graphics.pose().popPose();
+        graphics.pose().popMatrix();
     }
 
     @Override

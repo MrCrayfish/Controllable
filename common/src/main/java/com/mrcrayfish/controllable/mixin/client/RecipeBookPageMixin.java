@@ -48,7 +48,7 @@ public class RecipeBookPageMixin
         recipeButtons.stream().filter(AbstractWidget::isHoveredOrFocused).findFirst().ifPresent(btn -> {
             if(ClientHelper.mixinIsCraftable(btn)) {
                 Component craftText = Component.translatable("controllable.tooltip.craft", ClientHelper.getButtonComponent(ButtonBindings.PICKUP_ITEM.getButton())).withStyle(ChatFormatting.YELLOW);
-                graphics.renderTooltip(this.minecraft.font, craftText, mouseX, mouseY);
+                graphics.setTooltipForNextFrame(craftText, mouseX, mouseY); // TODO 1.21.6
             }
         });
     }

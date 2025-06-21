@@ -16,6 +16,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -27,6 +28,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Author: MrCrayfish
@@ -99,12 +101,11 @@ public class ControllerLayoutScreen extends Screen
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int width = 38 * 5;
         int height = 24 * 5;
         int x = this.width / 2 - width / 2;
         int y = this.height / 2 - 50 - 35;
-        graphics.blit(RenderType::guiTextured, TEXTURE, x, y, width, height, 50, 0, 38, 24, 256, 256);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, width, height, 50, 0, 38, 24, 256, 256);
         this.controllerButtons.forEach(controllerButton -> controllerButton.draw(graphics, x, y, mouseX, mouseY, this.configureButton == controllerButton.getButton()));
         graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
         this.drawMultiLineCenteredString(graphics, this.font, Component.translatable("controllable.gui.layout.info").withStyle(ChatFormatting.GRAY), x + width / 2, y + 135, width + 190, 0xFFFFFFFF);
@@ -123,7 +124,9 @@ public class ControllerLayoutScreen extends Screen
             List<Component> components = new ArrayList<>();
             components.add(Component.translatable("controllable.gui.layout.button", Component.translatable(Buttons.NAMES[button.getButton()]).withStyle(ChatFormatting.BLUE)));
             components.add(Component.translatable("controllable.gui.layout.remap").withStyle(ChatFormatting.GRAY));
-            graphics.renderComponentTooltip(this.font, components, mouseX, mouseY);
+
+            // TODO 1.21.6
+            graphics.setTooltipForNextFrame(this.font, components, Optional.empty(), mouseX, mouseY);
         }
 
         if(!this.validLayout && this.doneButton.isHoveredOrFocused())
@@ -131,12 +134,15 @@ public class ControllerLayoutScreen extends Screen
             List<FormattedCharSequence> components = new ArrayList<>();
             components.add(Component.translatable("controllable.gui.layout.warning").withStyle(ChatFormatting.RED).getVisualOrderText());
             components.addAll(this.font.split(Component.translatable("controllable.gui.layout.invalid_layout").withStyle(ChatFormatting.GRAY), 180));
-            graphics.renderTooltip(this.font, components, mouseX, mouseY - 50);
+
+            // TODO 1.21.6
+            graphics.setTooltipForNextFrame(components, mouseX, mouseY - 50);
         }
 
         if(this.thumbstickButton.isHoveredOrFocused())
         {
-            graphics.renderTooltip(this.font, Component.translatable("controllable.gui.layout.thumbsticks"), mouseX, mouseY);
+            // TODO 1.21.6
+            graphics.setTooltipForNextFrame(Component.translatable("controllable.gui.layout.thumbsticks"), mouseX, mouseY);
         }
     }
 

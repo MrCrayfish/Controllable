@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GuiLayerManager.class)
 public class GuiLayerManagerMixin
 {
-    @Inject(method = "renderInner", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LayeredDraw$Layer;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
+    @Inject(method = "renderInner", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/gui/GuiLayer;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
     private void controllableBeforeRenderLayer(GuiGraphics graphics, DeltaTracker tracker, CallbackInfo info, @Local(index = 4, ordinal = 0) GuiLayerManager.NamedLayer layer)
     {
         ClientEvents.beforeRenderLayer(graphics, layer);

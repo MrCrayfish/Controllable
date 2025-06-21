@@ -16,6 +16,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
@@ -65,7 +66,7 @@ public class ClientHelper
         int texU = button * 13;
         int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
         int size = 13;
-        graphics.blit(RenderType::guiTextured, ButtonIcons.TEXTURE, x, y, texU, texV, size, size, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, ButtonIcons.TEXTURE, x, y, texU, texV, size, size, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
     }
 
     public static boolean isPlayingGame()

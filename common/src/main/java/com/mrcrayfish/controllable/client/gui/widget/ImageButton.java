@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
@@ -41,6 +42,6 @@ public class ImageButton extends Button
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
         super.renderWidget(graphics, mouseX, mouseY, partialTicks);
-        graphics.blit(RenderType::guiTextured, this.texture, this.getX() + (this.width - this.imageWidth) / 2, this.getY() + (this.height - this.imageHeight) / 2, this.imageU, this.imageV, this.imageWidth, this.imageHeight, this.textureWidth, this.textureHeight, !this.active ? ARGB.white(0.5F) : ARGB.white(1));
+        graphics.blit(RenderPipelines.GUI_TEXTURED, this.texture, this.getX() + (this.width - this.imageWidth) / 2, this.getY() + (this.height - this.imageHeight) / 2, this.imageU, this.imageV, this.imageWidth, this.imageHeight, this.textureWidth, this.textureHeight, !this.active ? ARGB.white(0.5F) : ARGB.white(1));
     }
 }

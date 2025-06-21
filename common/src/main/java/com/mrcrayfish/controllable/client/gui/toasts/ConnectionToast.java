@@ -6,6 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -45,8 +46,8 @@ public class ConnectionToast implements Toast
     @Override
     public void render(GuiGraphics graphics, Font font, long delta)
     {
-        graphics.blitSprite(RenderType::guiTextured, BACKGROUND_SPRITE, 0, 0, 160, 32);
-        graphics.blit(RenderType::guiTextured, ControllerLayoutScreen.TEXTURE, 8, 8, 20, 43, 20, 16, 256, 256);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND_SPRITE, 0, 0, 160, 32);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, ControllerLayoutScreen.TEXTURE, 8, 8, 20, 43, 20, 16, 256, 256);
         String title = font.plainSubstrByWidth(this.controllerName.getString(), 120);
         graphics.drawString(font, title, 18, 7, 0xFF00, false);
         Component message = this.connected ? LABEL_CONNECTED : LABEL_DISCONNECTED;

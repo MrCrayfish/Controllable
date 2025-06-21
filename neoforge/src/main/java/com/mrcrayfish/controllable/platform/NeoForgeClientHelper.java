@@ -46,12 +46,6 @@ public class NeoForgeClientHelper implements IClientHelper
     public final Map<IKeyConflictContext, BindingContext> keyContextMap = new Object2ObjectOpenHashMap<>();
 
     @Override
-    public float getGuiFarPlane()
-    {
-        return ClientHooks.getGuiFarPlane();
-    }
-
-    @Override
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
         if(action == GLFW.GLFW_RELEASE)

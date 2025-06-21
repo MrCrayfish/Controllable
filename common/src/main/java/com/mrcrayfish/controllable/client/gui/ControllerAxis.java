@@ -18,7 +18,7 @@ public class ControllerAxis extends ControllerButton
     @Override
     public void draw(GuiGraphics graphics, int x, int y, int mouseX, int mouseY, boolean selected)
     {
-        graphics.pose().pushPose();
+        graphics.pose().pushMatrix();
         Controller controller = Controllable.getController();
         if(controller != null)
         {
@@ -45,10 +45,10 @@ public class ControllerAxis extends ControllerButton
 
             if(!this.screen.isButtonPressed(this.button))
             {
-                graphics.pose().translate(0, -5, 0);
+                graphics.pose().translate(0, -5);
             }
         }
         super.draw(graphics, x, y, mouseX, mouseY, selected);
-        graphics.pose().popPose();
+        graphics.pose().popMatrix();
     }
 }

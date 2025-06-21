@@ -23,6 +23,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -306,8 +307,7 @@ public class RadialMenu
         this.updateSelected();
 
         Minecraft mc = Minecraft.getInstance();
-        PoseStack poseStack = graphics.pose();
-        poseStack.pushPose();
+        graphics.pose().pushMatrix();
 
         float animation = Mth.lerp(tracker.getGameTimeDeltaPartialTick(false), this.prevAnimateTicks, this.animateTicks) / 5F;
         float c1 = 1.70158F;
@@ -317,23 +317,23 @@ public class RadialMenu
         // Draw background
         graphics.fill(0, 0, mc.getWindow().getWidth(), mc.getWindow().getHeight(), 0x78101010);
 
-        poseStack.translate(0, -10, 0);
-        poseStack.translate((int) (mc.getWindow().getGuiScaledWidth() / 2F), (int) (mc.getWindow().getGuiScaledHeight() / 2F), 0);
+        graphics.pose().translate(0, -10);
+        graphics.pose().translate((int) (mc.getWindow().getGuiScaledWidth() / 2F), (int) (mc.getWindow().getGuiScaledHeight() / 2F));
 
         //matrixStack.scale(animation, animation, animation);
 
-        poseStack.pushPose();
+        graphics.pose().pushMatrix();
         this.settingsItem.draw(graphics, mc, false, this.selected == this.settingsItem, animation);
-        poseStack.popPose();
+        graphics.pose().popMatrix();
 
-        poseStack.pushPose();
+        graphics.pose().pushMatrix();
         this.closeItem.draw(graphics, mc, false, this.selected == this.closeItem, animation);
-        poseStack.popPose();
+        graphics.pose().popMatrix();
 
         this.drawRadialItems(this.rightItems, graphics, mc, animation);
         this.drawRadialItems(this.leftItems, graphics, mc, animation);
 
-        poseStack.popPose();
+        graphics.pose().popMatrix();
     }
 
     // TODO draw minimised version if too many entries (aka only draw the action name, not the category too)
@@ -342,16 +342,15 @@ public class RadialMenu
         for(int i = 0; i < items.size(); i++)
         {
             AbstractRadialItem item = items.get(i);
-            PoseStack poseStack = graphics.pose();
-            poseStack.pushPose();
-            if(i == 0) poseStack.translate(0, -10, 0);
-            if(i == items.size() - 1) poseStack.translate(0, 10, 0);
+            graphics.pose().pushMatrix();
+            if(i == 0) graphics.pose().translate(0, -10);
+            if(i == items.size() - 1) graphics.pose().translate(0, 10);
             boolean left = item.angle >= 180F;
             float x = (float) Math.cos(Math.toRadians(item.angle - 90F)) * 70F;
             float y = (float) Math.sin(Math.toRadians(item.angle - 90F)) * 70F;
-            poseStack.translate((int) x, (int) y, 0);
+            graphics.pose().translate((int) x, (int) y);
             item.draw(graphics, mc, left, this.selected == item, animation);
-            poseStack.popPose();
+            graphics.pose().popMatrix();
         }
     }
 
@@ -482,30 +481,17 @@ public class RadialMenu
             float green = ARGB.green(color) / 255F;
             float blue = ARGB.blue(color) / 255F;
 
-            PoseStack poseStack = graphics.pose();
-            poseStack.translate(0, 100, 0);
+            graphics.pose().translate(0, 100);
 
             alpha = Math.min(1.0F, alpha * animation);
+            color = ARGB.colorFromFloat(red, green, blue, alpha);
 
             // Draw background
-            VertexConsumer consumer = mc.renderBuffers().bufferSource().getBuffer(RenderType.gui());
-            // Top (reduced width by 2)
-            consumer.addVertex(poseStack.last().pose(), -14, -15, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), -14, -14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 14, -14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 14, -15, 0).setColor(red, green, blue, alpha);
-            // Middle
-            consumer.addVertex(poseStack.last().pose(), -15, -14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), -15, 14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 15, 14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 15, -14, 0).setColor(red, green, blue, alpha);
-            // Bottom (reduced width by 2)
-            consumer.addVertex(poseStack.last().pose(), -14, 14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), -14, 15, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 14, 15, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 14, 14, 0).setColor(red, green, blue, alpha);
-
-            graphics.blit(RenderType::guiTextured, TEXTURE, -10, -10, 98, 15, 20, 20, 10, 10, 256, 256);
+            // TODO 1.21.6
+            graphics.fill(-14, -14, 14, -15, color);
+            graphics.fill(-15, -14, 15, 14, color);
+            graphics.fill(-14, 14, 14, 15, color);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, -10, -10, 98, 15, 20, 20, 10, 10, 256, 256);
 
             if(selected)
             {
@@ -543,30 +529,17 @@ public class RadialMenu
             float green = ARGB.green(color) / 255F;
             float blue = ARGB.blue(color) / 255F;
 
-            PoseStack poseStack = graphics.pose();
-            poseStack.translate(0, -90, 0);
+            graphics.pose().translate(0, -90);
 
             alpha = Math.min(1.0F, alpha * animation);
+            color = ARGB.colorFromFloat(red, green, blue, alpha);
 
-            // Draw background
-            VertexConsumer consumer = mc.renderBuffers().bufferSource().getBuffer(RenderType.gui());
-            // Top (reduced width by 2)
-            consumer.addVertex(poseStack.last().pose(), -14, -15, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), -14, -14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 14, -14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 14, -15, 0).setColor(red, green, blue, alpha);
-            // Middle
-            consumer.addVertex(poseStack.last().pose(), -15, -14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), -15, 14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 15, 14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 15, -14, 0).setColor(red, green, blue, alpha);
-            // Bottom (reduced width by 2)
-            consumer.addVertex(poseStack.last().pose(), -14, 14, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), -14, 15, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 14, 15, 0).setColor(red, green, blue, alpha);
-            consumer.addVertex(poseStack.last().pose(), 14, 14, 0).setColor(red, green, blue, alpha);
+            // TODO 1.21.6
+            graphics.fill(-14, -14, 14, -15, color);
+            graphics.fill(-15, -14, 15, 14, color);
+            graphics.fill(-14, 14, 14, 15, color);
 
-            graphics.blit(RenderType::guiTextured, TEXTURE, -10, -10, 88, 15, 20, 20, 10, 10, 256, 256);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, -10, -10, 88, 15, 20, 20, 10, 10, 256, 256);
 
             if(selected)
             {
@@ -605,8 +578,7 @@ public class RadialMenu
         @Override
         protected void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation)
         {
-            PoseStack poseStack = graphics.pose();
-            poseStack.pushPose();
+            graphics.pose().pushMatrix();
 
             int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
             float alpha = ARGB.alpha(color) / 255F;
@@ -627,28 +599,25 @@ public class RadialMenu
             start *= (left ? animation : 1);
             end *= (left ? 1 : animation);
 
-            poseStack.translate((1.0F - animation) * (left ? -20 : 20), 0, 0);
+            graphics.pose().translate((1.0F - animation) * (left ? -20 : 20), 0);
 
             // Draw background
-            VertexConsumer consumer = mc.renderBuffers().bufferSource().getBuffer(RenderType.gui());
-
-            // Top (offset by 1)
-            consumer.addVertex(poseStack.last().pose(), start + 1, -15, 0).setColor(red, green, blue, left ? 0 : alpha);
-            consumer.addVertex(poseStack.last().pose(), start + 1, -14, 0).setColor(red, green, blue, left ? 0 : alpha);
-            consumer.addVertex(poseStack.last().pose(), end - 1, -14, 0).setColor(red, green, blue, left ? alpha : 0);
-            consumer.addVertex(poseStack.last().pose(), end - 1, -15, 0).setColor(red, green, blue, left ? alpha : 0);
+            // TODO 1.21.6
+            graphics.fill((int) (start + 1), -15, (int) (end - 1), -14, color);
+            graphics.fill((int) start, -14, (int) end, 14, color);
+            graphics.fill((int) (start + 1), 14, (int) (end - 1), 15, color);
 
             // Middle
-            consumer.addVertex(poseStack.last().pose(), start, -14, 0).setColor(red, green, blue, left ? 0 : alpha);
-            consumer.addVertex(poseStack.last().pose(), start, 14, 0).setColor(red, green, blue, left ? 0 : alpha);
-            consumer.addVertex(poseStack.last().pose(), end, 14, 0).setColor(red, green, blue, left ? alpha : 0);
-            consumer.addVertex(poseStack.last().pose(), end, -14, 0).setColor(red, green, blue, left ? alpha : 0);
+//            consumer.addVertex(poseStack.last().pose(), start, -14, 0).setColor(red, green, blue, left ? 0 : alpha);
+//            consumer.addVertex(poseStack.last().pose(), start, 14, 0).setColor(red, green, blue, left ? 0 : alpha);
+//            consumer.addVertex(poseStack.last().pose(), end, 14, 0).setColor(red, green, blue, left ? alpha : 0);
+//            consumer.addVertex(poseStack.last().pose(), end, -14, 0).setColor(red, green, blue, left ? alpha : 0);
 
             // Bottom (offset by 1)
-            consumer.addVertex(poseStack.last().pose(), start + 1, 14, 0).setColor(red, green, blue, left ? 0 : alpha);
-            consumer.addVertex(poseStack.last().pose(), start + 1, 15, 0).setColor(red, green, blue, left ? 0 : alpha);
-            consumer.addVertex(poseStack.last().pose(), end - 1, 15, 0).setColor(red, green, blue, left ? alpha : 0);
-            consumer.addVertex(poseStack.last().pose(), end - 1, 14, 0).setColor(red, green, blue, left ? alpha : 0);
+//            consumer.addVertex(poseStack.last().pose(), start + 1, 14, 0).setColor(red, green, blue, left ? 0 : alpha);
+//            consumer.addVertex(poseStack.last().pose(), start + 1, 15, 0).setColor(red, green, blue, left ? 0 : alpha);
+//            consumer.addVertex(poseStack.last().pose(), end - 1, 15, 0).setColor(red, green, blue, left ? alpha : 0);
+//            consumer.addVertex(poseStack.last().pose(), end - 1, 14, 0).setColor(red, green, blue, left ? alpha : 0);
 
             if(this.label != null)
             {
@@ -662,7 +631,7 @@ public class RadialMenu
                 graphics.drawString(mc.font, this.description, offset, 2, 0xFFFFFFFF);
             }
 
-            poseStack.popPose();
+            graphics.pose().popMatrix();
         }
     }
 }

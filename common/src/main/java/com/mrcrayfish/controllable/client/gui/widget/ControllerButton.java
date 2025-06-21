@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
@@ -37,7 +38,6 @@ public class ControllerButton extends Button
         {
             textureV += this.height;
         }
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        graphics.blit(RenderType::guiTextured, TEXTURE, this.getX(), this.getY(), 0, textureV, this.width, this.height, 256, 256);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, this.getX(), this.getY(), 0, textureV, this.width, this.height, 256, 256);
     }
 }

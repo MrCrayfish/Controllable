@@ -32,11 +32,6 @@ import java.util.List;
  */
 public interface IClientHelper
 {
-    default float getGuiFarPlane()
-    {
-        return 2000F;
-    }
-
     boolean sendScreenInput(Screen screen, int key, int action, int modifiers);
 
     void sendMouseDrag(Screen screen, double dragX, double dragY, double finalMouseX, double finalMouseY, int activeButton);

@@ -16,6 +16,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.ClickEvent;
@@ -25,6 +26,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -160,7 +162,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
 
                 int iconTop = lineTop + (lineEnd - lineTop) / 2 - 7;
                 int iconLeft = rowLeft - 30;
-                graphics.blit(RenderType::guiTextured, Icons.TEXTURE, iconLeft, iconTop, 110, 0, 14, 14, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
+                graphics.blit(RenderPipelines.GUI_TEXTURED, Icons.TEXTURE, iconLeft, iconTop, 110, 0, 14, 14, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
 
                 for(int i : matchedEntries)
                 {
@@ -170,18 +172,19 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
 
                 if(ScreenHelper.isMouseWithin(iconLeft, iconTop, 14, 14, mouseX, mouseY))
                 {
-                    this.holder.setTooltipForNextRenderPass(this.createLinkTooltip(), DefaultTooltipPositioner.INSTANCE, true);
+                    // TODO 1.21.6
+                    graphics.setTooltipForNextFrame(this.createLinkTooltip(), mouseX, mouseY);
                 }
             }
         }
     }
 
-    private Tooltip createLinkTooltip()
+    private List<FormattedCharSequence> createLinkTooltip()
     {
-        List<FormattedText> lines = new ArrayList<>();
-        lines.add(Component.translatable("controllable.gui.linked_controllers").withStyle(ChatFormatting.AQUA));
-        lines.addAll(this.minecraft.font.getSplitter().splitLines(Component.translatable("controllable.gui.linked_controllers.desc"), 200, Style.EMPTY));
-        return ClientHelper.createListTooltip(lines);
+        List<FormattedCharSequence> lines = new ArrayList<>();
+        lines.add(Component.translatable("controllable.gui.linked_controllers").withStyle(ChatFormatting.AQUA).getVisualOrderText());
+        lines.addAll(this.minecraft.font.split(Component.translatable("controllable.gui.linked_controllers.desc"), 200));
+        return lines;
     }
 
     public class ControllerEntry extends TabSelectionList.Item<ControllerEntry>
@@ -209,12 +212,12 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             {
                 ScreenHelper.drawRoundedBox(graphics, left - 1, top - 1, listWidth + 2, slotHeight + 2, 0xFFFFFFFF);
                 ScreenHelper.drawRoundedBox(graphics, left, top, listWidth, slotHeight, 0xFF000000);
-                graphics.blitSprite(RenderType::guiTextured, CHECKMARK, left + 2, top, 18, 18);
+                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, CHECKMARK, left + 2, top, 18, 18);
             }
             else if(Controllable.getController() != null && hovered)
             {
-                graphics.blit(RenderType::guiTextured, Icons.TEXTURE, left + 4, top + 4, 110, 0, 11, 11, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
-                holder.setTooltipForNextRenderPass(Component.translatable("controllable.gui.link").withStyle(ChatFormatting.AQUA));
+                graphics.blit(RenderPipelines.GUI_TEXTURED, Icons.TEXTURE, left + 4, top + 4, 110, 0, 11, 11, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
+                graphics.setTooltipForNextFrame(Component.translatable("controllable.gui.link").withStyle(ChatFormatting.AQUA), mouseX, mouseY);
             }
             Font font = Minecraft.getInstance().font;
             graphics.drawString(font, this.label, left + 22, top + (slotHeight - font.lineHeight) / 2 + 1, 0xFFFFFF);

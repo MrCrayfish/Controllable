@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 
 /**
@@ -35,7 +36,6 @@ public class ControllerButton
 
     public void draw(GuiGraphics graphics, int x, int y, int mouseX, int mouseY, boolean selected)
     {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int buttonU = this.u;
         int buttonV = this.v;
         int buttonX = x + this.x * this.scale;
@@ -52,7 +52,7 @@ public class ControllerButton
         {
             buttonV += this.height;
         }
-        graphics.blit(RenderType::guiTextured, ControllerLayoutScreen.TEXTURE, buttonX, buttonY, buttonU, buttonV, this.width * this.scale, this.height * this.scale, this.width, this.height, 256, 256);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, ControllerLayoutScreen.TEXTURE, buttonX, buttonY, buttonU, buttonV, this.width * this.scale, this.height * this.scale, this.width, this.height, 256, 256);
     }
 
     public int getButton()

@@ -10,6 +10,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.inventory.Slot;
 
@@ -28,8 +29,7 @@ public class VirtualCursorOverlay implements IOverlay
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
-        PoseStack pose = graphics.pose();
-        pose.pushPose();
+        graphics.pose().pushMatrix();
 
         Minecraft mc = Minecraft.getInstance();
         CursorStyle type = Config.CLIENT.options.cursorType.get();
@@ -39,15 +39,15 @@ public class VirtualCursorOverlay implements IOverlay
             double cursorX = Controllable.getCursor().getRenderX();
             double cursorY = Controllable.getCursor().getRenderY();
             double zIndex = 3000;
-            pose.translate(cursorX / guiScale, cursorY / guiScale, zIndex);
+            //graphics.pose().translate(cursorX / guiScale, cursorY / guiScale, zIndex); // TODO 1.21.6
             boolean isHoveringSlot = this.isHoveringFilledContainerSlot();
             if(isHoveringSlot && type.isScaleHover())
             {
-                pose.scale(1.33F, 1.33F, 1.33F);
+                graphics.pose().scale(1.33F, 1.33F); // TODO 1.21.6
             }
-            graphics.blit(RenderType::guiTextured, CursorStyle.TEXTURE, -8, -8, isHoveringSlot ? 32 : 0, type.ordinal() * 32, 16, 16, 32, 32, 64, CursorStyle.values().length * 32);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, CursorStyle.TEXTURE, -8, -8, isHoveringSlot ? 32 : 0, type.ordinal() * 32, 16, 16, 32, 32, 64, CursorStyle.values().length * 32);
         }
-        pose.popPose();
+        graphics.pose().popMatrix();
     }
 
     /**

@@ -322,7 +322,7 @@ public class ButtonBindings
                 if(!mc.isLocalServer() && (server == null || !server.isPublished())) {
                     Component message = Component.translatable("multiplayer.socialInteractions.not_available");
                     player.displayClientMessage(message, true);
-                    mc.getNarrator().sayNow(message);
+                    mc.getNarrator().saySystemNow(message);
                 } else {
                     mc.setScreen(new SocialInteractionsScreen());
                 }

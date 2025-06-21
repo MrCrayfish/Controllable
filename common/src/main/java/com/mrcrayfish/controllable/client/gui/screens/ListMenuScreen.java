@@ -153,20 +153,6 @@ public abstract class ListMenuScreen extends Screen
 
     protected abstract List<Item> constructEntries();
 
-    /**
-     * Sets the tool tip to render. Must be actively called in the render method as
-     * the tooltip is reset every draw call.
-     *
-     * @param tooltip a tooltip list to show
-     */
-    public void setActiveTooltip(@Nullable List<FormattedCharSequence> tooltip)
-    {
-        if(tooltip != null)
-        {
-            this.setTooltipForNextRenderPass(tooltip);
-        }
-    }
-
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
@@ -241,7 +227,8 @@ public abstract class ListMenuScreen extends Screen
                 Item item = this.getEntryAtPosition(mouseX, mouseY);
                 if(item != null)
                 {
-                    ListMenuScreen.this.setActiveTooltip(item.tooltip);
+                    // TODO 1.21.6
+                    graphics.setTooltipForNextFrame(item.tooltip, mouseX, mouseY);
                 }
             }
             this.children().forEach(item ->

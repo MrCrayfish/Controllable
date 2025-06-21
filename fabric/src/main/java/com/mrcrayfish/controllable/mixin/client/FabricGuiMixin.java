@@ -20,8 +20,8 @@ public class FabricGuiMixin
     {
         if(Config.CLIENT.options.consoleHotbar.get())
         {
-            graphics.pose().pushPose();
-            graphics.pose().translate(0, -25, 0);
+            graphics.pose().pushMatrix();
+            graphics.pose().translate(0, -25);
         }
     }
 
@@ -30,11 +30,12 @@ public class FabricGuiMixin
     {
         if(Config.CLIENT.options.consoleHotbar.get())
         {
-            graphics.pose().popPose();
+            graphics.pose().popMatrix();
         }
     }
 
-    @Inject(method = "renderExperienceLevel", at = @At(value = "HEAD"))
+    // TODO 1.21.6
+    /*@Inject(method = "renderExperienceLevel", at = @At(value = "HEAD"))
     private void consoleExpLevelHead(GuiGraphics graphics, DeltaTracker tracker, CallbackInfo ci)
     {
         if(Config.CLIENT.options.consoleHotbar.get())
@@ -51,5 +52,5 @@ public class FabricGuiMixin
         {
             graphics.pose().popPose();
         }
-    }
+    }*/
 }
