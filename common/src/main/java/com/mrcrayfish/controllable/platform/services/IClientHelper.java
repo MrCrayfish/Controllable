@@ -6,12 +6,7 @@ import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
-import net.minecraft.client.gui.components.AbstractSelectionList;
-import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -110,4 +105,6 @@ public interface IClientHelper
     void updateMoveVector(ClientInput input, Vector2f vec);
 
     boolean canLocalPlayerStartSprinting(LocalPlayer player);
+
+    boolean isOverlayRecipeButtonCraftable(AbstractWidget widget);
 }

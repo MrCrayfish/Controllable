@@ -28,7 +28,7 @@ public class TabOptionTitleItem extends TabOptionBaseItem implements SkipItem
         Font font = Minecraft.getInstance().font;
         int labelWidth = font.width(this.label) + 2;
         ScreenHelper.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
-        graphics.drawCenteredString(font, this.label, left + width / 2, top + 5, 0xFFFFFF);
+        graphics.drawCenteredString(font, this.label, left + width / 2, top + 5, 0xFFFFFFFF);
     }
 
     @Override

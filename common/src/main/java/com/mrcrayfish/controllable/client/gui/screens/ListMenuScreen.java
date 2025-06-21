@@ -174,12 +174,6 @@ public abstract class ListMenuScreen extends Screen
             items.forEach(this::addEntry);
         }
 
-        /*@Override
-        protected void setRenderHeader(boolean p_93474_, int p_93475_)
-        {
-            super.setRenderHeader(p_93474_, p_93475_);
-        }*/
-
         @Override
         protected int scrollBarX()
         {
@@ -225,23 +219,11 @@ public abstract class ListMenuScreen extends Screen
             if(this.isMouseOver(mouseX, mouseY) && mouseX < ListMenuScreen.this.list.getRowLeft() + ListMenuScreen.this.list.getRowWidth() - 67)
             {
                 Item item = this.getEntryAtPosition(mouseX, mouseY);
-                if(item != null)
+                if(item != null && item.tooltip != null)
                 {
-                    // TODO 1.21.6
                     graphics.setTooltipForNextFrame(item.tooltip, mouseX, mouseY);
                 }
             }
-            this.children().forEach(item ->
-            {
-                item.children().forEach(o ->
-                {
-                    if(o instanceof Button)
-                    {
-                        //TODO figure out tooltips?
-                        //((Button) o).renderToolTip(poseStack, mouseX, mouseY);
-                    }
-                });
-            });
         }
 
         @Override
@@ -260,7 +242,7 @@ public abstract class ListMenuScreen extends Screen
     protected abstract class Item extends ContainerObjectSelectionList.Entry<Item>
     {
         protected final Component label;
-        protected List<FormattedCharSequence> tooltip;
+        protected @Nullable List<FormattedCharSequence> tooltip;
 
         public Item(Component label)
         {
@@ -321,7 +303,7 @@ public abstract class ListMenuScreen extends Screen
             Font font = Minecraft.getInstance().font;
             int labelWidth = font.width(this.label) + 2;
             ScreenHelper.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
-            graphics.drawCenteredString(Objects.requireNonNull(ListMenuScreen.this.minecraft).font, this.label, left + width / 2, top + 5, 0xFFFFFF);
+            graphics.drawCenteredString(Objects.requireNonNull(ListMenuScreen.this.minecraft).font, this.label, left + width / 2, top + 5, 0xFFFFFFFF);
         }
     }
 

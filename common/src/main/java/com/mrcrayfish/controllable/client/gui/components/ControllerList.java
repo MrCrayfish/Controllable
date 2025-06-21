@@ -172,7 +172,6 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
 
                 if(ScreenHelper.isMouseWithin(iconLeft, iconTop, 14, 14, mouseX, mouseY))
                 {
-                    // TODO 1.21.6
                     graphics.setTooltipForNextFrame(this.createLinkTooltip(), mouseX, mouseY);
                 }
             }
@@ -220,7 +219,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
                 graphics.setTooltipForNextFrame(Component.translatable("controllable.gui.link").withStyle(ChatFormatting.AQUA), mouseX, mouseY);
             }
             Font font = Minecraft.getInstance().font;
-            graphics.drawString(font, this.label, left + 22, top + (slotHeight - font.lineHeight) / 2 + 1, 0xFFFFFF);
+            graphics.drawString(font, this.label, left + 22, top + (slotHeight - font.lineHeight) / 2 + 1, 0xFFFFFFFF);
         }
 
         @Override

@@ -64,8 +64,8 @@ public class RecipeBookOverlay implements IOverlay
         {
             RecipeBookTabButton first = tabButtons.get(0);
             RecipeBookTabButton last = tabButtons.get(tabButtons.size() - 1);
-            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_RECIPE_TAB.getButton()), first.getX() + 15 - 5, first.getY() - 13, 0xFFFFFF);
-            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.getX() + 15 - 5, last.getY() + last.getHeight() + 13 - 9, 0xFFFFFF);
+            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_RECIPE_TAB.getButton()), first.getX() + 15 - 5, first.getY() - 13, 0xFFFFFFFF);
+            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.getX() + 15 - 5, last.getY() + last.getHeight() + 13 - 9, 0xFFFFFFFF);
         }
 
         RecipeBookPage page = ((RecipeBookComponentAccessor) this.recipeBook).controllableGetRecipeBookPage();
@@ -73,13 +73,13 @@ public class RecipeBookOverlay implements IOverlay
         StateSwitchingButton forwardButton = ((RecipeBookPageAccessor) page).controllableGetForwardButton();
         if(forwardButton.visible)
         {
-            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.getX() + 24 - 5, forwardButton.getY() + 4, 0xFFFFFF);
+            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.getX() + 24 - 5, forwardButton.getY() + 4, 0xFFFFFFFF);
         }
 
         StateSwitchingButton backButton = ((RecipeBookPageAccessor) page).controllableGetBackButton();
         if(backButton.visible)
         {
-            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.getX() - 24 + 12 - 5, backButton.getY() + 4, 0xFFFFFF);
+            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.getX() - 24 + 12 - 5, backButton.getY() + 4, 0xFFFFFFFF);
         }
     }
 }

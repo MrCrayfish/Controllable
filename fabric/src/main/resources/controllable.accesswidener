@@ -16,9 +16,11 @@ accessible field net/minecraft/client/KeyMapping clickCount I
 accessible field net/minecraft/client/gui/components/Tooltip cachedTooltip Ljava/util/List;
 accessible field net/minecraft/client/gui/screens/inventory/StonecutterScreen startIndex I
 accessible field net/minecraft/client/gui/screens/inventory/LoomScreen startRow I
+accessible field net/minecraft/client/gui/screens/recipebook/OverlayRecipeComponent$OverlayRecipeButton isCraftable Z
 accessible method net/minecraft/client/Minecraft startUseItem ()V
 accessible method net/minecraft/client/Minecraft startAttack ()Z
 accessible method net/minecraft/client/Minecraft pickBlock ()V
 accessible method net/minecraft/client/Minecraft openChatScreen (Ljava/lang/String;)V
 accessible method net/minecraft/client/player/LocalPlayer canStartSprinting ()Z
+accessible class net/minecraft/client/gui/screens/recipebook/OverlayRecipeComponent$OverlayRecipeButton
 accessible class net/minecraft/client/gui/components/AbstractSelectionList$Entry

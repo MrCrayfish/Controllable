@@ -107,7 +107,7 @@ public class ControllerLayoutScreen extends Screen
         int y = this.height / 2 - 50 - 35;
         graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, width, height, 50, 0, 38, 24, 256, 256);
         this.controllerButtons.forEach(controllerButton -> controllerButton.draw(graphics, x, y, mouseX, mouseY, this.configureButton == controllerButton.getButton()));
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
         this.drawMultiLineCenteredString(graphics, this.font, Component.translatable("controllable.gui.layout.info").withStyle(ChatFormatting.GRAY), x + width / 2, y + 135, width + 190, 0xFFFFFFFF);
         super.render(graphics, mouseX, mouseY, partialTicks);
 
@@ -124,8 +124,6 @@ public class ControllerLayoutScreen extends Screen
             List<Component> components = new ArrayList<>();
             components.add(Component.translatable("controllable.gui.layout.button", Component.translatable(Buttons.NAMES[button.getButton()]).withStyle(ChatFormatting.BLUE)));
             components.add(Component.translatable("controllable.gui.layout.remap").withStyle(ChatFormatting.GRAY));
-
-            // TODO 1.21.6
             graphics.setTooltipForNextFrame(this.font, components, Optional.empty(), mouseX, mouseY);
         }
 
@@ -134,14 +132,11 @@ public class ControllerLayoutScreen extends Screen
             List<FormattedCharSequence> components = new ArrayList<>();
             components.add(Component.translatable("controllable.gui.layout.warning").withStyle(ChatFormatting.RED).getVisualOrderText());
             components.addAll(this.font.split(Component.translatable("controllable.gui.layout.invalid_layout").withStyle(ChatFormatting.GRAY), 180));
-
-            // TODO 1.21.6
             graphics.setTooltipForNextFrame(components, mouseX, mouseY - 50);
         }
 
         if(this.thumbstickButton.isHoveredOrFocused())
         {
-            // TODO 1.21.6
             graphics.setTooltipForNextFrame(Component.translatable("controllable.gui.layout.thumbsticks"), mouseX, mouseY);
         }
     }

@@ -184,7 +184,7 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
                 ScreenHelper.drawOutlinedBox(graphics, left - 2, top - 2, rowWidth + 4, rowHeight + 4, 0xAAFFFFFF);
             }
             Font font = KeyBindingListMenuScreen.this.minecraft.font;
-            graphics.drawString(font, this.label, left + 5, top + 5, 0xFFFFFF);
+            graphics.drawString(font, this.label, left + 5, top + 5, 0xFFFFFFFF);
             this.addBinding.setX(left + rowWidth - 42);
             this.addBinding.setY(top - 1);
             this.addBinding.render(graphics, mouseX, mouseY, partialTicks);

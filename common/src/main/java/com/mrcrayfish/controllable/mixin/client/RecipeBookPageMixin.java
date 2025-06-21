@@ -5,6 +5,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
+import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -46,9 +47,9 @@ public class RecipeBookPageMixin
 
         List<AbstractWidget> recipeButtons = ClientHelper.mixinGetRecipeButtons(this.overlay);
         recipeButtons.stream().filter(AbstractWidget::isHoveredOrFocused).findFirst().ifPresent(btn -> {
-            if(ClientHelper.mixinIsCraftable(btn)) {
+            if(ClientServices.CLIENT.isOverlayRecipeButtonCraftable(btn)) {
                 Component craftText = Component.translatable("controllable.tooltip.craft", ClientHelper.getButtonComponent(ButtonBindings.PICKUP_ITEM.getButton())).withStyle(ChatFormatting.YELLOW);
-                graphics.setTooltipForNextFrame(craftText, mouseX, mouseY); // TODO 1.21.6
+                graphics.setTooltipForNextFrame(craftText, mouseX, mouseY);
             }
         });
     }

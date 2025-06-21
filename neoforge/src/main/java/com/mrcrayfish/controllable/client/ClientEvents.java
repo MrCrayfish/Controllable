@@ -32,10 +32,12 @@ public class ClientEvents
 
     private static final Set<ResourceLocation> OFFSET_LAYERS = Util.make(new HashSet<>(), set -> {
         set.add(VanillaGuiLayers.HOTBAR);
-        set.add(VanillaGuiLayers.CONTEXTUAL_INFO_BAR); // TODO 1.21.6
-        set.add(VanillaGuiLayers.CONTEXTUAL_INFO_BAR_BACKGROUND); // TODO 1.21.6
+        set.add(VanillaGuiLayers.CONTEXTUAL_INFO_BAR);
+        set.add(VanillaGuiLayers.CONTEXTUAL_INFO_BAR_BACKGROUND);
         set.add(VanillaGuiLayers.SPECTATOR_TOOLTIP);
         set.add(VanillaGuiLayers.EXPERIENCE_LEVEL);
+        set.add(VanillaGuiLayers.SELECTED_ITEM_NAME);
+        set.add(VanillaGuiLayers.CHAT);
     });
 
     @SubscribeEvent

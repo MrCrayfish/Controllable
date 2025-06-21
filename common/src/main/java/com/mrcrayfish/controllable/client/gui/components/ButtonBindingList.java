@@ -202,7 +202,6 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             {
                 this.tooltip.set(null);
             }
-            // TODO 1.21.6
             this.tooltip.refreshTooltipForNextRenderPass(graphics, (int) mouseX, (int) mouseY, true, false, this.getRectangle());
         }
 

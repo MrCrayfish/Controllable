@@ -96,14 +96,14 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         super.renderWidget(graphics, mouseX, mouseY, partialTick);
         if(this.headerText != null)
         {
-            graphics.drawCenteredString(TabSelectionList.this.minecraft.font, this.headerText, this.getX() + this.width / 2, this.getY() - 15, 0xFFFFFF);
+            graphics.drawCenteredString(TabSelectionList.this.minecraft.font, this.headerText, this.getX() + this.width / 2, this.getY() - 15, 0xFFFFFFFF);
         }
         if(this.footerText != null)
         {
             Font font = TabSelectionList.this.minecraft.font;
             int footerWidth = font.width(this.footerText);
             ScreenHelper.drawRoundedBox(graphics, this.getX() + (this.width - footerWidth) / 2, this.getBottom() + 6, footerWidth, 14, 0x55000000);
-            graphics.drawCenteredString(font, this.footerText, this.getX() + this.width / 2, this.getBottom() + 9, 0xFFFFFF);
+            graphics.drawCenteredString(font, this.footerText, this.getX() + this.width / 2, this.getBottom() + 9, 0xFFFFFFFF);
         }
         //graphics.fillGradient(this.getX(), this.getY(), this.getRight(), this.getY() + 4, 0xFF000000, 0);
         //graphics.fillGradient(this.getX(), this.getBottom() - 4, this.getRight(), this.getBottom(), 0, 0xFF000000);
@@ -190,7 +190,7 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
             Font font = Objects.requireNonNull(TabSelectionList.this.minecraft).font;
             int labelWidth = font.width(this.label) + 2;
             ScreenHelper.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
-            graphics.drawCenteredString(font, this.label, left + width / 2, top + 5, 0xFFFFFF);
+            graphics.drawCenteredString(font, this.label, left + width / 2, top + 5, 0xFFFFFFFF);
         }
 
         @Override

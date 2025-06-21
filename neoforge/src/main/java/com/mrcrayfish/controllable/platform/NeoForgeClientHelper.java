@@ -11,17 +11,13 @@ import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
-import net.minecraft.client.gui.components.AbstractSelectionList;
-import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
+import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -334,6 +330,12 @@ public class NeoForgeClientHelper implements IClientHelper
     public boolean canLocalPlayerStartSprinting(LocalPlayer player)
     {
         return player.canStartSprinting();
+    }
+
+    @Override
+    public boolean isOverlayRecipeButtonCraftable(AbstractWidget widget)
+    {
+        return widget instanceof OverlayRecipeComponent.OverlayRecipeButton btn && btn.isCraftable;
     }
 
     private BasicNavigationPoint getCreativeTabPoint(AbstractContainerScreen<?> screen, CreativeTabsScreenPage page, CreativeModeTab tab)

@@ -6,9 +6,10 @@
     "compatibilityLevel": "JAVA_21",
     "refmap": "controllable.refmap.json",
     "client": [
-        "client.NeoForgeRecipeBookPageMixin",
+        "client.GuiLayerManagerMixin",
+        "client.NeoForgeGameRendererMixin",
         "client.NeoForgeKeyMappingMixin",
-        "client.GuiLayerManagerMixin"
+        "client.NeoForgeRecipeBookPageMixin"
     ],
     "injectors": {
         "defaultRequire": 1

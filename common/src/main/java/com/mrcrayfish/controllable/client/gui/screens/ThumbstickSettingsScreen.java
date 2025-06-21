@@ -65,7 +65,7 @@ public class ThumbstickSettingsScreen extends Screen
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
         //this.optionsRowList.render(graphics, mouseX, mouseY, partialTicks);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
         super.render(graphics, mouseX, mouseY, partialTicks);
     }
 }

@@ -169,8 +169,8 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
                 graphics.fill(left, top - 2, left + rowWidth, top + rowHeight + 2, 0x55000000);
             }
             Font font = RadialItemList.this.minecraft.font;
-            graphics.drawString(font, this.label, left + 5, top + 5, 0xFFFFFF);
-            graphics.drawString(font, this.description, left + 5, top + 18, 0xFFFFFF);
+            graphics.drawString(font, this.label, left + 5, top + 5, 0xFFFFFFFF);
+            graphics.drawString(font, this.description, left + 5, top + 18, 0xFFFFFFFF);
             for(int i = 0; i < this.buttons.length; i++)
             {
                 int offset = (this.buttons.length - i) * 22;

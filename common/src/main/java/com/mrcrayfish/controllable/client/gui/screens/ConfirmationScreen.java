@@ -82,7 +82,7 @@ public class ConfirmationScreen extends Screen
         for(int i = 0; i < lines.size(); i++)
         {
             int lineWidth = this.font.width(lines.get(i));
-            graphics.drawString(this.font, lines.get(i), this.width / 2 - lineWidth / 2, this.startY + MESSAGE_PADDING + i * (this.font.lineHeight + 2) + 1, 0xFFFFFF);
+            graphics.drawString(this.font, lines.get(i), this.width / 2 - lineWidth / 2, this.startY + MESSAGE_PADDING + i * (this.font.lineHeight + 2) + 1, 0xFFFFFFFF);
         }
     }
 

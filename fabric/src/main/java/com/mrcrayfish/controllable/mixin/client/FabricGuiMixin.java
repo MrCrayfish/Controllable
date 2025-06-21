@@ -33,24 +33,4 @@ public class FabricGuiMixin
             graphics.pose().popMatrix();
         }
     }
-
-    // TODO 1.21.6
-    /*@Inject(method = "renderExperienceLevel", at = @At(value = "HEAD"))
-    private void consoleExpLevelHead(GuiGraphics graphics, DeltaTracker tracker, CallbackInfo ci)
-    {
-        if(Config.CLIENT.options.consoleHotbar.get())
-        {
-            graphics.pose().pushPose();
-            graphics.pose().translate(0, -25, 0);
-        }
-    }
-
-    @Inject(method = "renderExperienceLevel", at = @At(value = "TAIL"))
-    private void consoleExpLevelTail(GuiGraphics graphics, DeltaTracker tracker, CallbackInfo ci)
-    {
-        if(Config.CLIENT.options.consoleHotbar.get())
-        {
-            graphics.pose().popPose();
-        }
-    }*/
 }

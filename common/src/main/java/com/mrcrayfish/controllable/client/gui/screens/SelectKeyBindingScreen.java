@@ -81,7 +81,7 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
         super.render(graphics, mouseX, mouseY, partialTick);
         if(this.list.children().isEmpty())
         {
-            graphics.drawCenteredString(this.font, LABEL_NO_KEYBINDS_AVAILABLE, this.list.getX() + this.list.getWidth() / 2, this.list.getY() + this.list.getHeight() / 2 - 4, 0xFFFFFF);
+            graphics.drawCenteredString(this.font, LABEL_NO_KEYBINDS_AVAILABLE, this.list.getX() + this.list.getWidth() / 2, this.list.getY() + this.list.getHeight() / 2 - 4, 0xFFFFFFFF);
         }
     }
 

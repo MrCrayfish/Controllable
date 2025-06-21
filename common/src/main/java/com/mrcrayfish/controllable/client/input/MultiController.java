@@ -1,5 +1,7 @@
 package com.mrcrayfish.controllable.client.input;
 
+import net.minecraft.util.Mth;
+
 import java.util.List;
 import java.util.function.Function;
 
@@ -88,56 +90,56 @@ public final class MultiController extends Controller
         return false;
     }
 
-    private float averageOfInput(Function<Controller, Float> func)
+    private float findBiggestDelta(Function<Controller, Float> func)
     {
-        int count = 0;
-        float total = 0;
+        float delta = 0;
+        float result = 0;
         for(Controller controller : this.controllers)
         {
             float value = func.apply(controller);
-            if(value != 0)
+            if(Mth.abs(value) > delta)
             {
-                total += value;
-                count++;
+                result = value;
+                delta = Mth.abs(value);
             }
         }
-        return count > 0 ? total / count : 0;
+        return result;
     }
 
     @Override
     protected float internalGetLTriggerValue()
     {
-        return this.averageOfInput(Controller::internalGetLTriggerValue);
+        return this.findBiggestDelta(Controller::internalGetLTriggerValue);
     }
 
     @Override
     protected float internalGetRTriggerValue()
     {
-        return this.averageOfInput(Controller::internalGetRTriggerValue);
+        return this.findBiggestDelta(Controller::internalGetRTriggerValue);
     }
 
     @Override
     protected float internalGetLThumbStickXValue()
     {
-        return this.averageOfInput(Controller::internalGetLThumbStickXValue);
+        return this.findBiggestDelta(Controller::internalGetLThumbStickXValue);
     }
 
     @Override
     protected float internalGetLThumbStickYValue()
     {
-        return this.averageOfInput(Controller::internalGetLThumbStickYValue);
+        return this.findBiggestDelta(Controller::internalGetLThumbStickYValue);
     }
 
     @Override
     protected float internalGetRThumbStickXValue()
     {
-        return this.averageOfInput(Controller::internalGetRThumbStickXValue);
+        return this.findBiggestDelta(Controller::internalGetRThumbStickXValue);
     }
 
     @Override
     protected float internalGetRThumbStickYValue()
     {
-        return this.averageOfInput(Controller::internalGetRThumbStickYValue);
+        return this.findBiggestDelta(Controller::internalGetRThumbStickYValue);
     }
 
     @Override

@@ -80,7 +80,7 @@ public abstract class Controller
      *
      * @return the left trigger value
      */
-    public final float getLTriggerValue()
+    public float getLTriggerValue()
     {
         return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetLTriggerValue(), this.getTriggerDeadzone()) : 0;
     }
@@ -92,7 +92,7 @@ public abstract class Controller
      *
      * @return the right trigger value
      */
-    public final float getRTriggerValue()
+    public float getRTriggerValue()
     {
         return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetRTriggerValue(), this.getTriggerDeadzone()) : 0;
     }
@@ -104,7 +104,7 @@ public abstract class Controller
      *
      * @return the left thumb stick x value
      */
-    public final float getLThumbStickXValue()
+    public float getLThumbStickXValue()
     {
         return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetLThumbStickXValue(), this.getThumbstickDeadzone(Thumbstick.LEFT)) : 0;
     }
@@ -116,7 +116,7 @@ public abstract class Controller
      *
      * @return the left thumb stick y value
      */
-    public final float getLThumbStickYValue()
+    public float getLThumbStickYValue()
     {
         return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetLThumbStickYValue(), this.getThumbstickDeadzone(Thumbstick.LEFT)) : 0;
     }
@@ -128,7 +128,7 @@ public abstract class Controller
      *
      * @return the right thumb stick x value
      */
-    public final float getRThumbStickXValue()
+    public float getRThumbStickXValue()
     {
         return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetRThumbStickXValue(), this.getThumbstickDeadzone(Thumbstick.RIGHT)) : 0;
     }
@@ -140,7 +140,7 @@ public abstract class Controller
      *
      * @return the right thumb stick y value
      */
-    public final float getRThumbStickYValue()
+    public float getRThumbStickYValue()
     {
         return this.isAccessible() ? InputHelper.applyDeadzone(this.internalGetRThumbStickYValue(), this.getThumbstickDeadzone(Thumbstick.RIGHT)) : 0;
     }
@@ -217,7 +217,7 @@ public abstract class Controller
      * @param button the button to get the pressed value for
      * @return a float value between 0 and 1 (inclusive)
      */
-    public final float getPressedValue(int button)
+    public float getPressedValue(int button)
     {
         return switch(button)
         {

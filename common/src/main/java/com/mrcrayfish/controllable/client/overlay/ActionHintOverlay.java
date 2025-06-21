@@ -71,7 +71,6 @@ public class ActionHintOverlay implements IOverlay
     private void drawConsoleHints(GuiGraphics graphics)
     {
         graphics.pose().pushMatrix();
-        //graphics.pose().translate(0, 0, 400); // TODO 1.21.6
 
         Minecraft mc = Minecraft.getInstance();
         graphics.pose().translate(5, mc.getWindow().getGuiScaledHeight() - BUTTON_SIZE - 5);
@@ -151,7 +150,6 @@ public class ActionHintOverlay implements IOverlay
     {
         Minecraft mc = Minecraft.getInstance();
         graphics.pose().pushMatrix();
-        //graphics.pose().translate(0, 0, 400F); // TODO 1.21.6
         graphics.drawString(mc.font, label, x, y, 0xFFFFFFFF);
         graphics.pose().popMatrix();
     }

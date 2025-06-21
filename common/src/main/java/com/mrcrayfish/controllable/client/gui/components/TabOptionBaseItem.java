@@ -83,7 +83,7 @@ public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implem
             ScreenHelper.drawOutlinedBox(graphics, left - 2, top - 2, listWidth + 4, slotHeight + 4, 0xAAFFFFFF);
         }
         Font font = Minecraft.getInstance().font;
-        graphics.drawString(font, this.label, left + 5, top + (slotHeight - font.lineHeight) / 2 + 1, this.labelColor);
+        graphics.drawString(font, this.label, left + 5, top + (slotHeight - font.lineHeight) / 2 + 1, this.labelColor | 0xFF000000);
     }
 
     @Override

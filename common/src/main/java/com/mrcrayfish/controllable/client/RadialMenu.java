@@ -475,24 +475,20 @@ public class RadialMenu
         @Override
         protected void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation)
         {
-            int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
+            int color = selected ? 0xAACCCCCC : mc.options.getBackgroundColor(0.7F);
             float alpha = ARGB.alpha(color) / 255F;
             float red = ARGB.red(color) / 255F;
             float green = ARGB.green(color) / 255F;
             float blue = ARGB.blue(color) / 255F;
-
-            graphics.pose().translate(0, 100);
-
             alpha = Math.min(1.0F, alpha * animation);
-            color = ARGB.colorFromFloat(red, green, blue, alpha);
+            color = ARGB.colorFromFloat(alpha, red, green, blue);
 
             // Draw background
-            // TODO 1.21.6
+            graphics.pose().translate(0, 100);
             graphics.fill(-14, -14, 14, -15, color);
             graphics.fill(-15, -14, 15, 14, color);
             graphics.fill(-14, 14, 14, 15, color);
             graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, -10, -10, 98, 15, 20, 20, 10, 10, 256, 256);
-
             if(selected)
             {
                 graphics.drawCenteredString(mc.font, LABEL, 0, -30, 0xFFFFFFFF);
@@ -523,24 +519,19 @@ public class RadialMenu
         @Override
         protected void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation)
         {
-            int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
+            int color = selected ? 0xAACCCCCC : mc.options.getBackgroundColor(0.7F);
             float alpha = ARGB.alpha(color) / 255F;
             float red = ARGB.red(color) / 255F;
             float green = ARGB.green(color) / 255F;
             float blue = ARGB.blue(color) / 255F;
+            alpha = Math.min(1.0F, alpha * animation);
+            color = ARGB.colorFromFloat(alpha, red, green, blue);
 
             graphics.pose().translate(0, -90);
-
-            alpha = Math.min(1.0F, alpha * animation);
-            color = ARGB.colorFromFloat(red, green, blue, alpha);
-
-            // TODO 1.21.6
             graphics.fill(-14, -14, 14, -15, color);
             graphics.fill(-15, -14, 15, 14, color);
             graphics.fill(-14, 14, 14, 15, color);
-
             graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, -10, -10, 88, 15, 20, 20, 10, 10, 256, 256);
-
             if(selected)
             {
                 graphics.drawCenteredString(mc.font, LABEL, 0, 21, 0xFFFFFFFF);
@@ -580,55 +571,33 @@ public class RadialMenu
         {
             graphics.pose().pushMatrix();
 
-            int color = selected ? 0xFFCCCCCC : mc.options.getBackgroundColor(0.7F);
-            float alpha = ARGB.alpha(color) / 255F;
-            float red = ARGB.red(color) / 255F;
-            float green = ARGB.green(color) / 255F;
-            float blue = ARGB.blue(color) / 255F;
-
+            int width = 500;
             float start = 0;
-            float end = 150F;
-            alpha *= animation;
-
+            float end = width;
             if(left)
             {
-                start -= 150;
-                end -= 150;
+                start -= width;
+                end -= width;
             }
-
             start *= (left ? animation : 1);
             end *= (left ? 1 : animation);
 
+            int color = selected ? 0xAACCCCCC : mc.options.getBackgroundColor(0.5F);
             graphics.pose().translate((1.0F - animation) * (left ? -20 : 20), 0);
-
-            // Draw background
-            // TODO 1.21.6
             graphics.fill((int) (start + 1), -15, (int) (end - 1), -14, color);
             graphics.fill((int) start, -14, (int) end, 14, color);
             graphics.fill((int) (start + 1), 14, (int) (end - 1), 15, color);
 
-            // Middle
-//            consumer.addVertex(poseStack.last().pose(), start, -14, 0).setColor(red, green, blue, left ? 0 : alpha);
-//            consumer.addVertex(poseStack.last().pose(), start, 14, 0).setColor(red, green, blue, left ? 0 : alpha);
-//            consumer.addVertex(poseStack.last().pose(), end, 14, 0).setColor(red, green, blue, left ? alpha : 0);
-//            consumer.addVertex(poseStack.last().pose(), end, -14, 0).setColor(red, green, blue, left ? alpha : 0);
-
-            // Bottom (offset by 1)
-//            consumer.addVertex(poseStack.last().pose(), start + 1, 14, 0).setColor(red, green, blue, left ? 0 : alpha);
-//            consumer.addVertex(poseStack.last().pose(), start + 1, 15, 0).setColor(red, green, blue, left ? 0 : alpha);
-//            consumer.addVertex(poseStack.last().pose(), end - 1, 15, 0).setColor(red, green, blue, left ? alpha : 0);
-//            consumer.addVertex(poseStack.last().pose(), end - 1, 14, 0).setColor(red, green, blue, left ? alpha : 0);
-
             if(this.label != null)
             {
                 int offset = !left ? 5 : -mc.font.width(this.label) - 5;
-                graphics.drawString(mc.font, this.label, offset, -10, 0xFFFFFFFF);
+                graphics.drawString(mc.font, this.label, offset, -10, 0xFFFFFFFF, !selected);
             }
 
             if(this.description != null)
             {
                 int offset = !left ? 5 : -mc.font.width(this.description) - 5;
-                graphics.drawString(mc.font, this.description, offset, 2, 0xFFFFFFFF);
+                graphics.drawString(mc.font, this.description, offset, 2, selected ? 0xFF000000 : 0xFFFFFFFF, !selected);
             }
 
             graphics.pose().popMatrix();

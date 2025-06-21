@@ -30,7 +30,6 @@ public class VirtualCursorOverlay implements IOverlay
     public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
         graphics.pose().pushMatrix();
-
         Minecraft mc = Minecraft.getInstance();
         CursorStyle type = Config.CLIENT.options.cursorType.get();
         if(mc.player == null || (mc.player.inventoryMenu.getCarried().isEmpty() || type.getBehaviour() == CursorStyle.ItemHeldBehaviour.SHOW))
@@ -38,12 +37,11 @@ public class VirtualCursorOverlay implements IOverlay
             double guiScale = mc.getWindow().getGuiScale();
             double cursorX = Controllable.getCursor().getRenderX();
             double cursorY = Controllable.getCursor().getRenderY();
-            double zIndex = 3000;
-            //graphics.pose().translate(cursorX / guiScale, cursorY / guiScale, zIndex); // TODO 1.21.6
+            graphics.pose().translate((float) (cursorX / guiScale), (float) (cursorY / guiScale));
             boolean isHoveringSlot = this.isHoveringFilledContainerSlot();
             if(isHoveringSlot && type.isScaleHover())
             {
-                graphics.pose().scale(1.33F, 1.33F); // TODO 1.21.6
+                graphics.pose().scale(1.33F, 1.33F);
             }
             graphics.blit(RenderPipelines.GUI_TEXTURED, CursorStyle.TEXTURE, -8, -8, isHoveringSlot ? 32 : 0, type.ordinal() * 32, 16, 16, 32, 32, 64, CursorStyle.values().length * 32);
         }

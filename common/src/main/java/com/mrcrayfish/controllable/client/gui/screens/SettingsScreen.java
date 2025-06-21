@@ -137,9 +137,7 @@ public class SettingsScreen extends Screen
         super.render(graphics, !waitingForInput ? mouseX : -1, !waitingForInput ? mouseY : -1, partialTick);
         if(waitingForInput)
         {
-            this.renderBlurredBackground(graphics);
             graphics.pose().pushMatrix();
-            //graphics.pose().translate(0, 100); // TODO 1.21.6 what happen to z depth
             graphics.fillGradient(0, 0, this.width, this.height, 0xE0101010, 0xF0101010);
             ScreenHelper.drawRoundedBox(graphics, (int) (this.width * 0.125), this.height / 4, (int) (this.width * 0.75), this.height / 2, 0x99000000);
             Component pressButtonLabel = Component.translatable("controllable.gui.waiting_for_input").withStyle(ChatFormatting.YELLOW);
@@ -251,7 +249,7 @@ public class SettingsScreen extends Screen
                 updateConfirmation.setIcon(ConfirmationScreen.Icon.INFO);
                 mc.setScreen(updateConfirmation);
             }).build(), Button.builder(restoreDefaults, btn -> {
-                mc.setScreen(new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.restore_defaults"), result -> {
+                mc.setScreen(new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.restore_default_buttons"), result -> {
                     if(result){
                         FrameworkConfigManager.FrameworkConfigImpl config = FrameworkConfigManager.getInstance().getConfig(Config.CLIENT_CONFIG_ID);
                         if(config != null) {

@@ -12,7 +12,6 @@
     "client.MinecraftMixin",
     "client.MouseHandlerMixin",
     "client.MouseHelperMixin",
-    "client.OverlayRecipeButtonAccessor",
     "client.OverlayRecipeComponentAccessor",
     "client.RecipeBookComponentAccessor",
     "client.RecipeBookPageAccessor",
