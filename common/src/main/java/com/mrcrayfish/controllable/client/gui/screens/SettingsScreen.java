@@ -282,7 +282,11 @@ public class SettingsScreen extends Screen
                 mc.options.toggleSprint().set(sprintMode == SprintMode.TOGGLE);
                 mc.options.save();
             }));
-            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.quickCraft));
+            optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.quickCraft).setChangeCallback(value -> {
+                if(mc.player != null) {
+                    mc.player.getRecipeBook().rebuildCollections();
+                }
+            }));
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.radialThumbstick));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.spyglassSensitivity, 0.05));
 
