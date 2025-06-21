@@ -5,6 +5,7 @@
   "minVersion": "0.8",
   "refmap": "controllable.refmap.json",
   "client": [
+    "client.ClientRecipeBookMixin",
     "client.ContainerScreenMixin",
     "client.GameRendererMixin",
     "client.GuiMixin",
