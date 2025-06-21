@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -22,17 +23,32 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin
 {
-    @Shadow
-    @Final
-    private Minecraft minecraft;
+    @Unique
+    private int controllable$captureMouseX;
 
-    /*@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;render(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"))
-    private void controllableLastRender(DeltaTracker tracker, boolean running, CallbackInfo ci, @Local GuiGraphics graphics)
+    @Unique
+    private int controllable$captureMouseY;
+
+    @Unique
+    private GuiGraphics controllable$graphics;
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getOverlay()Lnet/minecraft/client/gui/screens/Overlay;", ordinal = 0))
+    private void captureLocals(DeltaTracker tracker, boolean p_109096_, CallbackInfo ci, @Local(ordinal = 0) int mouseX, @Local(ordinal = 1) int mouseY, @Local(ordinal = 0) GuiGraphics graphics)
     {
-        int mouseX = (int) this.minecraft.mouseHandler.getScaledXPos(this.minecraft.getWindow());
-        int mouseY = (int) this.minecraft.mouseHandler.getScaledYPos(this.minecraft.getWindow());
-        OverlayRenderer.draw(graphics, mouseX, mouseY, tracker);
-    }*/
+        this.controllable$captureMouseX = mouseX;
+        this.controllable$captureMouseY = mouseY;
+        this.controllable$graphics = graphics;
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;render(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"))
+    private void renderOverlay(DeltaTracker tracker, boolean p_109096_, CallbackInfo ci)
+    {
+        if(this.controllable$graphics != null)
+        {
+            OverlayRenderer.draw(this.controllable$graphics, this.controllable$captureMouseX, this.controllable$captureMouseY, tracker);
+            this.controllable$graphics = null;
+        }
+    }
 
     @ModifyVariable(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearDepthTexture(Lcom/mojang/blaze3d/textures/GpuTexture;D)V", remap = false, ordinal = 0), index = 4, ordinal = 0, require = 1)
     private int controllableModifyMouseX(int original)

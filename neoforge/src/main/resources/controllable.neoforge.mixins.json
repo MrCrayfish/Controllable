@@ -7,7 +7,6 @@
     "refmap": "controllable.refmap.json",
     "client": [
         "client.GuiLayerManagerMixin",
-        "client.NeoForgeGameRendererMixin",
         "client.NeoForgeKeyMappingMixin",
         "client.NeoForgeRecipeBookPageMixin"
     ],
