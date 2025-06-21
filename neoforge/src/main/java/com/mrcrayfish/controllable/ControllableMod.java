@@ -10,7 +10,7 @@ import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 /**
  * Author: MrCrayfish
  */
-@EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD, modid = Constants.MOD_ID)
+@EventBusSubscriber(value = Dist.CLIENT, modid = Constants.MOD_ID)
 public class ControllableMod
 {
     @SubscribeEvent
