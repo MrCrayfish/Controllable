@@ -125,7 +125,7 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
                 graphics.fill(left - 2, top - 2, left + rowWidth + 2, top + rowHeight + 2, 0x55000000);
             }
             Font font = RadialMenuAddBindingsScreen.this.minecraft.font;
-            int colour = this.active ? ChatFormatting.WHITE.getColor() : ChatFormatting.DARK_GRAY.getColor();
+            int colour = this.active ? 0xFFFFFFFF : 0xFF555555;
             graphics.drawString(font, this.label, left + 5, top + 6, colour);
             this.bindingButton.setX(left + rowWidth - 25);
             this.bindingButton.setY(top);
