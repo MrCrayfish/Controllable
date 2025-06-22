@@ -97,6 +97,7 @@ sourcesJar {
         rename { "${it}_${mod_name}" }
     }
     from(rootProject.file("LICENSE_ControllableSDL"))
+    from(rootProject.file("LICENSE_GameControllerDB"))
 }
 
 jar {
@@ -104,6 +105,7 @@ jar {
         rename { "${it}_${mod_name}" }
     }
     from(rootProject.file("LICENSE_ControllableSDL"))
+    from(rootProject.file("LICENSE_GameControllerDB"))
     manifest {
         attributes([
             'Specification-Title'   : mod_name,
