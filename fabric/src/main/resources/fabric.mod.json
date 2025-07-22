@@ -28,7 +28,7 @@
     "accessWidener": "controllable.accesswidener",
     "depends": {
         "fabricloader": ">=${fabric_loader_version}",
-        "fabric": "*",
+        "fabric-api": "*",
         "minecraft": "${minecraft_version}",
         "java": ">=21",
         "framework": ">=${framework_version}"
