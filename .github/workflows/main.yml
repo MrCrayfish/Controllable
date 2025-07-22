@@ -126,17 +126,20 @@ jobs:
           name: '${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
           artifacts: "${{ steps.artifacts.outputs.neoforge }},${{ steps.artifacts.outputs.neoforge }}.asc,${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.fabric }}.asc,CHANGELOG.txt"
           bodyFile: "RELEASE_BODY.md"
-      - name: Upload NeoForge Artifacts
+      - name: Prepare Artifacts
+        run: |
+          mkdir artifacts
+          mv ${{ steps.artifacts.outputs.neoforge }} artifacts
+          mv ${{ steps.artifacts.outputs.neoforge }}.asc artifacts
+          mv ${{ steps.artifacts.outputs.fabric }} artifacts
+          mv ${{ steps.artifacts.outputs.fabric }}.asc artifacts
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: '${{ steps.mod_id.outputs.value }}-neoforge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
-          path: |
-            ${{ steps.artifacts.outputs.neoforge }}
-            ${{ steps.artifacts.outputs.neoforge }}.asc
-      - name: Upload Fabric Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: '${{ steps.mod_id.outputs.value }}-fabric-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
-          path: |
-            ${{ steps.artifacts.outputs.fabric }}
-            ${{ steps.artifacts.outputs.fabric }}.asc
+          name: '${{ steps.mod_data.outputs.mod_id }}-${{ steps.mod_data.outputs.minecraft_version }}-${{ steps.mod_data.outputs.mod_version }}'
+          path: artifacts
+      - name: Delete tag on fail
+        if: failure()
+        run: |
+          echo "Cleaning up tag..."
+          git push origin :refs/tags/${{ github.ref_name }}
