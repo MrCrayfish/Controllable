@@ -57,7 +57,7 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
     public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
         super.render(graphics, slotIndex, top, left, listWidth, slotHeight, mouseX, mouseY, hovered, partialTick);
-        this.slider.active = this.dependentOption == null || this.dependentOption.isEnabled();
+        this.slider.active = this.isOptionActive();
         this.slider.setX(left + listWidth - this.slider.getWidth() - 20);
         this.slider.setY(top);
         this.slider.render(graphics, mouseX, mouseY, partialTick);

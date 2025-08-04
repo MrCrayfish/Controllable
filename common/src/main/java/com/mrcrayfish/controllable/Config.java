@@ -84,6 +84,9 @@ public class Config
             @ConfigProperty(name = "mouseSpeed", comment = "The speed which the cursor or virtual mouse moves around the screen")
             public final DoubleProperty cursorSpeed = DoubleProperty.create(15.0, 0.0, 50.0);
 
+            @ConfigProperty(name = "disableVirtualCursor", comment = "If enabled, this will disable and remove the virtual cursor from appearing. This is useful for a controller/mouse input combination.")
+            public final BoolProperty disableVirtualCursor = BoolProperty.create(false);
+
             @ConfigProperty(name = "showActions", comment = "If enabled, shows common actions when displaying available on the screen")
             public final EnumProperty<ActionVisibility> showButtonHints = EnumProperty.create(ActionVisibility.MINIMAL);
 

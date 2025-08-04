@@ -463,6 +463,9 @@ public class InputHandler
 
     public static void navigateCursor(Screen screen, Navigate navigate)
     {
+        if(!Controllable.getCursor().isEnabled())
+            return;
+
         int cursorScreenX = Controllable.getCursor().getScreenX();
         int cursorScreenY = Controllable.getCursor().getScreenY();
         List<NavigationPoint> points = gatherNavigationPoints(screen, navigate, cursorScreenX, cursorScreenY);

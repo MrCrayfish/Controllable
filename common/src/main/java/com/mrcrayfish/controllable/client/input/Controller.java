@@ -204,7 +204,7 @@ public abstract class Controller
      */
     public final boolean isUsingVirtualCursor()
     {
-        return this.isBeingUsed() && Controllable.getCursor().getMode().isController();
+        return this.isBeingUsed() && Controllable.getCursor().getMode().isController() && Controllable.getCursor().isEnabled();
     }
 
     /**

@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.gui.components.*;
+import com.mrcrayfish.controllable.client.settings.CursorStyle;
 import com.mrcrayfish.controllable.client.settings.SneakMode;
 import com.mrcrayfish.controllable.client.settings.SprintMode;
 import com.mrcrayfish.controllable.client.gui.widget.TabListWidget;
@@ -329,8 +330,18 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(rightDeadzoneOption);
 
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.triggerDeadZone, 0.01));
-            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.cursorSpeed, 1.0));
-            optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.cursorType));
+
+            TabOptionToggleItem disableVirtualCursor = new TabOptionToggleItem(Config.CLIENT.options.disableVirtualCursor);
+            optionsList.addEntry(disableVirtualCursor);
+
+            TabOptionSliderItem cursorSpeed = new TabOptionSliderItem(Config.CLIENT.options.cursorSpeed, 1.0);
+            cursorSpeed.setDependentOption(disableVirtualCursor, true);
+            optionsList.addEntry(cursorSpeed);
+
+            TabOptionEnumItem<CursorStyle> cursorType = new TabOptionEnumItem<>(Config.CLIENT.options.cursorType);
+            cursorType.setDependentOption(disableVirtualCursor, true);
+            optionsList.addEntry(cursorType);
+
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.listScrollSpeed, 1.0));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.hoverModifier, 0.05));
             if(!Minecraft.ON_OSX)

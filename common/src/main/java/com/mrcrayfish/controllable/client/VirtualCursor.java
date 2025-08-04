@@ -67,6 +67,11 @@ public final class VirtualCursor
         this.renderY = this.y = this.prevY = mc.getWindow().getScreenHeight() / 2;
     }
 
+    public boolean isEnabled()
+    {
+        return !Config.CLIENT.options.disableVirtualCursor.get();
+    }
+
     /**
      * @return True if the virtual cursor is visible
      */
@@ -178,6 +183,10 @@ public final class VirtualCursor
      */
     private void updateMovement()
     {
+        // Don't do any updates if virtual cursor is disabled
+        if(!this.isEnabled())
+            return;
+
         this.prevX = this.x;
         this.prevY = this.y;
         this.inputVector.zero();
@@ -242,6 +251,10 @@ public final class VirtualCursor
      */
     private void updateRenderPosition(DeltaTracker tracker)
     {
+        // Don't do any updates if virtual cursor is disabled
+        if(!this.isEnabled())
+            return;
+
         // Skip updating if no screen
         Minecraft mc = Minecraft.getInstance();
         if(mc.screen == null)
