@@ -69,6 +69,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.AbstractBoat;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.inventory.FurnaceResultSlot;
 import net.minecraft.world.inventory.RecipeBookMenu;
@@ -329,7 +330,7 @@ public class InputHandler
                     controller.updateInputTime();
                 }
 
-                float threshold = localPlayer.getVehicle() instanceof Boat ? 0.5F : 0;
+                float threshold = localPlayer.getVehicle() instanceof AbstractBoat ? 0.5F : 0;
                 if(Math.abs(inputX) > threshold)
                 {
                     right = inputX > 0;
