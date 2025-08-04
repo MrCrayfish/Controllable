@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.util;
 
 import com.mojang.blaze3d.Blaze3D;
+import com.mojang.blaze3d.platform.Window;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.integration.EmiSupport;
 import com.mrcrayfish.controllable.platform.ClientServices;
@@ -8,11 +9,39 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 
+import java.util.Optional;
+
 /**
  * Author: MrCrayfish
  */
 public class MouseHooks
 {
+    /**
+     * @return The scaled x position of the mouse. If virtual cursor is disabled, it will use the native cursor x position.
+     */
+    private static double getScreenMouseX()
+    {
+        if(Controllable.getCursor().isEnabled())
+        {
+            return Controllable.getCursor().getScreenX();
+        }
+        Window window = Minecraft.getInstance().getWindow();
+        return Minecraft.getInstance().mouseHandler.getScaledXPos(window);
+    }
+
+    /**
+     * @return The scaled y position of the mouse. If virtual cursor is disabled, it will use the native cursor y position.
+     */
+    private static double getScreenMouseY()
+    {
+        if(Controllable.getCursor().isEnabled())
+        {
+            return Controllable.getCursor().getScreenY();
+        }
+        Window window = Minecraft.getInstance().getWindow();
+        return Minecraft.getInstance().mouseHandler.getScaledYPos(window);
+    }
+
     /**
      * Invokes a mouse click in a GUI. This is modified version that is designed for controllers.
      * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
@@ -24,8 +53,8 @@ public class MouseHooks
     {
         if(screen != null)
         {
-            int screenCursorX = Controllable.getCursor().getScreenX();
-            int screenCursorY = Controllable.getCursor().getScreenY();
+            double screenCursorX = getScreenMouseX();
+            double screenCursorY = getScreenMouseY();
             if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
             {
                 if(EmiSupport.invokeMouseClick(button, screenCursorX, screenCursorY))
@@ -67,8 +96,8 @@ public class MouseHooks
     {
         if(screen != null)
         {
-            int screenCursorX = Controllable.getCursor().getScreenX();
-            int screenCursorY = Controllable.getCursor().getScreenY();
+            double screenCursorX = getScreenMouseX();
+            double screenCursorY = getScreenMouseY();
             if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
             {
                 if(EmiSupport.invokeMouseReleased(button, screenCursorX, screenCursorY))

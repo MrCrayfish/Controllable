@@ -30,6 +30,7 @@ public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implem
 {
     private int labelColor = 0xFFFFFFFF;
     protected @Nullable TabOptionBaseItem dependentOption;
+    protected boolean invertDependentOption;
     protected Supplier<Boolean> visibilityCondition = () -> true;
 
     public TabOptionBaseItem(Component label)
@@ -42,9 +43,20 @@ public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implem
         return true;
     }
 
+    protected boolean isOptionActive()
+    {
+        return this.dependentOption == null || this.invertDependentOption && !this.dependentOption.isEnabled() || !this.invertDependentOption && this.dependentOption.isEnabled();
+    }
+
     public void setDependentOption(@Nullable TabOptionBaseItem required)
     {
         this.dependentOption = required;
+    }
+
+    public void setDependentOption(@Nullable TabOptionBaseItem required, boolean invert)
+    {
+        this.setDependentOption(required);
+        this.invertDependentOption = invert;
     }
 
     public void setVisibilityCondition(Supplier<Boolean> visibilityCondition)
@@ -83,7 +95,8 @@ public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implem
             ScreenHelper.drawOutlinedBox(graphics, left - 2, top - 2, listWidth + 4, slotHeight + 4, 0xAAFFFFFF);
         }
         Font font = Minecraft.getInstance().font;
-        graphics.drawString(font, this.label, left + 5, top + (slotHeight - font.lineHeight) / 2 + 1, this.labelColor | 0xFF000000);
+        int textColor = this.isOptionActive() ? (this.labelColor | 0xFF000000) : 0xFF777777;
+        graphics.drawString(font, this.label, left + 5, top + (slotHeight - font.lineHeight) / 2 + 1, textColor);
     }
 
     @Override
@@ -104,6 +117,7 @@ public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implem
             }
         });
     }
+
     protected static Component createTooltipMessage(AbstractProperty<?> property)
     {
         String tooltipKey = property.getTranslationKey() + ".tooltip";

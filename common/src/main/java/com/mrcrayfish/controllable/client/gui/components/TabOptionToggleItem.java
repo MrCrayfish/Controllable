@@ -33,6 +33,7 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
 {
     private final AbstractWidget toggle;
     private Consumer<Boolean> changeCallback;
+    private final Supplier<Boolean> getter;
 
     public TabOptionToggleItem(BoolProperty property)
     {
@@ -50,6 +51,7 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
     public TabOptionToggleItem(Component label, Tooltip tooltip, Supplier<Boolean> getter, Consumer<Boolean> setter)
     {
         super(label);
+        this.getter = getter;
         this.toggle = CycleButton.onOffBuilder(getter.get())
                 .withTooltip(value -> tooltip)
                 .withInitialValue(getter.get())
@@ -70,6 +72,12 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
     }
 
     @Override
+    public boolean isEnabled()
+    {
+        return this.getter.get();
+    }
+
+    @Override
     public List<? extends GuiEventListener> children()
     {
         return ImmutableList.of(this.toggle);
@@ -85,7 +93,7 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
     public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
         super.render(graphics, slotIndex, top, left, listWidth, slotHeight, mouseX, mouseY, hovered, partialTick);
-        this.toggle.active = this.dependentOption == null || this.dependentOption.isEnabled();
+        this.toggle.active = this.isOptionActive();
         this.toggle.setX(left + listWidth - this.toggle.getWidth() - 20);
         this.toggle.setY(top);
         this.toggle.render(graphics, mouseX, mouseY, partialTick);

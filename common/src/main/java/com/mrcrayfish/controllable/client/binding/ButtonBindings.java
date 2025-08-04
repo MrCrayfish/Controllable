@@ -229,6 +229,8 @@ public class ButtonBindings
     }));
 
     public static final ButtonBinding NAVIGATE_UP = new ButtonBinding(Buttons.DPAD_UP, "controllable.key.move_up", "key.categories.ui", InScreenContext.INSTANCE, OnPressHandler.create(context -> {
+        if(!Controllable.getCursor().isEnabled())
+            return Optional.empty();
         return Optional.of(() -> {
             context.screen().ifPresent(screen -> {
                 InputHandler.navigateCursor(screen, InputHandler.Navigate.UP);
@@ -237,6 +239,8 @@ public class ButtonBindings
     }));
 
     public static final ButtonBinding NAVIGATE_DOWN = new ButtonBinding(Buttons.DPAD_DOWN, "controllable.key.move_down", "key.categories.ui", InScreenContext.INSTANCE, OnPressHandler.create(context -> {
+        if(!Controllable.getCursor().isEnabled())
+            return Optional.empty();
         return Optional.of(() -> {
             context.screen().ifPresent(screen -> {
                 InputHandler.navigateCursor(screen, InputHandler.Navigate.DOWN);
@@ -245,6 +249,8 @@ public class ButtonBindings
     }));
 
     public static final ButtonBinding NAVIGATE_LEFT = new ButtonBinding(Buttons.DPAD_LEFT, "controllable.key.move_left", "key.categories.ui", InScreenContext.INSTANCE, OnPressHandler.create(context -> {
+        if(!Controllable.getCursor().isEnabled())
+            return Optional.empty();
         return Optional.of(() -> {
             context.screen().ifPresent(screen -> {
                 InputHandler.navigateCursor(screen, InputHandler.Navigate.LEFT);
@@ -253,6 +259,8 @@ public class ButtonBindings
     }));
 
     public static final ButtonBinding NAVIGATE_RIGHT = new ButtonBinding(Buttons.DPAD_RIGHT, "controllable.key.move_right", "key.categories.ui", InScreenContext.INSTANCE, OnPressHandler.create(context -> {
+        if(!Controllable.getCursor().isEnabled())
+            return Optional.empty();
         return Optional.of(() -> {
             context.screen().ifPresent(screen -> {
                 InputHandler.navigateCursor(screen, InputHandler.Navigate.RIGHT);
