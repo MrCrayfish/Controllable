@@ -22,6 +22,8 @@ import java.util.function.Consumer;
  */
 public class ControllerEvents
 {
+    private static boolean released = false;
+
     public static void init()
     {
         FrameworkScreenEvents.INIT.register(ControllerEvents::onModifyScreenWidgets);
@@ -32,15 +34,20 @@ public class ControllerEvents
         ButtonBinding.resetButtonStates();
 
         // Fixes an issue where using item is not stopped after opening a screen
-        Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed())
+        if(!released)
         {
-            Minecraft mc = Minecraft.getInstance();
-            if(mc.gameMode != null && mc.player != null && mc.player.isUsingItem())
+            released = true;
+            Controller controller = Controllable.getController();
+            if(controller != null && controller.isBeingUsed())
             {
-                mc.gameMode.releaseUsingItem(mc.player);
+                Minecraft mc = Minecraft.getInstance();
+                if(mc.gameMode != null && mc.player != null && mc.player.isUsingItem())
+                {
+                    mc.gameMode.releaseUsingItem(mc.player);
+                }
             }
         }
+        released = false;
 
         if(screen instanceof OptionsScreen)
         {
