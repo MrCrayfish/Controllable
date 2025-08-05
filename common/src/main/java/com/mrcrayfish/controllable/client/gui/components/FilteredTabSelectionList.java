@@ -26,7 +26,7 @@ public class FilteredTabSelectionList<E extends ContainerObjectSelectionList.Ent
         this.replaceEntries(newEntries);
         if(scroll)
         {
-            this.setScrollAmount(this.maxScrollAmount());
+            this.setScrollAmount(this.getMaxScroll());
         }
     }
 

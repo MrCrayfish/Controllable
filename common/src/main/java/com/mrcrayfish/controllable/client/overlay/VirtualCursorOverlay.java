@@ -39,7 +39,6 @@ public class VirtualCursorOverlay implements IOverlay
             double cursorY = Controllable.getCursor().getRenderY();
             double zIndex = 3000;
             pose.translate(cursorX / guiScale, cursorY / guiScale, zIndex);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             boolean isHoveringSlot = this.isHoveringFilledContainerSlot();
             if(isHoveringSlot && type.isScaleHover())
             {
