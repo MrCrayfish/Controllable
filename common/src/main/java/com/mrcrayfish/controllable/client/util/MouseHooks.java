@@ -26,7 +26,8 @@ public class MouseHooks
             return Controllable.getCursor().getScreenX();
         }
         Window window = Minecraft.getInstance().getWindow();
-        return Minecraft.getInstance().mouseHandler.getScaledXPos(window);
+        double x = Minecraft.getInstance().mouseHandler.xpos();
+        return x * window.getGuiScaledWidth() / window.getScreenWidth();
     }
 
     /**
@@ -38,8 +39,10 @@ public class MouseHooks
         {
             return Controllable.getCursor().getScreenY();
         }
+        // TODO TEST
         Window window = Minecraft.getInstance().getWindow();
-        return Minecraft.getInstance().mouseHandler.getScaledYPos(window);
+        double y = Minecraft.getInstance().mouseHandler.ypos();
+        return y * window.getGuiScaledHeight() / window.getScreenHeight();
     }
 
     /**

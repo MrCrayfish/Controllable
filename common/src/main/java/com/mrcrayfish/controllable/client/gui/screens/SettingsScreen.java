@@ -17,6 +17,7 @@ import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.config.AbstractProperty;
 import com.mrcrayfish.framework.config.FrameworkConfigManager;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -28,8 +29,11 @@ import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.recipebook.RecipeCollection;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import org.lwjgl.glfw.GLFW;
 
 import org.jetbrains.annotations.Nullable;
@@ -287,8 +291,13 @@ public class SettingsScreen extends Screen
                 mc.options.save();
             }));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.quickCraft).setChangeCallback(value -> {
-                if(mc.player != null) {
-                    mc.player.getRecipeBook().rebuildCollections();
+                if(mc.player != null && mc.level != null) {
+                    // Rebuild the client recipe book
+                    ClientRecipeBook book = mc.player.getRecipeBook();
+                    Iterable<RecipeHolder<?>> holders = book.getCollections().stream().flatMap(c -> c.getRecipes().stream()).toList();
+                    RegistryAccess access = mc.level.registryAccess();
+                    book.setupCollections(holders, access);
+                    book.getCollections().forEach(c -> c.updateKnownRecipes(book));
                 }
             }));
             optionsList.addEntry(new TabOptionEnumItem<>(Config.CLIENT.options.radialThumbstick));

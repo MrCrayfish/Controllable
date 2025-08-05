@@ -15,7 +15,7 @@ public class ClientRecipeBookMixin
      * feels a lot better. If quick craft option is toggled on or off during runtime, it will
      * automatically group/ungroup the recipes.
      */
-    @ModifyExpressionValue(method = "categorizeAndGroupRecipes", at = @At(value = "INVOKE", target = "Ljava/util/OptionalInt;isEmpty()Z"))
+    @ModifyExpressionValue(method = "categorizeAndGroupRecipes", at = @At(value = "INVOKE", target = "Ljava/lang/String;isEmpty()Z"))
     private static boolean test(boolean original)
     {
         return original || Config.CLIENT.options.quickCraft.get();
