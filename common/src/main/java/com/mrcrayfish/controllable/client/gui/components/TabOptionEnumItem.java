@@ -66,19 +66,19 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
     }
 
     @Override
-    public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
+    public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
-        super.render(graphics, slotIndex, top, left, listWidth, slotHeight, mouseX, mouseY, hovered, partialTick);
+        super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
         this.cycle.active = this.isOptionActive();
-        this.cycle.setX(left + listWidth - this.cycle.getWidth() - 20);
-        this.cycle.setY(top);
+        this.cycle.setX(this.getX() + this.getWidth() - this.cycle.getWidth() - 20);
+        this.cycle.setY(this.getY() + 2);
         this.cycle.render(graphics, mouseX, mouseY, partialTick);
 
         Controller controller = Controllable.getController();
-        if(this.cycle.active && controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
+        if(this.cycle.active && controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(this.getX(), this.getY(), this.getWidth(), this.getHeight(), mouseX, mouseY))
         {
-            ClientHelper.drawButton(graphics, left + listWidth - this.cycle.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, ButtonBindings.NEXT_CREATIVE_TAB.getButton());
-            ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton());
+            ClientHelper.drawButton(graphics, this.getX() + this.getWidth() - this.cycle.getWidth() - 20 - 17, this.getY() + (this.getHeight() - 11) / 2, ButtonBindings.NEXT_CREATIVE_TAB.getButton());
+            ClientHelper.drawButton(graphics, this.getX() + this.getWidth() - 16, this.getY() + (this.getHeight() - 11) / 2, ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton());
 
             if(ButtonBindings.NEXT_CREATIVE_TAB.isButtonDown())
             {

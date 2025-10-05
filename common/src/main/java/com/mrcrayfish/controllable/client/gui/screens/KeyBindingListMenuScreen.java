@@ -25,6 +25,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -71,19 +72,19 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
         return ImmutableList.copyOf(bindings);
     });
 
-    private final Map<String, List<KeyMapping>> categories = new LinkedHashMap<>();
+    private final Map<KeyMapping.Category, List<KeyMapping>> categories = new LinkedHashMap<>();
 
     protected KeyBindingListMenuScreen(Screen parent, Component title, int itemHeight)
     {
         super(parent, title, itemHeight);
         this.setRowWidth(290);
-        this.categories.put("key.categories.movement", new ArrayList<>());
-        this.categories.put("key.categories.gameplay", new ArrayList<>());
-        this.categories.put("key.categories.inventory", new ArrayList<>());
-        this.categories.put("key.categories.creative", new ArrayList<>());
-        this.categories.put("key.categories.multiplayer", new ArrayList<>());
-        this.categories.put("key.categories.ui", new ArrayList<>());
-        this.categories.put("key.categories.misc", new ArrayList<>());
+        this.categories.put(KeyMapping.Category.MOVEMENT, new ArrayList<>());
+        this.categories.put(KeyMapping.Category.GAMEPLAY, new ArrayList<>());
+        this.categories.put(KeyMapping.Category.INVENTORY, new ArrayList<>());
+        this.categories.put(KeyMapping.Category.CREATIVE, new ArrayList<>());
+        this.categories.put(KeyMapping.Category.MULTIPLAYER, new ArrayList<>());
+        this.categories.put(KeyMapping.Category.SPECTATOR, new ArrayList<>());
+        this.categories.put(KeyMapping.Category.MISC, new ArrayList<>());
     }
 
     @Override
@@ -105,7 +106,7 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
             if(!list.isEmpty())
             {
                 Collections.sort(list);
-                items.add(new TitleItem(Component.translatable(category).withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
+                items.add(new TitleItem(category.label().copy().withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD)));
                 list.forEach(binding -> items.add(new KeyBindingItem(binding)));
             }
         });
@@ -171,26 +172,21 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void render(GuiGraphics graphics, int index, int top, int left, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
-            // Draws a transparent black background on every odd item to help match the widgets with the label
-            if(index % 2 != 0)
-            {
-                graphics.fill(left - 2, top - 2, left + rowWidth + 2, top + rowHeight + 2, 0x55000000);
-            }
             Controller controller = Controllable.getController();
-            if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, rowWidth, rowHeight, mouseX, mouseY))
+            if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(this.getX(), this.getY(), this.getWidth(), this.getHeight(), mouseX, mouseY))
             {
-                ScreenHelper.drawOutlinedBox(graphics, left - 2, top - 2, rowWidth + 4, rowHeight + 4, 0xAAFFFFFF);
+                ScreenHelper.drawOutlinedBox(graphics, this.getX() - 2, this.getY() - 1, this.getWidth() + 4, this.getHeight() + 2, 0xAAFFFFFF);
             }
             Font font = KeyBindingListMenuScreen.this.minecraft.font;
-            graphics.drawString(font, this.label, left + 5, top + 5, 0xFFFFFFFF);
-            this.addBinding.setX(left + rowWidth - 42);
-            this.addBinding.setY(top - 1);
-            this.addBinding.render(graphics, mouseX, mouseY, partialTicks);
-            this.removeBinding.setX(left + rowWidth - 20);
-            this.removeBinding.setY(top - 1);
-            this.removeBinding.render(graphics, mouseX, mouseY, partialTicks);
+            graphics.drawString(font, this.label, this.getX() + 5, this.getY() + 7, 0xFFFFFFFF);
+            this.addBinding.setX(this.getX() + this.getWidth() - 42);
+            this.addBinding.setY(this.getY() + 1);
+            this.addBinding.render(graphics, mouseX, mouseY, partialTick);
+            this.removeBinding.setX(this.getX() + this.getWidth() - 20);
+            this.removeBinding.setY(this.getY() + 1);
+            this.removeBinding.render(graphics, mouseX, mouseY, partialTick);
         }
 
         @Override

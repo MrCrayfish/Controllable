@@ -13,6 +13,7 @@ import com.mrcrayfish.framework.api.config.validate.NumberRange;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -54,19 +55,19 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
     }
 
     @Override
-    public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
+    public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
-        super.render(graphics, slotIndex, top, left, listWidth, slotHeight, mouseX, mouseY, hovered, partialTick);
+        super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
         this.slider.active = this.isOptionActive();
-        this.slider.setX(left + listWidth - this.slider.getWidth() - 20);
-        this.slider.setY(top);
+        this.slider.setX(this.getX() + this.getWidth() - this.slider.getWidth() - 20);
+        this.slider.setY(this.getY() + 2);
         this.slider.render(graphics, mouseX, mouseY, partialTick);
 
         Controller controller = Controllable.getController();
-        if(this.slider.active && controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
+        if(this.slider.active && controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(this.getX(), this.getY(), this.getWidth(), this.getHeight(), mouseX, mouseY))
         {
-            ClientHelper.drawButton(graphics, left + listWidth - this.slider.getWidth() - 20 - 17, top + (slotHeight - 11) / 2, ButtonBindings.NEXT_CREATIVE_TAB.getButton());
-            ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton());
+            ClientHelper.drawButton(graphics, this.getX() + this.getWidth() - this.slider.getWidth() - 20 - 17, this.getY() + (this.getHeight() - 11) / 2, ButtonBindings.NEXT_CREATIVE_TAB.getButton());
+            ClientHelper.drawButton(graphics, this.getX() + this.getWidth() - 16, this.getY() + (this.getHeight() - 11) / 2, ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton());
 
             long currentTime = System.currentTimeMillis();
             if(currentTime - this.lastChange > 100)
@@ -98,8 +99,8 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button)
+    public boolean mouseReleased(MouseButtonEvent event)
     {
-        return this.slider.mouseReleased(mouseX, mouseY, button);
+        return this.slider.mouseReleased(event);
     }
 }

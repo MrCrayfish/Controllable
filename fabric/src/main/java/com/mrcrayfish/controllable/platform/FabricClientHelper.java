@@ -23,8 +23,12 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.Slot;
@@ -35,55 +39,55 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FabricClientHelper implements IClientHelper
 {
     @Override
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
+        KeyEvent event = new KeyEvent(key, GLFW.glfwGetKeyScancode(key), modifiers);
         if(action == GLFW.GLFW_RELEASE)
         {
-            if(!ScreenKeyboardEvents.allowKeyRelease(screen).invoker().allowKeyRelease(screen, key, -1, modifiers))
+            if(!ScreenKeyboardEvents.allowKeyRelease(screen).invoker().allowKeyRelease(screen, event))
                 return true;
 
             boolean handled = false;
-            ScreenKeyboardEvents.beforeKeyRelease(screen).invoker().beforeKeyRelease(screen, key, -1, modifiers);
+            ScreenKeyboardEvents.beforeKeyRelease(screen).invoker().beforeKeyRelease(screen, event);
             if(Controllable.isArchitecturyLoaded())
             {
-                if(ArchitecturySupport.sendScreenKeyReleased(screen, key, -1, modifiers))
+                if(ArchitecturySupport.sendScreenKeyReleased(screen, key, event.scancode(), modifiers))
                 {
                     handled = true;
                 }
             }
-            else if(screen.keyReleased(key, -1, modifiers))
+            else if(screen.keyReleased(event))
             {
                 handled = true;
             }
-            ScreenKeyboardEvents.afterKeyRelease(screen).invoker().afterKeyRelease(screen, key, -1, modifiers);
+            ScreenKeyboardEvents.afterKeyRelease(screen).invoker().afterKeyRelease(screen, event);
             return handled;
         }
         else if(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT)
         {
             screen.afterKeyboardAction();
 
-            if(!ScreenKeyboardEvents.allowKeyPress(screen).invoker().allowKeyPress(screen, key, -1, modifiers))
+            if(!ScreenKeyboardEvents.allowKeyPress(screen).invoker().allowKeyPress(screen, event))
                 return true;
 
             boolean handled = false;
-            ScreenKeyboardEvents.beforeKeyPress(screen).invoker().beforeKeyPress(screen, key, -1, modifiers);
+            ScreenKeyboardEvents.beforeKeyPress(screen).invoker().beforeKeyPress(screen, event);
             if(Controllable.isArchitecturyLoaded())
             {
-                if(ArchitecturySupport.sendScreenKeyPressed(screen, key, -1, modifiers))
+                if(ArchitecturySupport.sendScreenKeyPressed(screen, key, event.scancode(), modifiers))
                 {
                     handled = true;
                 }
             }
-            else if(screen.keyPressed(key, -1, modifiers))
+            else if(screen.keyPressed(event))
             {
                 handled = true;
             }
-            ScreenKeyboardEvents.afterKeyPress(screen).invoker().afterKeyPress(screen, key, -1, modifiers);
+            ScreenKeyboardEvents.afterKeyPress(screen).invoker().afterKeyPress(screen, event);
             return handled;
         }
         return false;
@@ -101,44 +105,51 @@ public class FabricClientHelper implements IClientHelper
         }
         else
         {
-            screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
+            MouseButtonEvent event = new MouseButtonEvent(finalMouseX, finalMouseY, new MouseButtonInfo(activeButton, 0));
+            screen.mouseDragged(event, finalDragX, finalDragY);
         }
     }
 
     @Override
-    public void sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button)
+    public boolean sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button, boolean doubleClick)
     {
-        if(!ScreenMouseEvents.allowMouseClick(screen).invoker().allowMouseClick(screen, mouseX, mouseY, button))
-            return;
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+        if(!ScreenMouseEvents.allowMouseClick(screen).invoker().allowMouseClick(screen, event))
+            return false;
 
-        ScreenMouseEvents.beforeMouseClick(screen).invoker().beforeMouseClick(screen, mouseX, mouseY, button);
+        boolean handled;
+        ScreenMouseEvents.beforeMouseClick(screen).invoker().beforeMouseClick(screen, event);
         if(Controllable.isArchitecturyLoaded())
         {
-            ArchitecturySupport.sendScreenMouseClick(screen, mouseX, mouseY, button);
+            handled = ArchitecturySupport.sendScreenMouseClick(screen, mouseX, mouseY, button);
         }
         else
         {
-            screen.mouseClicked(mouseX, mouseY, button);
+            handled = screen.mouseClicked(event, doubleClick);
         }
-        ScreenMouseEvents.afterMouseClick(screen).invoker().afterMouseClick(screen, mouseX, mouseY, button);
+        handled |= ScreenMouseEvents.afterMouseClick(screen).invoker().afterMouseClick(screen, event, handled);
+        return handled;
     }
 
     @Override
     public void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
     {
-        if(!ScreenMouseEvents.allowMouseRelease(screen).invoker().allowMouseRelease(screen, mouseX, mouseY, button))
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+        if(!ScreenMouseEvents.allowMouseRelease(screen).invoker().allowMouseRelease(screen, event))
             return;
 
-        ScreenMouseEvents.beforeMouseRelease(screen).invoker().beforeMouseRelease(screen, mouseX, mouseY, button);
+        ScreenMouseEvents.beforeMouseRelease(screen).invoker().beforeMouseRelease(screen, event);
+
+        boolean handled;
         if(Controllable.isArchitecturyLoaded())
         {
-            ArchitecturySupport.sendScreenMouseReleased(screen, mouseX, mouseY, button);
+            handled = ArchitecturySupport.sendScreenMouseReleased(screen, mouseX, mouseY, button);
         }
         else
         {
-            screen.mouseReleased(mouseX, mouseY, button);
+            handled = screen.mouseReleased(event);
         }
-        ScreenMouseEvents.afterMouseRelease(screen).invoker().afterMouseRelease(screen, mouseX, mouseY, button);
+        ScreenMouseEvents.afterMouseRelease(screen).invoker().afterMouseRelease(screen, event, handled);
     }
 
     @Override
@@ -168,13 +179,21 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public int getActiveMouseButton()
     {
-        return Minecraft.getInstance().mouseHandler.activeButton;
+        var info = Minecraft.getInstance().mouseHandler.activeButton;
+        return info != null ? info.button() : -1;
     }
 
     @Override
     public void setActiveMouseButton(int button)
     {
-        Minecraft.getInstance().mouseHandler.activeButton = button;
+        if(button == -1)
+        {
+            Minecraft.getInstance().mouseHandler.activeButton = null;
+        }
+        else
+        {
+            Minecraft.getInstance().mouseHandler.activeButton = new MouseButtonInfo(button, 0);
+        }
     }
 
     @Override
@@ -269,13 +288,13 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public int getAbstractListRowBottom(AbstractSelectionList<?> list, int index)
     {
-        return ReflectUtil.getAbstractListRowBottom(list, index);
+        return list.getRowBottom(index);
     }
 
     @Override
     public int getAbstractListRowTop(AbstractSelectionList<?> list, int index)
     {
-        return ReflectUtil.getAbstractListRowTop(list, index);
+        return list.getRowTop(index);
     }
 
     @Override
@@ -293,7 +312,8 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public void pushLinesToTooltip(Tooltip blank, List<FormattedCharSequence> lines)
     {
-        ReflectUtil.pushLinesToTooltip(blank, lines);
+        blank.cachedTooltip = lines;
+        blank.splitWithLanguage = Language.getInstance();
     }
 
     @Override
@@ -335,7 +355,7 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public void openChatScreen(String s)
     {
-        Minecraft.getInstance().openChatScreen(s);
+        Minecraft.getInstance().openChatScreen(ChatComponent.ChatMethod.MESSAGE);
     }
 
     @Override

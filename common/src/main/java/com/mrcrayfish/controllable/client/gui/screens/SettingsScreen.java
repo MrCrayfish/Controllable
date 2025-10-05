@@ -28,6 +28,8 @@ import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
@@ -151,29 +153,29 @@ public class SettingsScreen extends Screen
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
     {
         if(this.selectedBinding != null)
             return true;
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    public boolean keyPressed(int key, int action, int modifiers)
+    public boolean keyPressed(KeyEvent event)
     {
         if(this.selectedBinding != null)
         {
-            if(key == GLFW.GLFW_KEY_ESCAPE)
+            if(event.key() == GLFW.GLFW_KEY_ESCAPE)
             {
                 this.selectedBinding = null;
             }
             return true;
         }
-        if(this.navigationBar.keyPressed(key))
+        if(this.navigationBar.keyPressed(event))
         {
             return true;
         }
-        return super.keyPressed(key, action, modifiers);
+        return super.keyPressed(event);
     }
 
     public void setSelectedBinding(ButtonBinding binding)
@@ -212,19 +214,30 @@ public class SettingsScreen extends Screen
     {
         private static final Component TITLE = Component.empty().append(ClientHelper.getIconComponent(Icons.CONTROLLER)).append(" ").append(Component.translatable("controllable.settings.tab.controller.title"));
 
+        private final TabListWidget listWidget;
+
         public ControllerTab(SettingsScreen screen)
         {
             super(TITLE);
             GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
             ControllerList list = new ControllerList(SettingsScreen.this, SettingsScreen.this.minecraft, 24);
-            rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, list));
+            this.listWidget = rootHelper.addChild(new TabListWidget(list));
             screen.tickers.add(list::tick);
+        }
+
+        @Override
+        public void doLayout(ScreenRectangle rectangle)
+        {
+            this.listWidget.updateDimensions(rectangle);
+            super.doLayout(rectangle);
         }
     }
 
     public class SettingsTab extends GridLayoutTab
     {
         private static final Component TITLE = Component.empty().append(ClientHelper.getIconComponent(Icons.SETTINGS)).append(" ").append(Component.translatable("controllable.settings.tab.settings.title"));
+
+        private final TabListWidget listWidget;
 
         public SettingsTab()
         {
@@ -341,7 +354,7 @@ public class SettingsScreen extends Screen
 
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.listScrollSpeed, 1.0));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.hoverModifier, 0.05));
-            if(!Minecraft.ON_OSX)
+            if(!Minecraft.getInstance().isOfflineDeveloperMode())
             {
                 optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.rumble));
             }
@@ -353,9 +366,15 @@ public class SettingsScreen extends Screen
             advancedModeOption.setChangeCallback(aBoolean -> optionsList.rebuildList(true));
             optionsList.addEntry(advancedModeOption);
 
-            rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, optionsList));
-
+            this.listWidget = rootHelper.addChild(new TabListWidget(optionsList));
             optionsList.rebuildList(false);
+        }
+
+        @Override
+        public void doLayout(ScreenRectangle rectangle)
+        {
+            this.listWidget.updateDimensions(rectangle);
+            super.doLayout(rectangle);
         }
     }
 
@@ -363,11 +382,20 @@ public class SettingsScreen extends Screen
     {
         private static final Component TITLE = Component.empty().append(ClientHelper.getIconComponent(Icons.BINDINGS)).append(" ").append(Component.translatable("controllable.settings.tab.bindings.title"));
 
+        private final TabListWidget listWidget;
+
         public BindingsTab()
         {
             super(TITLE);
             GridLayout.RowHelper rootHelper = this.layout.rowSpacing(8).createRowHelper(1);
-            rootHelper.addChild(new TabListWidget(() -> SettingsScreen.this.tabArea, new ButtonBindingList(SettingsScreen.this, SettingsScreen.this.minecraft, 24)));
+            this.listWidget = rootHelper.addChild(new TabListWidget(new ButtonBindingList(SettingsScreen.this, SettingsScreen.this.minecraft, 24)));
+        }
+
+        @Override
+        public void doLayout(ScreenRectangle rectangle)
+        {
+            this.listWidget.updateDimensions(rectangle);
+            super.doLayout(rectangle);
         }
     }
 }

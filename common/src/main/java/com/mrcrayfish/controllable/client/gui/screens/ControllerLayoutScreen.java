@@ -16,6 +16,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -142,9 +144,9 @@ public class ControllerLayoutScreen extends Screen
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
     {
-        if(mouseButton == 0 && this.configureButton == -1)
+        if(event.button() == 0 && this.configureButton == -1)
         {
             ControllerButton button = this.controllerButtons.stream().filter(ControllerButton::isHovered).findFirst().orElse(null);
             if(button != null)
@@ -153,18 +155,18 @@ public class ControllerLayoutScreen extends Screen
                 return true;
             }
         }
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    public boolean keyPressed(int key, int scanCode, int mods)
+    public boolean keyPressed(KeyEvent event)
     {
-        if(key == GLFW.GLFW_KEY_ESCAPE && this.configureButton != -1)
+        if(event.key() == GLFW.GLFW_KEY_ESCAPE && this.configureButton != -1)
         {
             this.configureButton = -1;
             return true;
         }
-        return super.keyPressed(key, scanCode, mods);
+        return super.keyPressed(event);
     }
 
     public void processButton(int index, ButtonStates newStates)

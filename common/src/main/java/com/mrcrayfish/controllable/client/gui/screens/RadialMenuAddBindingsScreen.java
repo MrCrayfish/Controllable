@@ -117,19 +117,20 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void render(GuiGraphics graphics, int index, int top, int left, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             // Draws a transparent black background on every odd item to help match the widgets with the label
-            if(index % 2 != 0)
+            // TODO 1.21.9
+            /*if(index % 2 != 0)
             {
                 graphics.fill(left - 2, top - 2, left + rowWidth + 2, top + rowHeight + 2, 0x55000000);
-            }
+            }*/
             Font font = RadialMenuAddBindingsScreen.this.minecraft.font;
             int colour = this.active ? 0xFFFFFFFF : 0xFF555555;
-            graphics.drawString(font, this.label, left + 5, top + 6, colour);
-            this.bindingButton.setX(left + rowWidth - 25);
-            this.bindingButton.setY(top);
-            this.bindingButton.render(graphics, mouseX, mouseY, partialTicks);
+            graphics.drawString(font, this.label, this.getX() + 5, this.getY() + 8, colour);
+            this.bindingButton.setX(this.getX() + rowWidth - 25);
+            this.bindingButton.setY(this.getY() + 2);
+            this.bindingButton.render(graphics, mouseX, mouseY, partialTick);
             this.bindingButton.active = this.active;
         }
 

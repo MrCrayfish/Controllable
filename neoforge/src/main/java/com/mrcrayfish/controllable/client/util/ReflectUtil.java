@@ -29,42 +29,14 @@ import java.util.List;
  */
 public class ReflectUtil
 {
-    private static final Method ABSTRACT_SELECTION_LIST_GET_ROW_TOP = ObfuscationReflectionHelper.findMethod(AbstractSelectionList.class, "getRowTop", int.class);
-    private static final Method ABSTRACT_SELECTION_LIST_GET_ROW_BOTTOM = ObfuscationReflectionHelper.findMethod(AbstractSelectionList.class, "getRowBottom", int.class);
     private static final Method ABSTRACT_CONTAINER_SCREEN_CLICK_SLOT = ObfuscationReflectionHelper.findMethod(AbstractContainerScreen.class, "slotClicked", Slot.class, int.class, int.class, ClickType.class);
-    private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ObfuscationReflectionHelper.findField(AbstractSelectionList.class, "itemHeight");
+    private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ObfuscationReflectionHelper.findField(AbstractSelectionList.class, "defaultEntryHeight");
     private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ObfuscationReflectionHelper.findField(CreativeModeInventoryScreen.class, "scrollOffs");
     private static final Field KEY_MAPPING_PRESS_TIME = ObfuscationReflectionHelper.findField(KeyMapping.class, "clickCount");
     private static final Field STONE_CUTTER_INDEX = ObfuscationReflectionHelper.findField(StonecutterScreen.class, "startIndex");
     private static final Field LOOM_START_ROW = ObfuscationReflectionHelper.findField(LoomScreen.class, "startRow");
     private static final Field IMAGE_BUTTON_SPRITES = ObfuscationReflectionHelper.findField(ImageButton.class, "sprites");
     private static final Field MOVE_VECTOR = ObfuscationReflectionHelper.findField(ClientInput.class, "moveVector");
-
-    public static int getAbstractListRowTop(AbstractSelectionList<?> list, int index)
-    {
-        try
-        {
-            return (int) ABSTRACT_SELECTION_LIST_GET_ROW_TOP.invoke(list, index);
-        }
-        catch(IllegalAccessException | InvocationTargetException e)
-        {
-            e.printStackTrace();
-            return 1000000;
-        }
-    }
-
-    public static int getAbstractListRowBottom(AbstractSelectionList<?> list, int index)
-    {
-        try
-        {
-            return (int) ABSTRACT_SELECTION_LIST_GET_ROW_BOTTOM.invoke(list, index);
-        }
-        catch(IllegalAccessException | InvocationTargetException e)
-        {
-            e.printStackTrace();
-            return -1000000;
-        }
-    }
 
     public static int getAbstractListItemHeight(AbstractSelectionList<?> list)
     {

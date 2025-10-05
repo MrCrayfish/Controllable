@@ -17,6 +17,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
@@ -79,12 +80,32 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     protected void updateWidgetNarration(NarrationElementOutput output) {}
 
     @Override
-    protected void renderSelection(GuiGraphics graphics, int rowTop, int rowWidth, int rowHeight, int outlineColour, int backgroundColour)
+    protected void renderListItems(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
-        int left = this.getRowLeft();
-        int right = this.getRowRight();
-        graphics.fill(left, rowTop - 2, right, rowTop + rowHeight + 2, outlineColour);
-        graphics.fill(left + 1, rowTop - 1, right - 1, rowTop + rowHeight + 1, backgroundColour);
+        List<RadialItemList.ButtonBindingEntry> entries = this.children();
+        for(int i = 0; i < entries.size(); i++)
+        {
+            var entry = entries.get(i);
+            if(entry.getY() + entry.getHeight() >= this.getY() && entry.getY() <= this.getBottom())
+            {
+                if(i % 2 != 0)
+                {
+                    graphics.fill(entry.getX(), entry.getY(), entry.getX() + entry.getWidth(), entry.getY() + entry.getHeight(), 0x55000000);
+                }
+                this.renderItem(graphics, mouseX, mouseY, partialTick, entry);
+            }
+        }
+    }
+
+    @Override
+    protected void renderSelection(GuiGraphics graphics, ButtonBindingEntry entry, int outlineColour)
+    {
+        int left = entry.getX();
+        int right = entry.getX() + entry.getWidth();
+        int top = entry.getY();
+        int bottom = entry.getY() + entry.getHeight();
+        graphics.fill(left, top, right, bottom, outlineColour);
+        graphics.fill(left + 1, top + 1, right - 1, bottom -1, 0xFF111111);
     }
 
     public class ButtonBindingEntry extends ContainerObjectSelectionList.Entry<ButtonBindingEntry>
@@ -162,32 +183,28 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
         }
 
         @Override
-        public void render(GuiGraphics graphics, int slotIndex, int top, int left, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean hovered, float partialTicks)
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
-            if(slotIndex % 2 != 0)
-            {
-                graphics.fill(left, top - 2, left + rowWidth, top + rowHeight + 2, 0x55000000);
-            }
             Font font = RadialItemList.this.minecraft.font;
-            graphics.drawString(font, this.label, left + 5, top + 5, 0xFFFFFFFF);
-            graphics.drawString(font, this.description, left + 5, top + 18, 0xFFFFFFFF);
+            graphics.drawString(font, this.label, this.getX() + 5, this.getY() + 7, 0xFFFFFFFF);
+            graphics.drawString(font, this.description, this.getX() + 5, this.getY() + 20, 0xFFFFFFFF);
             for(int i = 0; i < this.buttons.length; i++)
             {
                 int offset = (this.buttons.length - i) * 22;
-                int buttonLeft = left + rowWidth - 6 - offset;
+                int buttonLeft = this.getX() + this.getWidth() - 6 - offset;
                 this.buttons[i].visible = RadialItemList.this.getSelected() == this;
                 this.buttons[i].setX(buttonLeft);
-                this.buttons[i].setY(top + 6);
-                this.buttons[i].render(graphics, mouseX, mouseY, partialTicks);
+                this.buttons[i].setY(this.getY() + 8);
+                this.buttons[i].render(graphics, mouseX, mouseY, partialTick);
             }
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button)
+        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
         {
             RadialItemList.this.setSelected(this);
             RadialItemList.this.selectedBinding = this.data.getBinding();
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(event, doubleClick);
         }
 
         @Override

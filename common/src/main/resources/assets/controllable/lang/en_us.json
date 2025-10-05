@@ -255,5 +255,6 @@
     "framework_config.controllable.client.options.triggerDeadZone.tooltip": "How much the trigger has to be pressed before it's input is registered. This fixes issues with triggers not being completely released to zero.",
     "framework_config.controllable.client.options.yawSensitivity": "Yaw Sensitivity",
     "framework_config.controllable.client.options.yawSensitivity.tooltip": "The sensitivity of the camera's yaw rotation when applying the rotation speed. Setting to 1.0 would mean applying 100% of the rotation speed to the yaw.",
-    "key.categories.controllable_custom": "Custom Keybinds"
+    "key.category.controllable.ui": "Game Interface",
+    "key.category.controllable.custom": "Custom Keybinds"
 }

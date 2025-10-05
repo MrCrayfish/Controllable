@@ -17,6 +17,9 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
@@ -84,10 +87,11 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
     {
         boolean header = this.headerText != null;
         boolean footer = this.footerText != null;
-        this.width = rectangle.width();
-        this.height = rectangle.height() - 15 + (header ? -10 : 0) + (footer ? -20 : 0);
-        this.setX(rectangle.left());
-        this.setY(rectangle.top() + 15 + (header ? 10 : 0));
+        int listWidth = rectangle.width();
+        int listHeight = rectangle.height() - 15 + (header ? -10 : 0) + (footer ? -20 : 0);
+        int listX = rectangle.left();
+        int listY = rectangle.top() + 15 + (header ? 10 : 0);
+        this.updateSizeAndPosition(listWidth, listHeight, listX, listY);
     }
 
     @Override
@@ -110,12 +114,30 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
     }
 
     @Override
+    protected void renderListItems(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    {
+        List<E> entries = this.children();
+        for(int i = 0; i < entries.size(); i++)
+        {
+            E entry = entries.get(i);
+            if(entry.getY() + entry.getHeight() >= this.getY() && entry.getY() <= this.getBottom())
+            {
+                if(i % 2 != 0)
+                {
+                    graphics.fill(entry.getX(), entry.getY(), entry.getX() + entry.getWidth(), entry.getY() + entry.getHeight(), 0x55000000);
+                }
+                this.renderItem(graphics, mouseX, mouseY, partialTick, entry);
+            }
+        }
+    }
+
+    @Override
     public void visitWidgets(Consumer<AbstractWidget> consumer) {}
 
     @Override
-    protected boolean isValidClickButton(int button)
+    protected boolean isValidClickButton(MouseButtonInfo info)
     {
-        return super.isValidClickButton(button) || button == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+        return super.isValidClickButton(info) || info.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
     }
 
     public abstract static class Item<T extends ContainerObjectSelectionList.Entry<T>> extends ContainerObjectSelectionList.Entry<T>
@@ -164,12 +186,6 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         {
             super(label);
         }
-
-        @Override
-        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
-        {
-
-        }
     }
 
     public class TitleItem extends BaseItem implements SkipItem
@@ -185,12 +201,12 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         }
 
         @Override
-        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             Font font = Objects.requireNonNull(TabSelectionList.this.minecraft).font;
             int labelWidth = font.width(this.label) + 2;
-            ScreenHelper.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
-            graphics.drawCenteredString(font, this.label, left + width / 2, top + 5, 0xFFFFFFFF);
+            ScreenHelper.drawRoundedBox(graphics, this.getX() + this.getWidth() / 2 - labelWidth / 2, this.getY() + 4, labelWidth, 14, 0x88000000);
+            graphics.drawCenteredString(font, this.label, this.getX() + this.getWidth() / 2, this.getY() + 7, 0xFFFFFFFF);
         }
 
         @Override
@@ -217,11 +233,11 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         }
 
         @Override
-        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
-            this.button.setWidth(width / 2);
-            this.button.setX(left + width / 4);
-            this.button.setY(top);
+            this.button.setWidth(this.getWidth() / 2);
+            this.button.setX(this.getX() + this.getWidth() / 4);
+            this.button.setY(this.getY());
             this.button.render(graphics, mouseX, mouseY, partialTick);
         }
 

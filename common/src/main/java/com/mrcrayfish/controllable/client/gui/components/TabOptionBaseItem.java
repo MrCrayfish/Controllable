@@ -82,21 +82,17 @@ public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implem
     }
 
     @Override
-    public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
+    public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
         // Draws a transparent black background on every odd item to help match the widgets with the label
-        if(slotIndex % 2 != 0)
-        {
-            graphics.fill(left - 2, top - 2, left + listWidth + 2, top + slotHeight + 2, 0x55000000);
-        }
         Controller controller = Controllable.getController();
-        if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
+        if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(this.getX(), this.getY(), this.getWidth(), this.getHeight(), mouseX, mouseY))
         {
-            ScreenHelper.drawOutlinedBox(graphics, left - 2, top - 2, listWidth + 4, slotHeight + 4, 0xAAFFFFFF);
+            ScreenHelper.drawOutlinedBox(graphics, this.getX() - 2, this.getY() - 2, this.getWidth() + 4, this.getHeight() + 4, 0xAAFFFFFF);
         }
         Font font = Minecraft.getInstance().font;
         int textColor = this.isOptionActive() ? (this.labelColor | 0xFF000000) : 0xFF777777;
-        graphics.drawString(font, this.label, left + 5, top + (slotHeight - font.lineHeight) / 2 + 1, textColor);
+        graphics.drawString(font, this.label, this.getX() + 5, this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1, textColor);
     }
 
     @Override

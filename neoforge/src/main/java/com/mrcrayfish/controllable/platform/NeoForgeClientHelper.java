@@ -18,6 +18,9 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -44,13 +47,14 @@ public class NeoForgeClientHelper implements IClientHelper
     @Override
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
+        KeyEvent event = new KeyEvent(key, GLFW.glfwGetKeyScancode(key), modifiers);
         if(action == GLFW.GLFW_RELEASE)
         {
-            if(!ClientHooks.onScreenKeyReleasedPre(screen, key, -1, modifiers))
+            if(!ClientHooks.onScreenKeyReleasedPre(screen, event))
             {
-                if(!screen.keyReleased(key, -1, modifiers))
+                if(!screen.keyReleased(event))
                 {
-                    return ClientHooks.onScreenKeyReleasedPost(screen, key, -1, modifiers);
+                    return ClientHooks.onScreenKeyReleasedPost(screen, event);
                 }
             }
             return true;
@@ -58,11 +62,11 @@ public class NeoForgeClientHelper implements IClientHelper
         else if(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT)
         {
             screen.afterKeyboardAction();
-            if(!ClientHooks.onScreenKeyPressedPre(screen, key, -1, modifiers))
+            if(!ClientHooks.onScreenKeyPressedPre(screen, event))
             {
-                if(!screen.keyPressed(key, -1, modifiers))
+                if(!screen.keyPressed(event))
                 {
-                    return ClientHooks.onScreenKeyPressedPost(screen, key, -1, modifiers);
+                    return ClientHooks.onScreenKeyPressedPost(screen, event);
                 }
             }
             return true;
@@ -76,30 +80,35 @@ public class NeoForgeClientHelper implements IClientHelper
         Minecraft mc = screen.getMinecraft();
         double finalDragX = dragX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
         double finalDragY = dragY * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
-        if(ClientHooks.onScreenMouseDragPre(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
+        MouseButtonEvent event = new MouseButtonEvent(finalMouseX, finalMouseY, new MouseButtonInfo(activeButton, 0));
+        if(ClientHooks.onScreenMouseDragPre(screen, event, finalDragX, finalDragY))
             return;
-        if(screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
+        if(screen.mouseDragged(event, finalDragX, finalDragY))
             return;
-        ClientHooks.onScreenMouseDragPost(screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
+        ClientHooks.onScreenMouseDragPost(screen, event, finalDragX, finalDragY);
     }
 
     @Override
-    public void sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button)
+    public boolean sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button, boolean doubleClick)
     {
-        if(!ClientHooks.onScreenMouseClickedPre(screen, mouseX, mouseY, button))
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+        if(!ClientHooks.onScreenMouseClickedPre(screen, event, doubleClick))
         {
-            boolean handled = screen.mouseClicked(mouseX, mouseY, button);
-            ClientHooks.onScreenMouseClickedPost(screen, mouseX, mouseY, button, handled);
+            boolean handled = screen.mouseClicked(event, doubleClick);
+            handled |= ClientHooks.onScreenMouseClickedPost(screen, event, doubleClick, handled);
+            return handled;
         }
+        return false;
     }
 
     @Override
     public void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
     {
-        if(!ClientHooks.onScreenMouseReleasedPre(screen, mouseX, mouseY, button))
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+        if(!ClientHooks.onScreenMouseReleasedPre(screen, event))
         {
-            boolean handled = screen.mouseReleased(mouseX, mouseY, button);
-            ClientHooks.onScreenMouseReleasedPost(screen, mouseX, mouseY, button, handled);
+            boolean handled = screen.mouseReleased(event);
+            ClientHooks.onScreenMouseReleasedPost(screen, event, handled);
         }
     }
 
@@ -130,13 +139,21 @@ public class NeoForgeClientHelper implements IClientHelper
     @Override
     public int getActiveMouseButton()
     {
-        return Minecraft.getInstance().mouseHandler.activeButton;
+        var info = Minecraft.getInstance().mouseHandler.activeButton;
+        return info != null ? info.button() : -1;
     }
 
     @Override
     public void setActiveMouseButton(int button)
     {
-        Minecraft.getInstance().mouseHandler.activeButton = button;
+        if(button == -1)
+        {
+            Minecraft.getInstance().mouseHandler.activeButton = null;
+        }
+        else
+        {
+            Minecraft.getInstance().mouseHandler.activeButton = new MouseButtonInfo(button, 0);
+        }
     }
 
     @Override
@@ -239,13 +256,13 @@ public class NeoForgeClientHelper implements IClientHelper
     @Override
     public int getAbstractListRowBottom(AbstractSelectionList<?> list, int index)
     {
-        return ReflectUtil.getAbstractListRowBottom(list, index);
+        return list.getRowBottom(index);
     }
 
     @Override
     public int getAbstractListRowTop(AbstractSelectionList<?> list, int index)
     {
-        return ReflectUtil.getAbstractListRowTop(list, index);
+        return list.getRowTop(index);
     }
 
     @Override
@@ -287,7 +304,7 @@ public class NeoForgeClientHelper implements IClientHelper
     @Override
     public void sendKeyInputEvent(int key, int scanCode, int action, int modifiers)
     {
-        ClientHooks.onKeyInput(key, 0, action, modifiers);
+        ClientHooks.onKeyInput(new KeyEvent(key, scanCode, modifiers), action);
     }
 
     @Override
@@ -305,7 +322,7 @@ public class NeoForgeClientHelper implements IClientHelper
     @Override
     public void openChatScreen(String s)
     {
-        Minecraft.getInstance().openChatScreen(s);
+        Minecraft.getInstance().openChatScreen(ChatComponent.ChatMethod.MESSAGE);
     }
 
     @Override

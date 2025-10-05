@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class FabricKeyMappingMixin
 {
     @Shadow
-    private InputConstants.Key key;
+    protected InputConstants.Key key;
 
     @Shadow
     private boolean isDown;

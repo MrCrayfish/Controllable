@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
+import com.mrcrayfish.controllable.client.gui.RadialItemList;
 import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
 import com.mrcrayfish.controllable.client.gui.widget.BackgroundStringWidget;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
@@ -9,7 +10,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -20,6 +20,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -35,7 +36,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -101,6 +101,7 @@ public abstract class ListMenuScreen extends Screen
 
         this.updateSearchTextFieldSuggestion("");
         this.layout.visitWidgets(this::addRenderableWidget);
+        this.layout.arrangeElements();
         this.repositionElements();
     }
 
@@ -154,15 +155,15 @@ public abstract class ListMenuScreen extends Screen
     protected abstract List<Item> constructEntries();
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
     {
-        if(ScreenHelper.isMouseWithin(10, 13, 23, 23, (int) mouseX, (int) mouseY))
+        if(ScreenHelper.isMouseWithin(10, 13, 23, 23, (int) event.x(), (int) event.y()))
         {
             Style style = Style.EMPTY.withClickEvent(new ClickEvent.OpenUrl(URI.create("https://www.curseforge.com/minecraft/mc-mods/configured")));
             this.handleComponentClicked(style);
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     protected class EntryList extends ContainerObjectSelectionList<Item>
@@ -195,9 +196,9 @@ public abstract class ListMenuScreen extends Screen
 
         // Overridden simply to make it public
         @Override
-        public boolean removeEntry(Item item)
+        public void removeEntry(Item item)
         {
-            return super.removeEntry(item);
+            super.removeEntry(item);
         }
 
         @Nullable
@@ -227,13 +228,31 @@ public abstract class ListMenuScreen extends Screen
         }
 
         @Override
-        public boolean mouseReleased(double mouseX, double mouseY, int button)
+        protected void renderListItems(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+        {
+            List<Item> entries = this.children();
+            for(int i = 0; i < entries.size(); i++)
+            {
+                var entry = entries.get(i);
+                if(entry.getY() + entry.getHeight() >= this.getY() && entry.getY() <= this.getBottom())
+                {
+                    if(i % 2 != 0)
+                    {
+                        graphics.fill(entry.getX(), entry.getY(), entry.getX() + entry.getWidth(), entry.getY() + entry.getHeight(), 0x55000000);
+                    }
+                    this.renderItem(graphics, mouseX, mouseY, partialTick, entry);
+                }
+            }
+        }
+
+        @Override
+        public boolean mouseReleased(MouseButtonEvent event)
         {
             boolean wasDragging = this.isDragging();
             this.setDragging(false);
             if(wasDragging && this.getFocused() != null)
             {
-                return this.getFocused().mouseReleased(mouseX, mouseY, button);
+                return this.getFocused().mouseReleased(event);
             }
             return false;
         }
@@ -298,12 +317,12 @@ public abstract class ListMenuScreen extends Screen
         }
 
         @Override
-        public void render(GuiGraphics graphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             Font font = Minecraft.getInstance().font;
             int labelWidth = font.width(this.label) + 2;
-            ScreenHelper.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
-            graphics.drawCenteredString(Objects.requireNonNull(ListMenuScreen.this.minecraft).font, this.label, left + width / 2, top + 5, 0xFFFFFFFF);
+            ScreenHelper.drawRoundedBox(graphics, this.getX() + this.getWidth() / 2 - labelWidth / 2, this.getY() + 4, labelWidth, 14, 0x88000000);
+            graphics.drawCenteredString(Objects.requireNonNull(ListMenuScreen.this.minecraft).font, this.label, this.getX() + this.getWidth() / 2, this.getY() + 7, 0xFFFFFFFF);
         }
     }
 

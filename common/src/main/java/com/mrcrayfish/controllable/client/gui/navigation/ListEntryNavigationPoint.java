@@ -29,7 +29,7 @@ public class ListEntryNavigationPoint extends NavigationPoint
         this.index = index;
         this.itemHeight = ClientServices.CLIENT.getListItemHeight(this.list);
         this.dir = dir;
-        this.itemY = ClientServices.CLIENT.getAbstractListRowTop(this.list, index) + this.itemHeight / 2 - 2;
+        this.itemY = ClientServices.CLIENT.getAbstractListRowTop(this.list, index) + this.itemHeight / 2;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ListEntryNavigationPoint extends NavigationPoint
             this.list.setScrollAmount(scroll);
         }
 
-        this.itemY = ClientServices.CLIENT.getAbstractListRowTop(this.list, index) + this.itemHeight / 2 - 2;
+        this.itemY = ClientServices.CLIENT.getAbstractListRowTop(this.list, index) + this.itemHeight / 2;
     }
 
     @Override

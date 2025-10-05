@@ -15,6 +15,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -90,39 +91,39 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
     }
 
     @Override
-    public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTick)
+    public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
-        super.render(graphics, slotIndex, top, left, listWidth, slotHeight, mouseX, mouseY, hovered, partialTick);
+        super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
         this.toggle.active = this.isOptionActive();
-        this.toggle.setX(left + listWidth - this.toggle.getWidth() - 20);
-        this.toggle.setY(top);
+        this.toggle.setX(this.getX() + this.getWidth() - this.toggle.getWidth() - 20);
+        this.toggle.setY(this.getY() + 2);
         this.toggle.render(graphics, mouseX, mouseY, partialTick);
 
         Controller controller = Controllable.getController();
-        if(this.toggle.active && controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(left, top, listWidth, slotHeight, mouseX, mouseY))
+        if(this.toggle.active && controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(this.getX(), this.getY(), this.getWidth(), this.getHeight(), mouseX, mouseY))
         {
-            ClientHelper.drawButton(graphics, left + listWidth - 16, top + (slotHeight - 11) / 2, Buttons.A);
+            ClientHelper.drawButton(graphics, this.getX() + this.getWidth() - 16, this.getY() + (this.getHeight() - 11) / 2, Buttons.A);
         }
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
     {
         Controller controller = Controllable.getController();
         if(controller == null || !controller.isBeingUsed())
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(event, doubleClick);
 
-        if(button != GLFW.GLFW_MOUSE_BUTTON_1)
+        if(event.button() != GLFW.GLFW_MOUSE_BUTTON_1)
             return false;
 
-        if(!this.isMouseOver(mouseX, mouseY))
+        if(!this.isMouseOver(event.x(), event.y()))
             return false;
 
         if(!this.toggle.active || !this.toggle.visible)
             return false;
 
         this.toggle.playDownSound(Minecraft.getInstance().getSoundManager());
-        this.toggle.onClick(mouseX, mouseY);
+        this.toggle.onClick(event, doubleClick);
         return true;
     }
 }

@@ -25,6 +25,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
@@ -48,14 +49,14 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
     {
         super(mc, itemHeight);
         this.settingsScreen = settingsScreen;
-        this.categories.put("key.categories.controllable_custom", new ArrayList<>());
-        this.categories.put("key.categories.movement", new ArrayList<>());
-        this.categories.put("key.categories.gameplay", new ArrayList<>());
-        this.categories.put("key.categories.inventory", new ArrayList<>());
-        this.categories.put("key.categories.creative", new ArrayList<>());
-        this.categories.put("key.categories.multiplayer", new ArrayList<>());
-        this.categories.put("key.categories.ui", new ArrayList<>());
-        this.categories.put("key.categories.misc", new ArrayList<>());
+        this.categories.put("key.category.controllable.custom", new ArrayList<>());
+        this.categories.put("key.category.minecraft.movement", new ArrayList<>());
+        this.categories.put("key.category.minecraft.gameplay", new ArrayList<>());
+        this.categories.put("key.category.minecraft.inventory", new ArrayList<>());
+        this.categories.put("key.category.minecraft.creative", new ArrayList<>());
+        this.categories.put("key.category.minecraft.multiplayer", new ArrayList<>());
+        this.categories.put("key.category.controllable.ui", new ArrayList<>());
+        this.categories.put("key.category.minecraft.misc", new ArrayList<>());
         this.repopulateBindings(false);
     }
 
@@ -175,18 +176,18 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void render(GuiGraphics graphics, int index, int top, int left, int width, int itemHeight, int mouseX, int mouseY, boolean selected, float partialTick)
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             this.updateTooltip(graphics, mouseX, mouseY);
             this.setLabelColor(this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor());
-            super.render(graphics, index, top, left, width, itemHeight, mouseX, mouseY, selected, partialTick);
+            super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
             this.bindingButton.setTooltip(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
             this.bindingButton.setTooltipDelay(Duration.ofMillis(400));
-            this.bindingButton.setX(left + width - 65);
-            this.bindingButton.setY(top);
+            this.bindingButton.setX(this.getX() + this.getWidth() - 65);
+            this.bindingButton.setY(this.getY() + 2);
             this.bindingButton.render(graphics, mouseX, mouseY, partialTick);
-            this.resetButton.setX(left + width - 24);
-            this.resetButton.setY(top);
+            this.resetButton.setX(this.getX() + width - 24);
+            this.resetButton.setY(this.getY() + 2);
             this.resetButton.active = !this.binding.isDefault();
             this.resetButton.render(graphics, mouseX, mouseY, partialTick);
         }
@@ -206,14 +207,14 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button)
+        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
         {
             Controller controller = Controllable.getController();
             if(!this.resetButton.isHovered() && controller != null && controller.isBeingUsed())
             {
-                this.bindingButton.mouseClicked(this.bindingButton.getX(), this.bindingButton.getY(), button);
+                this.bindingButton.mouseClicked(new MouseButtonEvent(this.bindingButton.getX(), this.bindingButton.getY(), event.buttonInfo()), doubleClick);
             }
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(event, doubleClick);
         }
 
         @Override
@@ -247,11 +248,11 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         }
 
         @Override
-        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
-            this.widget.setWidth(width - 10);
-            this.widget.setX(left + 5);
-            this.widget.setY(top);
+            this.widget.setWidth(this.getWidth() - 10);
+            this.widget.setX(this.getX() + 5);
+            this.widget.setY(this.getY() + 2);
             this.widget.render(graphics, mouseX, mouseY, partialTick);
         }
 
@@ -275,15 +276,15 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         }
 
         @Override
-        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
-            this.leftWidget.setWidth(width / 2 - 10);
-            this.leftWidget.setX(left + 5);
-            this.leftWidget.setY(top);
+            this.leftWidget.setWidth(this.getWidth() / 2 - 10);
+            this.leftWidget.setX(this.getX() + 5);
+            this.leftWidget.setY(this.getY() + 2);
             this.leftWidget.render(graphics, mouseX, mouseY, partialTick);
-            this.rightWidget.setWidth(width / 2 - 10);
-            this.rightWidget.setX(left + width / 2 + 5);
-            this.rightWidget.setY(top);
+            this.rightWidget.setWidth(this.getWidth() / 2 - 10);
+            this.rightWidget.setX(this.getX() + this.getWidth() / 2 + 5);
+            this.rightWidget.setY(this.getY() + 2);
             this.rightWidget.render(graphics, mouseX, mouseY, partialTick);
         }
 

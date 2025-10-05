@@ -60,6 +60,7 @@ import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
@@ -371,7 +372,7 @@ public class InputHandler
             // Since no reference to craft book button, instead search for it and invoke press.
             ClientServices.CLIENT.getScreenRenderables(screen).stream().filter(widget -> {
                 return widget instanceof ImageButton btn && RecipeBookComponent.RECIPE_BUTTON_SPRITES.equals(ClientServices.CLIENT.getImageButtonResource(btn));
-            }).findFirst().ifPresent(btn -> ((Button) btn).onPress());
+            }).findFirst().ifPresent(btn -> ((Button) btn).onPress(new MouseButtonInfo(0, 0)));
             boolean visible = optional.get().isVisible();
             Minecraft.getInstance()
                 .getSoundManager()

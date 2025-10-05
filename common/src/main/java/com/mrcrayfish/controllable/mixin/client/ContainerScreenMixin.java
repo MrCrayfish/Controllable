@@ -14,22 +14,22 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(AbstractContainerScreen.class)
 public abstract class ContainerScreenMixin
 {
-    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;isKeyDown(JI)Z", ordinal = 0))
+    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/MouseButtonEvent;hasShiftDown()Z", ordinal = 0))
     private boolean isQuickMovePressedOnClick(boolean original)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && ButtonBindings.QUICK_MOVE.isButtonDown())
+        if(controller != null && ButtonBindings.QUICK_MOVE.getContext().isActive() && ButtonBindings.QUICK_MOVE.isButtonDown())
         {
             return true;
         }
         return original;
     }
 
-    @ModifyExpressionValue(method = "mouseReleased", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;isKeyDown(JI)Z", ordinal = 0))
+    @ModifyExpressionValue(method = "mouseReleased", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/MouseButtonEvent;hasShiftDown()Z"))
     private boolean isQuickMovePressedOnReleased(boolean original)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && ButtonBindings.QUICK_MOVE.isButtonDown())
+        if(controller != null && ButtonBindings.QUICK_MOVE.getContext().isActive() && ButtonBindings.QUICK_MOVE.isButtonDown())
         {
             return true;
         }

@@ -3,59 +3,67 @@ package com.mrcrayfish.controllable.integration;
 import dev.architectury.event.events.client.ClientScreenInputEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 
 /**
  * Author: MrCrayfish
  */
 public class ArchitecturySupport
 {
-    public static void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
+    public static boolean sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(ClientScreenInputEvent.MOUSE_RELEASED_PRE.invoker().mouseReleased(mc, screen, mouseX, mouseY, button).isPresent())
-            return;
-        if(screen.mouseReleased(mouseX, mouseY, button))
-            return;
-        ClientScreenInputEvent.MOUSE_RELEASED_POST.invoker().mouseReleased(mc, screen, mouseX, mouseY, button);
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+        if(ClientScreenInputEvent.MOUSE_RELEASED_PRE.invoker().mouseReleased(mc, screen, event).isTrue())
+            return true;
+        if(screen.mouseReleased(event))
+            return true;
+        return ClientScreenInputEvent.MOUSE_RELEASED_POST.invoker().mouseReleased(mc, screen, event).isTrue();
     }
 
-    public static void sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button)
+    public static boolean sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(ClientScreenInputEvent.MOUSE_CLICKED_PRE.invoker().mouseClicked(mc, screen, mouseX, mouseY, button).isPresent())
-            return;
-        if(screen.mouseClicked(mouseX, mouseY, button))
-            return;
-        ClientScreenInputEvent.MOUSE_CLICKED_POST.invoker().mouseClicked(mc, screen, mouseX, mouseY, button);
+        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
+        if(ClientScreenInputEvent.MOUSE_CLICKED_PRE.invoker().mouseClicked(mc, screen, event, false).isTrue())
+            return true;
+        if(screen.mouseClicked(event, false))
+            return true;
+        return ClientScreenInputEvent.MOUSE_CLICKED_POST.invoker().mouseClicked(mc, screen, event, false).isTrue();
     }
 
     public static void sendMouseDrag(Screen screen, double finalMouseX, double finalMouseY, double finalDragX, double finalDragY, int activeButton)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(ClientScreenInputEvent.MOUSE_DRAGGED_PRE.invoker().mouseDragged(mc, screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY).isPresent())
+        MouseButtonEvent event = new MouseButtonEvent(finalMouseX, finalMouseY, new MouseButtonInfo(activeButton, 0));
+        if(ClientScreenInputEvent.MOUSE_DRAGGED_PRE.invoker().mouseDragged(mc, screen, event, finalDragX, finalDragY).isPresent())
             return;
-        if(screen.mouseDragged(finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY))
+        if(screen.mouseDragged(event, finalDragX, finalDragY))
             return;
-        ClientScreenInputEvent.MOUSE_DRAGGED_POST.invoker().mouseDragged(mc, screen, finalMouseX, finalMouseY, activeButton, finalDragX, finalDragY);
+        ClientScreenInputEvent.MOUSE_DRAGGED_POST.invoker().mouseDragged(mc, screen, event, finalDragX, finalDragY);
     }
 
     public static boolean sendScreenKeyReleased(Screen screen, int key, int scanCode, int modifiers)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(ClientScreenInputEvent.KEY_RELEASED_PRE.invoker().keyReleased(mc, screen, key, scanCode, modifiers).isPresent())
+        KeyEvent event = new KeyEvent(key, scanCode, modifiers);
+        if(ClientScreenInputEvent.KEY_RELEASED_PRE.invoker().keyReleased(mc, screen, event).isPresent())
             return true;
-        if(screen.keyReleased(key, -1, modifiers))
+        if(screen.keyReleased(event))
             return true;
-        return ClientScreenInputEvent.KEY_RELEASED_POST.invoker().keyReleased(mc, screen, key, scanCode, modifiers).isPresent();
+        return ClientScreenInputEvent.KEY_RELEASED_POST.invoker().keyReleased(mc, screen, event).isPresent();
     }
 
     public static boolean sendScreenKeyPressed(Screen screen, int key, int scanCode, int modifiers)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(ClientScreenInputEvent.KEY_PRESSED_PRE.invoker().keyPressed(mc, screen, key, scanCode, modifiers).isPresent())
+        KeyEvent event = new KeyEvent(key, scanCode, modifiers);
+        if(ClientScreenInputEvent.KEY_PRESSED_PRE.invoker().keyPressed(mc, screen, event).isPresent())
             return true;
-        if(screen.keyPressed(key, -1, modifiers))
+        if(screen.keyPressed(event))
             return true;
-        return ClientScreenInputEvent.KEY_PRESSED_POST.invoker().keyPressed(mc, screen, key, scanCode, modifiers).isPresent();
+        return ClientScreenInputEvent.KEY_PRESSED_POST.invoker().keyPressed(mc, screen, event).isPresent();
     }
 }

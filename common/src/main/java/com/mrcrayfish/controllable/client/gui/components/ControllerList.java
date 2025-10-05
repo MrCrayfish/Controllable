@@ -1,29 +1,22 @@
 package com.mrcrayfish.controllable.client.gui.components;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.controllable.client.input.MultiController;
-import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
@@ -72,12 +65,6 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
         this.updateSelected();
     }
 
-    @Override
-    protected boolean isSelectedItem(int index)
-    {
-        return false;
-    }
-
     private void updateSelected()
     {
         Controller controller = Controllable.getController();
@@ -109,19 +96,19 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
     {
         if(this.footerText != null)
         {
             Font font = this.minecraft.font;
             int footerWidth = font.width(this.footerText);
             int footerSubWidth = font.width(this.footerSubText);
-            if(ScreenHelper.isMouseWithin(this.getX() + (this.width + footerWidth) / 2 - footerSubWidth, this.getBottom() + 4, footerSubWidth, 14, (int) mouseX, (int) mouseY))
+            if(ScreenHelper.isMouseWithin(this.getX() + (this.width + footerWidth) / 2 - footerSubWidth, this.getBottom() + 4, footerSubWidth, 14, (int) event.x(), (int) event.y()))
             {
                 Objects.requireNonNull(Minecraft.getInstance().screen).handleComponentClicked(this.footerSubText.getStyle());
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
@@ -141,7 +128,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             int start = -1, end = -1;
             for(int i = 0; i < this.getItemCount(); i++)
             {
-                ControllerEntry entry = this.getEntry(i);
+                ControllerEntry entry = this.children().get(i);
                 if(jids.contains(entry.getJid()))
                 {
                     matchedEntries.add(i);
@@ -154,7 +141,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             }
             if(start != end)
             {
-                int itemCenter = (this.itemHeight - 4) / 2;
+                int itemCenter = (this.defaultEntryHeight) / 2 - 1;
                 int rowLeft = this.getRowLeft();
                 int lineTop = this.getRowTop(start) + itemCenter;
                 int lineEnd = this.getRowTop(end) + itemCenter;
@@ -204,28 +191,28 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
         }
 
         @Override
-        public void render(GuiGraphics graphics, int slotIndex, int top, int left, int listWidth, int slotHeight, int mouseX, int mouseY, boolean hovered, float partialTicks)
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
-            State state = this.getState();
-            if(state != State.NONE)
+            SelectedState state = this.getSelectedState();
+            if(state != SelectedState.NONE)
             {
-                ScreenHelper.drawRoundedBox(graphics, left - 1, top - 1, listWidth + 2, slotHeight + 2, 0xFFFFFFFF);
-                ScreenHelper.drawRoundedBox(graphics, left, top, listWidth, slotHeight, 0xFF000000);
-                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, CHECKMARK, left + 2, top, 18, 18);
+                ScreenHelper.drawRoundedBox(graphics, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 0xFFFFFFFF);
+                ScreenHelper.drawRoundedBox(graphics, this.getX() + 1, this.getY() + 1, this.getWidth() - 2, this.getHeight() - 2, 0xFF000000);
+                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, CHECKMARK, this.getX() + 2, this.getY() + 2, 18, 18);
             }
             else if(Controllable.getController() != null && hovered)
             {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, Icons.TEXTURE, left + 4, top + 4, 110, 0, 11, 11, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
+                graphics.blit(RenderPipelines.GUI_TEXTURED, Icons.TEXTURE, this.getX() + 4, this.getY() + 6, 110, 0, 11, 11, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
                 graphics.setTooltipForNextFrame(Component.translatable("controllable.gui.link").withStyle(ChatFormatting.AQUA), mouseX, mouseY);
             }
             Font font = Minecraft.getInstance().font;
-            graphics.drawString(font, this.label, left + 22, top + (slotHeight - font.lineHeight) / 2 + 1, 0xFFFFFFFF);
+            graphics.drawString(font, this.label, this.getX() + 22, this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1, 0xFFFFFFFF);
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button)
+        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
         {
-            if(button == GLFW.GLFW_MOUSE_BUTTON_1)
+            if(event.button() == GLFW.GLFW_MOUSE_BUTTON_1)
             {
                 this.connect();
                 minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WOODEN_BUTTON_CLICK_ON, 1.75F));
@@ -252,23 +239,23 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             manager.updateLastDevices();
         }
 
-        private State getState()
+        private SelectedState getSelectedState()
         {
             Controller controller = Controllable.getController();
             if(controller != null)
             {
                 if(controller.getJid().equals(this.jid))
-                    return State.SELECTED;
+                    return SelectedState.SELECTED;
 
                 if(controller instanceof MultiController m)
                 {
                     if(m.getControllers().stream().anyMatch(c -> c.getJid().equals(this.jid)))
                     {
-                        return State.MULTI_SELECTED;
+                        return SelectedState.MULTI_SELECTED;
                     }
                 }
             }
-            return State.NONE;
+            return SelectedState.NONE;
         }
 
         @Nullable
@@ -289,7 +276,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             return null;
         }
 
-        public enum State
+        public enum SelectedState
         {
             NONE,
             SELECTED,

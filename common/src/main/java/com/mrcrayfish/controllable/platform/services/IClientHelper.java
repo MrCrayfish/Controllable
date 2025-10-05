@@ -31,7 +31,7 @@ public interface IClientHelper
 
     void sendMouseDrag(Screen screen, double dragX, double dragY, double finalMouseX, double finalMouseY, int activeButton);
 
-    void sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button);
+    boolean sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button, boolean doubleClick);
 
     void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button);
 

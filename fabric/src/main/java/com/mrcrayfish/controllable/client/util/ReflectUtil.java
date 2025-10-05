@@ -34,16 +34,11 @@ import java.util.stream.Stream;
  */
 public class ReflectUtil
 {
-    private static final Method ABSTRACT_SELECTION_LIST_GET_ROW_TOP = ReflectUtil.findMethod(AbstractSelectionList.class, "net.minecraft.class_350", "method_25337", "(I)I", int.class);
-    private static final Method ABSTRACT_SELECTION_LIST_GET_ROW_BOTTOM = ReflectUtil.findMethod(AbstractSelectionList.class, "net.minecraft.class_350", "method_25319", "(I)I", int.class);
     private static final Method ABSTRACT_CONTAINER_SCREEN_CLICK_SLOT = ReflectUtil.findMethod(AbstractContainerScreen.class, "net.minecraft.class_465", "method_2383", "(Lnet/minecraft/class_1735;IILnet/minecraft/class_1713;)V", Slot.class, int.class, int.class, ClickType.class);
-    private static final Method SCREEN_ADD_RENDER_WIDGET = ReflectUtil.findMethod(Screen.class, "net.minecraft.class_437", "method_37060", "(Lnet/minecraft/class_4068;)Lnet/minecraft/class_4068;", Renderable.class);
-    private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ReflectUtil.findField(AbstractSelectionList.class, "net.minecraft.class_350", "field_22741", "I");
+    private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ReflectUtil.findField(AbstractSelectionList.class, "net.minecraft.class_350", "field_62109", "I");
     private static final Field IMAGE_BUTTON_SPRITES = ReflectUtil.findField(ImageButton.class, "net.minecraft.class_344", "field_45356", "Lnet/minecraft/class_8666;");
     private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ReflectUtil.findField(CreativeModeInventoryScreen.class, "net.minecraft.class_481", "field_2890", "F");
     private static final Field KEY_MAPPING_PRESS_TIME = ReflectUtil.findField(KeyMapping.class, "net.minecraft.class_304", "field_1661", "I");
-    private static final Field TOOLTIP_LINES = ReflectUtil.findField(Tooltip.class, "net.minecraft.class_7919", "field_41103", "Ljava/util/List;");
-    private static final Field TOOLTIP_LANGUAGE = ReflectUtil.findField(Tooltip.class, "net.minecraft.class_7919", "field_51822", "Lnet/minecraft/class_2477;");
     private static final Field STONE_CUTTER_INDEX = ReflectUtil.findField(StonecutterScreen.class, "net.minecraft.class_3979", "field_17671", "I");
     private static final Field LOOM_START_ROW = ReflectUtil.findField(LoomScreen.class, "net.minecraft.class_494", "field_39190", "I");
     private static final Field MOVE_VECTOR = ReflectUtil.findField(ClientInput.class, "net.minecraft.class_744", "field_55868", "Lnet/minecraft/class_241;");
@@ -78,32 +73,6 @@ public class ReflectUtil
         }
     }
 
-    public static int getAbstractListRowTop(AbstractSelectionList<?> list, int index)
-    {
-        try
-        {
-            return (int) ABSTRACT_SELECTION_LIST_GET_ROW_TOP.invoke(list, index);
-        }
-        catch(IllegalAccessException | InvocationTargetException e)
-        {
-            e.printStackTrace();
-            return 1000000;
-        }
-    }
-
-    public static int getAbstractListRowBottom(AbstractSelectionList<?> list, int index)
-    {
-        try
-        {
-            return (int) ABSTRACT_SELECTION_LIST_GET_ROW_BOTTOM.invoke(list, index);
-        }
-        catch(IllegalAccessException | InvocationTargetException e)
-        {
-            e.printStackTrace();
-            return -1000000;
-        }
-    }
-
     public static int getAbstractListItemHeight(AbstractSelectionList<?> list)
     {
         try
@@ -127,19 +96,6 @@ public class ReflectUtil
         {
             e.printStackTrace();
             return null;
-        }
-    }
-
-    public static void pushLinesToTooltip(Tooltip tooltip, List<FormattedCharSequence> lines)
-    {
-        try
-        {
-            TOOLTIP_LINES.set(tooltip, lines);
-            TOOLTIP_LANGUAGE.set(tooltip, Language.getInstance());
-        }
-        catch(IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
         }
     }
 
@@ -188,18 +144,6 @@ public class ReflectUtil
         catch(IllegalAccessException | InvocationTargetException e)
         {
             e.printStackTrace();
-        }
-    }
-
-    public static void addRenderable(Screen screen, Renderable renderable)
-    {
-        try
-        {
-            SCREEN_ADD_RENDER_WIDGET.invoke(screen, renderable);
-        }
-        catch(InvocationTargetException | IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
         }
     }
 

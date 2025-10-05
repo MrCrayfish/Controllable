@@ -4,6 +4,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.CommonComponents;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -53,10 +55,10 @@ public class ColorButton extends Button
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY)
+    public void onClick(MouseButtonEvent event, boolean doubleClick)
     {
         this.index = (this.index + 1) % COLORS.length;
-        super.onClick(mouseX, mouseY);
+        super.onClick(event, doubleClick);
     }
 
     @Override

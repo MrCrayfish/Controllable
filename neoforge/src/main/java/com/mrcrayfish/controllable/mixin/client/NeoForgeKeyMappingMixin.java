@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.KeyAdapterBinding;
 import net.minecraft.client.KeyMapping;
 import net.neoforged.neoforge.client.extensions.IKeyMappingExtension;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -15,18 +16,18 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(KeyMapping.class)
 public abstract class NeoForgeKeyMappingMixin implements IKeyMappingExtension
 {
-    @Shadow
-    public abstract String getCategory();
+    @Shadow @Final
+    private String name;
 
     @Override
-    public boolean isActiveAndMatches(InputConstants.Key keyCode)
+    public boolean isActiveAndMatches(InputConstants.Key key)
     {
-        String customKey = this.getCategory() + ".custom";
+        String customKey = this.name + ".custom";
         KeyAdapterBinding adapter = Controllable.getBindingRegistry().getKeyAdapters().get(customKey);
         if(adapter != null && adapter.isButtonDown())
         {
             return true;
         }
-        return keyCode != InputConstants.UNKNOWN && keyCode.equals(getKey()) && this.getKeyConflictContext().isActive() && this.getKeyModifier().isActive(this.getKeyConflictContext());
+        return key != InputConstants.UNKNOWN && key.equals(getKey()) && this.getKeyConflictContext().isActive() && this.getKeyModifier().isActive(this.getKeyConflictContext());
     }
 }

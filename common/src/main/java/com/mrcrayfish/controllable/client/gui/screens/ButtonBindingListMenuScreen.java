@@ -30,14 +30,14 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
     protected ButtonBindingListMenuScreen(Screen parent, Component title, int itemHeight)
     {
         super(parent, title, itemHeight);
-        this.categories.put("key.categories.controllable_custom", new ArrayList<>());
-        this.categories.put("key.categories.movement", new ArrayList<>());
-        this.categories.put("key.categories.gameplay", new ArrayList<>());
-        this.categories.put("key.categories.inventory", new ArrayList<>());
-        this.categories.put("key.categories.creative", new ArrayList<>());
-        this.categories.put("key.categories.multiplayer", new ArrayList<>());
-        this.categories.put("key.categories.ui", new ArrayList<>());
-        this.categories.put("key.categories.misc", new ArrayList<>());
+        this.categories.put("key.category.controllable.custom", new ArrayList<>());
+        this.categories.put("key.category.minecraft.movement", new ArrayList<>());
+        this.categories.put("key.category.minecraft.gameplay", new ArrayList<>());
+        this.categories.put("key.category.minecraft.inventory", new ArrayList<>());
+        this.categories.put("key.category.minecraft.creative", new ArrayList<>());
+        this.categories.put("key.category.minecraft.multiplayer", new ArrayList<>());
+        this.categories.put("key.category.controllable.ui", new ArrayList<>());
+        this.categories.put("key.category.minecraft.misc", new ArrayList<>());
     }
 
     @Override
@@ -64,7 +64,7 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
         // Sorts the button binding list then adds new entries to the option list for each category
         this.categories.forEach((category, list) ->
         {
-            boolean isCustom = category.equals("key.categories.controllable_custom");
+            boolean isCustom = category.equals("key.category.controllable.custom");
             if(!list.isEmpty() || isCustom)
             {
                 Collections.sort(list);
@@ -95,11 +95,11 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
         }
 
         @Override
-        public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTick)
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
-            this.widget.setWidth((int) (width * 0.5));
-            this.widget.setX(left + (width - this.widget.getWidth()) / 2);
-            this.widget.setY(top);
+            this.widget.setWidth((int) (this.getWidth() * 0.5));
+            this.widget.setX(this.getX() + (this.getWidth() - this.widget.getWidth()) / 2);
+            this.widget.setY(this.getY() + 2);
             this.widget.render(graphics, mouseX, mouseY, partialTick);
         }
 

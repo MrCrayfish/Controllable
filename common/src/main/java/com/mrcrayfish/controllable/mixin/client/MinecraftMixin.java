@@ -91,7 +91,7 @@ public class MinecraftMixin
         }
     }
 
-    @ModifyVariable(method = "runTick", at = @At(value = "STORE", target = "Lcom/mojang/blaze3d/platform/FramerateLimitTracker;getFramerateLimit()I"), index = 5)
+    @ModifyVariable(method = "runTick", at = @At(value = "STORE", target = "Lcom/mojang/blaze3d/platform/FramerateLimitTracker;getFramerateLimit()I"), index = 4)
     private int controllableModifyFramerate(int originalFps)
     {
         Minecraft mc = (Minecraft) (Object) this;

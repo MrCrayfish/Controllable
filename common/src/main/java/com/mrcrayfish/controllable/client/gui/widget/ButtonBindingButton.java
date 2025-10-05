@@ -7,6 +7,7 @@ import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
@@ -44,11 +45,11 @@ public class ButtonBindingButton extends Button
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
     {
-        if(this.active && this.visible && this.isMouseOver(mouseX, mouseY))
+        if(this.active && this.visible && this.isMouseOver(event.x(), event.y()))
         {
-            if(this.onPress.onPress(button))
+            if(this.onPress.onPress(event.button()))
             {
                 this.playDownSound(Minecraft.getInstance().getSoundManager());
             }

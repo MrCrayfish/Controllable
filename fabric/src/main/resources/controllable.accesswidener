@@ -1,6 +1,6 @@
 accessWidener v1 named
 accessible field net/minecraft/client/Minecraft rightClickDelay I
-accessible field net/minecraft/client/MouseHandler activeButton I
+accessible field net/minecraft/client/MouseHandler activeButton Lnet/minecraft/client/input/MouseButtonInfo;
 accessible field net/minecraft/client/MouseHandler lastHandleMovementTime D
 accessible field net/minecraft/client/gui/components/ChatComponent trimmedMessages Ljava/util/List;
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen hoveredSlot Lnet/minecraft/world/inventory/Slot;
@@ -10,17 +10,18 @@ accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScr
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageHeight I
 accessible field net/minecraft/client/OptionInstance caption Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/OptionInstance tooltip Lnet/minecraft/client/OptionInstance$TooltipSupplier;
-accessible field net/minecraft/client/gui/components/AbstractSelectionList itemHeight I
+accessible field net/minecraft/client/gui/components/AbstractSelectionList defaultEntryHeight I
 accessible field net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen scrollOffs F
 accessible field net/minecraft/client/KeyMapping clickCount I
 accessible field net/minecraft/client/gui/components/Tooltip cachedTooltip Ljava/util/List;
+accessible field net/minecraft/client/gui/components/Tooltip splitWithLanguage Lnet/minecraft/locale/Language;
 accessible field net/minecraft/client/gui/screens/inventory/StonecutterScreen startIndex I
 accessible field net/minecraft/client/gui/screens/inventory/LoomScreen startRow I
 accessible field net/minecraft/client/gui/screens/recipebook/OverlayRecipeComponent$OverlayRecipeButton isCraftable Z
 accessible method net/minecraft/client/Minecraft startUseItem ()V
 accessible method net/minecraft/client/Minecraft startAttack ()Z
 accessible method net/minecraft/client/Minecraft pickBlock ()V
-accessible method net/minecraft/client/Minecraft openChatScreen (Ljava/lang/String;)V
+accessible method net/minecraft/client/Minecraft openChatScreen (Lnet/minecraft/client/gui/components/ChatComponent$ChatMethod;)V
 accessible method net/minecraft/client/player/LocalPlayer canStartSprinting ()Z
 accessible class net/minecraft/client/gui/screens/recipebook/OverlayRecipeComponent$OverlayRecipeButton
 accessible class net/minecraft/client/gui/components/AbstractSelectionList$Entry

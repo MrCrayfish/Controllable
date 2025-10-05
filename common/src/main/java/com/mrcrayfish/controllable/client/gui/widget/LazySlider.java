@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable.client.gui.widget;
 
 import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
@@ -40,29 +41,29 @@ public class LazySlider extends AbstractSliderButton
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY)
+    public void onClick(MouseButtonEvent event, boolean doubleClick)
     {
-        super.onClick(mouseX, mouseY);
+        super.onClick(event, doubleClick);
         this.pressed = true;
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button)
+    public boolean mouseReleased(MouseButtonEvent event)
     {
-        if(this.isValidClickButton(button) && this.pressed)
+        if(this.isValidClickButton(event.buttonInfo()) && this.pressed)
         {
             this.onChange.accept(this.getValue());
             this.pressed = false;
-            this.onRelease(mouseX, mouseY);
+            this.onRelease(event);
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean mouseDragged(double p_93645_, double p_93646_, int p_93647_, double p_93648_, double p_93649_)
+    public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY)
     {
-        return this.pressed && super.mouseDragged(p_93645_, p_93646_, p_93647_, p_93648_, p_93649_);
+        return this.pressed && super.mouseDragged(event, deltaX, deltaY);
     }
 
     public double getValue()

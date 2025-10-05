@@ -15,7 +15,7 @@ public class MouseHandlerMixin
     @Inject(method = "onMove", at = @At(value = "HEAD"))
     private void controllableOnMouseMoved(long windowId, double mouseX, double mouseY, CallbackInfo ci)
     {
-        if(windowId == Minecraft.getInstance().getWindow().getWindow())
+        if(windowId == Minecraft.getInstance().getWindow().handle())
         {
             Controllable.getCursor().setMode(VirtualCursor.CursorMode.MOUSE);
         }

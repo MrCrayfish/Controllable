@@ -23,12 +23,12 @@ public class TabOptionTitleItem extends TabOptionBaseItem implements SkipItem
     }
 
     @Override
-    public void render(GuiGraphics graphics, int x, int top, int left, int width, int height, int mouseX, int mouseY, boolean selected, float partialTicks)
+    public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
         Font font = Minecraft.getInstance().font;
         int labelWidth = font.width(this.label) + 2;
-        ScreenHelper.drawRoundedBox(graphics, left + width / 2 - labelWidth / 2, top + 2, labelWidth, 14, 0x88000000);
-        graphics.drawCenteredString(font, this.label, left + width / 2, top + 5, 0xFFFFFFFF);
+        ScreenHelper.drawRoundedBox(graphics, this.getX() + this.getWidth() / 2 - labelWidth / 2, this.getY() + 4, labelWidth, 14, 0x88000000);
+        graphics.drawCenteredString(font, this.label, this.getX() + this.getWidth() / 2, this.getY() + 7, 0xFFFFFFFF);
     }
 
     @Override

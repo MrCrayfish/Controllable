@@ -28,6 +28,6 @@ public class PendingScreen extends Screen
         int centerX = this.width / 2;
         int centerY = this.height / 2;
         graphics.drawCenteredString(this.font, loadingBar, centerX, centerY - 9, -1);
-        graphics.drawCenteredString(this.font, this.title, centerX, centerY + 5, 0x808080);
+        graphics.drawCenteredString(this.font, this.title, centerX, centerY + 5, 0xFF808080);
     }
 }

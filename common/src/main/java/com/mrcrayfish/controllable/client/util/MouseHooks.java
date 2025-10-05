@@ -5,17 +5,19 @@ import com.mojang.blaze3d.platform.Window;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.integration.EmiSupport;
 import com.mrcrayfish.controllable.platform.ClientServices;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-
-import java.util.Optional;
 
 /**
  * Author: MrCrayfish
  */
 public class MouseHooks
 {
+    private static long previousTime;
+    private static int previousButton;
+
     /**
      * @return The scaled x position of the mouse. If virtual cursor is disabled, it will use the native cursor x position.
      */
@@ -81,7 +83,15 @@ public class MouseHooks
         {
             ClientServices.CLIENT.setActiveMouseButton(button);
             ClientServices.CLIENT.setLastMouseEventTime(Blaze3D.getTime());
-            ClientServices.CLIENT.sendScreenMouseClick(screen, cursorScreenX, cursorScreenY, button);
+
+            // 1.21.9 introduced double click
+            long currentTime = Util.getMillis();
+            boolean doubleClick = currentTime - previousTime < 250L && previousButton == button;
+            if(ClientServices.CLIENT.sendScreenMouseClick(screen, cursorScreenX, cursorScreenY, button, doubleClick))
+            {
+                previousTime = currentTime;
+                previousButton = button;
+            }
         }
     }
 

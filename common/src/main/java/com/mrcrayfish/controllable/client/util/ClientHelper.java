@@ -17,10 +17,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.locale.Language;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -32,8 +29,8 @@ import java.util.List;
  */
 public class ClientHelper
 {
-    public static final ResourceLocation ICON_FONT = Utils.resource("icons");
-    public static final ResourceLocation BUTTON_FONT = Utils.resource("buttons");
+    public static final FontDescription.Resource ICON_FONT = new FontDescription.Resource(Utils.resource("icons"));
+    public static final FontDescription.Resource BUTTON_FONT = new FontDescription.Resource(Utils.resource("buttons"));
 
     public static MutableComponent getIconComponent(Icons icon)
     {
