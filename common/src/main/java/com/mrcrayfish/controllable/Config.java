@@ -13,14 +13,14 @@ import com.mrcrayfish.framework.api.config.ConfigType;
 import com.mrcrayfish.framework.api.config.DoubleProperty;
 import com.mrcrayfish.framework.api.config.EnumProperty;
 import com.mrcrayfish.framework.api.config.FrameworkConfig;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Author: MrCrayfish
  */
 public class Config
 {
-    public static final ResourceLocation CLIENT_CONFIG_ID = Utils.resource("client");
+    public static final Identifier CLIENT_CONFIG_ID = Utils.resource("client");
 
     @FrameworkConfig(id = Constants.MOD_ID, name = "client", separator = '-', type = ConfigType.CLIENT)
     public static final Client CLIENT = new Client();

@@ -159,8 +159,8 @@ public abstract class ListMenuScreen extends Screen
     {
         if(ScreenHelper.isMouseWithin(10, 13, 23, 23, (int) event.x(), (int) event.y()))
         {
-            Style style = Style.EMPTY.withClickEvent(new ClickEvent.OpenUrl(URI.create("https://www.curseforge.com/minecraft/mc-mods/configured")));
-            this.handleComponentClicked(style);
+            var clickEvent = new ClickEvent.OpenUrl(URI.create("https://www.curseforge.com/minecraft/mc-mods/configured"));
+            defaultHandleClickEvent(clickEvent, this.minecraft, this);
             return true;
         }
         return super.mouseClicked(event, doubleClick);

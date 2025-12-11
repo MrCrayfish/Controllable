@@ -9,7 +9,7 @@ import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -25,7 +25,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.time.Duration;
 import java.util.ArrayList;

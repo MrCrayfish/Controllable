@@ -9,7 +9,7 @@ import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
 import com.mrcrayfish.framework.api.event.client.FrameworkScreenEvents;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractSelectionList;

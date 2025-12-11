@@ -1,12 +1,10 @@
 package com.mrcrayfish.controllable.client.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 
 /**
  * Author: MrCrayfish

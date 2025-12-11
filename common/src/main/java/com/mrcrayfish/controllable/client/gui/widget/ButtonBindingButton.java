@@ -9,7 +9,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 
 /**
@@ -33,9 +32,9 @@ public class ButtonBindingButton extends Button
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    public void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        super.renderWidget(graphics, mouseX, mouseY, partialTicks);
+        this.renderDefaultSprite(graphics);
         if(this.binding.getButton() < 0)
             return;
         int texU = this.binding.getButton() * 13;

@@ -4,7 +4,7 @@ import com.mrcrayfish.controllable.client.binding.context.rule.ContextRule;
 import com.mrcrayfish.controllable.client.binding.context.rule.HasPlayerRule;
 import com.mrcrayfish.controllable.client.binding.context.rule.NoScreenRule;
 import com.mrcrayfish.controllable.util.Utils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Set;
 
@@ -15,7 +15,7 @@ public class InGameContext extends BindingContext
 {
     public static final InGameContext INSTANCE = new InGameContext(Utils.resource("in_game"));
 
-    protected InGameContext(ResourceLocation id)
+    protected InGameContext(Identifier id)
     {
         super(id);
     }

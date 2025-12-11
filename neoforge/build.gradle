@@ -1,27 +1,14 @@
-import net.neoforged.gradle.common.tasks.PotentiallySignJar
+import org.apache.commons.io.FilenameUtils
 
 plugins {
     id 'multiloader-loader'
-    id 'net.neoforged.gradle.userdev'
+    id 'net.neoforged.moddev'
 }
-
-def at = file('src/main/resources/META-INF/accesstransformer.cfg')
-if (at.exists()) {
-    minecraft.accessTransformers.file at
-}
-
-jarJar.enable()
-
-/*mixin {
-    add sourceSets.main, "controllable.refmap.json"
-    config 'controllable.common.mixins.json'
-    config 'controllable.neoforge.mixins.json'
-}*/
 
 sourceSets {
     test {
-        compileClasspath += project(':common').sourceSets.main.output
-        runtimeClasspath += project(':common').sourceSets.main.output
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.runtimeClasspath
     }
 }
 
@@ -30,11 +17,32 @@ configurations {
     testRuntimeOnly.extendsFrom runtimeOnly
 }
 
-runs {
-    configureEach {
-        modSource project.sourceSets.main
-        dependencies {
-            runtime project.configurations.library
+neoForge {
+    version = neoforge_version
+
+    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers.from(at.absolutePath)
+    }
+
+    parchment {
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
+    }
+
+    mods {
+        framework {
+            sourceSet sourceSets.main
+        }
+    }
+
+    runs {
+        configureEach {
+            systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
+            ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
+        }
+        client {
+            client()
         }
     }
 }
@@ -42,8 +50,6 @@ runs {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    // Core dependencies
-    implementation "net.neoforged:neoforge:${neoforge_version}"
     implementation "com.mrcrayfish:framework-neoforge:${minecraft_version}-${framework_version}"
 
     // JEI
@@ -69,23 +75,35 @@ dependencies {
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
-tasks.jarJar.configure {
-    archiveClassifier = 'release'
+tasks.jar.configure {
     from(rootProject.file("LICENSE_LibSDL4J"))
     from(rootProject.file("LICENSE")) {
         rename { "${it}_${mod_name}" }
     }
 }
 
-tasks.register('signJar', PotentiallySignJar) {
+tasks.register("signJar") {
     dependsOn jar
     onlyIf {
-        hasProperty('keyStore') || System.getenv("KEYSTORE")
+        findProperty('keyStore') || System.getenv("KEYSTORE")
     }
-    keyStore = findProperty('keyStore') ?: System.getenv("KEYSTORE")
-    alias = findProperty('keyStoreAlias') ?: System.getenv("KEYSTORE_ALIAS")
-    storePass = findProperty('keyStorePass') ?: System.getenv("KEYSTORE_PASS")
-    input = jar.archiveFile
+    doLast {
+        def unsignedJar = tasks.jar.archiveFile.get().asFile
+        def name = FilenameUtils.removeExtension(unsignedJar.getName())
+        def signedJar  = layout.buildDirectory.file("libs/%s-signed.jar".formatted(name)).get().asFile
+        def signingKeyAlias = findProperty('keyStoreAlias') ?: System.getenv("KEYSTORE_ALIAS")
+        def signingKeystore = findProperty('keyStore') ?: System.getenv("KEYSTORE")
+        def signingPassword = findProperty('keyStorePass') ?: System.getenv("KEYSTORE_PASS")
+        ant.signjar(
+            jar: unsignedJar,
+            signedJar: signedJar,
+            alias: signingKeyAlias,
+            keyStore: signingKeystore,
+            storePass: signingPassword,
+            storetype: 'jks'
+        )
+        println "Signed jar created at: $signedJar"
+    }
 }
 
 jar.finalizedBy 'signJar'
@@ -99,4 +117,23 @@ idea {
 
 test {
     useJUnitPlatform()
+}
+
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    configurations.named("$variant") {
+        attributes {
+            attribute(loaderAttribute, 'neoforge')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName, it.getTaskName(null, 'jarJar')].each { variant->
+        configurations.named("$variant") {
+            attributes {
+                attribute(loaderAttribute, 'neoforge')
+            }
+        }
+    }
 }

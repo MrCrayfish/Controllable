@@ -2,7 +2,6 @@ package com.mrcrayfish.controllable.client.overlay;
 
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
@@ -13,7 +12,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.StateSwitchingButton;
+import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
@@ -70,13 +69,13 @@ public class RecipeBookOverlay implements IOverlay
 
         RecipeBookPage page = ((RecipeBookComponentAccessor) this.recipeBook).controllableGetRecipeBookPage();
 
-        StateSwitchingButton forwardButton = ((RecipeBookPageAccessor) page).controllableGetForwardButton();
+        ImageButton forwardButton = ((RecipeBookPageAccessor) page).controllableGetForwardButton();
         if(forwardButton.visible)
         {
             graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.getX() + 24 - 5, forwardButton.getY() + 4, 0xFFFFFFFF);
         }
 
-        StateSwitchingButton backButton = ((RecipeBookPageAccessor) page).controllableGetBackButton();
+        ImageButton backButton = ((RecipeBookPageAccessor) page).controllableGetBackButton();
         if(backButton.visible)
         {
             graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.getX() - 24 + 12 - 5, backButton.getY() + 4, 0xFFFFFFFF);

@@ -42,9 +42,8 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
     {
         super(label);
         List<T> values = (List<T>) Arrays.asList(getter.get().getClass().getEnumConstants());
-        this.cycle = CycleButton.builder(T::getLabel)
+        this.cycle = CycleButton.builder(T::getLabel, getter.get())
                 .withValues(values)
-                .withInitialValue(getter.get())
                 .withTooltip(value -> createTooltipWithWidth(tooltip, 250))
                 .displayOnlyValue()
                 .create(0, 0, 100, 20, this.label, (button, value) -> {

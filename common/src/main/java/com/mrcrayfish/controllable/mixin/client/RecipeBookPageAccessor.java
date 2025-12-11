@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.mixin.client;
 
-import net.minecraft.client.gui.components.StateSwitchingButton;
+import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.screens.recipebook.RecipeButton;
@@ -20,10 +20,10 @@ public interface RecipeBookPageAccessor
     List<RecipeButton> controllableGetButtons();
 
     @Accessor("forwardButton")
-    StateSwitchingButton controllableGetForwardButton();
+    ImageButton controllableGetForwardButton();
 
     @Accessor("backButton")
-    StateSwitchingButton controllableGetBackButton();
+    ImageButton controllableGetBackButton();
 
     @Accessor("currentPage")
     int controllableGetCurrentPage();

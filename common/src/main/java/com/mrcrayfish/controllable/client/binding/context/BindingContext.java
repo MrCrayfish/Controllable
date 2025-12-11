@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.client.binding.context;
 
 import com.google.common.base.Preconditions;
 import com.mrcrayfish.controllable.client.binding.context.rule.ContextRule;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,13 +26,13 @@ import java.util.Set;
  */
 public abstract class BindingContext
 {
-    private static final Set<ResourceLocation> REGISTERED_CONTEXTS = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<Identifier> REGISTERED_CONTEXTS = Collections.synchronizedSet(new HashSet<>());
     private static final Map<ConflictKey, Boolean> CONFLICT_CACHE = new HashMap<>();
 
-    private final ResourceLocation id;
+    private final Identifier id;
     private Set<ContextRule> rules;
 
-    BindingContext(ResourceLocation id)
+    BindingContext(Identifier id)
     {
         Preconditions.checkState(REGISTERED_CONTEXTS.add(id), "Duplicate binding context id: %s".formatted(id));
         this.id = id;

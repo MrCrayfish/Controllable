@@ -30,6 +30,7 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
@@ -397,5 +398,10 @@ public class SettingsScreen extends Screen
             this.listWidget.updateDimensions(rectangle);
             super.doLayout(rectangle);
         }
+    }
+
+    public static void handleClickEvent(ClickEvent event, Minecraft minecraft, Screen screen)
+    {
+        defaultHandleClickEvent(event, minecraft, screen);
     }
 }

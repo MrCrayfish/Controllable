@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.client.binding.context;
 
 import com.mrcrayfish.controllable.client.binding.context.rule.ContextRule;
 import com.mrcrayfish.controllable.util.Utils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Set;
 
@@ -15,7 +15,7 @@ public class GlobalContext extends BindingContext
 {
     public static final GlobalContext INSTANCE = new GlobalContext(Utils.resource("global"));
 
-    protected GlobalContext(ResourceLocation id)
+    protected GlobalContext(Identifier id)
     {
         super(id);
     }

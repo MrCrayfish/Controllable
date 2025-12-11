@@ -4,11 +4,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -30,7 +30,7 @@ public class ClientEvents
 {
     private static final int CONSOLE_HOTBAR_OFFSET = 25;
 
-    private static final Set<ResourceLocation> OFFSET_LAYERS = Util.make(new HashSet<>(), set -> {
+    private static final Set<Identifier> OFFSET_LAYERS = Util.make(new HashSet<>(), set -> {
         set.add(VanillaGuiLayers.HOTBAR);
         set.add(VanillaGuiLayers.CONTEXTUAL_INFO_BAR);
         set.add(VanillaGuiLayers.CONTEXTUAL_INFO_BAR_BACKGROUND);

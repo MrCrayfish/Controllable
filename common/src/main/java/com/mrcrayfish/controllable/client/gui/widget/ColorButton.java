@@ -62,9 +62,9 @@ public class ColorButton extends Button
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    public void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        super.renderWidget(graphics, mouseX, mouseY, partialTicks);
+        this.renderDefaultSprite(graphics);
         graphics.fill(this.getX() + 4, this.getY() + 4, this.getX() + 16, this.getY() + 16, 0xFF000000);
         graphics.fill(this.getX() + 5, this.getY() + 5, this.getX() + 15, this.getY() + 15, COLORS[this.index].getColor() + 0xFF000000);
     }

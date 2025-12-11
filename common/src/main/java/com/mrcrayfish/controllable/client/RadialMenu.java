@@ -24,10 +24,9 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.ARGB;
@@ -50,7 +49,7 @@ import java.util.*;
  */
 public class RadialMenu
 {
-    private static final ResourceLocation TEXTURE = Utils.resource("textures/gui/controller.png");
+    private static final Identifier TEXTURE = Utils.resource("textures/gui/controller.png");
     private static final int ANIMATE_DURATION = 5;
     private static RadialMenu instance;
 

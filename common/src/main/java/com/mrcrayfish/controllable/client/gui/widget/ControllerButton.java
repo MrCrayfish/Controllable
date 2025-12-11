@@ -7,9 +7,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ControllerButton extends Button
 {
-    private static final ResourceLocation TEXTURE = Utils.resource("textures/gui/controller.png");
+    private static final Identifier TEXTURE = Utils.resource("textures/gui/controller.png");
     private final AbstractWidget widget;
 
     public ControllerButton(AbstractWidget widget, OnPress onPress)
@@ -27,11 +26,11 @@ public class ControllerButton extends Button
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    public void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
         this.setX(this.widget.getRight() + 4);
         this.setY(this.widget.getY());
-        super.renderWidget(graphics, mouseX, mouseY, partialTicks);
+        this.renderDefaultSprite(graphics);
         boolean mouseOver = ScreenHelper.isMouseWithin(mouseX, mouseY, this.getX(), this.getY(), this.width, this.height);
         int textureV = 43;
         if(mouseOver)

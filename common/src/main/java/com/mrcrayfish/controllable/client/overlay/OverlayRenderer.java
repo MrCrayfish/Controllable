@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.client.overlay;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 

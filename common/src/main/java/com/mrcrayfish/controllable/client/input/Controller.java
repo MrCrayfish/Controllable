@@ -5,8 +5,8 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.client.util.InputHelper;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.Util;
 
 /**
  * Author: MrCrayfish

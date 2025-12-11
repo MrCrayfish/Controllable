@@ -8,16 +8,15 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Author: MrCrayfish
  */
 public class ConnectionToast implements Toast
 {
-    private static final ResourceLocation BACKGROUND_SPRITE = Utils.resource("toast/connection");
+    private static final Identifier BACKGROUND_SPRITE = Utils.resource("toast/connection");
     private static final Component LABEL_CONNECTED = Component.translatable("controllable.toast.connected").withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.BOLD);
     private static final Component LABEL_DISCONNECTED = Component.translatable("controllable.toast.disconnected").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD);
 

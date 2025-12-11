@@ -18,7 +18,7 @@ import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.Collections;

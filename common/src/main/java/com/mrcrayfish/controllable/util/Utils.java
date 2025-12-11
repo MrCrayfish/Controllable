@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.util;
 
 import com.mrcrayfish.controllable.Constants;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.nio.file.Path;
 
@@ -10,9 +10,9 @@ import java.nio.file.Path;
  */
 public class Utils
 {
-    public static ResourceLocation resource(String name)
+    public static Identifier resource(String name)
     {
-        return ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, name);
+        return Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
     }
 
     public static Path getGamePath()

@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.mixin.client;
 
-import net.minecraft.client.gui.components.StateSwitchingButton;
+import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookPage;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookTabButton;
@@ -17,7 +17,7 @@ import java.util.List;
 public interface RecipeBookComponentAccessor
 {
     @Accessor("filterButton")
-    StateSwitchingButton controllableGetFilterButton();
+    CycleButton<Boolean> controllableGetFilterButton();
 
     @Accessor("tabButtons")
     List<RecipeBookTabButton> controllableGetRecipeTabs();

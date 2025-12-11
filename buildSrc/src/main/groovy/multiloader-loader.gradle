@@ -16,6 +16,10 @@ dependencies {
         capabilities {
             requireCapability "$group:$mod_id"
         }
+        def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+        attributes {
+            attribute(loaderAttribute, 'common')
+        }
     }
     commonJava project(path: ':common', configuration: 'commonJava')
     commonResources project(path: ':common', configuration: 'commonResources')

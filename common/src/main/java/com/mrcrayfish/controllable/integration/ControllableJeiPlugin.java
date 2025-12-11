@@ -5,35 +5,41 @@ import com.mrcrayfish.controllable.util.Utils;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.runtime.IJeiRuntime;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Author: MrCrayfish
  */
-@JeiPlugin
-public class ControllableJeiPlugin implements IModPlugin
+//@JeiPlugin
+public class ControllableJeiPlugin// implements IModPlugin
 {
-    private static final ResourceLocation ID = Utils.resource("jei_plugin");
+    private static final Identifier ID = Utils.resource("jei_plugin");
 
     private static IJeiRuntime runtime;
 
-    @Override
-    public ResourceLocation getPluginUid()
+    /*@Override
+    public Identifier getPluginUid()
     {
         return ID;
-    }
+    }*/
 
-    @Override
+    /*@Override
+    public net.minecraft.resources.ResourceLocation getPluginUid()
+    {
+        return ID;
+    }*/
+
+    /*@Override
     public void onRuntimeAvailable(IJeiRuntime runtime)
     {
         ControllableJeiPlugin.runtime = runtime;
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void onRuntimeUnavailable()
     {
         ControllableJeiPlugin.runtime = null;
-    }
+    }*/
 
     public static IJeiRuntime getRuntime()
     {

@@ -5,10 +5,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,8 +21,8 @@ import java.util.function.Function;
  */
 public class ConfirmationScreen extends Screen
 {
-    private static final ResourceLocation MENU_LIST_BACKGROUND = ResourceLocation.withDefaultNamespace("textures/gui/menu_list_background.png");
-    private static final ResourceLocation IN_GAME_MENU_LIST_BACKGROUND = ResourceLocation.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
+    private static final Identifier MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_list_background.png");
+    private static final Identifier IN_GAME_MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
     private static final int FADE_LENGTH = 4;
     private static final int BRIGHTNESS = 32;
     private static final int MESSAGE_PADDING = 10;
@@ -119,9 +118,9 @@ public class ConfirmationScreen extends Screen
     public void drawListBackground(GuiGraphics graphics, int startX, int endX, int startY, int endY)
     {
         boolean inGame = Minecraft.getInstance().level != null;
-        ResourceLocation backgroundTexture = !inGame ? MENU_LIST_BACKGROUND : IN_GAME_MENU_LIST_BACKGROUND;
-        ResourceLocation headerTexture = !inGame ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR;
-        ResourceLocation footerTexture = !inGame ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR;
+        Identifier backgroundTexture = !inGame ? MENU_LIST_BACKGROUND : IN_GAME_MENU_LIST_BACKGROUND;
+        Identifier headerTexture = !inGame ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR;
+        Identifier footerTexture = !inGame ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR;
         graphics.blit(RenderPipelines.GUI_TEXTURED, backgroundTexture, startX, startY, (float) endX, (float) endY, endX - startX, endY - startY, 32, 32);
         graphics.blit(RenderPipelines.GUI_TEXTURED, headerTexture, startX, startY - 2, 0, 0, endX - startX, 2, 32, 2);
         graphics.blit(RenderPipelines.GUI_TEXTURED, footerTexture, startX, endY, 0, 0, endX - startX, 2, 32, 2);

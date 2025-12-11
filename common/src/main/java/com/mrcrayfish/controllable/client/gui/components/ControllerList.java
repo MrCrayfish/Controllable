@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.gui.components;
 
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.Icons;
+import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.controllable.client.input.MultiController;
@@ -17,7 +18,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
  */
 public class ControllerList extends TabSelectionList<ControllerList.ControllerEntry>
 {
-    private static final ResourceLocation CHECKMARK = ResourceLocation.withDefaultNamespace("container/beacon/confirm");
+    private static final Identifier CHECKMARK = Identifier.withDefaultNamespace("container/beacon/confirm");
 
     private final AdaptiveControllerManager manager;
     private final MutableComponent footerSubText;
@@ -105,7 +106,8 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             int footerSubWidth = font.width(this.footerSubText);
             if(ScreenHelper.isMouseWithin(this.getX() + (this.width + footerWidth) / 2 - footerSubWidth, this.getBottom() + 4, footerSubWidth, 14, (int) event.x(), (int) event.y()))
             {
-                Objects.requireNonNull(Minecraft.getInstance().screen).handleComponentClicked(this.footerSubText.getStyle());
+                ClickEvent e = this.footerSubText.getStyle().getClickEvent();
+                SettingsScreen.handleClickEvent(e, this.minecraft, this.minecraft.screen);
             }
         }
         return super.mouseClicked(event, doubleClick);

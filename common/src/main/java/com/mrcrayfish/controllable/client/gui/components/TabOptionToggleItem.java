@@ -55,7 +55,6 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
         this.getter = getter;
         this.toggle = CycleButton.onOffBuilder(getter.get())
                 .withTooltip(value -> tooltip)
-                .withInitialValue(getter.get())
                 .displayOnlyValue()
                 .create(0, 0, 100, 20, CommonComponents.EMPTY, (button, value) -> {
                     setter.accept(value);

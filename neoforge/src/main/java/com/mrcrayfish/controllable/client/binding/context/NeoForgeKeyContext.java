@@ -4,7 +4,7 @@ import com.mrcrayfish.controllable.client.binding.context.rule.ContextRule;
 import com.mrcrayfish.controllable.client.binding.context.rule.HasPlayerRule;
 import com.mrcrayfish.controllable.client.binding.context.rule.HasScreenRule;
 import com.mrcrayfish.controllable.client.binding.context.rule.NoScreenRule;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 
@@ -36,21 +36,21 @@ public class NeoForgeKeyContext extends BindingContext
         return 0;
     }
 
-    private static ResourceLocation generateId(IKeyConflictContext context)
+    private static Identifier generateId(IKeyConflictContext context)
     {
         if(context == KeyConflictContext.UNIVERSAL)
         {
-            return ResourceLocation.fromNamespaceAndPath("neoforge", "universal");
+            return Identifier.fromNamespaceAndPath("neoforge", "universal");
         }
         if(context == KeyConflictContext.GUI)
         {
-            return ResourceLocation.fromNamespaceAndPath("neoforge", "gui");
+            return Identifier.fromNamespaceAndPath("neoforge", "gui");
         }
         if(context == KeyConflictContext.IN_GAME)
         {
-            return ResourceLocation.fromNamespaceAndPath("neoforge", "in_game");
+            return Identifier.fromNamespaceAndPath("neoforge", "in_game");
         }
-        return ResourceLocation.fromNamespaceAndPath("neoforge", UUID.randomUUID().toString());
+        return Identifier.fromNamespaceAndPath("neoforge", UUID.randomUUID().toString());
     }
 
     private static Set<ContextRule> generateRules(IKeyConflictContext context)

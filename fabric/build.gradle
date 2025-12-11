@@ -1,4 +1,5 @@
 import net.fabricmc.loom.task.RemapJarTask
+import org.apache.commons.io.FilenameUtils
 
 plugins {
     id 'multiloader-loader'
@@ -59,10 +60,62 @@ remapJar {
     addNestedDependencies = false
 }
 
-task releaseJar(type: RemapJarTask) {
+tasks.register('releaseJar', RemapJarTask) {
     dependsOn tasks.jar
     input = tasks.jar.archiveFile
     addNestedDependencies = true
     archiveClassifier = 'release'
 }
 build.finalizedBy(releaseJar)
+
+tasks.register("signJar") {
+    dependsOn remapJar
+    onlyIf {
+        findProperty('keyStore') || System.getenv("KEYSTORE")
+    }
+    doLast {
+        def unsignedJar = tasks.remapJar.archiveFile.get().asFile
+        def name = FilenameUtils.removeExtension(unsignedJar.getName())
+        def signedJar  = layout.buildDirectory.file("libs/%s-signed.jar".formatted(name)).get().asFile
+        def signingKeyAlias = findProperty('keyStoreAlias') ?: System.getenv("KEYSTORE_ALIAS")
+        def signingKeystore = findProperty('keyStore') ?: System.getenv("KEYSTORE")
+        def signingPassword = findProperty('keyStorePass') ?: System.getenv("KEYSTORE_PASS")
+        ant.signjar(
+            jar: unsignedJar,
+            signedJar: signedJar,
+            alias: signingKeyAlias,
+            keyStore: signingKeystore,
+            storePass: signingPassword,
+            storetype: 'jks'
+        )
+        println "Signed jar created at: $signedJar"
+    }
+}
+
+build.dependsOn signJar
+
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements', 'includeInternal', 'modCompileClasspath'].each { variant ->
+    configurations.named("$variant") {
+        attributes {
+            attribute(loaderAttribute, 'fabric')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant->
+        configurations.named("$variant") {
+            attributes {
+                attribute(loaderAttribute, 'fabric')
+            }
+        }
+    }
+}
+loom.remapConfigurations.configureEach {
+    configurations.named(it.name) {
+        attributes {
+            attribute(loaderAttribute, 'fabric')
+        }
+    }
+}

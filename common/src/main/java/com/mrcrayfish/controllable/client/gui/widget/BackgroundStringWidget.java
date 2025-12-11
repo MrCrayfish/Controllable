@@ -1,15 +1,17 @@
 package com.mrcrayfish.controllable.client.gui.widget;
 
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractStringWidget;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.network.chat.Component;
 
 /**
  * Author: MrCrayfish
  */
-public class BackgroundStringWidget extends AbstractStringWidget
+public class BackgroundStringWidget extends StringWidget
 {
     public BackgroundStringWidget(Component message, Font font)
     {
@@ -25,6 +27,6 @@ public class BackgroundStringWidget extends AbstractStringWidget
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
         ScreenHelper.drawRoundedBox(graphics, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 0x55000000);
-        graphics.drawString(this.getFont(), this.getMessage().getVisualOrderText(), this.getX() + 2, this.getY() + 2, this.getColor());
+        graphics.drawString(this.getFont(), this.getMessage().getVisualOrderText(), this.getX() + 2, this.getY() + 2, 0xFFFFFFFF);
     }
 }

@@ -4,7 +4,7 @@ import com.mrcrayfish.controllable.client.binding.context.rule.ContextRule;
 import com.mrcrayfish.controllable.client.binding.context.rule.HasPlayerRule;
 import com.mrcrayfish.controllable.client.binding.context.rule.HasScreenRule;
 import com.mrcrayfish.controllable.util.Utils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Set;
 
@@ -15,7 +15,7 @@ public class InGameWithScreenContext extends InScreenContext
 {
     public static final InGameWithScreenContext INSTANCE = new InGameWithScreenContext(Utils.resource("in_game_with_screen"));
 
-    protected InGameWithScreenContext(ResourceLocation id)
+    protected InGameWithScreenContext(Identifier id)
     {
         super(id);
     }
