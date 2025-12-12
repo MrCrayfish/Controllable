@@ -18,7 +18,10 @@ configurations {
 }
 
 neoForge {
-    version = neoforge_version
+    enable {
+        version = neoforge_version
+        disableRecompilation = System.getenv("CI") == "true"
+    }
 
     def at = file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
