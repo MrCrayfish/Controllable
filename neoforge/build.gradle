@@ -75,13 +75,6 @@ dependencies {
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
-tasks.jar.configure {
-    from(rootProject.file("LICENSE_LibSDL4J"))
-    from(rootProject.file("LICENSE")) {
-        rename { "${it}_${mod_name}" }
-    }
-}
-
 tasks.register("signJar") {
     dependsOn jar
     onlyIf {
