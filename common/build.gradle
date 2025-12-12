@@ -21,7 +21,7 @@ dependencies {
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-gui:${jei_version}"
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-lib:${jei_version}"
     compileOnly "com.mrcrayfish:controllable-sdl:${controllable_sdl_version}"
-    compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
+    //compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
     compileOnly "org.spongepowered:mixin:0.8.7"
     compileOnly "io.github.llamalad7:mixinextras-common:0.5.0"

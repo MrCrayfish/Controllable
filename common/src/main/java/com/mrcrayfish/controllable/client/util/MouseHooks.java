@@ -59,10 +59,10 @@ public class MouseHooks
             double screenCursorY = getScreenMouseY();
             if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
             {
-                if(EmiSupport.invokeMouseClick(button, screenCursorX, screenCursorY))
+                /*if(EmiSupport.invokeMouseClick(button, screenCursorX, screenCursorY))
                 {
                     return;
-                }
+                }*/
             }
             invokeMouseClick(screen, button, screenCursorX, screenCursorY);
         }
@@ -110,10 +110,10 @@ public class MouseHooks
             double screenCursorY = getScreenMouseY();
             if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
             {
-                if(EmiSupport.invokeMouseReleased(button, screenCursorX, screenCursorY))
+                /*if(EmiSupport.invokeMouseReleased(button, screenCursorX, screenCursorY))
                 {
                     return;
-                }
+                }*/
             }
             invokeMouseReleased(screen, button, screenCursorX, screenCursorY);
         }
@@ -156,10 +156,10 @@ public class MouseHooks
                 {
                     if(Controllable.isEmiLoaded())
                     {
-                        if(EmiSupport.invokeMouseDragged(activeMouseButton, screenCursorX, screenCursorY, deltaX, deltaY))
+                        /*if(EmiSupport.invokeMouseDragged(activeMouseButton, screenCursorX, screenCursorY, deltaX, deltaY))
                         {
                             return;
-                        }
+                        }*/
                     }
                 }
                 ClientServices.CLIENT.sendMouseDrag(screen, deltaX, deltaY, screenCursorX, screenCursorY, activeMouseButton);

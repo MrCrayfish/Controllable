@@ -60,7 +60,7 @@ dependencies {
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-neoforge:${jei_version}"
 
     // EMI
-    compileOnly "dev.emi:emi-neoforge:${emi_version}"
+    //compileOnly "dev.emi:emi-neoforge:${emi_version}"
 
     // Roughly Enough Items
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"

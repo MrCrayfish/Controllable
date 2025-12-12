@@ -14,7 +14,7 @@ dependencies {
     modImplementation "com.mrcrayfish:framework-fabric:${minecraft_version}-${framework_version}"
     modCompileOnly ("dev.architectury:architectury-fabric:${architectury_api_version}") transitive false
     modCompileOnly ("mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}") transitive false
-    modCompileOnly ("dev.emi:emi-fabric:${emi_version}") transitive false
+    //modCompileOnly ("dev.emi:emi-fabric:${emi_version}") transitive false
     modCompileOnly ("me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}") transitive false
     modCompileOnly ("me.shedaniel.cloth:cloth-config-fabric:18.0.145")
     //modRuntimeOnly "squeek.appleskin:appleskin-fabric:mc1.21.3-3.0.6"

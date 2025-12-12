@@ -645,7 +645,7 @@ public class InputHandler
 
         if(Controllable.isEmiLoaded() && ClientHelper.isPlayingGame())
         {
-            points.addAll(EmiSupport.getNavigationPoints(screen));
+            //points.addAll(EmiSupport.getNavigationPoints(screen));
         }
 
         if(Controllable.isReiLoaded() && ClientHelper.isPlayingGame())

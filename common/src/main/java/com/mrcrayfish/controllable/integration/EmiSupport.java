@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class EmiSupport
 {
-    private static final Field widgetGroupsField = getField(RecipeScreen.class, "currentPage");
+    /*private static final Field widgetGroupsField = getField(RecipeScreen.class, "currentPage");
     private static final Field panelsField = getField(EmiScreenManager.class, "panels");
     private static final Field recipeTabsField = getField(RecipeScreen.class, "tabs");
     private static final Field tabField = getField(RecipeScreen.class, "tab");
@@ -219,5 +219,5 @@ public class EmiSupport
         {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 }
