@@ -57,19 +57,11 @@ loom {
 }
 
 remapJar {
-    addNestedDependencies = false
-}
-
-tasks.register('releaseJar', RemapJarTask) {
-    dependsOn tasks.jar
-    input = tasks.jar.archiveFile
     addNestedDependencies = true
-    archiveClassifier = 'release'
 }
-build.finalizedBy(releaseJar)
 
 tasks.register("signJar") {
-    dependsOn remapJar
+    dependsOn tasks.remapJar
     onlyIf {
         findProperty('keyStore') || System.getenv("KEYSTORE")
     }
@@ -91,8 +83,7 @@ tasks.register("signJar") {
         println "Signed jar created at: $signedJar"
     }
 }
-
-build.dependsOn signJar
+build.finalizedBy(signJar)
 
 // Implement mcgradleconventions loader attribute
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
