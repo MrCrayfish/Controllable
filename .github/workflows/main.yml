@@ -21,29 +21,37 @@ jobs:
           distribution: 'temurin'
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v3.5.0
-      - name: Read modid from gradle.properties
-        id: mod_id
-        uses: Reedyuk/read-properties@v1.0.4
+      - name: Read mod data from gradle.properties
+        id: mod_data
+        uses: christian-draeger/read-properties@1.1.1
         with:
           path: './gradle.properties'
-          property: 'mod_id'
-      - name: Read mod version from gradle.properties
-        id: mod_version
-        uses: Reedyuk/read-properties@v1.0.4
-        with:
-          path: './gradle.properties'
-          property: 'mod_version'
-      - name: Read minecraft version from gradle.properties
-        id: mc_version
-        uses: Reedyuk/read-properties@v1.0.4
-        with:
-          path: './gradle.properties'
-          property: 'minecraft_version'
+          properties: 'mod_id mod_version minecraft_version'
+      - name: Validate tag format
+        run: |
+          tag=${{ github.ref_name }}
+          expected_mc_version=${{ steps.mod_data.outputs.minecraft_version }}
+          expected_mod_version=${{ steps.mod_data.outputs.mod_version }}
+          mc_version=$(echo "${tag:1}" | cut -d '-' -f 1)
+          mod_version=$(echo "${tag:1}" | cut -d '-' -f 2)
+          if [[ "${tag:0:1}" != "v" ]]; then
+            echo "Tag must start with v"
+            exit 1
+          elif [[ "$mc_version" != "$expected_mc_version" ]]; then
+            echo "The minecraft version in the tag does not match the gradle property"
+            exit 1
+          elif [[ "$mod_version" != "$expected_mod_version" ]]; then
+            echo "The mod version in the tag does not match the gradle property"
+            exit 1
+          fi
+          echo "Tag validation sucessful!"
       - name: Cache
         uses: actions/cache@v4.2.0
         with:
           path: ~/.gradle/caches
-          key: gradle-minecraft-${{ steps.mc_version.outputs.value }}
+          key: gradle-minecraft-${{ steps.mod_data.outputs.minecraft_version }}
+          restore-keys: |
+            gradle-minecraft-${{ steps.mod_data.outputs.minecraft_version }}
       - name: Load Keystore
         id: load_keystore
         env:
@@ -92,8 +100,8 @@ jobs:
       - name: Construct artifact files
         id: artifacts
         run: |
-          echo "neoforge=neoforge/build/libs/${{ steps.mod_id.outputs.value }}-neoforge-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}-signed.jar" >> "$GITHUB_OUTPUT"
-          echo "fabric=fabric/build/libs/${{ steps.mod_id.outputs.value }}-fabric-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}-signed.jar" >> "$GITHUB_OUTPUT"
+          echo "fabric=fabric/build/libs/${{ steps.mod_data.outputs.mod_id }}-fabric-${{ steps.mod_data.outputs.minecraft_version }}-${{ steps.mod_data.outputs.mod_version }}-signed.jar" >> "$GITHUB_OUTPUT"
+          echo "neoforge=neoforge/build/libs/${{ steps.mod_data.outputs.mod_id }}-neoforge-${{ steps.mod_data.outputs.minecraft_version }}-${{ steps.mod_data.outputs.mod_version }}-signed.jar" >> "$GITHUB_OUTPUT"
       - name: Import GPG
         env:
           SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
@@ -112,19 +120,25 @@ jobs:
           gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.fabric }}
       - name: Create Changelog Files
         run: |
+          echo "" > CHANGELOG.txt
           echo "### Technical Changelog:" >> RELEASE_BODY.md
-          latest_tag=$(git describe --tags --abbrev=0)
-          previous_tag=$(git describe --tags --abbrev=0 --exclude=$latest_tag)
-          git log "$previous_tag..$latest_tag^" --oneline --pretty="- %s (%H)" >> RELEASE_BODY.md
+          tag_count=$(git tag --merged | wc -l)
+          if [ "$tag_count" -ge 2 ]; then
+            latest_tag=$(git describe --tags --abbrev=0)
+            previous_tag=$(git describe --tags --abbrev=0 --exclude=$latest_tag)
+            git log "$previous_tag..$latest_tag^" --oneline --pretty="- %s (%H)" >> RELEASE_BODY.md
+            git log "$previous_tag..$latest_tag^" --oneline --pretty="%s" >> CHANGELOG.txt
+          else
+            echo "No changes"
+          fi
           echo "### Download:" >> RELEASE_BODY.md
-          echo "- Official Website: https://mrcrayfish.com/mods/${{ steps.mod_id.outputs.value }}" >> RELEASE_BODY.md
+          echo "- Official Website: https://mrcrayfish.com/mods/${{ steps.mod_data.outputs.mod_id }}" >> RELEASE_BODY.md
           echo "- CurseForge: https://curseforge.com/minecraft/mc-mods/controllable" >> RELEASE_BODY.md
-          git log "$previous_tag..$latest_tag^" --oneline --pretty="%s" > CHANGELOG.txt
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          name: '${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
-          artifacts: "${{ steps.artifacts.outputs.neoforge }},${{ steps.artifacts.outputs.neoforge }}.asc,${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.fabric }}.asc,CHANGELOG.txt"
+          name: '${{ steps.mod_data.outputs.mod_version }}+${{ steps.mod_data.outputs.minecraft_version }}'
+          artifacts: "${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.fabric }}.asc,${{ steps.artifacts.outputs.neoforge }},${{ steps.artifacts.outputs.neoforge }}.asc,CHANGELOG.txt"
           bodyFile: "RELEASE_BODY.md"
       - name: Prepare Artifacts
         run: |
@@ -136,7 +150,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: '${{ steps.mod_id.outputs.value }}-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
+          name: '${{ steps.mod_data.outputs.mod_id }}-${{ steps.mod_data.outputs.minecraft_version }}-${{ steps.mod_data.outputs.mod_version }}'
           path: artifacts
       - name: Delete tag on fail
         if: failure()
