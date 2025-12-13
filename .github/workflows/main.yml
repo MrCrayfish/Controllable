@@ -136,7 +136,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: '${{ steps.mod_data.outputs.mod_id }}-${{ steps.mod_data.outputs.minecraft_version }}-${{ steps.mod_data.outputs.mod_version }}'
+          name: '${{ steps.mod_id.outputs.value }}-${{ steps.mc_version.outputs.value }}-${{ steps.mod_version.outputs.value }}'
           path: artifacts
       - name: Delete tag on fail
         if: failure()
