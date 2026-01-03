@@ -19,7 +19,6 @@
     "client.RecipeBookPageAccessor",
     "client.RecipeBookPageMixin",
     "client.TimerAccessor",
-    "client.jei.GuiIconToggleButtonMixin",
     "client.jei.IngredientGridMixin",
     "client.jei.IngredientGridWithNavigationMixin",
     "client.jei.IngredientListOverlayMixin",
