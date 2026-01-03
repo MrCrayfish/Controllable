@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.mixin.client.jei;
 
-import mezz.jei.gui.elements.GuiIconToggleButton;
+import mezz.jei.gui.elements.IconButton;
 import mezz.jei.gui.overlay.IngredientGridWithNavigation;
 import mezz.jei.gui.overlay.IngredientListOverlay;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,5 +18,5 @@ public interface IngredientListOverlayMixin
     IngredientGridWithNavigation controllableGetContents();
 
     @Accessor(value = "configButton", remap = false)
-    GuiIconToggleButton controllableGetConfigButton();
+    IconButton controllableGetConfigButton();
 }

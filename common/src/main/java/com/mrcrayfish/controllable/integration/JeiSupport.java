@@ -2,16 +2,13 @@ package com.mrcrayfish.controllable.integration;
 
 import com.mrcrayfish.controllable.client.gui.navigation.BasicNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
-import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
-import com.mrcrayfish.controllable.mixin.client.jei.GuiIconToggleButtonMixin;
 import com.mrcrayfish.controllable.mixin.client.jei.IngredientGridMixin;
 import com.mrcrayfish.controllable.mixin.client.jei.IngredientGridWithNavigationMixin;
 import com.mrcrayfish.controllable.mixin.client.jei.IngredientListOverlayMixin;
 import com.mrcrayfish.controllable.mixin.client.jei.PageNavigationMixin;
 import mezz.jei.common.util.ImmutableRect2i;
 import mezz.jei.gui.PageNavigation;
-import mezz.jei.gui.elements.GuiIconButton;
-import mezz.jei.gui.elements.GuiIconToggleButton;
+import mezz.jei.gui.elements.IconButton;
 import mezz.jei.gui.overlay.IngredientGrid;
 import mezz.jei.gui.overlay.IngredientGridWithNavigation;
 import mezz.jei.gui.overlay.IngredientListRenderer;
@@ -45,14 +42,17 @@ public class JeiSupport
                 });
 
                 PageNavigation navigation = ((IngredientGridWithNavigationMixin) ingredientGridWithNavigation).controllableGetNavigation();
-                GuiIconButton backButton = ((PageNavigationMixin) navigation).controllableGetBackButton();
-                points.add(new WidgetNavigationPoint(backButton));
-                GuiIconButton nextButton = ((PageNavigationMixin) navigation).controllableGetNextButton();
-                points.add(new WidgetNavigationPoint(nextButton));
+                IconButton backButton = ((PageNavigationMixin) navigation).controllableGetBackButton();
+                ImmutableRect2i area1 = backButton.getArea();
+                points.add(new BasicNavigationPoint(area1.getX() + area1.getWidth() / 2.0, area1.getY() + area1.getHeight() / 2.0));
 
-                GuiIconToggleButton configToggleButton = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).controllableGetConfigButton();
-                GuiIconButton configButton = ((GuiIconToggleButtonMixin) configToggleButton).controllableGetButton();
-                points.add(new WidgetNavigationPoint(nextButton));
+                IconButton nextButton = ((PageNavigationMixin) navigation).controllableGetNextButton();
+                ImmutableRect2i area2 = nextButton.getArea();
+                points.add(new BasicNavigationPoint(area2.getX() + area2.getWidth() / 2.0, area2.getY() + area2.getHeight() / 2.0));
+
+                IconButton configButton = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).controllableGetConfigButton();
+                ImmutableRect2i area3 = configButton.getArea();
+                points.add(new BasicNavigationPoint(area3.getX() + area3.getWidth() / 2.0, area3.getY() + area3.getHeight() / 2.0));
             }
         });
         return points;
