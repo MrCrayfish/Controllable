@@ -362,7 +362,7 @@ public class ButtonBindings
     }));
 
     public static final ButtonBinding DEBUG_INFO = new ButtonBinding(-1, "controllable.key.debug_info", "key.category.minecraft.misc", InGameContext.INSTANCE, OnPressHandler.create(context -> {
-        return Optional.of(() -> context.minecraft().getDebugOverlay().toggleFpsCharts()); // TODO test 1.21.9
+        return Optional.of(() -> context.minecraft().debugEntries.toggleDebugOverlay());
     }));
 
     public static final ButtonBinding RADIAL_MENU = new ButtonBinding(Buttons.DPAD_RIGHT, "controllable.key.radial_menu", "key.category.minecraft.gameplay", InGameContext.INSTANCE, OnPressHandler.create(context -> {
