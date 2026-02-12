@@ -23,7 +23,7 @@ public class ButtonBindingButton extends Button
 
     public ButtonBindingButton(int x, int y, ButtonBinding binding, ButtonOnPress onPress)
     {
-        super(x, y, 40, 20, CommonComponents.EMPTY, btn -> {}, DEFAULT_NARRATION);
+        super(x, y, 65, 20, CommonComponents.EMPTY, btn -> {}, DEFAULT_NARRATION);
         this.binding = binding;
         this.onPress = onPress;
     }
