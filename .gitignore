@@ -24,3 +24,5 @@ eclipse
 /neoforge/runs/
 /neoforge/run/
 /forge/
+neoforge/logs/latest.log
+common/src/main/java/com/mrcrayfish/controllable/mixin/client/MinecraftMixin.java
