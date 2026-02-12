@@ -16,11 +16,11 @@ neoForge {
 }
 
 dependencies {
-    compileOnly "com.mrcrayfish:framework-common:${minecraft_version}-${framework_version}"
+    compileOnly files('libs/framework-common-1.21.1-0.13.11.jar')
     compileOnly "mezz.jei:jei-${minecraft_version}-common:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-gui:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-lib:${jei_version}"
-    compileOnly "com.mrcrayfish:controllable-sdl:${controllable_sdl_version}"
+    compileOnly files('libs/controllable-sdl-2.32.10-1.1.0.jar')
     compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.7'

@@ -12,12 +12,6 @@ if (at.exists()) {
 
 jarJar.enable()
 
-/*mixin {
-    add sourceSets.main, "controllable.refmap.json"
-    config 'controllable.common.mixins.json'
-    config 'controllable.neoforge.mixins.json'
-}*/
-
 sourceSets {
     test {
         compileClasspath += project(':common').sourceSets.main.output
@@ -33,9 +27,6 @@ configurations {
 runs {
     configureEach {
         modSource project.sourceSets.main
-        dependencies {
-            runtime project.configurations.library
-        }
     }
     client {
         systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
@@ -60,48 +51,55 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 dependencies {
     // Core dependencies
     implementation "net.neoforged:neoforge:${neoforge_version}"
-    implementation "com.mrcrayfish:framework-neoforge:${minecraft_version}-${framework_version}"
+    implementation files('libs/framework-neoforge-1.21.1-0.13.11-signed.jar')
 
-    // JEI
+    // JEI, EMI, REI...
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
-
-    // EMI
     compileOnly "dev.emi:emi-neoforge:${emi_version}"
-
-    // Roughly Enough Items
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
 
-    // Controllable SDL (https://github.com/MrCrayfish/ControllableSDL)
-    library jarJar("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
-        transitive(false)
-    }
-
+    // Controllable SDL
+    implementation files('libs/controllable-sdl-2.32.10-1.1.0.jar')
+    jarJar(files('libs/controllable-sdl-2.32.10-1.1.0.jar'))
 
     testImplementation "org.junit.jupiter:junit-jupiter:5.7.2"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
-tasks.jarJar.configure {
+// Custom task to manually bundle SDL into the jar
+tasks.register('bundleSDL', Jar) {
+    dependsOn jar
     archiveClassifier = 'release'
+    from zipTree(jar.archiveFile)
+    from(zipTree('libs/controllable-sdl-2.32.10-1.1.0.jar'))
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    
     from(rootProject.file("LICENSE_LibSDL4J"))
     from(rootProject.file("LICENSE")) {
         rename { "${it}_${mod_name}" }
     }
+    
+    manifest {
+        from jar.manifest
+    }
 }
 
+build.dependsOn bundleSDL
+
 tasks.register('signJar', PotentiallySignJar) {
-    dependsOn jar
+    dependsOn bundleSDL
     onlyIf {
         hasProperty('keyStore') || System.getenv("KEYSTORE")
     }
     keyStore = findProperty('keyStore') ?: System.getenv("KEYSTORE")
     alias = findProperty('keyStoreAlias') ?: System.getenv("KEYSTORE_ALIAS")
     storePass = findProperty('keyStorePass') ?: System.getenv("KEYSTORE_PASS")
-    input = jar.archiveFile
+    input = bundleSDL.archiveFile
 }
 
-jar.finalizedBy 'signJar'
+jar.finalizedBy bundleSDL
+bundleSDL.finalizedBy 'signJar'
 
 idea {
     module {

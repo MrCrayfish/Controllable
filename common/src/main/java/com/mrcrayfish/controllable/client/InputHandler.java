@@ -140,6 +140,23 @@ public class InputHandler
         {
             for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
             {
+                // For multi-button bindings, check if all required buttons are pressed
+                if(binding.isMultiButton())
+                {
+                    boolean allPressed = true;
+                    for(int requiredButton : binding.getButtons())
+                    {
+                        if(!controller.getTrackedButtonStates().getState(requiredButton))
+                        {
+                            allPressed = false;
+                            break;
+                        }
+                    }
+                    
+                    if(!allPressed)
+                        continue;
+                }
+                
                 if(this.handleBindingPressed(controller, binding, false))
                     break;
             }

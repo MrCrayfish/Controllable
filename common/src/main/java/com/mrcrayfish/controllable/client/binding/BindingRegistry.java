@@ -8,6 +8,8 @@ import com.google.common.collect.TreeMultimap;
 import com.google.common.io.MoreFiles;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mrcrayfish.controllable.Constants;
@@ -30,6 +32,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
 /**
@@ -159,7 +163,11 @@ public class BindingRegistry
             this.bindings.add(binding);
             if(!binding.isUnbound())
             {
-                this.idToButtonList.put(binding.getButton(), binding);
+                // For multi-button bindings, register all buttons
+                for(int button : binding.getButtons())
+                {
+                    this.idToButtonList.put(button, binding);
+                }
             }
         }
     }
@@ -171,7 +179,11 @@ public class BindingRegistry
             this.bindings.add(binding);
             if(!binding.isUnbound())
             {
-                this.idToButtonList.put(binding.getButton(), binding);
+                // For multi-button bindings, register all buttons
+                for(int button : binding.getButtons())
+                {
+                    this.idToButtonList.put(button, binding);
+                }
             }
             this.save();
         }
@@ -192,7 +204,11 @@ public class BindingRegistry
         Controllable.getInputHandler().clearActiveHandlers();
         this.idToButtonList.clear();
         this.bindings.stream().filter(binding -> !binding.isUnbound()).forEach(binding -> {
-            this.idToButtonList.put(binding.getButton(), binding);
+            // For multi-button bindings, add to cache for each button
+            for(int button : binding.getButtons())
+            {
+                this.idToButtonList.put(button, binding);
+            }
         });
     }
 
@@ -211,9 +227,32 @@ public class BindingRegistry
                     this.registeredBindings.values().stream().filter(ButtonBinding::isNotReserved).forEach(binding ->
                     {
                         String description = binding.getDescription();
-                        if(adapters.get(description) instanceof JsonPrimitive value && value.isString())
+                        JsonElement element = adapters.get(description);
+                        
+                        if(element instanceof JsonPrimitive value && value.isString())
                         {
+                            // Single button binding (backward compatible)
                             ButtonBinding.setButton(binding, Buttons.getButtonFromName(value.getAsString()));
+                        }
+                        else if(element instanceof JsonArray array)
+                        {
+                            // Multi-button binding
+                            Set<Integer> buttons = new TreeSet<>();
+                            for(JsonElement buttonElement : array)
+                            {
+                                if(buttonElement instanceof JsonPrimitive buttonValue && buttonValue.isString())
+                                {
+                                    int button = Buttons.getButtonFromName(buttonValue.getAsString());
+                                    if(button >= 0)
+                                    {
+                                        buttons.add(button);
+                                    }
+                                }
+                            }
+                            if(!buttons.isEmpty())
+                            {
+                                ButtonBinding.setButtons(binding, buttons);
+                            }
                         }
                     });
                 }
@@ -281,8 +320,26 @@ public class BindingRegistry
                 .filter(ButtonBinding::isNotReserved)
                 .sorted(Comparator.comparing(ButtonBinding::getDescription))
                 .forEach(binding -> {
-                    String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
-                    bindings.addProperty(binding.getDescription(), name);
+                    if(binding.isMultiButton())
+                    {
+                        // Save as array for multi-button bindings
+                        JsonArray array = new JsonArray();
+                        for(int button : binding.getButtons())
+                        {
+                            String name = Buttons.getNameForButton(button);
+                            if(name != null)
+                            {
+                                array.add(name);
+                            }
+                        }
+                        bindings.add(binding.getDescription(), array);
+                    }
+                    else
+                    {
+                        // Save as string for single button bindings (backward compatible)
+                        String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
+                        bindings.addProperty(binding.getDescription(), name);
+                    }
                 });
             String json = GSON.toJson(bindings);
             Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("bindings.json");

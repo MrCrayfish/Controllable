@@ -5,20 +5,21 @@ plugins {
     id 'fabric-loom' version '1.7-SNAPSHOT'
 }
 
+repositories {
+    maven { url 'https://maven.mrcrayfish.com/' }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    modImplementation "com.mrcrayfish:framework-fabric:${minecraft_version}-${framework_version}"
+    modImplementation files('libs/framework-fabric-1.21.1-0.13.11-signed.jar')
     modCompileOnly "dev.architectury:architectury-fabric:${architectury_api_version}"
     modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
     modCompileOnly "dev.emi:emi-fabric:${emi_version}"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
-    //modRuntimeOnly "squeek.appleskin:appleskin-fabric:mc1.21.3-3.0.6"
-    library include("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
-        transitive(false)
-    }
+    library files('libs/controllable-sdl-2.32.10-1.1.0.jar')
     implementation "com.google.code.findbugs:jsr305:3.0.1"
 }
 
