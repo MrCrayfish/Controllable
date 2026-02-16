@@ -102,13 +102,6 @@ public class InputHandler
     private boolean initialized;
 
     @ApiStatus.Internal
-    public InputHandler()
-    {
-        Preconditions.checkState(instance == null, "Only one instance of InputHandler is allowed");
-        instance = this;
-    }
-
-    @ApiStatus.Internal
     public void registerEvents()
     {
         if(!this.initialized)
@@ -138,27 +131,31 @@ public class InputHandler
 
         if(state)
         {
+            // Collect all bindings for this button, both single and combo!
+            List<ButtonBinding> candidates = new ArrayList<>();
             for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
             {
-                // For multi-button bindings, check if all required buttons are pressed
-                if(binding.isMultiButton())
+                boolean allPressed = true;
+                for(int requiredButton : binding.getButtons())
                 {
-                    boolean allPressed = true;
-                    for(int requiredButton : binding.getButtons())
+                    // this covers both single and combos!
+                    if(!controller.getTrackedButtonStates().getState(requiredButton))
                     {
-                        if(!controller.getTrackedButtonStates().getState(requiredButton))
-                        {
-                            allPressed = false;
-                            break;
-                        }
+                        allPressed = false;
+                        break;
                     }
-                    
-                    if(!allPressed)
-                        continue;
                 }
-                
-                if(this.handleBindingPressed(controller, binding, false))
-                    break;
+                if(!allPressed)
+                    continue;
+                candidates.add(binding);
+            }
+
+            // If any binding matched, fire most-specific (combo > single)
+            if(!candidates.isEmpty())
+            {
+                candidates.sort(Comparator.comparingInt(ButtonBinding::getButtonCount).reversed());
+                ButtonBinding chosen = candidates.get(0);
+                this.handleBindingPressed(controller, chosen, false);
             }
         }
         else
@@ -166,7 +163,7 @@ public class InputHandler
             for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
             {
                 ButtonHandler handler = binding.getHandler();
-                if(!(handler instanceof BindingPressed))
+                if(!(handler instanceof com.mrcrayfish.controllable.client.binding.handlers.action.BindingPressed))
                     continue;
 
                 if(!binding.isButtonDown())
@@ -174,15 +171,17 @@ public class InputHandler
 
                 ButtonBinding.setButtonState(binding, false);
 
-                if(!(handler instanceof BindingReleased released))
+                if(!(handler instanceof com.mrcrayfish.controllable.client.binding.handlers.action.BindingReleased released))
                     continue;
 
-                // Cancel the handler if context is no longer valid
                 if(!binding.getContext().isActive())
                     continue;
 
-                Minecraft mc = Minecraft.getInstance();
-                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, false);
+                net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+                com.mrcrayfish.controllable.client.binding.handlers.action.context.Context context =
+                   new com.mrcrayfish.controllable.client.binding.handlers.action.context.Context(
+                      binding, controller, mc, mc.player, mc.level, mc.screen, false
+                   );
                 released.handleReleased(context);
                 return;
             }

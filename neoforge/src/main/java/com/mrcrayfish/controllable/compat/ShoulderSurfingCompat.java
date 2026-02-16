@@ -26,10 +26,16 @@ public class ShoulderSurfingCompat
                 {
                     // These are all static fields of type KeyMapping
                     KeyMapping keyMapping = (KeyMapping) inputHandler.getField(field).get(null);
-                    Controllable.getBindingRegistry().register(
-                        new KeyAdapterBinding(0, keyMapping)
-                    );
-                    System.out.println("[Controllable] Registered ShoulderSurfing key: " + field + " (" + keyMapping.getName() + ")");
+                    String descKey = keyMapping.getName() + ".custom";
+                    if (Controllable.getBindingRegistry().getKeyAdapters().get(descKey) == null)
+                    {
+                        Controllable.getBindingRegistry().addKeyAdapter(new KeyAdapterBinding(0, keyMapping));
+                        System.out.println("[Controllable][Compat] Registered ShoulderSurfing key: " + field + " (" + keyMapping.getName() + ")");
+                    }
+                    else
+                    {
+                        System.out.println("[Controllable][Compat] Skipped existing ShoulderSurfing key: " + field + " (" + keyMapping.getName() + ")");
+                    }
                 }
             }
             catch (Throwable t)

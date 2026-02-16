@@ -18,7 +18,6 @@ public class ControllableMod
     private static void onClientSetup(FMLClientSetupEvent event)
     {
         event.enqueueWork(ClientBootstrap::init);
-        ShoulderSurfingCompat.init();
     }
 
     @SubscribeEvent
@@ -28,6 +27,8 @@ public class ControllableMod
             Controllable.getBindingRegistry().completeSetup();
             Controllable.getControllerManager().completeSetup();
             Controllable.getCursor().resetToCenter();
+            // === ADD THIS LINE TO CALL COMPATIBILITY ===
+            com.mrcrayfish.controllable.compat.ShoulderSurfingCompat.init();
         });
     }
 }

@@ -16,19 +16,16 @@ import java.util.TreeSet;
 public class ButtonBinding implements Comparable<ButtonBinding>
 {
     private final int defaultButton;
-    private final Set<Integer> defaultButtons; // For multi-button bindings
+    private final Set<Integer> defaultButtons;
     private final String descriptionKey;
     private final String category;
     private final BindingContext context;
     private final boolean reserved;
     private final ButtonHandler handler;
-    private int button; // Primary button for backward compatibility
-    private Set<Integer> buttons; // Multi-button support
+    private int button;
+    private Set<Integer> buttons;
     private boolean pressed;
-    
-    /**
-     * Helper method to create a button set from a single button
-     */
+
     private static Set<Integer> createButtonSet(int button)
     {
         return button >= 0 ? new TreeSet<>(Collections.singleton(button)) : new TreeSet<>();
@@ -51,18 +48,17 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         this.reserved = reserved;
         this.handler = handler;
     }
-    
-    // Constructor for multi-button bindings
+
     public ButtonBinding(Set<Integer> buttons, String descriptionKey, String category, BindingContext context, ButtonHandler handler)
     {
         this(buttons, descriptionKey, category, context, false, handler);
     }
-    
+
     ButtonBinding(Set<Integer> buttons, String descriptionKey, String category, BindingContext context, boolean reserved, ButtonHandler handler)
     {
         this.buttons = new TreeSet<>(buttons);
         this.defaultButtons = new TreeSet<>(this.buttons);
-        this.button = this.buttons.isEmpty() ? -1 : this.buttons.iterator().next(); // Primary button is first
+        this.button = this.buttons.isEmpty() ? -1 : this.buttons.iterator().next();
         this.defaultButton = this.button;
         this.descriptionKey = descriptionKey;
         this.category = category;
@@ -71,83 +67,35 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         this.handler = handler;
     }
 
-    public int getButton()
-    {
-        return this.button;
-    }
-    
-    /**
-     * Returns all buttons required for this binding.
-     * For single button bindings, this returns a set with one element.
-     * For multi-button bindings, this returns all buttons in the combination.
-     */
-    public Set<Integer> getButtons()
-    {
-        return Collections.unmodifiableSet(this.buttons);
-    }
-    
-    /**
-     * Returns true if this binding requires multiple buttons to be pressed simultaneously
-     */
-    public boolean isMultiButton()
-    {
-        return this.buttons.size() > 1;
-    }
+    public int getButton() { return this.button; }
 
-    public String getLabelKey()
-    {
-        return this.descriptionKey;
-    }
+    public Set<Integer> getButtons() { return Collections.unmodifiableSet(this.buttons); }
 
-    public String getDescription()
-    {
-        return this.descriptionKey;
-    }
+    public boolean isMultiButton() { return this.buttons.size() > 1; }
 
-    public String getCategory()
-    {
-        return this.category;
-    }
+    public int getButtonCount() { return this.buttons.size(); }
 
-    public BindingContext getContext()
-    {
-        return this.context;
-    }
+    public String getLabelKey() { return this.descriptionKey; }
 
-    public boolean isDefault()
-    {
-        return this.buttons.equals(this.defaultButtons);
-    }
+    public String getDescription() { return this.descriptionKey; }
 
-    protected void setPressed(boolean pressed)
-    {
-        this.pressed = pressed;
-    }
+    public String getCategory() { return this.category; }
 
-    public boolean isNotReserved()
-    {
-        return !this.reserved;
-    }
+    public BindingContext getContext() { return this.context; }
 
-    public ButtonHandler getHandler()
-    {
-        return this.handler;
-    }
+    public boolean isDefault() { return this.buttons.equals(this.defaultButtons); }
 
-    public boolean isButtonDown()
-    {
-        return this.pressed;
-    }
+    protected void setPressed(boolean pressed) { this.pressed = pressed; }
 
-    public void resetPressedState()
-    {
-        this.pressed = false;
-    }
+    public boolean isNotReserved() { return !this.reserved; }
 
-    public boolean isUnbound()
-    {
-        return this.button == -1;
-    }
+    public ButtonHandler getHandler() { return this.handler; }
+
+    public boolean isButtonDown() { return this.pressed; }
+
+    public void resetPressedState() { this.pressed = false; }
+
+    public boolean isUnbound() { return this.button == -1; }
 
     @ApiStatus.Internal
     public void resetMappedButton()
@@ -162,7 +110,7 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         binding.button = button;
         binding.buttons = createButtonSet(button);
     }
-    
+
     @ApiStatus.Internal
     public static void setButtons(ButtonBinding binding, Set<Integer> buttons)
     {
@@ -176,9 +124,6 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         binding.setPressed(state);
     }
 
-    /**
-     * Resets all buttons states. Called when a GUI is opened.
-     */
     @ApiStatus.Internal
     public static void resetButtonStates()
     {
@@ -196,7 +141,6 @@ public class ButtonBinding implements Comparable<ButtonBinding>
 
     public boolean isConflictingContext()
     {
-        // For multi-button bindings, check all buttons involved
         for(int btn : this.buttons)
         {
             for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(btn))
@@ -210,18 +154,11 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         return false;
     }
 
-    /**
-     * Tests if the given binding conflicts with this binding
-     *
-     * @param binding the binding to test against
-     * @return true if the bindings conflict
-     */
     private boolean conflicts(ButtonBinding binding)
     {
         if(this == binding)
             return false;
-            
-        // Check if there's any overlap in buttons
+
         for(int btn : this.buttons)
         {
             if(binding.buttons.contains(btn) && this.context.conflicts(binding.context))
@@ -233,14 +170,8 @@ public class ButtonBinding implements Comparable<ButtonBinding>
     }
 
     @Override
-    public int hashCode()
-    {
-        return this.descriptionKey.hashCode();
-    }
+    public int hashCode() { return this.descriptionKey.hashCode(); }
 
     @Override
-    public boolean equals(Object obj)
-    {
-        return this == obj;
-    }
+    public boolean equals(Object obj) { return this == obj; }
 }
