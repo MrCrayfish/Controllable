@@ -1,6 +1,7 @@
 package com.mrcrayfish.controllable;
 
 import com.mrcrayfish.controllable.client.ClientBootstrap;
+import com.mrcrayfish.controllable.compat.ShoulderSurfingCompat;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -17,6 +18,7 @@ public class ControllableMod
     private static void onClientSetup(FMLClientSetupEvent event)
     {
         event.enqueueWork(ClientBootstrap::init);
+        ShoulderSurfingCompat.init();
     }
 
     @SubscribeEvent

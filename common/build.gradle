@@ -27,7 +27,6 @@ dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.7'
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.4.1'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.4.1'
-    modImplementation "net.neoforged:neoforge:21.1.217"
 }
 
 tasks.register('downloadMappings', Download) {
