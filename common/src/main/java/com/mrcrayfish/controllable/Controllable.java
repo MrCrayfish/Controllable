@@ -13,6 +13,7 @@ import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.glfw.GLFWControllerManager;
 import com.mrcrayfish.controllable.client.input.sdl2.SDL2ControllerManager;
+import com.mrcrayfish.controllable.compat.ShoulderSurfingCompat;
 import com.mrcrayfish.controllable.util.Utils;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,6 +46,8 @@ public class Controllable
         CAMERA_HANDLER.registerEvents();
         RADIAL_MENU.registerEvents();
         SCROLLING_HANDLER.registerEvents();
+
+        ShoulderSurfingCompat.init();
         
         // DEBUG: Print all registered bindings
         System.out.println("[Controllable] === Registered Bindings ===");

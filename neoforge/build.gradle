@@ -51,7 +51,8 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 dependencies {
     // Core dependencies
     implementation "net.neoforged:neoforge:${neoforge_version}"
-    implementation files('libs/framework-neoforge-1.21.1-0.13.11-signed.jar')
+    implementation files('libs/framework-neoforge-1.21.1-0.13.11-signed.jar')    
+    implementation files('libs/ShoulderSurfing-NeoForge-1.21.1-4.16.1.jar')
 
     // JEI, EMI, REI...
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
