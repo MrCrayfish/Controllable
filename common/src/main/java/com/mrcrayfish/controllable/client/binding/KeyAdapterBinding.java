@@ -7,10 +7,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * A special binding that translates button presses to key presses. This binding does not need to be
- * registered and is added by players during runtime.
- *
+ * A special binding that translates button presses to key presses. Supports multi-button.
  * Author: MrCrayfish
  */
 public final class KeyAdapterBinding extends ButtonBinding
@@ -20,7 +22,13 @@ public final class KeyAdapterBinding extends ButtonBinding
 
     public KeyAdapterBinding(int button, KeyMapping mapping)
     {
-        super(button, mapping.getName() + ".custom", "key.categories.controllable_custom", ClientServices.CLIENT.createBindingContext(mapping), EmptyHandler.INSTANCE);
+        this(new HashSet<>(Collections.singleton(button)), mapping);
+    }
+
+    public KeyAdapterBinding(Set<Integer> buttons, KeyMapping mapping)
+    {
+        // You must call super with buttons and all required params. Adjust signature as in your ButtonBinding.
+        super(buttons, mapping.getName() + ".custom", "key.categories.controllable_custom", ClientServices.CLIENT.createBindingContext(mapping), EmptyHandler.INSTANCE);
         this.keyMapping = mapping;
         this.labelKey = mapping.getName();
     }

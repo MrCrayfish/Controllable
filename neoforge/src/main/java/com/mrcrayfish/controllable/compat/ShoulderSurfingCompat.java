@@ -11,6 +11,7 @@ public class ShoulderSurfingCompat
     {
         if (isShoulderSurfingLoaded())
         {
+            boolean addedAny = false;
             try
             {
                 Class<?> inputHandler = Class.forName("com.github.exopandora.shouldersurfing.client.InputHandler");
@@ -24,18 +25,19 @@ public class ShoulderSurfingCompat
 
                 for (String field : fields)
                 {
-                    // These are all static fields of type KeyMapping
                     KeyMapping keyMapping = (KeyMapping) inputHandler.getField(field).get(null);
-                    String descKey = keyMapping.getName() + ".custom";
-                    if (Controllable.getBindingRegistry().getKeyAdapters().get(descKey) == null)
+                    // add as unbound if not present
+                    KeyAdapterBinding adapter = new KeyAdapterBinding(-1, keyMapping);
+                    if (Controllable.getBindingRegistry().getKeyAdapters().get(adapter.getDescription()) == null)
                     {
-                        Controllable.getBindingRegistry().addKeyAdapter(new KeyAdapterBinding(0, keyMapping));
-                        System.out.println("[Controllable][Compat] Registered ShoulderSurfing key: " + field + " (" + keyMapping.getName() + ")");
+                        Controllable.getBindingRegistry().addKeyAdapter(adapter);
+                        addedAny = true;
                     }
-                    else
-                    {
-                        System.out.println("[Controllable][Compat] Skipped existing ShoulderSurfing key: " + field + " (" + keyMapping.getName() + ")");
-                    }
+                }
+                if (addedAny)
+                {
+                    // THIS is what actually writes ShoulderSurfing binds to key_adapters.json.
+                    Controllable.getBindingRegistry().save();
                 }
             }
             catch (Throwable t)

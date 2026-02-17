@@ -282,16 +282,39 @@ public class BindingRegistry
                     }
                     JsonObject adapters = GSON.fromJson(reader, JsonObject.class);
                     adapters.asMap().forEach((key, element) -> {
-                        if(!(element instanceof JsonPrimitive value) || !value.isString())
-                            return;
                         KeyMapping mapping = bindings.get(key);
-                        if(mapping != null) {
-                            int button = Buttons.getButtonFromName(StringUtils.defaultIfEmpty(element.getAsString(), ""));
-                            KeyAdapterBinding keyAdapter = new KeyAdapterBinding(button, mapping);
-                            if(this.keyAdapters.putIfAbsent(keyAdapter.getDescription(), keyAdapter) == null) {
-                                this.bindings.add(keyAdapter);
-                                if(!keyAdapter.isUnbound()) {
-                                    this.idToButtonList.put(keyAdapter.getButton(), keyAdapter);
+                        if (mapping != null) {
+                            Set<Integer> buttons = new TreeSet<>();
+                            if (element instanceof JsonArray array) {
+                                for (JsonElement buttonElem : array) {
+                                    if (buttonElem instanceof JsonPrimitive value && value.isString()) {
+                                        int button = Buttons.getButtonFromName(value.getAsString());
+                                        if (button >= 0) {
+                                            buttons.add(button);
+                                        }
+                                    }
+                                }
+                            } else if (element instanceof JsonPrimitive value && value.isString()) {
+                                int button = Buttons.getButtonFromName(value.getAsString());
+                                if (button >= 0) {
+                                    buttons.add(button);
+                                }
+                            }
+                            if (!buttons.isEmpty()) {
+                                KeyAdapterBinding keyAdapter = new KeyAdapterBinding(buttons, mapping);
+                                if (this.keyAdapters.putIfAbsent(keyAdapter.getDescription(), keyAdapter) == null) {
+                                    this.bindings.add(keyAdapter);
+                                    if (!keyAdapter.isUnbound()) {
+                                        for (int button : keyAdapter.getButtons()) {
+                                            this.idToButtonList.put(button, keyAdapter);
+                                        }
+                                    }
+                                }
+                            } else {
+                                // Still add key mapping with no buttons (unbound)
+                                KeyAdapterBinding keyAdapter = new KeyAdapterBinding(-1, mapping);
+                                if (this.keyAdapters.putIfAbsent(keyAdapter.getDescription(), keyAdapter) == null) {
+                                    this.bindings.add(keyAdapter);
                                 }
                             }
                         }
@@ -355,12 +378,24 @@ public class BindingRegistry
         {
             JsonObject adapters = new JsonObject();
             this.keyAdapters.values().stream()
-                .filter(ButtonBinding::isNotReserved)
-                .sorted(Comparator.comparing(ButtonBinding::getDescription))
-                .forEach(binding -> {
+            .filter(ButtonBinding::isNotReserved)
+            .sorted(Comparator.comparing(ButtonBinding::getDescription))
+            .forEach(binding -> {
+                Set<Integer> buttons = binding.getButtons();
+                if (buttons.size() > 1) {
+                    JsonArray array = new JsonArray();
+                    for (int button : buttons) {
+                        String name = Buttons.getNameForButton(button);
+                        if (name != null) {
+                            array.add(name);
+                        }
+                    }
+                    adapters.add(binding.getKeyMapping().getName(), array);
+                } else {
                     String name = StringUtils.defaultIfEmpty(Buttons.getNameForButton(binding.getButton()), "");
                     adapters.addProperty(binding.getKeyMapping().getName(), name);
-                });
+                }
+            });
             String json = GSON.toJson(adapters);
             Path path = Utils.getConfigDirectory().resolve(Constants.MOD_ID).resolve("key_adapters.json");
             MoreFiles.createParentDirectories(path);
