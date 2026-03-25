@@ -25,13 +25,12 @@ import java.lang.reflect.Method;
  */
 public class ReflectUtil
 {
-    private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ReflectUtil.findField(AbstractSelectionList.class, "net.minecraft.class_350", "field_62109", "I");
-    private static final Field IMAGE_BUTTON_SPRITES = ReflectUtil.findField(ImageButton.class, "net.minecraft.class_344", "field_45356", "Lnet/minecraft/class_8666;");
-    private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ReflectUtil.findField(CreativeModeInventoryScreen.class, "net.minecraft.class_481", "field_2890", "F");
-    private static final Field KEY_MAPPING_PRESS_TIME = ReflectUtil.findField(KeyMapping.class, "net.minecraft.class_304", "field_1661", "I");
-    private static final Field STONE_CUTTER_INDEX = ReflectUtil.findField(StonecutterScreen.class, "net.minecraft.class_3979", "field_17671", "I");
-    private static final Field LOOM_START_ROW = ReflectUtil.findField(LoomScreen.class, "net.minecraft.class_494", "field_39190", "I");
-    private static final Field MOVE_VECTOR = ReflectUtil.findField(ClientInput.class, "net.minecraft.class_744", "field_55868", "Lnet/minecraft/class_241;");
+    private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ReflectUtil.findField(AbstractSelectionList.class, "defaultEntryHeight");
+    private static final Field IMAGE_BUTTON_SPRITES = ReflectUtil.findField(ImageButton.class, "sprites");
+    private static final Field KEY_MAPPING_PRESS_TIME = ReflectUtil.findField(KeyMapping.class, "clickCount");
+    private static final Field STONE_CUTTER_INDEX = ReflectUtil.findField(StonecutterScreen.class, "startIndex");
+    private static final Field LOOM_START_ROW = ReflectUtil.findField(LoomScreen.class, "startRow");
+    private static final Field MOVE_VECTOR = ReflectUtil.findField(ClientInput.class, "moveVector");
 
     private static Method findMethod(Class<?> targetClass, String className, String methodName, String methodDesc, Class<?>... types)
     {
@@ -48,12 +47,11 @@ public class ReflectUtil
         }
     }
 
-    private static Field findField(Class<?> targetClass, String className, String fieldName, String fieldDesc)
+    private static Field findField(Class<?> targetClass, String fieldName)
     {
         try
         {
-            MappingResolver resolver = FabricLoader.getInstance().getMappingResolver();
-            Field field = targetClass.getDeclaredField(resolver.mapFieldName("intermediary", className, fieldName, fieldDesc));
+            Field field = targetClass.getDeclaredField(fieldName);
             field.setAccessible(true);
             return field;
         }
@@ -86,30 +84,6 @@ public class ReflectUtil
         {
             e.printStackTrace();
             return null;
-        }
-    }
-
-    public static float getCreativeScrollOffset(CreativeModeInventoryScreen screen)
-    {
-        try
-        {
-            return (float) CREATIVE_SCREEN_SCROLL_OFFSET.get(screen);
-        }
-        catch(IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void setCreativeScrollOffset(CreativeModeInventoryScreen screen, float offset)
-    {
-        try
-        {
-            CREATIVE_SCREEN_SCROLL_OFFSET.set(screen, offset);
-        }
-        catch(IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
         }
     }
 
