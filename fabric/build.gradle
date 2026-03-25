@@ -54,19 +54,13 @@ loom {
     }
 }
 
-
-
-/*remapJar {
-    addNestedDependencies = true
-}*/
-
 tasks.register("signJar") {
     dependsOn jar
     onlyIf {
         findProperty('keyStore') || System.getenv("KEYSTORE")
     }
     doLast {
-        def unsignedJar = tasks.remapJar.archiveFile.get().asFile
+        def unsignedJar = tasks.jar.archiveFile.get().asFile
         def name = FilenameUtils.removeExtension(unsignedJar.getName())
         def signedJar  = layout.buildDirectory.file("libs/%s-signed.jar".formatted(name)).get().asFile
         def signingKeyAlias = findProperty('keyStoreAlias') ?: System.getenv("KEYSTORE_ALIAS")
