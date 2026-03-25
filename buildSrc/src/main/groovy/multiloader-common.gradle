@@ -8,7 +8,7 @@ base {
     archivesName = "${mod_id}-${project.name}"
 }
 
-version = "${minecraft_version}-${mod_version}"
+version = "${mod_version}+${minecraft_version}"
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version)
