@@ -6,9 +6,9 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.binding.handlers.impl.AttackHandler;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,8 +16,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import javax.annotation.Nullable;
 
 /**
  * Author: MrCrayfish
@@ -105,7 +103,7 @@ public class MinecraftMixin
         return originalFps;
     }
 
-    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/FramerateLimitTracker;getFramerateLimit()I"))
+    @Inject(method = "renderFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;getGameRenderState()Lnet/minecraft/client/renderer/state/GameRenderState;"))
     private void controllableWaitEvents(boolean outOfMemory, CallbackInfo ci)
     {
         Minecraft mc = (Minecraft) (Object) this;

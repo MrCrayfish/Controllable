@@ -10,7 +10,7 @@ import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.config.EnumProperty;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -65,13 +65,13 @@ public class TabOptionEnumItem<T extends Enum<T> & SettingEnum> extends TabOptio
     }
 
     @Override
-    public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+    public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
-        super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+        super.extractContent(graphics, mouseX, mouseY, hovered, partialTick);
         this.cycle.active = this.isOptionActive();
         this.cycle.setX(this.getX() + this.getWidth() - this.cycle.getWidth() - 20);
         this.cycle.setY(this.getY() + 2);
-        this.cycle.render(graphics, mouseX, mouseY, partialTick);
+        this.cycle.extractRenderState(graphics, mouseX, mouseY, partialTick);
 
         Controller controller = Controllable.getController();
         if(this.cycle.active && controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(this.getX(), this.getY(), this.getWidth(), this.getHeight(), mouseX, mouseY))

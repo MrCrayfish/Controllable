@@ -10,7 +10,7 @@ import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -114,13 +114,13 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
     }
 
     @Override
-    protected void renderListItems(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    protected void extractListItems(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick)
     {
-        super.renderListItems(graphics, mouseX, mouseY, partialTick);
-        this.renderLinkedItems(graphics, mouseX, mouseY);
+        super.extractListItems(extractor, mouseX, mouseY, partialTick);
+        this.extractLinkedItems(extractor, mouseX, mouseY);
     }
 
-    private void renderLinkedItems(GuiGraphics graphics, int mouseX, int mouseY)
+    private void extractLinkedItems(GuiGraphicsExtractor extractor, int mouseX, int mouseY)
     {
         Controller controller = Controllable.getController();
         if(controller instanceof MultiController multi)
@@ -147,21 +147,21 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
                 int rowLeft = this.getRowLeft();
                 int lineTop = this.getRowTop(start) + itemCenter;
                 int lineEnd = this.getRowTop(end) + itemCenter;
-                graphics.fill(rowLeft - 12, lineTop, rowLeft - 10, lineEnd, 0xFFFFFFFF);
+                extractor.fill(rowLeft - 12, lineTop, rowLeft - 10, lineEnd, 0xFFFFFFFF);
 
                 int iconTop = lineTop + (lineEnd - lineTop) / 2 - 7;
                 int iconLeft = rowLeft - 30;
-                graphics.blit(RenderPipelines.GUI_TEXTURED, Icons.TEXTURE, iconLeft, iconTop, 110, 0, 14, 14, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
+                extractor.blit(RenderPipelines.GUI_TEXTURED, Icons.TEXTURE, iconLeft, iconTop, 110, 0, 14, 14, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
 
                 for(int i : matchedEntries)
                 {
                     int rowTop = this.getRowTop(i);
-                    graphics.fill(rowLeft - 11, rowTop + itemCenter - 1, rowLeft - 4, rowTop + itemCenter + 1, 0xFFFFFFFF);
+                    extractor.fill(rowLeft - 11, rowTop + itemCenter - 1, rowLeft - 4, rowTop + itemCenter + 1, 0xFFFFFFFF);
                 }
 
                 if(ScreenHelper.isMouseWithin(iconLeft, iconTop, 14, 14, mouseX, mouseY))
                 {
-                    graphics.setTooltipForNextFrame(this.createLinkTooltip(), mouseX, mouseY);
+                    extractor.setTooltipForNextFrame(this.createLinkTooltip(), mouseX, mouseY);
                 }
             }
         }
@@ -193,22 +193,22 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+        public void extractContent(GuiGraphicsExtractor extractor, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             SelectedState state = this.getSelectedState();
             if(state != SelectedState.NONE)
             {
-                ScreenHelper.drawRoundedBox(graphics, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 0xFFFFFFFF);
-                ScreenHelper.drawRoundedBox(graphics, this.getX() + 1, this.getY() + 1, this.getWidth() - 2, this.getHeight() - 2, 0xFF000000);
-                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, CHECKMARK, this.getX() + 2, this.getY() + 2, 18, 18);
+                ScreenHelper.drawRoundedBox(extractor, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 0xFFFFFFFF);
+                ScreenHelper.drawRoundedBox(extractor, this.getX() + 1, this.getY() + 1, this.getWidth() - 2, this.getHeight() - 2, 0xFF000000);
+                extractor.blitSprite(RenderPipelines.GUI_TEXTURED, CHECKMARK, this.getX() + 2, this.getY() + 2, 18, 18);
             }
             else if(Controllable.getController() != null && hovered)
             {
-                graphics.blit(RenderPipelines.GUI_TEXTURED, Icons.TEXTURE, this.getX() + 4, this.getY() + 6, 110, 0, 11, 11, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
-                graphics.setTooltipForNextFrame(Component.translatable("controllable.gui.link").withStyle(ChatFormatting.AQUA), mouseX, mouseY);
+                extractor.blit(RenderPipelines.GUI_TEXTURED, Icons.TEXTURE, this.getX() + 4, this.getY() + 6, 110, 0, 11, 11, 11, 11, Icons.TEXTURE_WIDTH, Icons.TEXTURE_HEIGHT);
+                extractor.setTooltipForNextFrame(Component.translatable("controllable.gui.link").withStyle(ChatFormatting.AQUA), mouseX, mouseY);
             }
             Font font = Minecraft.getInstance().font;
-            graphics.drawString(font, this.label, this.getX() + 22, this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1, 0xFFFFFFFF);
+            extractor.text(font, this.label, this.getX() + 22, this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1, 0xFFFFFFFF);
         }
 
         @Override

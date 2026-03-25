@@ -1,24 +1,23 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.gui.components.*;
+import com.mrcrayfish.controllable.client.gui.widget.TabListWidget;
+import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.controllable.client.settings.CursorStyle;
 import com.mrcrayfish.controllable.client.settings.SneakMode;
 import com.mrcrayfish.controllable.client.settings.SprintMode;
-import com.mrcrayfish.controllable.client.gui.widget.TabListWidget;
-import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.config.AbstractProperty;
 import com.mrcrayfish.framework.config.FrameworkConfigManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.tabs.GridLayoutTab;
@@ -33,9 +32,9 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -91,7 +90,7 @@ public class SettingsScreen extends Screen
     {
         if(this.navigationBar != null)
         {
-            this.navigationBar.setWidth(this.width);
+            this.navigationBar.updateWidth(this.width);
             this.navigationBar.arrangeElements();
             ScreenRectangle navBarArea = this.navigationBar.getRectangle();
             this.tabArea = new ScreenRectangle(0, navBarArea.height() - 1, this.width, this.height - navBarArea.height() - 30);
@@ -135,21 +134,21 @@ public class SettingsScreen extends Screen
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick)
     {
         boolean waitingForInput = this.isWaitingForButtonInput();
-        super.render(graphics, !waitingForInput ? mouseX : -1, !waitingForInput ? mouseY : -1, partialTick);
+        super.extractRenderState(extractor, !waitingForInput ? mouseX : -1, !waitingForInput ? mouseY : -1, partialTick);
         if(waitingForInput)
         {
-            graphics.pose().pushMatrix();
-            graphics.fillGradient(0, 0, this.width, this.height, 0xE0101010, 0xF0101010);
-            ScreenHelper.drawRoundedBox(graphics, (int) (this.width * 0.125), this.height / 4, (int) (this.width * 0.75), this.height / 2, 0x99000000);
+            extractor.pose().pushMatrix();
+            extractor.fillGradient(0, 0, this.width, this.height, 0xE0101010, 0xF0101010);
+            ScreenHelper.drawRoundedBox(extractor, (int) (this.width * 0.125), this.height / 4, (int) (this.width * 0.75), this.height / 2, 0x99000000);
             Component pressButtonLabel = Component.translatable("controllable.gui.waiting_for_input").withStyle(ChatFormatting.YELLOW);
-            graphics.drawCenteredString(this.font, pressButtonLabel, this.width / 2, this.height / 2 - 10, 0xFFFFFFFF);
+            extractor.centeredText(this.font, pressButtonLabel, this.width / 2, this.height / 2 - 10, 0xFFFFFFFF);
             Component time = Component.literal(Integer.toString((int) Math.ceil(this.remainingTime / 20.0)));
             Component inputCancelLabel = Component.translatable("controllable.gui.input_cancel", time);
-            graphics.drawCenteredString(this.font, inputCancelLabel, this.width / 2, this.height / 2 + 3, 0xFFFFFFFF);
-            graphics.pose().popMatrix();
+            extractor.centeredText(this.font, inputCancelLabel, this.width / 2, this.height / 2 + 3, 0xFFFFFFFF);
+            extractor.pose().popMatrix();
         }
     }
 

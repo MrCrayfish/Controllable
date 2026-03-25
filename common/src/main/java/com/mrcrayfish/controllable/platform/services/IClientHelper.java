@@ -2,7 +2,6 @@ package com.mrcrayfish.controllable.platform.services;
 
 import com.mrcrayfish.controllable.client.binding.context.BindingContext;
 import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
-import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -12,6 +11,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -66,13 +66,7 @@ public interface IClientHelper
 
     void gatherCreativeTabNavigationPoints(CreativeModeInventoryScreen screen, List<NavigationPoint> points);
 
-    boolean canLocalPlayerSwimInFluid(LocalPlayer player);
-
     void scrollCreativeTabs(CreativeModeInventoryScreen screen, int dir);
-
-    float getCreativeScrollOffset(CreativeModeInventoryScreen screen);
-
-    void setCreativeScrollOffset(CreativeModeInventoryScreen screen, float offset);
 
     int getAbstractListRowBottom(AbstractSelectionList<?> list, int index);
 

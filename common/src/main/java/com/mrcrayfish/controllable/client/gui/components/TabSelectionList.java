@@ -7,7 +7,7 @@ import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
@@ -95,26 +95,26 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    public void extractWidgetRenderState(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick)
     {
-        super.renderWidget(graphics, mouseX, mouseY, partialTick);
+        super.extractWidgetRenderState(extractor, mouseX, mouseY, partialTick);
         if(this.headerText != null)
         {
-            graphics.drawCenteredString(TabSelectionList.this.minecraft.font, this.headerText, this.getX() + this.width / 2, this.getY() - 15, 0xFFFFFFFF);
+            extractor.centeredText(TabSelectionList.this.minecraft.font, this.headerText, this.getX() + this.width / 2, this.getY() - 15, 0xFFFFFFFF);
         }
         if(this.footerText != null)
         {
             Font font = TabSelectionList.this.minecraft.font;
             int footerWidth = font.width(this.footerText);
-            ScreenHelper.drawRoundedBox(graphics, this.getX() + (this.width - footerWidth) / 2, this.getBottom() + 6, footerWidth, 14, 0x55000000);
-            graphics.drawCenteredString(font, this.footerText, this.getX() + this.width / 2, this.getBottom() + 9, 0xFFFFFFFF);
+            ScreenHelper.drawRoundedBox(extractor, this.getX() + (this.width - footerWidth) / 2, this.getBottom() + 6, footerWidth, 14, 0x55000000);
+            extractor.centeredText(font, this.footerText, this.getX() + this.width / 2, this.getBottom() + 9, 0xFFFFFFFF);
         }
         //graphics.fillGradient(this.getX(), this.getY(), this.getRight(), this.getY() + 4, 0xFF000000, 0);
         //graphics.fillGradient(this.getX(), this.getBottom() - 4, this.getRight(), this.getBottom(), 0, 0xFF000000);
     }
 
     @Override
-    protected void renderListItems(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    protected void extractListItems(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick)
     {
         List<E> entries = this.children();
         for(int i = 0; i < entries.size(); i++)
@@ -124,9 +124,9 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
             {
                 if(i % 2 != 0)
                 {
-                    graphics.fill(entry.getX(), entry.getY(), entry.getX() + entry.getWidth(), entry.getY() + entry.getHeight(), 0x55000000);
+                    extractor.fill(entry.getX(), entry.getY(), entry.getX() + entry.getWidth(), entry.getY() + entry.getHeight(), 0x55000000);
                 }
-                this.renderItem(graphics, mouseX, mouseY, partialTick, entry);
+                this.extractItem(extractor, mouseX, mouseY, partialTick, entry);
             }
         }
     }
@@ -201,12 +201,12 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+        public void extractContent(GuiGraphicsExtractor extractor, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             Font font = Objects.requireNonNull(TabSelectionList.this.minecraft).font;
             int labelWidth = font.width(this.label) + 2;
-            ScreenHelper.drawRoundedBox(graphics, this.getX() + this.getWidth() / 2 - labelWidth / 2, this.getY() + 4, labelWidth, 14, 0x88000000);
-            graphics.drawCenteredString(font, this.label, this.getX() + this.getWidth() / 2, this.getY() + 7, 0xFFFFFFFF);
+            ScreenHelper.drawRoundedBox(extractor, this.getX() + this.getWidth() / 2 - labelWidth / 2, this.getY() + 4, labelWidth, 14, 0x88000000);
+            extractor.centeredText(font, this.label, this.getX() + this.getWidth() / 2, this.getY() + 7, 0xFFFFFFFF);
         }
 
         @Override
@@ -233,12 +233,12 @@ public class TabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> e
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+        public void extractContent(GuiGraphicsExtractor extractor, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             this.button.setWidth(this.getWidth() / 2);
             this.button.setX(this.getX() + this.getWidth() / 4);
             this.button.setY(this.getY());
-            this.button.render(graphics, mouseX, mouseY, partialTick);
+            this.button.extractRenderState(extractor, mouseX, mouseY, partialTick);
         }
 
         @Override

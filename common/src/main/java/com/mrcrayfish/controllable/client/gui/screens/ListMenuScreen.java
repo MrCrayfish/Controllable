@@ -2,14 +2,13 @@ package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.google.common.collect.ImmutableList;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
-import com.mrcrayfish.controllable.client.gui.RadialItemList;
 import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
 import com.mrcrayfish.controllable.client.gui.widget.BackgroundStringWidget;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -23,19 +22,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -209,26 +200,26 @@ public abstract class ListMenuScreen extends Screen
         }
 
         @Override
-        public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+        public void extractWidgetRenderState(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick)
         {
-            super.renderWidget(graphics, mouseX, mouseY, partialTick);
-            this.renderToolTips(graphics, mouseX, mouseY); // TODO test
+            super.extractWidgetRenderState(extractor, mouseX, mouseY, partialTick);
+            this.renderToolTips(extractor, mouseX, mouseY); // TODO test
         }
 
-        private void renderToolTips(GuiGraphics graphics, int mouseX, int mouseY)
+        private void renderToolTips(GuiGraphicsExtractor extractor, int mouseX, int mouseY)
         {
             if(this.isMouseOver(mouseX, mouseY) && mouseX < ListMenuScreen.this.list.getRowLeft() + ListMenuScreen.this.list.getRowWidth() - 67)
             {
                 Item item = this.getEntryAtPosition(mouseX, mouseY);
                 if(item != null && item.tooltip != null)
                 {
-                    graphics.setTooltipForNextFrame(item.tooltip, mouseX, mouseY);
+                    extractor.setTooltipForNextFrame(item.tooltip, mouseX, mouseY);
                 }
             }
         }
 
         @Override
-        protected void renderListItems(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+        protected void extractListItems(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick)
         {
             List<Item> entries = this.children();
             for(int i = 0; i < entries.size(); i++)
@@ -238,9 +229,9 @@ public abstract class ListMenuScreen extends Screen
                 {
                     if(i % 2 != 0)
                     {
-                        graphics.fill(entry.getX(), entry.getY(), entry.getX() + entry.getWidth(), entry.getY() + entry.getHeight(), 0x55000000);
+                        extractor.fill(entry.getX(), entry.getY(), entry.getX() + entry.getWidth(), entry.getY() + entry.getHeight(), 0x55000000);
                     }
-                    this.renderItem(graphics, mouseX, mouseY, partialTick, entry);
+                    this.extractItem(extractor, mouseX, mouseY, partialTick, entry);
                 }
             }
         }
@@ -317,12 +308,12 @@ public abstract class ListMenuScreen extends Screen
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+        public void extractContent(GuiGraphicsExtractor extractor, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             Font font = Minecraft.getInstance().font;
             int labelWidth = font.width(this.label) + 2;
-            ScreenHelper.drawRoundedBox(graphics, this.getX() + this.getWidth() / 2 - labelWidth / 2, this.getY() + 4, labelWidth, 14, 0x88000000);
-            graphics.drawCenteredString(Objects.requireNonNull(ListMenuScreen.this.minecraft).font, this.label, this.getX() + this.getWidth() / 2, this.getY() + 7, 0xFFFFFFFF);
+            ScreenHelper.drawRoundedBox(extractor, this.getX() + this.getWidth() / 2 - labelWidth / 2, this.getY() + 4, labelWidth, 14, 0x88000000);
+            extractor.centeredText(Objects.requireNonNull(ListMenuScreen.this.minecraft).font, this.label, this.getX() + this.getWidth() / 2, this.getY() + 7, 0xFFFFFFFF);
         }
     }
 

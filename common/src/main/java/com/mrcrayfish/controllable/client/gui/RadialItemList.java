@@ -8,7 +8,7 @@ import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
@@ -80,7 +80,7 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
     protected void updateWidgetNarration(NarrationElementOutput output) {}
 
     @Override
-    protected void renderListItems(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    protected void extractListItems(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick)
     {
         List<RadialItemList.ButtonBindingEntry> entries = this.children();
         for(int i = 0; i < entries.size(); i++)
@@ -90,22 +90,22 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
             {
                 if(i % 2 != 0)
                 {
-                    graphics.fill(entry.getX(), entry.getY(), entry.getX() + entry.getWidth(), entry.getY() + entry.getHeight(), 0x55000000);
+                    extractor.fill(entry.getX(), entry.getY(), entry.getX() + entry.getWidth(), entry.getY() + entry.getHeight(), 0x55000000);
                 }
-                this.renderItem(graphics, mouseX, mouseY, partialTick, entry);
+                this.extractItem(extractor, mouseX, mouseY, partialTick, entry);
             }
         }
     }
 
     @Override
-    protected void renderSelection(GuiGraphics graphics, ButtonBindingEntry entry, int outlineColour)
+    protected void extractSelection(GuiGraphicsExtractor extractor, ButtonBindingEntry entry, int outlineColour)
     {
         int left = entry.getX();
         int right = entry.getX() + entry.getWidth();
         int top = entry.getY();
         int bottom = entry.getY() + entry.getHeight();
-        graphics.fill(left, top, right, bottom, outlineColour);
-        graphics.fill(left + 1, top + 1, right - 1, bottom -1, 0xFF111111);
+        extractor.fill(left, top, right, bottom, outlineColour);
+        extractor.fill(left + 1, top + 1, right - 1, bottom -1, 0xFF111111);
     }
 
     public class ButtonBindingEntry extends ContainerObjectSelectionList.Entry<ButtonBindingEntry>
@@ -183,11 +183,11 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+        public void extractContent(GuiGraphicsExtractor extractor, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             Font font = RadialItemList.this.minecraft.font;
-            graphics.drawString(font, this.label, this.getX() + 5, this.getY() + 7, 0xFFFFFFFF);
-            graphics.drawString(font, this.description, this.getX() + 5, this.getY() + 20, 0xFFFFFFFF);
+            extractor.text(font, this.label, this.getX() + 5, this.getY() + 7, 0xFFFFFFFF);
+            extractor.text(font, this.description, this.getX() + 5, this.getY() + 20, 0xFFFFFFFF);
             for(int i = 0; i < this.buttons.length; i++)
             {
                 int offset = (this.buttons.length - i) * 22;
@@ -195,7 +195,7 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
                 this.buttons[i].visible = RadialItemList.this.getSelected() == this;
                 this.buttons[i].setX(buttonLeft);
                 this.buttons[i].setY(this.getY() + 8);
-                this.buttons[i].render(graphics, mouseX, mouseY, partialTick);
+                this.buttons[i].extractRenderState(extractor, mouseX, mouseY, partialTick);
             }
         }
 

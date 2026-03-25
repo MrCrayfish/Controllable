@@ -3,7 +3,7 @@ package com.mrcrayfish.controllable.client.gui;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * Author: MrCrayfish
@@ -16,9 +16,9 @@ public class ControllerAxis extends ControllerButton
     }
 
     @Override
-    public void draw(GuiGraphics graphics, int x, int y, int mouseX, int mouseY, boolean selected)
+    public void extract(GuiGraphicsExtractor extractor, int x, int y, int mouseX, int mouseY, boolean selected)
     {
-        graphics.pose().pushMatrix();
+        extractor.pose().pushMatrix();
         Controller controller = Controllable.getController();
         if(controller != null)
         {
@@ -45,10 +45,10 @@ public class ControllerAxis extends ControllerButton
 
             if(!this.screen.isButtonPressed(this.button))
             {
-                graphics.pose().translate(0, -5);
+                extractor.pose().translate(0, -5);
             }
         }
-        super.draw(graphics, x, y, mouseX, mouseY, selected);
-        graphics.pose().popMatrix();
+        super.extract(extractor, x, y, mouseX, mouseY, selected);
+        extractor.pose().popMatrix();
     }
 }

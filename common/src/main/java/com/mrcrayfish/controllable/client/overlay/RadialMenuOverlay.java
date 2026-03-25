@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.client.overlay;
 
 import com.mrcrayfish.controllable.Controllable;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * Author: MrCrayfish
@@ -16,7 +16,7 @@ public class RadialMenuOverlay implements IOverlay
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
         Controllable.getRadialMenu().onRenderEnd(graphics, tracker);
     }

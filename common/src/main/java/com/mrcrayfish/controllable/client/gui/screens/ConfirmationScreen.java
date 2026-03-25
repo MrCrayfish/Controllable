@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -68,20 +68,20 @@ public class ConfirmationScreen extends Screen
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTicks)
     {
-        super.render(graphics, mouseX, mouseY, partialTicks);
+        super.extractRenderState(extractor, mouseX, mouseY, partialTicks);
 
         List<FormattedCharSequence> lines = this.font.split(this.message, 300);
 
-        graphics.blit(RenderPipelines.GUI_TEXTURED, ControllerLayoutScreen.TEXTURE, this.width / 2 - 10, this.startY - 30, this.icon.ordinal() * 10, 21, 20, 20, 10, 10, 256, 256);
+        extractor.blit(RenderPipelines.GUI_TEXTURED, ControllerLayoutScreen.TEXTURE, this.width / 2 - 10, this.startY - 30, this.icon.ordinal() * 10, 21, 20, 20, 10, 10, 256, 256);
 
-        this.drawListBackground(graphics, 0, this.width, this.startY, this.endY);
+        this.extractListBackground(extractor, 0, this.width, this.startY, this.endY);
 
         for(int i = 0; i < lines.size(); i++)
         {
             int lineWidth = this.font.width(lines.get(i));
-            graphics.drawString(this.font, lines.get(i), this.width / 2 - lineWidth / 2, this.startY + MESSAGE_PADDING + i * (this.font.lineHeight + 2) + 1, 0xFFFFFFFF);
+            extractor.text(this.font, lines.get(i), this.width / 2 - lineWidth / 2, this.startY + MESSAGE_PADDING + i * (this.font.lineHeight + 2) + 1, 0xFFFFFFFF);
         }
     }
 
@@ -115,7 +115,7 @@ public class ConfirmationScreen extends Screen
         this.icon = icon;
     }
 
-    public void drawListBackground(GuiGraphics graphics, int startX, int endX, int startY, int endY)
+    public void extractListBackground(GuiGraphicsExtractor graphics, int startX, int endX, int startY, int endY)
     {
         boolean inGame = Minecraft.getInstance().level != null;
         Identifier backgroundTexture = !inGame ? MENU_LIST_BACKGROUND : IN_GAME_MENU_LIST_BACKGROUND;

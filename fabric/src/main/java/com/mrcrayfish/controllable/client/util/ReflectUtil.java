@@ -11,7 +11,6 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.player.ClientInput;
-import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +25,6 @@ import java.lang.reflect.Method;
  */
 public class ReflectUtil
 {
-    private static final Method ABSTRACT_CONTAINER_SCREEN_CLICK_SLOT = ReflectUtil.findMethod(AbstractContainerScreen.class, "net.minecraft.class_465", "method_2383", "(Lnet/minecraft/class_1735;IILnet/minecraft/class_1713;)V", Slot.class, int.class, int.class, ClickType.class);
     private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ReflectUtil.findField(AbstractSelectionList.class, "net.minecraft.class_350", "field_62109", "I");
     private static final Field IMAGE_BUTTON_SPRITES = ReflectUtil.findField(ImageButton.class, "net.minecraft.class_344", "field_45356", "Lnet/minecraft/class_8666;");
     private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ReflectUtil.findField(CreativeModeInventoryScreen.class, "net.minecraft.class_481", "field_2890", "F");
@@ -124,18 +122,6 @@ public class ReflectUtil
         catch(IllegalAccessException e)
         {
             throw new RuntimeException(e);
-        }
-    }
-
-    public static void clickSlot(AbstractContainerScreen<?> screen, Slot slotIn, int slotId, int mouseButton, ClickType type)
-    {
-        try
-        {
-            ABSTRACT_CONTAINER_SCREEN_CLICK_SLOT.invoke(screen, slotIn, slotId, mouseButton, type);
-        }
-        catch(IllegalAccessException | InvocationTargetException e)
-        {
-            e.printStackTrace();
         }
     }
 

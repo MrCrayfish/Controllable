@@ -12,7 +12,7 @@ import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -117,7 +117,7 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             // Draws a transparent black background on every odd item to help match the widgets with the label
             // TODO 1.21.9
@@ -127,10 +127,10 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
             }*/
             Font font = RadialMenuAddBindingsScreen.this.minecraft.font;
             int colour = this.active ? 0xFFFFFFFF : 0xFF555555;
-            graphics.drawString(font, this.label, this.getX() + 5, this.getY() + 8, colour);
+            graphics.text(font, this.label, this.getX() + 5, this.getY() + 8, colour);
             this.bindingButton.setX(this.getX() + rowWidth - 25);
             this.bindingButton.setY(this.getY() + 2);
-            this.bindingButton.render(graphics, mouseX, mouseY, partialTick);
+            this.bindingButton.extractRenderState(graphics, mouseX, mouseY, partialTick);
             this.bindingButton.active = this.active;
         }
 

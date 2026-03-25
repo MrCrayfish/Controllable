@@ -9,7 +9,7 @@ import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.config.AbstractProperty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -82,17 +82,17 @@ public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implem
     }
 
     @Override
-    public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+    public void extractContent(GuiGraphicsExtractor extractor, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
         // Draws a transparent black background on every odd item to help match the widgets with the label
         Controller controller = Controllable.getController();
         if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(this.getX(), this.getY(), this.getWidth(), this.getHeight(), mouseX, mouseY))
         {
-            ScreenHelper.drawOutlinedBox(graphics, this.getX() - 2, this.getY() - 2, this.getWidth() + 4, this.getHeight() + 4, 0xAAFFFFFF);
+            ScreenHelper.drawOutlinedBox(extractor, this.getX() - 2, this.getY() - 2, this.getWidth() + 4, this.getHeight() + 4, 0xAAFFFFFF);
         }
         Font font = Minecraft.getInstance().font;
         int textColor = this.isOptionActive() ? (this.labelColor | 0xFF000000) : 0xFF777777;
-        graphics.drawString(font, this.label, this.getX() + 5, this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1, textColor);
+        extractor.text(font, this.label, this.getX() + 5, this.getY() + (this.getHeight() - font.lineHeight) / 2 + 1, textColor);
     }
 
     @Override

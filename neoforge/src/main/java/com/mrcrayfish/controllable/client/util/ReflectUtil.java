@@ -12,7 +12,6 @@ import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.locale.Language;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.fml.util.ObfuscationReflectionHelper;
@@ -29,7 +28,6 @@ import java.util.List;
  */
 public class ReflectUtil
 {
-    private static final Method ABSTRACT_CONTAINER_SCREEN_CLICK_SLOT = ObfuscationReflectionHelper.findMethod(AbstractContainerScreen.class, "slotClicked", Slot.class, int.class, int.class, ClickType.class);
     private static final Field ABSTRACT_SELECTION_LIST_ITEM_HEIGHT = ObfuscationReflectionHelper.findField(AbstractSelectionList.class, "defaultEntryHeight");
     private static final Field CREATIVE_SCREEN_SCROLL_OFFSET = ObfuscationReflectionHelper.findField(CreativeModeInventoryScreen.class, "scrollOffs");
     private static final Field KEY_MAPPING_PRESS_TIME = ObfuscationReflectionHelper.findField(KeyMapping.class, "clickCount");
@@ -89,18 +87,6 @@ public class ReflectUtil
         catch(IllegalAccessException e)
         {
             throw new RuntimeException(e);
-        }
-    }
-
-    public static void clickSlot(AbstractContainerScreen<?> screen, Slot slotIn, int slotId, int mouseButton, ClickType type)
-    {
-        try
-        {
-            ABSTRACT_CONTAINER_SCREEN_CLICK_SLOT.invoke(screen, slotIn, slotId, mouseButton, type);
-        }
-        catch(IllegalAccessException | InvocationTargetException e)
-        {
-            e.printStackTrace();
         }
     }
 

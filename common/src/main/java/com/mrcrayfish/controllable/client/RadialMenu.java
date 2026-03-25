@@ -22,7 +22,7 @@ import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -269,7 +269,7 @@ public class RadialMenu
         }
     }
 
-    public void onRenderEnd(GuiGraphics graphics, DeltaTracker tracker)
+    public void onRenderEnd(GuiGraphicsExtractor graphics, DeltaTracker tracker)
     {
         Minecraft mc = Minecraft.getInstance();
         if(mc.options.hideGui || mc.screen != null)
@@ -301,7 +301,7 @@ public class RadialMenu
         }
     }
 
-    private void renderRadialMenu(GuiGraphics graphics, DeltaTracker tracker)
+    private void renderRadialMenu(GuiGraphicsExtractor graphics, DeltaTracker tracker)
     {
         this.updateSelected();
 
@@ -336,20 +336,20 @@ public class RadialMenu
     }
 
     // TODO draw minimised version if too many entries (aka only draw the action name, not the category too)
-    private void drawRadialItems(List<AbstractRadialItem> items, GuiGraphics graphics, Minecraft mc, float animation)
+    private void drawRadialItems(List<AbstractRadialItem> items, GuiGraphicsExtractor extractor, Minecraft mc, float animation)
     {
         for(int i = 0; i < items.size(); i++)
         {
             AbstractRadialItem item = items.get(i);
-            graphics.pose().pushMatrix();
-            if(i == 0) graphics.pose().translate(0, -10);
-            if(i == items.size() - 1) graphics.pose().translate(0, 10);
+            extractor.pose().pushMatrix();
+            if(i == 0) extractor.pose().translate(0, -10);
+            if(i == items.size() - 1) extractor.pose().translate(0, 10);
             boolean left = item.angle >= 180F;
             float x = (float) Math.cos(Math.toRadians(item.angle - 90F)) * 70F;
             float y = (float) Math.sin(Math.toRadians(item.angle - 90F)) * 70F;
-            graphics.pose().translate((int) x, (int) y);
-            item.draw(graphics, mc, left, this.selected == item, animation);
-            graphics.pose().popMatrix();
+            extractor.pose().translate((int) x, (int) y);
+            item.draw(extractor, mc, left, this.selected == item, animation);
+            extractor.pose().popMatrix();
         }
     }
 
@@ -434,7 +434,7 @@ public class RadialMenu
 
         public abstract void onUseItem(RadialMenu handler);
 
-        protected abstract void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation);
+        protected abstract void draw(GuiGraphicsExtractor graphics, Minecraft mc, boolean left, boolean selected, float animation);
 
         protected void playSound(SoundEvent event, float pitch)
         {
@@ -472,7 +472,7 @@ public class RadialMenu
         }
 
         @Override
-        protected void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation)
+        protected void draw(GuiGraphicsExtractor graphics, Minecraft mc, boolean left, boolean selected, float animation)
         {
             int color = selected ? 0xAACCCCCC : mc.options.getBackgroundColor(0.7F);
             float alpha = ARGB.alpha(color) / 255F;
@@ -490,7 +490,7 @@ public class RadialMenu
             graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, -10, -10, 98, 15, 20, 20, 10, 10, 256, 256);
             if(selected)
             {
-                graphics.drawCenteredString(mc.font, LABEL, 0, -30, 0xFFFFFFFF);
+                graphics.centeredText(mc.font, LABEL, 0, -30, 0xFFFFFFFF);
             }
         }
     }
@@ -516,7 +516,7 @@ public class RadialMenu
         }
 
         @Override
-        protected void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation)
+        protected void draw(GuiGraphicsExtractor graphics, Minecraft mc, boolean left, boolean selected, float animation)
         {
             int color = selected ? 0xAACCCCCC : mc.options.getBackgroundColor(0.7F);
             float alpha = ARGB.alpha(color) / 255F;
@@ -533,7 +533,7 @@ public class RadialMenu
             graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, -10, -10, 88, 15, 20, 20, 10, 10, 256, 256);
             if(selected)
             {
-                graphics.drawCenteredString(mc.font, LABEL, 0, 21, 0xFFFFFFFF);
+                graphics.centeredText(mc.font, LABEL, 0, 21, 0xFFFFFFFF);
             }
         }
     }
@@ -566,7 +566,7 @@ public class RadialMenu
         }
 
         @Override
-        protected void draw(GuiGraphics graphics, Minecraft mc, boolean left, boolean selected, float animation)
+        protected void draw(GuiGraphicsExtractor graphics, Minecraft mc, boolean left, boolean selected, float animation)
         {
             graphics.pose().pushMatrix();
 
@@ -590,13 +590,13 @@ public class RadialMenu
             if(this.label != null)
             {
                 int offset = !left ? 5 : -mc.font.width(this.label) - 5;
-                graphics.drawString(mc.font, this.label, offset, -10, 0xFFFFFFFF, !selected);
+                graphics.text(mc.font, this.label, offset, -10, 0xFFFFFFFF, !selected);
             }
 
             if(this.description != null)
             {
                 int offset = !left ? 5 : -mc.font.width(this.description) - 5;
-                graphics.drawString(mc.font, this.description, offset, 2, selected ? 0xFF000000 : 0xFFFFFFFF, !selected);
+                graphics.text(mc.font, this.description, offset, 2, selected ? 0xFF000000 : 0xFFFFFFFF, !selected);
             }
 
             graphics.pose().popMatrix();

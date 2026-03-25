@@ -7,7 +7,6 @@ import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.platform.services.IClientHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -21,6 +20,7 @@ import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -183,7 +183,7 @@ public class NeoForgeClientHelper implements IClientHelper
     @Override
     public void pickBlock(Minecraft mc)
     {
-        mc.pickBlock();
+        mc.pick(1.0F);
     }
 
     @Override
@@ -212,12 +212,6 @@ public class NeoForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public boolean canLocalPlayerSwimInFluid(LocalPlayer player)
-    {
-        return !(player.isInWater() || player.isInFluidType((fluidType, height) -> player.canSwimInFluidType(fluidType))) || (player.isUnderWater() || player.canStartSwimming());
-    }
-
-    @Override
     public void scrollCreativeTabs(CreativeModeInventoryScreen screen, int dir)
     {
         try
@@ -239,18 +233,6 @@ public class NeoForgeClientHelper implements IClientHelper
         {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public float getCreativeScrollOffset(CreativeModeInventoryScreen screen)
-    {
-        return ReflectUtil.getCreativeScrollOffset(screen);
-    }
-
-    @Override
-    public void setCreativeScrollOffset(CreativeModeInventoryScreen screen, float offset)
-    {
-        ReflectUtil.setCreativeScrollOffset(screen, offset);
     }
 
     @Override

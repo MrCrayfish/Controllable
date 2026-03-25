@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.OptionsList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -62,10 +62,10 @@ public class ThumbstickSettingsScreen extends Screen
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTicks)
     {
         //this.optionsRowList.render(graphics, mouseX, mouseY, partialTicks);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
-        super.render(graphics, mouseX, mouseY, partialTicks);
+        extractor.centeredText(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
+        super.extractRenderState(extractor, mouseX, mouseY, partialTicks);
     }
 }

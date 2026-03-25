@@ -1,7 +1,7 @@
 package com.mrcrayfish.controllable.client.overlay;
 
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * Author: MrCrayfish
@@ -12,5 +12,5 @@ public interface IOverlay
 
     default void tick() {}
 
-    void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker);
+    void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, DeltaTracker tracker);
 }

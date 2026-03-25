@@ -10,7 +10,7 @@ import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.config.BoolProperty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -90,13 +90,13 @@ public class TabOptionToggleItem extends TabOptionBaseItem implements Navigatabl
     }
 
     @Override
-    public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+    public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
-        super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+        super.extractContent(graphics, mouseX, mouseY, hovered, partialTick);
         this.toggle.active = this.isOptionActive();
         this.toggle.setX(this.getX() + this.getWidth() - this.toggle.getWidth() - 20);
         this.toggle.setY(this.getY() + 2);
-        this.toggle.render(graphics, mouseX, mouseY, partialTick);
+        this.toggle.extractRenderState(graphics, mouseX, mouseY, partialTick);
 
         Controller controller = Controllable.getController();
         if(this.toggle.active && controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(this.getX(), this.getY(), this.getWidth(), this.getHeight(), mouseX, mouseY))

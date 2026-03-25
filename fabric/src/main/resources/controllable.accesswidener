@@ -1,4 +1,4 @@
-accessWidener v1 named
+accessWidener v1 official
 accessible field net/minecraft/client/Minecraft rightClickDelay I
 accessible field net/minecraft/client/MouseHandler activeButton Lnet/minecraft/client/input/MouseButtonInfo;
 accessible field net/minecraft/client/MouseHandler lastHandleMovementTime D
@@ -20,7 +20,7 @@ accessible field net/minecraft/client/gui/screens/inventory/LoomScreen startRow 
 accessible field net/minecraft/client/gui/screens/recipebook/OverlayRecipeComponent$OverlayRecipeButton isCraftable Z
 accessible method net/minecraft/client/Minecraft startUseItem ()V
 accessible method net/minecraft/client/Minecraft startAttack ()Z
-accessible method net/minecraft/client/Minecraft pickBlock ()V
+accessible method net/minecraft/client/Minecraft pick (F)V
 accessible method net/minecraft/client/Minecraft openChatScreen (Lnet/minecraft/client/gui/components/ChatComponent$ChatMethod;)V
 accessible method net/minecraft/client/player/LocalPlayer canStartSprinting ()Z
 accessible class net/minecraft/client/gui/screens/recipebook/OverlayRecipeComponent$OverlayRecipeButton

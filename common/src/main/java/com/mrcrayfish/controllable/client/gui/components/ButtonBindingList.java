@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
-import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.gui.ISearchable;
 import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.gui.screens.ConfirmationScreen;
@@ -13,11 +12,12 @@ import com.mrcrayfish.controllable.client.gui.screens.SelectKeyBindingScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.gui.widget.ButtonBindingButton;
 import com.mrcrayfish.controllable.client.gui.widget.ImageButton;
+import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetTooltipHolder;
@@ -31,11 +31,7 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Author: MrCrayfish
@@ -176,23 +172,23 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+        public void extractContent(GuiGraphicsExtractor extractor, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
-            this.updateTooltip(graphics, mouseX, mouseY);
+            this.updateTooltip(extractor, mouseX, mouseY);
             this.setLabelColor(this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor());
-            super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+            super.extractContent(extractor, mouseX, mouseY, hovered, partialTick);
             this.bindingButton.setTooltip(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
             this.bindingButton.setTooltipDelay(Duration.ofMillis(400));
             this.bindingButton.setX(this.getX() + this.getWidth() - 65);
             this.bindingButton.setY(this.getY() + 2);
-            this.bindingButton.render(graphics, mouseX, mouseY, partialTick);
+            this.bindingButton.extractRenderState(extractor, mouseX, mouseY, partialTick);
             this.resetButton.setX(this.getX() + width - 24);
             this.resetButton.setY(this.getY() + 2);
             this.resetButton.active = !this.binding.isDefault();
-            this.resetButton.render(graphics, mouseX, mouseY, partialTick);
+            this.resetButton.extractRenderState(extractor, mouseX, mouseY, partialTick);
         }
 
-        private void updateTooltip(GuiGraphics graphics, double mouseX, double mouseY)
+        private void updateTooltip(GuiGraphicsExtractor extractor, double mouseX, double mouseY)
         {
             Controller controller = Controllable.getController();
             if(!this.bindingButton.isHovered() && !this.resetButton.isHovered() && this.isMouseOver(mouseX, mouseY) && controller != null && controller.isBeingUsed())
@@ -203,7 +199,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             {
                 this.tooltip.set(null);
             }
-            this.tooltip.refreshTooltipForNextRenderPass(graphics, (int) mouseX, (int) mouseY, true, false, this.getRectangle());
+            this.tooltip.refreshTooltipForNextRenderPass(extractor, (int) mouseX, (int) mouseY, true, false, this.getRectangle());
         }
 
         @Override
@@ -248,12 +244,12 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+        public void extractContent(GuiGraphicsExtractor extractor, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             this.widget.setWidth(this.getWidth() - 10);
             this.widget.setX(this.getX() + 5);
             this.widget.setY(this.getY() + 2);
-            this.widget.render(graphics, mouseX, mouseY, partialTick);
+            this.widget.extractRenderState(extractor, mouseX, mouseY, partialTick);
         }
 
         @Override
@@ -276,16 +272,16 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+        public void extractContent(GuiGraphicsExtractor extractor, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             this.leftWidget.setWidth(this.getWidth() / 2 - 10);
             this.leftWidget.setX(this.getX() + 5);
             this.leftWidget.setY(this.getY() + 2);
-            this.leftWidget.render(graphics, mouseX, mouseY, partialTick);
+            this.leftWidget.extractRenderState(extractor, mouseX, mouseY, partialTick);
             this.rightWidget.setWidth(this.getWidth() / 2 - 10);
             this.rightWidget.setX(this.getX() + this.getWidth() / 2 + 5);
             this.rightWidget.setY(this.getY() + 2);
-            this.rightWidget.render(graphics, mouseX, mouseY, partialTick);
+            this.rightWidget.extractRenderState(extractor, mouseX, mouseY, partialTick);
         }
 
         @Override

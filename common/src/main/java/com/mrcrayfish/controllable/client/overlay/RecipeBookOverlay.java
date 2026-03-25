@@ -11,7 +11,7 @@ import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
@@ -54,7 +54,7 @@ public class RecipeBookOverlay implements IOverlay
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
         Font font = Minecraft.getInstance().font;
 
@@ -63,8 +63,8 @@ public class RecipeBookOverlay implements IOverlay
         {
             RecipeBookTabButton first = tabButtons.get(0);
             RecipeBookTabButton last = tabButtons.get(tabButtons.size() - 1);
-            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_RECIPE_TAB.getButton()), first.getX() + 15 - 5, first.getY() - 13, 0xFFFFFFFF);
-            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.getX() + 15 - 5, last.getY() + last.getHeight() + 13 - 9, 0xFFFFFFFF);
+            graphics.text(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_RECIPE_TAB.getButton()), first.getX() + 15 - 5, first.getY() - 13, 0xFFFFFFFF);
+            graphics.text(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_RECIPE_TAB.getButton()), last.getX() + 15 - 5, last.getY() + last.getHeight() + 13 - 9, 0xFFFFFFFF);
         }
 
         RecipeBookPage page = ((RecipeBookComponentAccessor) this.recipeBook).controllableGetRecipeBookPage();
@@ -72,13 +72,13 @@ public class RecipeBookOverlay implements IOverlay
         ImageButton forwardButton = ((RecipeBookPageAccessor) page).controllableGetForwardButton();
         if(forwardButton.visible)
         {
-            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.getX() + 24 - 5, forwardButton.getY() + 4, 0xFFFFFFFF);
+            graphics.text(font, ClientHelper.getButtonComponent(ButtonBindings.PREVIOUS_CREATIVE_TAB.getButton()), forwardButton.getX() + 24 - 5, forwardButton.getY() + 4, 0xFFFFFFFF);
         }
 
         ImageButton backButton = ((RecipeBookPageAccessor) page).controllableGetBackButton();
         if(backButton.visible)
         {
-            graphics.drawString(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.getX() - 24 + 12 - 5, backButton.getY() + 4, 0xFFFFFFFF);
+            graphics.text(font, ClientHelper.getButtonComponent(ButtonBindings.NEXT_CREATIVE_TAB.getButton()), backButton.getX() - 24 + 12 - 5, backButton.getY() + 4, 0xFFFFFFFF);
         }
     }
 }

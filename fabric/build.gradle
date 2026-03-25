@@ -3,25 +3,23 @@ import org.apache.commons.io.FilenameUtils
 
 plugins {
     id 'multiloader-loader'
-    id 'fabric-loom'
+    id 'net.fabricmc.fabric-loom'
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    modImplementation "com.mrcrayfish:framework-fabric:${minecraft_version}-${framework_version}"
-    modCompileOnly ("dev.architectury:architectury-fabric:${architectury_api_version}") transitive false
-    modCompileOnly ("mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}") transitive false
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    implementation "com.mrcrayfish:framework-fabric:${framework_version}+${minecraft_version}"
+    compileOnly "dev.architectury:architectury-fabric:${architectury_api_version}" transitive false
+    compileOnly ("mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}") transitive false
     //modCompileOnly ("dev.emi:emi-fabric:${emi_version}") transitive false
-    modCompileOnly ("me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}") transitive false
-    modCompileOnly ("me.shedaniel.cloth:cloth-config-fabric:18.0.145")
+    compileOnly ("me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}") transitive false
+    compileOnly ("me.shedaniel.cloth:cloth-config-fabric:18.0.145")
     //modRuntimeOnly "squeek.appleskin:appleskin-fabric:mc1.21.3-3.0.6"
     library include("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
         transitive false
     }
-    implementation "com.google.code.findbugs:jsr305:3.0.1"
 }
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
@@ -56,12 +54,14 @@ loom {
     }
 }
 
-remapJar {
+
+
+/*remapJar {
     addNestedDependencies = true
-}
+}*/
 
 tasks.register("signJar") {
-    dependsOn tasks.remapJar
+    dependsOn jar
     onlyIf {
         findProperty('keyStore') || System.getenv("KEYSTORE")
     }
@@ -100,13 +100,6 @@ sourceSets.configureEach {
             attributes {
                 attribute(loaderAttribute, 'fabric')
             }
-        }
-    }
-}
-loom.remapConfigurations.configureEach {
-    configurations.named(it.name) {
-        attributes {
-            attribute(loaderAttribute, 'fabric')
         }
     }
 }

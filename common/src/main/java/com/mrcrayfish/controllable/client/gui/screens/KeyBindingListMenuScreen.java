@@ -14,7 +14,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -172,7 +172,7 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
 
         @Override
         @SuppressWarnings("ConstantConditions")
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             Controller controller = Controllable.getController();
             if(controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(this.getX(), this.getY(), this.getWidth(), this.getHeight(), mouseX, mouseY))
@@ -180,13 +180,13 @@ public abstract class KeyBindingListMenuScreen extends ListMenuScreen
                 ScreenHelper.drawOutlinedBox(graphics, this.getX() - 2, this.getY() - 1, this.getWidth() + 4, this.getHeight() + 2, 0xAAFFFFFF);
             }
             Font font = KeyBindingListMenuScreen.this.minecraft.font;
-            graphics.drawString(font, this.label, this.getX() + 5, this.getY() + 7, 0xFFFFFFFF);
+            graphics.text(font, this.label, this.getX() + 5, this.getY() + 7, 0xFFFFFFFF);
             this.addBinding.setX(this.getX() + this.getWidth() - 42);
             this.addBinding.setY(this.getY() + 1);
-            this.addBinding.render(graphics, mouseX, mouseY, partialTick);
+            this.addBinding.extractRenderState(graphics, mouseX, mouseY, partialTick);
             this.removeBinding.setX(this.getX() + this.getWidth() - 20);
             this.removeBinding.setY(this.getY() + 1);
-            this.removeBinding.render(graphics, mouseX, mouseY, partialTick);
+            this.removeBinding.extractRenderState(graphics, mouseX, mouseY, partialTick);
         }
 
         @Override

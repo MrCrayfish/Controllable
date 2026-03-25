@@ -28,11 +28,6 @@ neoForge {
         accessTransformers.from(at.absolutePath)
     }
 
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
-
     mods {
         framework {
             sourceSet sourceSets.main
@@ -53,7 +48,7 @@ neoForge {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    implementation "com.mrcrayfish:framework-neoforge:${minecraft_version}-${framework_version}"
+    implementation "com.mrcrayfish:framework-neoforge:${framework_version}+${minecraft_version}"
 
     // JEI
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}"

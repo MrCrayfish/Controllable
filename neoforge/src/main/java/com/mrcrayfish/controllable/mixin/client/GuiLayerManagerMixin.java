@@ -1,9 +1,10 @@
 package com.mrcrayfish.controllable.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mrcrayfish.controllable.client.ClientEvents;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.neoforged.neoforge.client.gui.GuiLayerManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,9 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GuiLayerManager.class)
 public class GuiLayerManagerMixin
 {
-    @Inject(method = "renderInner", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/gui/GuiLayer;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
-    private void controllableBeforeRenderLayer(GuiGraphics graphics, DeltaTracker tracker, CallbackInfo info, @Local(index = 4, ordinal = 0) GuiLayerManager.NamedLayer layer)
+    @Inject(method = "renderInner", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/gui/GuiLayer;render(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
+    private void controllable$BeforeRenderLayer(GuiGraphicsExtractor extractor, DeltaTracker tracker, CallbackInfo info, @Local(index = 4, ordinal = 0) GuiLayerManager.NamedLayer layer)
     {
-        ClientEvents.beforeRenderLayer(graphics, layer);
+        ClientEvents.beforeRenderLayer(extractor, layer);
     }
 }

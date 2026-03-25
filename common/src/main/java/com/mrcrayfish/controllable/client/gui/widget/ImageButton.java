@@ -1,6 +1,6 @@
 package com.mrcrayfish.controllable.client.gui.widget;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
@@ -35,9 +35,9 @@ public class ImageButton extends Button
     }
 
     @Override
-    public void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderDefaultSprite(graphics);
+        this.extractDefaultSprite(graphics);
         graphics.blit(RenderPipelines.GUI_TEXTURED, this.texture, this.getX() + (this.width - this.imageWidth) / 2, this.getY() + (this.height - this.imageHeight) / 2, this.imageU, this.imageV, this.imageWidth, this.imageHeight, this.textureWidth, this.textureHeight, !this.active ? 0x88FFFFFF : 0xFFFFFFFF);
     }
 }

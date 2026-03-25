@@ -15,7 +15,7 @@ import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.component.DataComponents;
@@ -52,7 +52,7 @@ public class ActionHintOverlay implements IOverlay
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
         if(this.actions.isEmpty())
             return;
@@ -67,7 +67,7 @@ public class ActionHintOverlay implements IOverlay
         }
     }
 
-    private void drawConsoleHints(GuiGraphics graphics)
+    private void drawConsoleHints(GuiGraphicsExtractor graphics)
     {
         graphics.pose().pushMatrix();
 
@@ -100,7 +100,7 @@ public class ActionHintOverlay implements IOverlay
         graphics.pose().popMatrix();
     }
 
-    private void drawSidedHints(GuiGraphics graphics)
+    private void drawSidedHints(GuiGraphicsExtractor graphics)
     {
         int[] positions = new int[2];
         for(int button : this.actions.keySet())
@@ -117,7 +117,7 @@ public class ActionHintOverlay implements IOverlay
         }
     }
 
-    private void drawSideHint(GuiGraphics graphics, Action action, Action.Side side, int button, int position)
+    private void drawSideHint(GuiGraphicsExtractor graphics, Action action, Action.Side side, int button, int position)
     {
         Minecraft mc = Minecraft.getInstance();
 
@@ -135,7 +135,7 @@ public class ActionHintOverlay implements IOverlay
         this.drawHintLabel(graphics, action.getDescription(), labelX, y + 3);
     }
 
-    private void drawHintBackground(GuiGraphics graphics, int x, int y, int width, int height)
+    private void drawHintBackground(GuiGraphicsExtractor graphics, int x, int y, int width, int height)
     {
         if(Config.CLIENT.options.drawHintBackground.get())
         {
@@ -145,12 +145,12 @@ public class ActionHintOverlay implements IOverlay
         }
     }
 
-    private void drawHintLabel(GuiGraphics graphics, Component label, int x, int y)
+    private void drawHintLabel(GuiGraphicsExtractor extractor, Component label, int x, int y)
     {
         Minecraft mc = Minecraft.getInstance();
-        graphics.pose().pushMatrix();
-        graphics.drawString(mc.font, label, x, y, 0xFFFFFFFF);
-        graphics.pose().popMatrix();
+        extractor.pose().pushMatrix();
+        extractor.text(mc.font, label, x, y, 0xFFFFFFFF);
+        extractor.pose().popMatrix();
     }
 
     @Override

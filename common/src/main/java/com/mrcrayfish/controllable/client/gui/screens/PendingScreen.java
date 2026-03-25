@@ -2,7 +2,7 @@ package com.mrcrayfish.controllable.client.gui.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -17,9 +17,9 @@ public class PendingScreen extends Screen
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick)
     {
-        super.render(graphics, mouseX, mouseY, partialTick);
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         String loadingBar = switch((int) (Util.getMillis() / 300L % 4L)) {
             case 1, 3 -> "o O o";
             case 2 -> "o o O";
@@ -27,7 +27,7 @@ public class PendingScreen extends Screen
         };
         int centerX = this.width / 2;
         int centerY = this.height / 2;
-        graphics.drawCenteredString(this.font, loadingBar, centerX, centerY - 9, -1);
-        graphics.drawCenteredString(this.font, this.title, centerX, centerY + 5, 0xFF808080);
+        graphics.centeredText(this.font, loadingBar, centerX, centerY - 9, -1);
+        graphics.centeredText(this.font, this.title, centerX, centerY + 5, 0xFF808080);
     }
 }

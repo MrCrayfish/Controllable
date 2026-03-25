@@ -3,7 +3,7 @@ package com.mrcrayfish.controllable.client.gui;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 
 /**
@@ -32,7 +32,7 @@ public class ControllerButton
         this.scale = scale;
     }
 
-    public void draw(GuiGraphics graphics, int x, int y, int mouseX, int mouseY, boolean selected)
+    public void extract(GuiGraphicsExtractor extractor, int x, int y, int mouseX, int mouseY, boolean selected)
     {
         int buttonU = this.u;
         int buttonV = this.v;
@@ -50,7 +50,7 @@ public class ControllerButton
         {
             buttonV += this.height;
         }
-        graphics.blit(RenderPipelines.GUI_TEXTURED, ControllerLayoutScreen.TEXTURE, buttonX, buttonY, buttonU, buttonV, this.width * this.scale, this.height * this.scale, this.width, this.height, 256, 256);
+        extractor.blit(RenderPipelines.GUI_TEXTURED, ControllerLayoutScreen.TEXTURE, buttonX, buttonY, buttonU, buttonV, this.width * this.scale, this.height * this.scale, this.width, this.height, 256, 256);
     }
 
     public int getButton()

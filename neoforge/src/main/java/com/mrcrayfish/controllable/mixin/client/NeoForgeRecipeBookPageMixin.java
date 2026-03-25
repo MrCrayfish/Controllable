@@ -21,7 +21,7 @@ import java.util.List;
 @Mixin(RecipeBookPage.class)
 public class NeoForgeRecipeBookPageMixin
 {
-    @ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;setComponentTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/resources/Identifier;)V"), index = 1)
+    @ModifyArg(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setComponentTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/resources/Identifier;)V"), index = 1)
     private List<Component> controllableModifyRenderToolTip(List<Component> components)
     {
         Controller controller = Controllable.getController();

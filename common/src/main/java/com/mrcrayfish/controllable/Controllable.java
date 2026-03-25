@@ -78,7 +78,8 @@ public class Controllable
 
     public static boolean isArchitecturyLoaded()
     {
-        return ARCHITECTURY_LOADED;
+        // TODO 26.1 reimplement when possible
+        return false; //ARCHITECTURY_LOADED;
     }
 
     public static boolean isJeiLoaded()

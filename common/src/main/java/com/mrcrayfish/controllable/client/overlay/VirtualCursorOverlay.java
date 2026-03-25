@@ -8,7 +8,7 @@ import com.mrcrayfish.controllable.client.settings.CursorStyle;
 import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.world.inventory.Slot;
@@ -26,7 +26,7 @@ public class VirtualCursorOverlay implements IOverlay
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, DeltaTracker tracker)
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, DeltaTracker tracker)
     {
         graphics.pose().pushMatrix();
         Minecraft mc = Minecraft.getInstance();

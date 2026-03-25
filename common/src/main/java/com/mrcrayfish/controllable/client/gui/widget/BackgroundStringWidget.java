@@ -3,7 +3,7 @@ package com.mrcrayfish.controllable.client.gui.widget;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractStringWidget;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.network.chat.Component;
@@ -24,9 +24,9 @@ public class BackgroundStringWidget extends StringWidget
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    public void extractWidgetRenderState(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick)
     {
-        ScreenHelper.drawRoundedBox(graphics, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 0x55000000);
-        graphics.drawString(this.getFont(), this.getMessage().getVisualOrderText(), this.getX() + 2, this.getY() + 2, 0xFFFFFFFF);
+        ScreenHelper.drawRoundedBox(extractor, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 0x55000000);
+        extractor.text(this.getFont(), this.getMessage().getVisualOrderText(), this.getX() + 2, this.getY() + 2, 0xFFFFFFFF);
     }
 }

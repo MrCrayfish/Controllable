@@ -3,7 +3,8 @@ package com.mrcrayfish.controllable.client.util;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
 import com.mrcrayfish.controllable.platform.ClientServices;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -35,19 +36,19 @@ public class ScreenHelper
         return Button.builder(label, onPress).pos(x, y).size(width, height).build();
     }
 
-    public static void drawOutlinedBox(GuiGraphics graphics, int x, int y, int width, int height, int color)
+    public static void drawOutlinedBox(GuiGraphicsExtractor extractor, int x, int y, int width, int height, int color)
     {
-        graphics.fill(x, y, x + width, y + 1, color);                          // Top
-        graphics.fill(x, y + 1, x + 1, y + height - 1, color);                 // Left
-        graphics.fill(x, y + height - 1, x + width, y + height, color);        // Bottom
-        graphics.fill(x + width - 1, y + 1, x + width, y + height - 1, color); // Right
+        extractor.fill(x, y, x + width, y + 1, color);                          // Top
+        extractor.fill(x, y + 1, x + 1, y + height - 1, color);                 // Left
+        extractor.fill(x, y + height - 1, x + width, y + height, color);        // Bottom
+        extractor.fill(x + width - 1, y + 1, x + width, y + height - 1, color); // Right
     }
 
-    public static void drawRoundedBox(GuiGraphics graphics, int x, int y, int width, int height, int backgroundColor)
+    public static void drawRoundedBox(GuiGraphicsExtractor extractor, int x, int y, int width, int height, int backgroundColor)
     {
-        graphics.fill(x - 3 + 1, y, x + width + 2 - 1, y + 1, backgroundColor);
-        graphics.fill(x - 3, y + 1, x + width + 2, y + height - 1, backgroundColor);
-        graphics.fill(x - 3 + 1, y + height - 1, x + width + 2 - 1, y + height, backgroundColor);
+        extractor.fill(x - 3 + 1, y, x + width + 2 - 1, y + 1, backgroundColor);
+        extractor.fill(x - 3, y + 1, x + width + 2, y + height - 1, backgroundColor);
+        extractor.fill(x - 3 + 1, y + height - 1, x + width + 2 - 1, y + height, backgroundColor);
     }
 
     public static Optional<GuiEventListener> findHoveredListener(Screen screen, double mouseX, double mouseY, Predicate<GuiEventListener> condition)

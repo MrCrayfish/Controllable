@@ -8,7 +8,7 @@ import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
@@ -76,12 +76,12 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick)
     {
-        super.render(graphics, mouseX, mouseY, partialTick);
+        super.extractRenderState(extractor, mouseX, mouseY, partialTick);
         if(this.list.children().isEmpty())
         {
-            graphics.drawCenteredString(this.font, LABEL_NO_KEYBINDS_AVAILABLE, this.list.getX() + this.list.getWidth() / 2, this.list.getY() + this.list.getHeight() / 2 - 4, 0xFFFFFFFF);
+            extractor.centeredText(this.font, LABEL_NO_KEYBINDS_AVAILABLE, this.list.getX() + this.list.getWidth() / 2, this.list.getY() + this.list.getHeight() / 2 - 4, 0xFFFFFFFF);
         }
     }
 

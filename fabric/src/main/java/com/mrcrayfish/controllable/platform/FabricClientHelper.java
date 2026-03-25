@@ -8,11 +8,10 @@ import com.mrcrayfish.controllable.client.gui.navigation.NavigationPoint;
 import com.mrcrayfish.controllable.client.util.ReflectUtil;
 import com.mrcrayfish.controllable.integration.ArchitecturySupport;
 import com.mrcrayfish.controllable.platform.services.IClientHelper;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.client.GuiMessage;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -26,6 +25,7 @@ import net.minecraft.client.gui.screens.recipebook.OverlayRecipeComponent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.locale.Language;
@@ -223,13 +223,13 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public void pickBlock(Minecraft mc)
     {
-        mc.pickBlock();
+        mc.pick(1.0F);
     }
 
     @Override
     public List<Renderable> getScreenRenderables(Screen screen)
     {
-        return new ArrayList<>(Screens.getButtons(screen));
+        return new ArrayList<>(Screens.getWidgets(screen));
     }
 
     @Override
@@ -255,12 +255,6 @@ public class FabricClientHelper implements IClientHelper
     }
 
     @Override
-    public boolean canLocalPlayerSwimInFluid(LocalPlayer player)
-    {
-        return !player.isInWater() || player.isUnderWater();
-    }
-
-    @Override
     public void scrollCreativeTabs(CreativeModeInventoryScreen screen, int dir)
     {
         if(dir > 0)
@@ -271,18 +265,6 @@ public class FabricClientHelper implements IClientHelper
         {
             screen.switchToPreviousPage();
         }
-    }
-
-    @Override
-    public float getCreativeScrollOffset(CreativeModeInventoryScreen screen)
-    {
-        return ReflectUtil.getCreativeScrollOffset(screen);
-    }
-
-    @Override
-    public void setCreativeScrollOffset(CreativeModeInventoryScreen screen, float offset)
-    {
-        ReflectUtil.setCreativeScrollOffset(screen, offset);
     }
 
     @Override
@@ -319,7 +301,7 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public int getKeyValue(KeyMapping mapping)
     {
-        return KeyBindingHelper.getBoundKeyOf(mapping).getValue();
+        return KeyMappingHelper.getBoundKeyOf(mapping).getValue();
     }
 
     @Override

@@ -6,7 +6,7 @@ import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.gui.Icons;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -95,12 +95,12 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             this.widget.setWidth((int) (this.getWidth() * 0.5));
             this.widget.setX(this.getX() + (this.getWidth() - this.widget.getWidth()) / 2);
             this.widget.setY(this.getY() + 2);
-            this.widget.render(graphics, mouseX, mouseY, partialTick);
+            this.widget.extractRenderState(graphics, mouseX, mouseY, partialTick);
         }
 
         @Override

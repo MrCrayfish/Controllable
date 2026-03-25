@@ -10,6 +10,7 @@ import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
+import net.minecraft.client.FramerateLimiter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.ApiStatus;
@@ -126,7 +127,7 @@ public class InputProcessor
         int captureCount = 4; // The amount of times to capture controller input while waiting
         for(int i = 0; i < captureCount; i++)
         {
-            RenderSystem.limitDisplayFPS(fps * captureCount);
+            FramerateLimiter.limitDisplayFPS(fps * captureCount);
             this.gatherAndQueueControllerInput();
         }
     }

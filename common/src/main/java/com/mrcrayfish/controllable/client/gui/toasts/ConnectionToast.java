@@ -4,7 +4,7 @@ import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -44,13 +44,13 @@ public class ConnectionToast implements Toast
     }
 
     @Override
-    public void render(GuiGraphics graphics, Font font, long delta)
+    public void extractRenderState(GuiGraphicsExtractor extractor, Font font, long delta)
     {
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND_SPRITE, 0, 0, 160, 32);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, ControllerLayoutScreen.TEXTURE, 8, 8, 20, 43, 20, 16, 256, 256);
+        extractor.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND_SPRITE, 0, 0, 160, 32);
+        extractor.blit(RenderPipelines.GUI_TEXTURED, ControllerLayoutScreen.TEXTURE, 8, 8, 20, 43, 20, 16, 256, 256);
         String title = font.plainSubstrByWidth(this.controllerName.getString(), 120);
-        graphics.drawString(font, title, 35, 7, 0xFFFFFFFF, false);
+        extractor.text(font, title, 35, 7, 0xFFFFFFFF, false);
         Component message = this.connected ? LABEL_CONNECTED : LABEL_DISCONNECTED;
-        graphics.drawString(font, message, 35, 18, 0xFFFFFF00, false);
+        extractor.text(font, message, 35, 18, 0xFFFFFF00, false);
     }
 }

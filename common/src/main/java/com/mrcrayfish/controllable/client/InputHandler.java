@@ -650,7 +650,8 @@ public class InputHandler
 
         if(Controllable.isReiLoaded() && ClientHelper.isPlayingGame())
         {
-            points.addAll(ReiSupport.getNavigationPoints(screen));
+            // TODO 26.1 reimplement when possible
+            //points.addAll(ReiSupport.getNavigationPoints(screen));
         }
 
         // Gather any additional points from event

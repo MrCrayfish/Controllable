@@ -16,7 +16,7 @@ neoForge {
 }
 
 dependencies {
-    compileOnly "com.mrcrayfish:framework-common:${minecraft_version}-${framework_version}"
+    compileOnly "com.mrcrayfish:framework-common:${framework_version}+${minecraft_version}"
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-common:${jei_version}"
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-gui:${jei_version}"
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-lib:${jei_version}"

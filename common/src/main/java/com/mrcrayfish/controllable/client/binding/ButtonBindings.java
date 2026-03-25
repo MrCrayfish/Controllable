@@ -135,7 +135,7 @@ public class ButtonBindings
         return Optional.of(() -> {
             Minecraft mc = context.minecraft();
             Screenshot.grab(mc.gameDirectory, mc.getMainRenderTarget(), (component) -> {
-                mc.execute(() -> mc.gui.getChat().addMessage(component));
+                mc.execute(() -> mc.gui.getChat().addClientSystemMessage(component));
             });
         });
     }));
@@ -327,7 +327,7 @@ public class ButtonBindings
                 IntegratedServer server = mc.getSingleplayerServer();
                 if(!mc.isLocalServer() && (server == null || !server.isPublished())) {
                     Component message = Component.translatable("multiplayer.socialInteractions.not_available");
-                    player.displayClientMessage(message, true);
+                    player.sendOverlayMessage(message);
                     mc.getNarrator().saySystemNow(message);
                 } else {
                     mc.setScreen(new SocialInteractionsScreen());

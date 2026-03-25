@@ -3,7 +3,7 @@ package com.mrcrayfish.controllable.client.gui.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.controllable.util.Utils;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -26,11 +26,11 @@ public class ControllerButton extends Button
     }
 
     @Override
-    public void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
     {
         this.setX(this.widget.getRight() + 4);
         this.setY(this.widget.getY());
-        this.renderDefaultSprite(graphics);
+        this.extractDefaultSprite(graphics);
         boolean mouseOver = ScreenHelper.isMouseWithin(mouseX, mouseY, this.getX(), this.getY(), this.width, this.height);
         int textureV = 43;
         if(mouseOver)

@@ -11,7 +11,7 @@ import com.mrcrayfish.controllable.client.util.ScreenHelper;
 import com.mrcrayfish.framework.api.config.DoubleProperty;
 import com.mrcrayfish.framework.api.config.validate.NumberRange;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -55,13 +55,13 @@ public class TabOptionSliderItem extends TabOptionBaseItem implements Navigatabl
     }
 
     @Override
-    public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
+    public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick)
     {
-        super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+        super.extractContent(graphics, mouseX, mouseY, hovered, partialTick);
         this.slider.active = this.isOptionActive();
         this.slider.setX(this.getX() + this.getWidth() - this.slider.getWidth() - 20);
         this.slider.setY(this.getY() + 2);
-        this.slider.render(graphics, mouseX, mouseY, partialTick);
+        this.slider.extractRenderState(graphics, mouseX, mouseY, partialTick);
 
         Controller controller = Controllable.getController();
         if(this.slider.active && controller != null && controller.isBeingUsed() && ScreenHelper.isMouseWithin(this.getX(), this.getY(), this.getWidth(), this.getHeight(), mouseX, mouseY))

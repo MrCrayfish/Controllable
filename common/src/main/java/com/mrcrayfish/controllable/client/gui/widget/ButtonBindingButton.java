@@ -5,7 +5,7 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -32,15 +32,15 @@ public class ButtonBindingButton extends Button
     }
 
     @Override
-    public void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    public void extractContents(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderDefaultSprite(graphics);
+        this.extractDefaultSprite(extractor);
         if(this.binding.getButton() < 0)
             return;
         int texU = this.binding.getButton() * 13;
         int texV = Config.CLIENT.options.controllerIcons.get().ordinal() * 13;
         int size = 13;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, ButtonIcons.TEXTURE, this.getX() + (this.width - size) / 2 + 1, this.getY() + 3, texU, texV, size, size, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
+        extractor.blit(RenderPipelines.GUI_TEXTURED, ButtonIcons.TEXTURE, this.getX() + (this.width - size) / 2 + 1, this.getY() + 3, texU, texV, size, size, ButtonIcons.TEXTURE_WIDTH, ButtonIcons.TEXTURE_HEIGHT);
     }
 
     @Override

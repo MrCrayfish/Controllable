@@ -3,7 +3,7 @@ package com.mrcrayfish.controllable.client.gui.widget;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrcrayfish.controllable.client.gui.components.TabSelectionList;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -30,9 +30,9 @@ public class TabListWidget extends AbstractWidget implements ContainerEventHandl
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+    public void extractWidgetRenderState(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick)
     {
-        this.list.render(graphics, mouseX, mouseY, partialTick);
+        this.list.extractWidgetRenderState(extractor, mouseX, mouseY, partialTick);
     }
 
     @Override
