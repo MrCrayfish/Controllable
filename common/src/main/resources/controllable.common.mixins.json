@@ -3,6 +3,9 @@
   "package": "com.mrcrayfish.controllable.mixin",
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  },
   "refmap": "controllable.refmap.json",
   "client": [
     "client.ClientRecipeBookMixin",

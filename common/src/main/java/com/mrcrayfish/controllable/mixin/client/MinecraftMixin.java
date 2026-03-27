@@ -1,6 +1,8 @@
 package com.mrcrayfish.controllable.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
@@ -13,8 +15,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
@@ -89,30 +89,17 @@ public class MinecraftMixin
         }
     }
 
-    @ModifyVariable(method = "runTick", at = @At(value = "STORE", target = "Lcom/mojang/blaze3d/platform/FramerateLimitTracker;getFramerateLimit()I"), index = 4)
-    private int controllableModifyFramerate(int originalFps)
+    @WrapOperation(method = "renderFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/FramerateLimiter;limitDisplayFPS(I)V"))
+    private void controllable$CaptureInputWhileWaiting(int framerateLimit, Operation<Void> original)
     {
         Minecraft mc = (Minecraft) (Object) this;
-        if(mc.getOverlay() == null)
+        if(framerateLimit < 40 && Config.CLIENT.options.fpsPollingFix.get() && mc.getOverlay() == null)
         {
-            if(Config.CLIENT.options.fpsPollingFix.get() && mc.options.framerateLimit().get() < 40)
-            {
-                return 260; // To bypass "fps < 260" condition
-            }
+            Controllable.getInputProcessor().queueInputsWait(framerateLimit);
         }
-        return originalFps;
-    }
-
-    @Inject(method = "renderFrame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;getGameRenderState()Lnet/minecraft/client/renderer/state/GameRenderState;"))
-    private void controllableWaitEvents(boolean outOfMemory, CallbackInfo ci)
-    {
-        Minecraft mc = (Minecraft) (Object) this;
-        if(mc.getOverlay() == null)
+        else
         {
-            if(Config.CLIENT.options.fpsPollingFix.get() && mc.options.framerateLimit().get() < 40)
-            {
-                Controllable.getInputProcessor().queueInputsWait();
-            }
+            original.call(framerateLimit);
         }
     }
 }

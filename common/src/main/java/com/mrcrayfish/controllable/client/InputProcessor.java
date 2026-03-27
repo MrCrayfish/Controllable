@@ -1,7 +1,6 @@
 package com.mrcrayfish.controllable.client;
 
 import com.google.common.base.Preconditions;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
@@ -13,6 +12,7 @@ import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
 import net.minecraft.client.FramerateLimiter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayDeque;
@@ -120,14 +120,12 @@ public class InputProcessor
      * overrides the wait behaviour of Minecraft and is off by default. Do not call this method, it
      * is internal only.
      */
-    public void queueInputsWait()
+    public void queueInputsWait(int framerateLimit)
     {
-        Minecraft mc = Minecraft.getInstance();
-        int fps = mc.level != null || mc.screen == null && mc.getOverlay() == null ? mc.options.framerateLimit().get() : 60;
-        int captureCount = 4; // The amount of times to capture controller input while waiting
-        for(int i = 0; i < captureCount; i++)
+        int inputCaptureCount = 4; // The number of times to capture controller input while waiting
+        for(int i = 0; i < inputCaptureCount; i++)
         {
-            FramerateLimiter.limitDisplayFPS(fps * captureCount);
+            FramerateLimiter.limitDisplayFPS(framerateLimit * inputCaptureCount);
             this.gatherAndQueueControllerInput();
         }
     }
