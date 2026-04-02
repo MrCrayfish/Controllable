@@ -183,7 +183,7 @@ public class NeoForgeClientHelper implements IClientHelper
     @Override
     public void pickBlock(Minecraft mc)
     {
-        mc.pick(1.0F);
+        mc.pickBlockOrEntity();
     }
 
     @Override
