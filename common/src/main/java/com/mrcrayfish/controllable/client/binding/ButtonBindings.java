@@ -1,5 +1,6 @@
 package com.mrcrayfish.controllable.client.binding;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.context.GlobalContext;
@@ -23,19 +24,16 @@ import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.client.gui.screens.social.SocialInteractionsScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Inventory;
 import org.lwjgl.glfw.GLFW;
 
@@ -269,7 +267,7 @@ public class ButtonBindings
     public static final ButtonBinding PICKUP_ITEM = new ButtonBinding(Buttons.A, "controllable.key.pickup_item", "key.category.minecraft.inventory", InScreenContext.INSTANCE, OnPressAndReleaseHandler.create(context -> {
         return Optional.of(() -> {
             context.screen().ifPresent(screen -> {
-                MouseHooks.invokeMouseClick(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+                MouseHooks.sendMouseClickEvent(screen, InputConstants.MOUSE_BUTTON_LEFT);
                 // If invokeMouseClick closed the screen, and the button is the same as the jump
                 // button, the player will jump as soon as the screen is closed. To prevent this,
                 // the jump binding is simply unpressed.
@@ -285,37 +283,34 @@ public class ButtonBindings
         });
     }, context -> {
         return context.screen().map(screen -> {
-            MouseHooks.invokeMouseReleased(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+            MouseHooks.sendMouseReleasedEvent(screen, InputConstants.MOUSE_BUTTON_LEFT);
             return true;
         }).orElse(false);
     }));
 
-    public static final ButtonBinding QUICK_MOVE = new ButtonBinding(Buttons.B, "controllable.key.quick_move", "key.category.minecraft.inventory", InScreenContext.INSTANCE, OnPressHandler.create(context -> {
-        return Optional.of(() -> {
-            context.screen().ifPresent(screen -> {
-                context.player().ifPresent(player -> {
-                    if(player.inventoryMenu.getCarried().isEmpty()) {
-                        MouseHooks.invokeMouseClick(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT);
-                        if(Config.CLIENT.options.quickMoveSound.get()) {
-                            context.minecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WOODEN_BUTTON_CLICK_ON, 1.75F, 1.0F));
-                        }
-                    } else {
-                        MouseHooks.invokeMouseReleased(screen, GLFW.GLFW_MOUSE_BUTTON_RIGHT);
-                    }
-                });
-            });
-        });
+    public static final ButtonBinding QUICK_MOVE = new ButtonBinding(Buttons.B, "controllable.key.quick_move", "key.category.minecraft.inventory", InScreenContext.INSTANCE, OnPressAndReleaseHandler.create(context -> {
+        return Optional.of(() -> context.screen().ifPresent(screen -> context.player().ifPresent(player -> {
+            MouseHooks.sendMouseClickEventWithShift(screen, InputConstants.MOUSE_BUTTON_LEFT);
+            if(player.inventoryMenu.getCarried().isEmpty() && Config.CLIENT.options.quickMoveSound.get()) {
+                context.minecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WOODEN_BUTTON_CLICK_ON, 1.75F, 1.0F));
+            }
+        })));
+    }, context -> {
+        return context.screen().map(screen -> context.player().map(player -> {
+            MouseHooks.sendMouseReleasedEventWithShift(screen, InputConstants.MOUSE_BUTTON_LEFT);
+            return true;
+        }).orElse(false)).orElse(false);
     }));
 
     public static final ButtonBinding SPLIT_STACK = new ButtonBinding(Buttons.X, "controllable.key.split_stack", "key.category.minecraft.inventory", InScreenContext.INSTANCE, OnPressAndReleaseHandler.create(context -> {
         return Optional.of(() -> {
             context.screen().ifPresent(screen -> {
-                MouseHooks.invokeMouseClick(screen, GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+                MouseHooks.sendMouseClickEvent(screen, InputConstants.MOUSE_BUTTON_RIGHT);
             });
         });
     }, context -> {
         return context.screen().map(screen -> {
-            MouseHooks.invokeMouseReleased(screen, GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+            MouseHooks.sendMouseReleasedEvent(screen, GLFW.GLFW_MOUSE_BUTTON_RIGHT);
             return true;
         }).orElse(false);
     }));

@@ -1,10 +1,12 @@
 package com.mrcrayfish.controllable.client.util;
 
 import com.mojang.blaze3d.Blaze3D;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.integration.EmiSupport;
 import com.mrcrayfish.controllable.platform.ClientServices;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -44,96 +46,88 @@ public class MouseHooks
         return Minecraft.getInstance().mouseHandler.getScaledYPos(window);
     }
 
-    /**
-     * Invokes a mouse click in a GUI. This is modified version that is designed for controllers.
-     * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
-     *
-     * @param screen the screen instance
-     * @param button the button to click with
-     */
-    public static void invokeMouseClick(Screen screen, int button)
+    public static void sendMouseClickEvent(Screen screen, int button)
     {
         if(screen != null)
         {
-            double screenCursorX = getScreenMouseX();
-            double screenCursorY = getScreenMouseY();
-            if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
-            {
-                /*if(EmiSupport.invokeMouseClick(button, screenCursorX, screenCursorY))
-                {
-                    return;
-                }*/
-            }
-            invokeMouseClick(screen, button, screenCursorX, screenCursorY);
+            sendMouseClickEvent(screen, button, getScreenMouseX(), getScreenMouseY());
         }
     }
 
-    /**
-     * Invokes a mouse click in a GUI. This is modified version that is designed for controllers.
-     * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
-     *
-     * @param screen the screen instance
-     * @param button the button to click with
-     * @param cursorScreenX the x position of the cursor in screen space
-     * @param cursorScreenY the y position of the cursor in screen space
-     */
-    public static void invokeMouseClick(Screen screen, int button, double cursorScreenX, double cursorScreenY)
+    public static void sendMouseClickEventWithShift(Screen screen, int button)
     {
         if(screen != null)
         {
-            ClientServices.CLIENT.setActiveMouseButton(button);
+            var info = new MouseButtonInfo(button, InputConstants.MOD_SHIFT);
+            var event = new MouseButtonEvent(getScreenMouseX(), getScreenMouseY(), info);
+            sendMouseClickEvent(screen, event);
+        }
+    }
+
+    public static void sendMouseClickEvent(Screen screen, int button, double mouseX, double mouseY)
+    {
+        var info = new MouseButtonInfo(button, 0);
+        var event = new MouseButtonEvent(mouseX, mouseY, info);
+        sendMouseClickEvent(screen, event);
+    }
+
+    public static void sendMouseClickEvent(Screen screen, MouseButtonEvent event)
+    {
+        /*if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
+        {
+            if(EmiSupport.invokeMouseClick(button, screenCursorX, screenCursorY))
+            {
+                return;
+            }
+        }*/
+        if(screen != null)
+        {
+            ClientServices.CLIENT.setActiveMouseButtonInfo(event.buttonInfo());
             ClientServices.CLIENT.setLastMouseEventTime(Blaze3D.getTime());
 
             // 1.21.9 introduced double click
             long currentTime = Util.getMillis();
-            boolean doubleClick = currentTime - previousTime < 250L && previousButton == button;
-            if(ClientServices.CLIENT.sendScreenMouseClick(screen, cursorScreenX, cursorScreenY, button, doubleClick))
+            boolean doubleClick = currentTime - previousTime < 250L && previousButton == event.button();
+            if(ClientServices.CLIENT.sendScreenMouseClick(screen, event, doubleClick))
             {
                 previousTime = currentTime;
-                previousButton = button;
+                previousButton = event.button();
             }
         }
     }
 
-    /**
-     * Invokes a mouse released in a GUI. This is modified version that is designed for controllers.
-     * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
-     *
-     * @param screen the screen instance
-     * @param button the button to click with
-     */
-    public static void invokeMouseReleased(Screen screen, int button)
+    public static void sendMouseReleasedEvent(Screen screen, int button)
     {
-        if(screen != null)
+        sendMouseReleasedEvent(screen, button, getScreenMouseX(), getScreenMouseY());
+    }
+
+    public static void sendMouseReleasedEventWithShift(Screen screen, int button)
+    {
+        var info = new MouseButtonInfo(button, InputConstants.MOD_SHIFT);
+        var event = new MouseButtonEvent(getScreenMouseX(), getScreenMouseY(), info);
+        sendMouseReleasedEvent(screen, event);
+    }
+
+    public static void sendMouseReleasedEvent(Screen screen, int button, double mouseX, double mouseY)
+    {
+        var info = new MouseButtonInfo(button, 0);
+        var event = new MouseButtonEvent(mouseX, mouseY, info);
+        sendMouseReleasedEvent(screen, event);
+    }
+
+    public static void sendMouseReleasedEvent(Screen screen, MouseButtonEvent event)
+    {
+        /*if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
         {
-            double screenCursorX = getScreenMouseX();
-            double screenCursorY = getScreenMouseY();
-            if(screen instanceof AbstractContainerScreen && Controllable.isEmiLoaded())
+            if(EmiSupport.invokeMouseReleased(button, screenCursorX, screenCursorY))
             {
-                /*if(EmiSupport.invokeMouseReleased(button, screenCursorX, screenCursorY))
-                {
-                    return;
-                }*/
+                return;
             }
-            invokeMouseReleased(screen, button, screenCursorX, screenCursorY);
-        }
-    }
-
-    /**
-     * Invokes a mouse released in a GUI. This is modified version that is designed for controllers.
-     * Upon clicking, mouse released is called straight away to make sure dragging doesn't happen.
-     *
-     * @param screen the screen instance
-     * @param button the button to click with
-     * @param cursorScreenX the x position of the cursor in screen space
-     * @param cursorScreenY the y position of the cursor in screen space
-     */
-    public static void invokeMouseReleased(Screen screen, int button, double cursorScreenX, double cursorScreenY)
-    {
+        }*/
         if(screen != null)
         {
-            ClientServices.CLIENT.setActiveMouseButton(-1);
-            ClientServices.CLIENT.sendScreenMouseReleased(screen, cursorScreenX, cursorScreenY, button);
+            ClientServices.CLIENT.setActiveMouseButtonInfo(null);
+            ClientServices.CLIENT.sendScreenMouseReleased(screen, event);
         }
     }
 
@@ -148,9 +142,9 @@ public class MouseHooks
             screen.mouseMoved(screenCursorX, screenCursorY);
 
             // Invoke a mouse drag if possible
-            int activeMouseButton = ClientServices.CLIENT.getActiveMouseButton();
+            MouseButtonInfo activeInfo = ClientServices.CLIENT.getActiveMouseButtonInfo();
             double lastMouseEventTime = ClientServices.CLIENT.getLastMouseEventTime();
-            if(activeMouseButton != -1 && lastMouseEventTime > 0)
+            if(activeInfo != null && lastMouseEventTime > 0)
             {
                 if(screen instanceof AbstractContainerScreen<?>)
                 {
@@ -162,7 +156,7 @@ public class MouseHooks
                         }*/
                     }
                 }
-                ClientServices.CLIENT.sendMouseDrag(screen, deltaX, deltaY, screenCursorX, screenCursorY, activeMouseButton);
+                ClientServices.CLIENT.sendMouseDrag(screen, deltaX, deltaY, screenCursorX, screenCursorY, activeInfo.button());
             }
         }
     }

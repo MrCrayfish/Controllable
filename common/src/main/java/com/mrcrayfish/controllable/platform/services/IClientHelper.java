@@ -11,6 +11,8 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
@@ -31,9 +33,9 @@ public interface IClientHelper
 
     void sendMouseDrag(Screen screen, double dragX, double dragY, double finalMouseX, double finalMouseY, int activeButton);
 
-    boolean sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button, boolean doubleClick);
+    boolean sendScreenMouseClick(Screen screen, MouseButtonEvent event, boolean doubleClick);
 
-    void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button);
+    void sendScreenMouseReleased(Screen screen, MouseButtonEvent event);
 
     List<GuiMessage.Line> getChatTrimmedMessages(ChatComponent chat);
 
@@ -44,9 +46,10 @@ public interface IClientHelper
 
     int getAbstractListBottom(AbstractSelectionList<?> list);
 
-    int getActiveMouseButton();
+    @Nullable
+    MouseButtonInfo getActiveMouseButtonInfo();
 
-    void setActiveMouseButton(int button);
+    void setActiveMouseButtonInfo(@Nullable MouseButtonInfo info);
 
     double getLastMouseEventTime();
 

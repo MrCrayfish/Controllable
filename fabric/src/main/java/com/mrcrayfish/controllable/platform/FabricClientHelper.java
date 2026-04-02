@@ -34,6 +34,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
@@ -111,9 +112,8 @@ public class FabricClientHelper implements IClientHelper
     }
 
     @Override
-    public boolean sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button, boolean doubleClick)
+    public boolean sendScreenMouseClick(Screen screen, MouseButtonEvent event, boolean doubleClick)
     {
-        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
         if(!ScreenMouseEvents.allowMouseClick(screen).invoker().allowMouseClick(screen, event))
             return false;
 
@@ -121,7 +121,7 @@ public class FabricClientHelper implements IClientHelper
         ScreenMouseEvents.beforeMouseClick(screen).invoker().beforeMouseClick(screen, event);
         if(Controllable.isArchitecturyLoaded())
         {
-            handled = ArchitecturySupport.sendScreenMouseClick(screen, mouseX, mouseY, button);
+            handled = ArchitecturySupport.sendScreenMouseClick(screen, event.x(), event.y(), event.button());
         }
         else
         {
@@ -132,9 +132,8 @@ public class FabricClientHelper implements IClientHelper
     }
 
     @Override
-    public void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
+    public void sendScreenMouseReleased(Screen screen, MouseButtonEvent event)
     {
-        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
         if(!ScreenMouseEvents.allowMouseRelease(screen).invoker().allowMouseRelease(screen, event))
             return;
 
@@ -143,7 +142,7 @@ public class FabricClientHelper implements IClientHelper
         boolean handled;
         if(Controllable.isArchitecturyLoaded())
         {
-            handled = ArchitecturySupport.sendScreenMouseReleased(screen, mouseX, mouseY, button);
+            handled = ArchitecturySupport.sendScreenMouseReleased(screen, event.x(), event.y(), event.button());
         }
         else
         {
@@ -177,23 +176,16 @@ public class FabricClientHelper implements IClientHelper
     }
 
     @Override
-    public int getActiveMouseButton()
+    @Nullable
+    public MouseButtonInfo getActiveMouseButtonInfo()
     {
-        var info = Minecraft.getInstance().mouseHandler.activeButton;
-        return info != null ? info.button() : -1;
+        return Minecraft.getInstance().mouseHandler.activeButton;
     }
 
     @Override
-    public void setActiveMouseButton(int button)
+    public void setActiveMouseButtonInfo(MouseButtonInfo info)
     {
-        if(button == -1)
-        {
-            Minecraft.getInstance().mouseHandler.activeButton = null;
-        }
-        else
-        {
-            Minecraft.getInstance().mouseHandler.activeButton = new MouseButtonInfo(button, 0);
-        }
+        Minecraft.getInstance().mouseHandler.activeButton = info;
     }
 
     @Override

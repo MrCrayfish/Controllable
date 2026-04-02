@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
@@ -17,9 +18,7 @@ import com.mrcrayfish.controllable.client.settings.AnalogMovement;
 import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.client.util.*;
 import com.mrcrayfish.controllable.event.ControllerEvents;
-import com.mrcrayfish.controllable.integration.EmiSupport;
 import com.mrcrayfish.controllable.integration.JeiSupport;
-import com.mrcrayfish.controllable.integration.ReiSupport;
 import com.mrcrayfish.controllable.mixin.client.OverlayRecipeComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookComponentAccessor;
 import com.mrcrayfish.controllable.mixin.client.RecipeBookPageAccessor;
@@ -772,9 +771,9 @@ public class InputHandler
                 int screenLeft = ClientServices.CLIENT.getScreenLeft(screen);
                 int screenTop = ClientServices.CLIENT.getScreenTop(screen);
                 if(menu.getCarried().isEmpty()) {
-                    MouseHooks.invokeMouseClick(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
+                    MouseHooks.sendMouseClickEvent(screen, InputConstants.MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
                 } else {
-                    MouseHooks.invokeMouseReleased(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
+                    MouseHooks.sendMouseReleasedEvent(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
                 }
             });
         }

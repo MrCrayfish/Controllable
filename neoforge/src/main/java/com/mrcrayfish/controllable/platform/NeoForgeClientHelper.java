@@ -31,6 +31,7 @@ import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.gui.CreativeTabsScreenPage;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
@@ -89,9 +90,8 @@ public class NeoForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public boolean sendScreenMouseClick(Screen screen, double mouseX, double mouseY, int button, boolean doubleClick)
+    public boolean sendScreenMouseClick(Screen screen, MouseButtonEvent event, boolean doubleClick)
     {
-        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
         if(!ClientHooks.onScreenMouseClickedPre(screen, event, doubleClick))
         {
             boolean handled = screen.mouseClicked(event, doubleClick);
@@ -102,9 +102,8 @@ public class NeoForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public void sendScreenMouseReleased(Screen screen, double mouseX, double mouseY, int button)
+    public void sendScreenMouseReleased(Screen screen, MouseButtonEvent event)
     {
-        MouseButtonEvent event = new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(button, 0));
         if(!ClientHooks.onScreenMouseReleasedPre(screen, event))
         {
             boolean handled = screen.mouseReleased(event);
@@ -137,23 +136,16 @@ public class NeoForgeClientHelper implements IClientHelper
     }
 
     @Override
-    public int getActiveMouseButton()
+    @Nullable
+    public MouseButtonInfo getActiveMouseButtonInfo()
     {
-        var info = Minecraft.getInstance().mouseHandler.activeButton;
-        return info != null ? info.button() : -1;
+        return Minecraft.getInstance().mouseHandler.activeButton;
     }
 
     @Override
-    public void setActiveMouseButton(int button)
+    public void setActiveMouseButtonInfo(MouseButtonInfo info)
     {
-        if(button == -1)
-        {
-            Minecraft.getInstance().mouseHandler.activeButton = null;
-        }
-        else
-        {
-            Minecraft.getInstance().mouseHandler.activeButton = new MouseButtonInfo(button, 0);
-        }
+        Minecraft.getInstance().mouseHandler.activeButton = info;
     }
 
     @Override
