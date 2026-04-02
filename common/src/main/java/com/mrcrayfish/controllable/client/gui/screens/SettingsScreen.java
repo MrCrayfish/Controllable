@@ -360,9 +360,9 @@ public class SettingsScreen extends Screen
             }
 
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.experimental").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
-            TabOptionToggleItem gyroMouse = new TabOptionToggleItem(Config.CLIENT.options.experimental.gyroMouse);
+            TabOptionToggleItem gyroMouse = new TabOptionToggleItem(Config.CLIENT.options.gyro.gyroMouse);
             optionsList.addEntry(gyroMouse);
-            TabOptionSliderItem gyroSpeed = new TabOptionSliderItem(Config.CLIENT.options.experimental.gyroSpeed, 1.0);
+            TabOptionSliderItem gyroSpeed = new TabOptionSliderItem(Config.CLIENT.options.gyro.gyroSpeed, 1.0);
             gyroSpeed.setDependentOption(gyroMouse, false);
             optionsList.addEntry(gyroSpeed);
 

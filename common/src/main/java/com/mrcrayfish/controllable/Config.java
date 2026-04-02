@@ -138,15 +138,15 @@ public class Config
                 If enabled, after four seconds, any overlays related to the controller will be hidden if no input is detected""")
             public final BoolProperty overlayTimeout = BoolProperty.create(true);
 
-            @ConfigProperty(name = "experimental", comment = """
-                Experimental related options.""")
-            public final Experimental experimental = new Experimental();
+            @ConfigProperty(name = "gyro", comment = """
+                Gyro related options. (Experimental)""")
+            public final Gyro gyro = new Gyro();
 
             @ConfigProperty(name = "advanced", comment = """
                 Advanced related options. "advancedMode" option must be enabled""")
             public final Advanced advanced = new Advanced();
 
-            public static class Experimental
+            public static class Gyro
             {
                 @ConfigProperty(name = "gyroMouse", comment = """
                 If enabled and your controller supports gyro, the cursor will now be controlled by by gyro""")

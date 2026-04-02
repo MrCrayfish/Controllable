@@ -435,7 +435,7 @@ public final class VirtualCursor
     private void applyGyroInput(DeltaTracker tracker)
     {
         Controller controller = Controllable.getController();
-        if(controller == null || !controller.supportsGyroscope() || !Config.CLIENT.options.experimental.gyroMouse.get())
+        if(controller == null || !controller.supportsGyroscope() || !Config.CLIENT.options.gyro.gyroMouse.get())
             return;
 
         Vector3f gyroscope = controller.getGyroscope();
@@ -451,7 +451,7 @@ public final class VirtualCursor
         controller.updateInputTime();
 
         // Scale the gyro input by the configured gyro speed
-        float gyroSpeed = Config.CLIENT.options.experimental.gyroSpeed.get().floatValue();
+        float gyroSpeed = Config.CLIENT.options.gyro.gyroSpeed.get().floatValue();
         gyroX *= (gyroSpeed * tracker.getGameTimeDeltaPartialTick(false));
         gyroY *= (gyroSpeed * tracker.getGameTimeDeltaPartialTick(false));
 
