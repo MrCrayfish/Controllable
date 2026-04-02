@@ -30,12 +30,14 @@ public final class VirtualCursor
     private static volatile VirtualCursor instance;
 
     private final Vector2f inputVector = new Vector2f();
-    private int prevX;
-    private int prevY;
-    private int x;
-    private int y;
+    private double prevX;
+    private double prevY;
+    private double x;
+    private double y;
     private double renderX;
     private double renderY;
+    private double lastMoveX;
+    private double lastMoveY;
     private boolean visible;
     private boolean snapIfNoMove;
     private boolean initialized;
@@ -64,8 +66,8 @@ public final class VirtualCursor
     public void resetToCenter()
     {
         Minecraft mc = Minecraft.getInstance();
-        this.renderX = this.x = this.prevX = mc.getWindow().getScreenWidth() / 2;
-        this.renderY = this.y = this.prevY = mc.getWindow().getScreenHeight() / 2;
+        this.renderX = this.x = this.prevX = this.lastMoveX = mc.getWindow().getScreenWidth() / 2.0;
+        this.renderY = this.y = this.prevY = this.lastMoveY = mc.getWindow().getScreenHeight() / 2.0;
     }
 
     public boolean isEnabled()
@@ -97,7 +99,7 @@ public final class VirtualCursor
      */
     public int getX()
     {
-        return this.x;
+        return (int) this.x;
     }
 
     /**
@@ -105,7 +107,7 @@ public final class VirtualCursor
      */
     public int getY()
     {
-        return this.y;
+        return (int) this.y;
     }
 
     /**
@@ -239,9 +241,11 @@ public final class VirtualCursor
         }
 
         // Send moved event to screens
-        if(this.x != this.prevX || this.y != this.prevY)
+        if(this.x != this.lastMoveX || this.y != this.lastMoveY)
         {
-            MouseHooks.invokeMouseMoved(mc.screen, this.x, this.y, this.x - this.prevX, this.y - this.prevY);
+            MouseHooks.invokeMouseMoved(mc.screen, this.x, this.y, this.x - this.lastMoveX, this.y - this.lastMoveY);
+            this.lastMoveX = this.x;
+            this.lastMoveY = this.y;
         }
     }
 
@@ -261,15 +265,7 @@ public final class VirtualCursor
         if(mc.screen == null)
             return;
 
-        if(this.applyGyroInput(tracker))
-            return;
-
-        // If position didn't change, don't update
-        if(this.x == this.prevX && this.y == this.prevY) {
-            this.renderX = this.x;
-            this.renderY = this.y;
-            return;
-        }
+        this.applyGyroInput(tracker);
 
         float partialTick = this.getPartialTick(tracker); // The normalised time between two ticks
         this.renderX = this.prevX + (this.x - this.prevX) * partialTick;
@@ -305,8 +301,8 @@ public final class VirtualCursor
         Minecraft mc = Minecraft.getInstance();
         if(mc.screen != null)
             return;
-        this.renderX = this.x = this.prevX = mc.getWindow().getScreenWidth() / 2;
-        this.renderY = this.y = this.prevY = mc.getWindow().getScreenHeight() / 2;
+        this.renderX = this.x = this.prevX = this.lastMoveX = mc.getWindow().getScreenWidth() / 2.0;
+        this.renderY = this.y = this.prevY = this.lastMoveY = mc.getWindow().getScreenHeight() / 2.0;
         this.setVisible(true);
     }
 
@@ -404,8 +400,8 @@ public final class VirtualCursor
         this.x = x;
         this.y = y;
         this.clampCursorToWindowBounds();
-        this.renderX = this.prevX = this.x;
-        this.renderY = this.prevY = this.y;
+        this.renderX = this.prevX = this.lastMoveX = this.x;
+        this.renderY = this.prevY = this.lastMoveY = this.y;
     }
 
     /**
@@ -435,30 +431,47 @@ public final class VirtualCursor
      * Applies gyro input to move the cursor. Only applies if enabled by the player.
      *
      * @param tracker a DeltaTracker instance
-     * @return {@code true} if gyro input was applied; otherwise {@code false}
      */
-    private boolean applyGyroInput(DeltaTracker tracker)
+    private void applyGyroInput(DeltaTracker tracker)
     {
         Controller controller = Controllable.getController();
-        if(controller != null && controller.supportsGyroscope() && Config.CLIENT.options.experimental.gyroMouse.get())
-        {
-            Vector3f gyroscope = controller.getGyroscope();
-            float gyroX = -gyroscope.y;
-            float gyroY = -gyroscope.x;
-            float jitterThreshold = 0.025F;
-            if(Math.abs(gyroX) >= jitterThreshold || Math.abs(gyroY) >= jitterThreshold)
-            {
-                float partialTick = this.getPartialTick(tracker);
-                double gyroSpeed = Config.CLIENT.options.experimental.gyroSpeed.get();
-                this.renderX += gyroX * gyroSpeed * partialTick;
-                this.renderY += gyroY * gyroSpeed * partialTick;
-                this.x = (int) this.renderX;
-                this.y = (int) this.renderY;
-                controller.updateInputTime();
-            }
-            return true;
-        }
-        return false;
+        if(controller == null || !controller.supportsGyroscope() || !Config.CLIENT.options.experimental.gyroMouse.get())
+            return;
+
+        Vector3f gyroscope = controller.getGyroscope();
+        float gyroX = -gyroscope.y;
+        float gyroY = -gyroscope.x;
+
+        // Apply a threshold to prevent movement jitters
+        float jitterThreshold = 0.025F;
+        if(!(Math.abs(gyroX) >= jitterThreshold) && !(Math.abs(gyroY) >= jitterThreshold))
+            return;
+
+        // Input detected, so update last input time
+        controller.updateInputTime();
+
+        // Scale the gyro input by the configured gyro speed
+        float gyroSpeed = Config.CLIENT.options.experimental.gyroSpeed.get().floatValue();
+        gyroX *= (gyroSpeed * tracker.getGameTimeDeltaPartialTick(false));
+        gyroY *= (gyroSpeed * tracker.getGameTimeDeltaPartialTick(false));
+
+        double beforeX = this.x;
+        double beforeY = this.y;
+
+        // Add the gyro input to the x and y positions
+        this.x += gyroX;
+        this.y += gyroY;
+
+        // Ensure it doesn't go out of the window bounds
+        this.clampCursorToWindowBounds();
+
+        // Also add the gyro input to the previous positions but only the delta
+        this.prevX += (this.x - beforeX);
+        this.prevY += (this.y - beforeY);
+
+        // Ensure the cursor is visible if positions changed
+        this.setVisible(true);
+        this.mode = CursorMode.CONTROLLER;
     }
 
     public enum CursorMode
