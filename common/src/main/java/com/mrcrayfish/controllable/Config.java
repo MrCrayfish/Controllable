@@ -150,7 +150,7 @@ public class Config
             {
                 @ConfigProperty(name = "gyroMouse", comment = """
                 If enabled and your controller supports gyro, the cursor will now be controlled by by gyro""")
-                public final BoolProperty gyroMouse = BoolProperty.create(true);
+                public final BoolProperty gyroMouse = BoolProperty.create(false);
 
                 @ConfigProperty(name = "gyroSpeed", comment = """
                 Sets the speed of the gyro cursor""")
