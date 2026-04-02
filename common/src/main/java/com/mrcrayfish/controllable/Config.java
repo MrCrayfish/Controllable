@@ -7,12 +7,7 @@ import com.mrcrayfish.controllable.client.settings.ButtonIcons;
 import com.mrcrayfish.controllable.client.settings.CursorStyle;
 import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.util.Utils;
-import com.mrcrayfish.framework.api.config.BoolProperty;
-import com.mrcrayfish.framework.api.config.ConfigProperty;
-import com.mrcrayfish.framework.api.config.ConfigType;
-import com.mrcrayfish.framework.api.config.DoubleProperty;
-import com.mrcrayfish.framework.api.config.EnumProperty;
-import com.mrcrayfish.framework.api.config.FrameworkConfig;
+import com.mrcrayfish.framework.api.config.*;
 import net.minecraft.resources.Identifier;
 
 /**
@@ -143,9 +138,24 @@ public class Config
                 If enabled, after four seconds, any overlays related to the controller will be hidden if no input is detected""")
             public final BoolProperty overlayTimeout = BoolProperty.create(true);
 
+            @ConfigProperty(name = "experimental", comment = """
+                Experimental related options.""")
+            public final Experimental experimental = new Experimental();
+
             @ConfigProperty(name = "advanced", comment = """
                 Advanced related options. "advancedMode" option must be enabled""")
             public final Advanced advanced = new Advanced();
+
+            public static class Experimental
+            {
+                @ConfigProperty(name = "gyroMouse", comment = """
+                If enabled and your controller supports gyro, the cursor will now be controlled by by gyro""")
+                public final BoolProperty gyroMouse = BoolProperty.create(true);
+
+                @ConfigProperty(name = "gyroSpeed", comment = """
+                Sets the speed of the gyro cursor""")
+                public final DoubleProperty gyroSpeed = DoubleProperty.create(10.0, 1.0, 20.0);
+            }
 
             public static class Advanced
             {

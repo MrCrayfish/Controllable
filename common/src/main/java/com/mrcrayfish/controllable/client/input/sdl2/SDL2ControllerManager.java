@@ -9,6 +9,7 @@ import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.DeviceInfo;
 import com.mrcrayfish.controllable.client.input.MultiController;
 import com.mrcrayfish.controllable.util.Utils;
+import com.mrcrayfish.controllable_sdl.api.SdlSubSystemConst;
 import com.mrcrayfish.controllable_sdl.api.gamecontroller.SdlGamecontroller;
 import com.mrcrayfish.controllable_sdl.jna.SdlNativeLibraryLoader;
 import com.sun.jna.Memory;
@@ -32,8 +33,7 @@ import java.util.stream.IntStream;
 
 import static com.mrcrayfish.controllable_sdl.api.Sdl.SDL_Init;
 import static com.mrcrayfish.controllable_sdl.api.Sdl.SDL_Quit;
-import static com.mrcrayfish.controllable_sdl.api.SdlSubSystemConst.SDL_INIT_GAMECONTROLLER;
-import static com.mrcrayfish.controllable_sdl.api.SdlSubSystemConst.SDL_INIT_JOYSTICK;
+import static com.mrcrayfish.controllable_sdl.api.SdlSubSystemConst.*;
 import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SdlGamecontroller.*;
 import static com.mrcrayfish.controllable_sdl.api.hints.SdlHints.SDL_SetHint;
 import static com.mrcrayfish.controllable_sdl.api.hints.SdlHintsConst.*;
@@ -84,7 +84,9 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
             this.lastBackgroundInput = true;
         }
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_VERTICAL_JOY_CONS, "1");
-        SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE, "1");
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE, "1");
+        SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_SENSOR);
     }
 
     @Override

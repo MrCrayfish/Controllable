@@ -359,6 +359,13 @@ public class SettingsScreen extends Screen
                 optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.rumble));
             }
 
+            optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.experimental").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
+            TabOptionToggleItem gyroMouse = new TabOptionToggleItem(Config.CLIENT.options.experimental.gyroMouse);
+            optionsList.addEntry(gyroMouse);
+            TabOptionSliderItem gyroSpeed = new TabOptionSliderItem(Config.CLIENT.options.experimental.gyroSpeed, 1.0);
+            gyroSpeed.setDependentOption(gyroMouse, false);
+            optionsList.addEntry(gyroSpeed);
+
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.other").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.navigateSound));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.fpsPollingFix));

@@ -20,6 +20,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 /**
  * Author: MrCrayfish
@@ -228,7 +229,7 @@ public final class VirtualCursor
             controller.updateInputTime();
 
             // Let the next update know to try snapping if no input detected
-            this.snapIfNoMove = true;
+            this.snapIfNoMove = this.inputVector.lengthSquared() > 0; // Only snap if not gyro
             this.mode = CursorMode.CONTROLLER;
         }
         else if(this.snapIfNoMove)
@@ -258,6 +259,9 @@ public final class VirtualCursor
         // Skip updating if no screen
         Minecraft mc = Minecraft.getInstance();
         if(mc.screen == null)
+            return;
+
+        if(this.applyGyroInput(tracker))
             return;
 
         // If position didn't change, don't update
@@ -425,6 +429,36 @@ public final class VirtualCursor
                 this.clampCursorToWindowBounds();
             }
         }
+    }
+
+    /**
+     * Applies gyro input to move the cursor. Only applies if enabled by the player.
+     *
+     * @param tracker a DeltaTracker instance
+     * @return {@code true} if gyro input was applied; otherwise {@code false}
+     */
+    private boolean applyGyroInput(DeltaTracker tracker)
+    {
+        Controller controller = Controllable.getController();
+        if(controller != null && controller.supportsGyroscope() && Config.CLIENT.options.experimental.gyroMouse.get())
+        {
+            Vector3f gyroscope = controller.getGyroscope();
+            float gyroX = -gyroscope.y;
+            float gyroY = -gyroscope.x;
+            float jitterThreshold = 0.025F;
+            if(Math.abs(gyroX) >= jitterThreshold || Math.abs(gyroY) >= jitterThreshold)
+            {
+                float partialTick = this.getPartialTick(tracker);
+                double gyroSpeed = Config.CLIENT.options.experimental.gyroSpeed.get();
+                this.renderX += gyroX * gyroSpeed * partialTick;
+                this.renderY += gyroY * gyroSpeed * partialTick;
+                this.x = (int) this.renderX;
+                this.y = (int) this.renderY;
+                controller.updateInputTime();
+            }
+            return true;
+        }
+        return false;
     }
 
     public enum CursorMode

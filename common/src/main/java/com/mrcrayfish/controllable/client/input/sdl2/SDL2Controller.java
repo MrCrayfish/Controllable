@@ -1,22 +1,24 @@
 package com.mrcrayfish.controllable.client.input.sdl2;
 
-import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.client.input.ButtonStates;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.client.input.DeviceInfo;
-import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable_sdl.api.gamecontroller.SDL_GameController;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_Joystick;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
+import com.sun.jna.Memory;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.util.Mth;
+import org.joml.Vector3f;
 
 import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SDL_GameControllerAxis.*;
 import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SDL_GameControllerButton.*;
 import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SdlGamecontroller.*;
 import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.*;
 import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystickConst.SDL_JOYSTICK_AXIS_MAX;
+import static com.mrcrayfish.controllable_sdl.api.sensor.SDL_SensorType.SDL_SENSOR_GYRO;
+import static com.mrcrayfish.controllable_sdl.api.sensor.SdlSensor.SDL_SensorUpdate;
 
 /**
  *  A wrapper class that aims to reduce the exposure to the underlying controller library. This class
@@ -30,6 +32,7 @@ public class SDL2Controller extends Controller
     private SDL_GameController controller;
     private String cachedName;
     private DeviceInfo info;
+    private boolean gyro;
 
     public SDL2Controller(int deviceIndex)
     {
@@ -50,6 +53,7 @@ public class SDL2Controller extends Controller
         if(this.controller == null)
         {
             this.controller = SDL_GameControllerOpen(this.deviceIndex);
+            this.updateGyroState();
             return this.controller != null;
         }
         return true;
@@ -74,6 +78,7 @@ public class SDL2Controller extends Controller
     @Override
     public ButtonStates captureButtonStates()
     {
+        SDL_SensorUpdate();
         SDL_GameControllerUpdate();
         ButtonStates states = new ButtonStates();
         states.setState(Buttons.A, this.readButton(SDL_CONTROLLER_BUTTON_A));
@@ -199,5 +204,36 @@ public class SDL2Controller extends Controller
             this.info = new DeviceInfo(name, guid, serial, type, vendor, product, productVersion, firmware, buttons, axes);
         }
         return this.info;
+    }
+
+    private void updateGyroState()
+    {
+        this.gyro = false;
+        if(this.controller == null)
+            return;
+        if(!SDL_GameControllerHasSensor(this.controller, SDL_SENSOR_GYRO))
+            return;
+        if(SDL_GameControllerSetSensorEnabled(this.controller, SDL_SENSOR_GYRO, true) != 0)
+            return;
+        this.gyro = true;
+    }
+
+    @Override
+    public boolean supportsGyroscope()
+    {
+        return this.gyro;
+    }
+
+    @Override
+    public Vector3f getGyroscope()
+    {
+        int num = 3;
+        byte[] bytes = new byte[Float.BYTES * num];
+        try(Memory memory = new Memory(bytes.length))
+        {
+            SDL_GameControllerGetSensorData(this.controller, SDL_SENSOR_GYRO, memory, num);
+            float[] values = memory.getFloatArray(0, num);
+            return new Vector3f(values[0], values[1], values[2]);
+        }
     }
 }

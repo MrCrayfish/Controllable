@@ -7,12 +7,15 @@ import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.client.util.InputHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
+import org.joml.Vector3f;
 
 /**
  * Author: MrCrayfish
  */
 public abstract class Controller
 {
+    private final Vector3f EMPTY_GYROSCOPE_INPUT = new Vector3f();
+
     protected final ButtonStates states;
     protected long lastInputTime;
 
@@ -294,5 +297,22 @@ public abstract class Controller
             };
         }
         return Config.CLIENT.options.thumbstickDeadZone.get().floatValue();
+    }
+
+    /**
+     * @return True if this controller supports gyroscope input
+     */
+    public boolean supportsGyroscope()
+    {
+        return false;
+    }
+
+    /**
+     * @return A Vector3f containing the gyroscope input or zero if not supported
+     */
+    public Vector3f getGyroscope()
+    {
+        EMPTY_GYROSCOPE_INPUT.zero();
+        return EMPTY_GYROSCOPE_INPUT;
     }
 }
