@@ -9,6 +9,7 @@ import java.util.List;
 public class FilteredTabSelectionList<E extends ContainerObjectSelectionList.Entry<E>> extends TabSelectionList<E>
 {
     private final List<E> original = new LinkedList<>();
+    private boolean preventEntries = false;
 
     public FilteredTabSelectionList(Minecraft mc, int itemHeight)
     {
@@ -33,14 +34,19 @@ public class FilteredTabSelectionList<E extends ContainerObjectSelectionList.Ent
     @Override
     public int addEntry(E entry)
     {
-        this.original.add(entry);
+        if(!this.preventEntries) this.original.add(entry);
         return super.addEntry(entry);
     }
 
     @Override
     protected void addEntryToTop(E entry)
     {
-        this.original.addFirst(entry);
+        if(!this.preventEntries) this.original.addFirst(entry);
         super.addEntryToTop(entry);
+    }
+
+    public void finalise()
+    {
+        this.preventEntries = true;
     }
 }

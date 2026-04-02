@@ -367,6 +367,7 @@ public class SettingsScreen extends Screen
             optionsList.addEntry(advancedModeOption);
 
             this.listWidget = rootHelper.addChild(new TabListWidget(optionsList));
+            optionsList.finalise();
             optionsList.rebuildList(false);
         }
 
