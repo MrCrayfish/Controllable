@@ -156,6 +156,14 @@ public class Config
                 Sets the speed of the gyro cursor""")
                 public final DoubleProperty gyroSpeed = DoubleProperty.create(50.0, 1.0, 100.0);
 
+                @ConfigProperty(name = "verticalSensitivity", comment = """
+                The vertical sensitivity of the gyro. This value is multiplied with the speed of the gyro""")
+                public final DoubleProperty verticalSensitivity = DoubleProperty.create(1.0, 0.0, 2.0);
+
+                @ConfigProperty(name = "horizontalSensitivity", comment = """
+                The horizontal sensitivity of the gyro. This value is multiplied with the speed of the gyro""")
+                public final DoubleProperty horizontalSensitivity = DoubleProperty.create(1.0, 0.0, 2.0);
+
                 @ConfigProperty(name = "invertY", comment = """
                 Inverts the y-input of the gyro""")
                 public final BoolProperty invertY = BoolProperty.create(false);

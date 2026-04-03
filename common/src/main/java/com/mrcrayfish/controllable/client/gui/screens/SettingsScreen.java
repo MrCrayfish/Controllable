@@ -365,6 +365,12 @@ public class SettingsScreen extends Screen
             TabOptionSliderItem gyroSpeed = new TabOptionSliderItem(Config.CLIENT.options.gyro.gyroSpeed, 1.0);
             gyroSpeed.setDependentOption(gyroMouse, false);
             optionsList.addEntry(gyroSpeed);
+            TabOptionSliderItem gyroVerticalSensitivity = new TabOptionSliderItem(Config.CLIENT.options.gyro.verticalSensitivity, 0.1);
+            gyroVerticalSensitivity.setDependentOption(gyroMouse, false);
+            optionsList.addEntry(gyroVerticalSensitivity);
+            TabOptionSliderItem gyroHorizontalSensitivity = new TabOptionSliderItem(Config.CLIENT.options.gyro.horizontalSensitivity, 0.1);
+            gyroHorizontalSensitivity.setDependentOption(gyroMouse, false);
+            optionsList.addEntry(gyroHorizontalSensitivity);
             TabOptionToggleItem gyroInvertY = new TabOptionToggleItem(Config.CLIENT.options.gyro.invertY);
             gyroInvertY.setDependentOption(gyroMouse, false);
             optionsList.addEntry(gyroInvertY);
