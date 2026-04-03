@@ -452,8 +452,9 @@ public final class VirtualCursor
 
         // Scale the gyro input by the configured gyro speed
         float gyroSpeed = Config.CLIENT.options.gyro.gyroSpeed.get().floatValue();
-        gyroX *= (gyroSpeed * tracker.getGameTimeDeltaPartialTick(false));
-        gyroY *= (gyroSpeed * tracker.getGameTimeDeltaPartialTick(false));
+        float partialTick = tracker.getGameTimeDeltaTicks();
+        gyroX *= (gyroSpeed * partialTick);
+        gyroY *= (gyroSpeed * partialTick);
 
         double beforeX = this.x;
         double beforeY = this.y;

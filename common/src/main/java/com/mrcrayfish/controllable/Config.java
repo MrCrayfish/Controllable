@@ -154,7 +154,7 @@ public class Config
 
                 @ConfigProperty(name = "gyroSpeed", comment = """
                 Sets the speed of the gyro cursor""")
-                public final DoubleProperty gyroSpeed = DoubleProperty.create(10.0, 1.0, 20.0);
+                public final DoubleProperty gyroSpeed = DoubleProperty.create(50.0, 1.0, 100.0);
             }
 
             public static class Advanced
