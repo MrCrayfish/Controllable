@@ -12,7 +12,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mrcrayfish.controllable.Constants;
 import com.mrcrayfish.controllable.Controllable;
-import com.mrcrayfish.controllable.client.InputHandler;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.util.Utils;
 import net.minecraft.client.KeyMapping;
@@ -117,6 +116,7 @@ public class BindingRegistry
         this.register(ButtonBindings.LOOK_DOWN);
         this.register(ButtonBindings.LOOK_LEFT);
         this.register(ButtonBindings.LOOK_RIGHT);
+        this.register(ButtonBindings.CENTER_CURSOR);
     }
 
     public List<ButtonBinding> getRegisteredBindings()

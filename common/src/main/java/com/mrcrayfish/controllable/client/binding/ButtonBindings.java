@@ -443,4 +443,8 @@ public class ButtonBindings
     public static final ButtonBinding LOOK_LEFT = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_LEFT, "controllable.key.look_left", "key.category.minecraft.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
 
     public static final ButtonBinding LOOK_RIGHT = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_RIGHT, "controllable.key.look_right", "key.category.minecraft.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
+
+    public static final ButtonBinding CENTER_CURSOR = new ButtonBinding(Buttons.TOUCHPAD, "controllable.key.center_cursor", "key.category.controllable.ui", InScreenContext.INSTANCE, OnPressHandler.create(context -> {
+        return Optional.of(() -> Controllable.getCursor().resetToCenter());
+    }));
 }

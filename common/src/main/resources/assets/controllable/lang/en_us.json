@@ -135,6 +135,7 @@
     "controllable.gui.update_mapping_message": "Controllable will download the latest gamepad mappings from GitHub with the following url: %s",
     "controllable.gui.update_mappings": "Update Mappings",
     "controllable.gui.waiting_for_input": "Listening for button input...",
+    "controllable.key.center_cursor": "Center Cursor",
     "controllable.key.close_inventory": "Close Inventory",
     "controllable.key.debug_info": "Show Debug Info",
     "controllable.key.hotbar_slot_1": "Hotbar Slot #1",
