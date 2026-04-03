@@ -224,6 +224,8 @@
     "framework_config.controllable.client.options.gyro.gyroMouse.tooltip": "When enabled and if your controller supports gyro, the virtual cursor will now be controlled by gyro input",
     "framework_config.controllable.client.options.gyro.gyroSpeed": "Gyro Sensitivity",
     "framework_config.controllable.client.options.gyro.gyroSpeed.tooltip": "The sensitivity of the gyro input. A higher value will mean the cursor will move faster.",
+    "framework_config.controllable.client.options.gyro.invertY": "Invert Y-Input",
+    "framework_config.controllable.client.options.gyro.invertY.tooltip": "Inverts the y-axis of the gyro input",
     "framework_config.controllable.client.options.hintBackground": "Draw Hint Background",
     "framework_config.controllable.client.options.hintBackground.tooltip": "Draws a transparent background behind the text of the button hint",
     "framework_config.controllable.client.options.hoverModifier": "Widget Hover Modifier",

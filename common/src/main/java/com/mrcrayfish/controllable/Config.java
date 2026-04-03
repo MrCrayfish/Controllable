@@ -155,6 +155,10 @@ public class Config
                 @ConfigProperty(name = "gyroSpeed", comment = """
                 Sets the speed of the gyro cursor""")
                 public final DoubleProperty gyroSpeed = DoubleProperty.create(50.0, 1.0, 100.0);
+
+                @ConfigProperty(name = "invertY", comment = """
+                Inverts the y-input of the gyro""")
+                public final BoolProperty invertY = BoolProperty.create(false);
             }
 
             public static class Advanced

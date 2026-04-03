@@ -450,6 +450,10 @@ public final class VirtualCursor
         // Input detected, so update last input time
         controller.updateInputTime();
 
+        // Invert y-input if enabled
+        if(Config.CLIENT.options.gyro.invertY.get())
+            gyroY = -gyroY;
+
         // Scale the gyro input by the configured gyro speed
         float gyroSpeed = Config.CLIENT.options.gyro.gyroSpeed.get().floatValue();
         float partialTick = tracker.getGameTimeDeltaTicks();

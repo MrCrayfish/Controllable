@@ -365,6 +365,9 @@ public class SettingsScreen extends Screen
             TabOptionSliderItem gyroSpeed = new TabOptionSliderItem(Config.CLIENT.options.gyro.gyroSpeed, 1.0);
             gyroSpeed.setDependentOption(gyroMouse, false);
             optionsList.addEntry(gyroSpeed);
+            TabOptionToggleItem gyroInvertY = new TabOptionToggleItem(Config.CLIENT.options.gyro.invertY);
+            gyroInvertY.setDependentOption(gyroMouse, false);
+            optionsList.addEntry(gyroInvertY);
 
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.other").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.options.navigateSound));
