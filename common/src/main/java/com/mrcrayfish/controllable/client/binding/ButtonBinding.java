@@ -94,6 +94,15 @@ public class ButtonBinding implements Comparable<ButtonBinding>
         return this.buttons.size() > 1;
     }
 
+    /**
+     * Returns the number of buttons in this binding. Used for priority sorting so that
+     * longer combos (e.g. LB+RB+Y) are matched before shorter sub-combos (e.g. Y).
+     */
+    public int getButtonCount()
+    {
+        return this.buttons.size();
+    }
+
     public String getLabelKey()
     {
         return this.descriptionKey;

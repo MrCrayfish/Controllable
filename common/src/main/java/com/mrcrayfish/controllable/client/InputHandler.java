@@ -24,6 +24,7 @@ import com.mrcrayfish.controllable.client.gui.navigation.SkipItem;
 import com.mrcrayfish.controllable.client.gui.navigation.SlotNavigationPoint;
 import com.mrcrayfish.controllable.client.gui.navigation.WidgetNavigationPoint;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.input.ButtonStates;
 import com.mrcrayfish.controllable.client.settings.AnalogMovement;
 import com.mrcrayfish.controllable.client.settings.Thumbstick;
 import com.mrcrayfish.controllable.client.util.ClientHelper;
@@ -82,6 +83,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -100,6 +102,20 @@ public class InputHandler
     private final Set<PriorityHandler<BindingMovementInput>> activeMovementInputHandlers = new TreeSet<>();
     private @Nullable ButtonBinding activeVirtualBinding;
     private boolean initialized;
+
+    /**
+     * Buttons that appear as non-sole members in at least one multi-button combo.
+     * These are "pure modifier" buttons — pressing them must never immediately fire their
+     * single-button binding because doing so would conflict with any combo using them.
+     * Rebuilt every time the binding registry cache is rebuilt via rebuildComboModifiers().
+     */
+    private final Set<Integer> comboModifierButtons = new HashSet<>();
+
+    /**
+     * Tracks which buttons were consumed as part of a successfully fired multi-button combo so
+     * that on release we do NOT fire their single-button bindings.
+     */
+    private final Set<Integer> comboSuppressedButtons = new HashSet<>();
 
     @ApiStatus.Internal
     public InputHandler()
@@ -128,64 +144,153 @@ public class InputHandler
         return this.activeVirtualBinding;
     }
 
+    /**
+     * Called by InputProcessor with the full set of buttons newly pressed in a single frame.
+     * Handling all pressed buttons together allows us to detect combos whose buttons were all
+     * pressed within the same poll frame (e.g. LB+RB+Y captured together).
+     */
     @ApiStatus.Internal
-    public void handleButtonInput(Controller controller, int button, boolean state)
+    public void handleButtonsPressed(Controller controller, List<Integer> pressedButtons)
     {
-        if(controller == null)
+        if(controller == null || pressedButtons.isEmpty())
             return;
 
         controller.updateInputTime();
 
-        if(state)
+        // Pass 1: find every multi-button combo fully satisfied in this frame.
+        // A combo is satisfied if ALL its buttons are currently tracked as held,
+        // and at least one of its buttons was newly pressed this frame.
+        ButtonStates tracked = controller.getTrackedButtonStates();
+        List<ButtonBinding> completeCombos = new ArrayList<>();
+        Set<ButtonBinding> seen = new HashSet<>();
+
+        for(int button : pressedButtons)
         {
             for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
             {
-                // For multi-button bindings, check if all required buttons are pressed
-                if(binding.isMultiButton())
+                if(!binding.isMultiButton() || !seen.add(binding))
+                    continue;
+
+                boolean hasNewButton = false;
+                boolean allHeld = true;
+                for(int required : binding.getButtons())
                 {
-                    boolean allPressed = true;
-                    for(int requiredButton : binding.getButtons())
-                    {
-                        if(!controller.getTrackedButtonStates().getState(requiredButton))
-                        {
-                            allPressed = false;
-                            break;
-                        }
-                    }
-                    
-                    if(!allPressed)
-                        continue;
+                    if(!tracked.getState(required)) { allHeld = false; break; }
+                    if(pressedButtons.contains(required)) hasNewButton = true;
                 }
-                
+                if(allHeld && hasNewButton)
+                    completeCombos.add(binding);
+            }
+        }
+
+        // Pass 2: among complete combos, only fire the longest ones.
+        // Shorter combos that are strict subsets of a longer one are suppressed.
+        if(!completeCombos.isEmpty())
+        {
+            int maxLen = completeCombos.stream().mapToInt(ButtonBinding::getButtonCount).max().orElse(0);
+            for(ButtonBinding binding : completeCombos)
+            {
+                if(binding.getButtonCount() < maxLen)
+                    continue;
+                if(this.handleBindingPressed(controller, binding, false))
+                {
+                    for(int comboBtn : binding.getButtons())
+                        this.comboSuppressedButtons.add(comboBtn);
+                }
+            }
+        }
+
+        // Pass 3: fire single-button bindings for buttons not consumed by any combo.
+        for(int button : pressedButtons)
+        {
+            if(this.comboSuppressedButtons.contains(button))
+                continue;
+            if(this.comboModifierButtons.contains(button))
+                continue;
+
+            for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
+            {
+                if(binding.isMultiButton())
+                    continue;
                 if(this.handleBindingPressed(controller, binding, false))
                     break;
             }
         }
-        else
+    }
+
+    /** Called for individual button releases — releases are always single-button events. */
+    @ApiStatus.Internal
+    public void handleButtonInput(Controller controller, int button, boolean state)
+    {
+        if(controller == null || state)
+            return;
+
+        controller.updateInputTime();
+        this.handleButtonReleased(controller, button);
+    }
+    /**
+     * Called when a physical button is released.
+     *
+     * 1. Release any active multi-button combos that include this button (combo is broken).
+     * 2. Clear combo-suppression for this button.
+     * 3. If the button is a known modifier but was NOT combo-suppressed, fire its single-button
+     *    binding now as an instant tap (the user pressed and released a modifier alone).
+     * 4. Release any active single-button binding normally.
+     */
+    private void handleButtonReleased(Controller controller, int button)
+    {
+        Minecraft mc = Minecraft.getInstance();
+
+        // --- Release active multi-button combos whose combination is now broken ---
+        for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
         {
-            for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
+            if(!binding.isMultiButton())
+                continue;
+
+            ButtonHandler handler = binding.getHandler();
+            if(!(handler instanceof BindingPressed))
+                continue;
+
+            if(!binding.isButtonDown())
+                continue;
+
+            ButtonBinding.setButtonState(binding, false);
+
+            if(handler instanceof BindingReleased released && binding.getContext().isActive())
             {
-                ButtonHandler handler = binding.getHandler();
-                if(!(handler instanceof BindingPressed))
-                    continue;
-
-                if(!binding.isButtonDown())
-                    continue;
-
-                ButtonBinding.setButtonState(binding, false);
-
-                if(!(handler instanceof BindingReleased released))
-                    continue;
-
-                // Cancel the handler if context is no longer valid
-                if(!binding.getContext().isActive())
-                    continue;
-
-                Minecraft mc = Minecraft.getInstance();
                 Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, false);
                 released.handleReleased(context);
-                return;
             }
+        }
+
+        // --- Clear combo suppression for this button ---
+        boolean wasComboSuppressed = this.comboSuppressedButtons.remove(button);
+
+        // --- Release normal single-button bindings ---
+        // Skip if this button was part of a completed combo this session.
+        if(wasComboSuppressed)
+            return;
+
+        for(ButtonBinding binding : Controllable.getBindingRegistry().getBindingsForButton(button))
+        {
+            if(binding.isMultiButton())
+                continue;
+
+            ButtonHandler handler = binding.getHandler();
+            if(!(handler instanceof BindingPressed))
+                continue;
+
+            if(!binding.isButtonDown())
+                continue;
+
+            ButtonBinding.setButtonState(binding, false);
+
+            if(handler instanceof BindingReleased released && binding.getContext().isActive())
+            {
+                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, false);
+                released.handleReleased(context);
+            }
+            return;
         }
     }
 
@@ -786,11 +891,51 @@ public class InputHandler
         }
     }
 
+    /**
+     * Rebuilds the set of pure combo modifier buttons from the current binding registry.
+     * A button is a "pure modifier" ONLY if it appears in at least one multi-button combo AND
+     * has NO single-button binding of its own. Buttons that have both a single binding and
+     * appear in combos are NOT pure modifiers — they fire their single binding normally and
+     * only get suppressed when a combo actually completes using them.
+     * Called by BindingRegistry.rebuildCache().
+     */
+    @ApiStatus.Internal
+    public void rebuildComboModifiers()
+    {
+        this.comboModifierButtons.clear();
+
+        java.util.List<ButtonBinding> allBindings = Controllable.getBindingRegistry().getRegisteredBindings();
+
+        // Collect all buttons that have at least one single-button binding
+        Set<Integer> hasSingleBinding = new HashSet<>();
+        for(ButtonBinding binding : allBindings)
+        {
+            if(!binding.isMultiButton() && !binding.isUnbound())
+            {
+                hasSingleBinding.add(binding.getButton());
+            }
+        }
+
+        // A button is a pure modifier only if it appears in a combo but has NO single binding
+        for(ButtonBinding binding : allBindings)
+        {
+            if(binding.isMultiButton())
+            {
+                for(int btn : binding.getButtons())
+                {
+                    if(!hasSingleBinding.contains(btn))
+                        this.comboModifierButtons.add(btn);
+                }
+            }
+        }
+    }
+
     public void clearActiveHandlers()
     {
         this.activeTickHandlers.clear();
         this.activeRenderHandlers.clear();
         this.activeMovementInputHandlers.clear();
+        this.comboSuppressedButtons.clear();
     }
 
     public enum Navigate

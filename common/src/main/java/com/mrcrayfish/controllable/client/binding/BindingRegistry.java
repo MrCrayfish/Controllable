@@ -48,7 +48,10 @@ public class BindingRegistry
     private final Map<String, ButtonBinding> registeredBindings = new HashMap<>();
     private final Map<String, KeyAdapterBinding> keyAdapters = new HashMap<>();
     private final Multimap<Integer, ButtonBinding> idToButtonList = TreeMultimap.create(Ordering.natural(),
-        Comparator.<ButtonBinding, Integer>comparing(binding -> binding.getContext().priority()).reversed().thenComparing(ButtonBinding::compareTo)
+        Comparator.<ButtonBinding, Integer>comparing(binding -> binding.getContext().priority()).reversed()
+            .thenComparing((a, b) -> Boolean.compare(b.isMultiButton(), a.isMultiButton())) // multi-button first
+            .thenComparing(Comparator.<ButtonBinding, Integer>comparing(ButtonBinding::getButtonCount).reversed()) // more buttons = higher priority
+            .thenComparing(ButtonBinding::compareTo)
     );
 
     public BindingRegistry()
@@ -194,7 +197,10 @@ public class BindingRegistry
         if(this.bindings.remove(binding))
         {
             this.keyAdapters.remove(binding.getDescription());
-            this.idToButtonList.remove(binding.getButton(), binding);
+            for(int button : binding.getButtons())
+            {
+                this.idToButtonList.remove(button, binding);
+            }
             this.save();
         }
     }
@@ -210,6 +216,7 @@ public class BindingRegistry
                 this.idToButtonList.put(button, binding);
             }
         });
+        Controllable.getInputHandler().rebuildComboModifiers();
     }
 
     public void completeSetup()
