@@ -15,6 +15,8 @@ import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -74,43 +76,73 @@ public class InputProcessor
         while(!this.inputQueue.isEmpty())
         {
             ButtonStates states = this.inputQueue.poll();
-            for(int i = 0; i < Buttons.BUTTONS.length; i++)
-            {
-                this.processButton(Buttons.BUTTONS[i], states);
-            }
+            this.processButtonFrame(states);
         }
     }
 
-    private void processButton(int index, ButtonStates newStates)
+    /**
+     * Processes a full captured frame of button states.
+     *
+     * All newly-pressed buttons in the same frame are collected first, then passed together
+     * to the InputHandler so it can resolve combos across the whole batch before deciding
+     * which single-button bindings to fire. This avoids the ordering problem where Y (index 3)
+     * would be processed before LB (index 9) and RB (index 10) in the same frame, preventing
+     * LB+RB+Y from being recognised as a complete combo.
+     */
+    private void processButtonFrame(ButtonStates newStates)
     {
-        boolean state = newStates.getState(index);
-
         Screen screen = Minecraft.getInstance().screen;
-        if(screen instanceof ControllerLayoutScreen)
-        {
-            ((ControllerLayoutScreen) screen).processButton(index, newStates);
-            return;
-        }
-
         Controller controller = Controllable.getController();
         if(controller == null)
             return;
 
         ButtonStates trackedStates = controller.getTrackedButtonStates();
-        if(state)
+
+        // Layout screen handles raw events itself
+        if(screen instanceof ControllerLayoutScreen layoutScreen)
         {
-            if(!trackedStates.getState(index))
+            for(int i = 0; i < Buttons.BUTTONS.length; i++)
+                layoutScreen.processButton(Buttons.BUTTONS[i], newStates);
+            return;
+        }
+
+        // Collect newly-pressed and newly-released buttons for this frame
+        List<Integer> newlyPressed  = new ArrayList<>();
+        List<Integer> newlyReleased = new ArrayList<>();
+
+        for(int i = 0; i < Buttons.BUTTONS.length; i++)
+        {
+            int index = Buttons.BUTTONS[i];
+            boolean state = newStates.getState(index);
+            boolean tracked = trackedStates.getState(index);
+            if(state && !tracked)
+                newlyPressed.add(index);
+            else if(!state && tracked)
+                newlyReleased.add(index);
+        }
+
+        // Update tracked state for pressed buttons BEFORE dispatching any press events,
+        // so the InputHandler can see the full set of currently-held buttons when it checks
+        // whether a combo is complete.
+        for(int index : newlyPressed)
+        {
+            trackedStates.setState(index, true);
+            if(screen instanceof SettingsScreen settings && settings.isWaitingForButtonInput() && settings.processButton(index))
             {
-                trackedStates.setState(index, true);
-                if(screen instanceof SettingsScreen settings && settings.isWaitingForButtonInput() && settings.processButton(index))
-                    return;
-                Controllable.getInputHandler().handleButtonInput(controller, index, true); // Handle on down
+                newlyPressed.remove((Integer) index);
+                break; // SettingsScreen consumes the first button it sees
             }
         }
-        else if(trackedStates.getState(index))
+
+        // Dispatch all press events together so InputHandler can batch-resolve combos
+        if(!newlyPressed.isEmpty())
+            Controllable.getInputHandler().handleButtonsPressed(controller, newlyPressed);
+
+        // Dispatch release events (order doesn't matter for releases)
+        for(int index : newlyReleased)
         {
             trackedStates.setState(index, false);
-            Controllable.getInputHandler().handleButtonInput(controller, index, false); // Handle on release
+            Controllable.getInputHandler().handleButtonInput(controller, index, false);
         }
     }
 

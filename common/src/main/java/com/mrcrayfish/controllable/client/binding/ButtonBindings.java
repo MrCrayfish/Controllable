@@ -10,9 +10,9 @@ import com.mrcrayfish.controllable.client.binding.handlers.MovementInputHandler;
 import com.mrcrayfish.controllable.client.binding.handlers.OnPressAndReleaseHandler;
 import com.mrcrayfish.controllable.client.binding.handlers.OnPressHandler;
 import com.mrcrayfish.controllable.client.InputHandler;
-import com.mrcrayfish.controllable.client.binding.handlers.impl.AttackHandler;
 import com.mrcrayfish.controllable.client.binding.handlers.impl.DropHandler;
 import com.mrcrayfish.controllable.client.binding.handlers.impl.SneakHandler;
+import com.mrcrayfish.controllable.client.binding.handlers.impl.AttackHandler;
 import com.mrcrayfish.controllable.client.gui.screens.SettingsScreen;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.util.MouseHooks;
@@ -39,6 +39,8 @@ import net.minecraft.world.effect.MobEffects;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author: MrCrayfish
@@ -103,9 +105,7 @@ public class ButtonBindings
     }));
 
     public static final ButtonBinding DROP_ITEM = new ButtonBinding(Buttons.DPAD_DOWN, "key.drop", "key.categories.gameplay", InGameContext.INSTANCE, new DropHandler());
-
-    public static final ButtonBinding ATTACK = new ButtonBinding(Buttons.RIGHT_TRIGGER, "key.attack", "key.categories.gameplay", InGameContext.INSTANCE, new AttackHandler());
-
+    
     public static final ButtonBinding USE_ITEM = new ButtonBinding(Buttons.LEFT_TRIGGER, "key.use", "key.categories.gameplay", InGameContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
             context.player().ifPresent(player -> {
@@ -115,6 +115,8 @@ public class ButtonBindings
             });
         });
     }));
+
+    public static final ButtonBinding ATTACK = new ButtonBinding(Buttons.RIGHT_TRIGGER, "key.attack", "key.categories.gameplay", InGameContext.INSTANCE, new AttackHandler());
 
     public static final ButtonBinding PICK_BLOCK = new ButtonBinding(Buttons.DPAD_LEFT, "key.pickItem", "key.categories.gameplay", InGameContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
@@ -456,4 +458,5 @@ public class ButtonBindings
     public static final ButtonBinding LOOK_LEFT = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_LEFT, "controllable.key.look_left", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
 
     public static final ButtonBinding LOOK_RIGHT = new ButtonBinding(Buttons.RIGHT_THUMB_STICK_RIGHT, "controllable.key.look_right", "key.categories.movement", InGameContext.INSTANCE, EmptyHandler.INSTANCE);
+
 }

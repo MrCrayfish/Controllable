@@ -34,6 +34,7 @@ public class Controllable
     private static final boolean EMI_LOADED = Utils.isModLoaded("emi");
     private static final boolean REI_LOADED = Utils.isModLoaded("roughlyenoughitems");
     private static final boolean JEI_LOADED = Utils.isModLoaded("jei") && !EMI_LOADED && !REI_LOADED;
+    private static final boolean TACZ_LOADED = Utils.isModLoaded("tacz");
 
     public static void init()
     {
@@ -44,6 +45,13 @@ public class Controllable
         CAMERA_HANDLER.registerEvents();
         RADIAL_MENU.registerEvents();
         SCROLLING_HANDLER.registerEvents();
+        
+        // DEBUG: Print all registered bindings
+        System.out.println("[Controllable] === Registered Bindings ===");
+        BINDING_REGISTRY.getBindings().forEach(binding -> {
+            System.out.println("[Controllable] " + binding.getDescription() + " -> Button: " + binding.getButton() + " (Multi: " + binding.isMultiButton() + ")");
+        });
+        System.out.println("[Controllable] === End Bindings ===");
     }
 
     public static BindingRegistry getBindingRegistry()
@@ -76,6 +84,11 @@ public class Controllable
         return RUMBLE_HANDLER;
     }
 
+    public static boolean isTaczLoaded()
+    {
+        return TACZ_LOADED;
+    }
+    
     public static boolean isArchitecturyLoaded()
     {
         return ARCHITECTURY_LOADED;

@@ -33,6 +33,9 @@ public class ControllerEvents
     private static void onScreenInit(Screen screen)
     {
         ButtonBinding.resetButtonStates();
+        // Clear all active tick/render/movement handlers and combo suppression state so that
+        // held-button actions (e.g. jump from a combo) don't persist after a screen opens.
+        Controllable.getInputHandler().clearActiveHandlers();
 
         // Fixes an issue where using item is not stopped after opening a screen
         if(!released)

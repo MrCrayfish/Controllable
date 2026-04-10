@@ -2,3 +2,12 @@ plugins {
     id 'fabric-loom' version '1.7-SNAPSHOT' apply false
     id 'net.neoforged.moddev' version '2.0.73' apply false
 }
+repositories {
+    maven { url 'https://maven.mrcrayfish.com/' }
+    mavenCentral()
+    maven { url 'https://maven.blamejared.com' }
+    maven { url 'https://maven.terraformersmc.com/' }
+    maven { url 'https://maven.shedaniel.me' }
+    maven { url 'https://libraries.minecraft.net' }
+    maven { url 'https://maven.neoforged.net/releases' }
+}

@@ -183,7 +183,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             super.render(graphics, index, top, left, width, itemHeight, mouseX, mouseY, selected, partialTick);
             this.bindingButton.setTooltip(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
             this.bindingButton.setTooltipDelay(Duration.ofMillis(400));
-            this.bindingButton.setX(left + width - 65);
+            this.bindingButton.setX(left + width - 85);
             this.bindingButton.setY(top);
             this.bindingButton.render(graphics, mouseX, mouseY, partialTick);
             this.resetButton.setX(left + width - 24);

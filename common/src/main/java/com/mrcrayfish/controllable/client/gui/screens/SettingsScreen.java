@@ -54,6 +54,7 @@ public class SettingsScreen extends Screen
     private TabNavigationBar navigationBar;
     private Button doneButton;
     private ButtonBinding selectedBinding;
+    private final java.util.Set<Integer> pendingButtons = new java.util.TreeSet<>();
     private int remainingTime;
     private int initialTab = 0;
 
@@ -131,6 +132,32 @@ public class SettingsScreen extends Screen
             if(this.remainingTime <= 0)
             {
                 this.selectedBinding = null;
+                this.pendingButtons.clear();
+            }
+            
+            // Check if all pending buttons have been released
+            if(!this.pendingButtons.isEmpty())
+            {
+                var controller = Controllable.getController();
+                if(controller != null)
+                {
+                    var states = controller.getTrackedButtonStates();
+                    boolean anyPressed = false;
+                    for(int button : this.pendingButtons)
+                    {
+                        if(states.getState(button))
+                        {
+                            anyPressed = true;
+                            break;
+                        }
+                    }
+                    
+                    // If no pending buttons are pressed, finalize the binding
+                    if(!anyPressed)
+                    {
+                        this.finalizeBinding();
+                    }
+                }
             }
         }
     }
@@ -148,11 +175,38 @@ public class SettingsScreen extends Screen
             stack.translate(0, 0, 100);
             graphics.fillGradient(0, 0, this.width, this.height, 0xE0101010, 0xF0101010);
             ScreenHelper.drawRoundedBox(graphics, (int) (this.width * 0.125), this.height / 4, (int) (this.width * 0.75), this.height / 2, 0x99000000);
-            Component pressButtonLabel = Component.translatable("controllable.gui.waiting_for_input").withStyle(ChatFormatting.YELLOW);
-            graphics.drawCenteredString(this.font, pressButtonLabel, this.width / 2, this.height / 2 - 10, 0xFFFFFFFF);
+            
+            if(this.pendingButtons.isEmpty())
+            {
+                Component pressButtonLabel = Component.translatable("controllable.gui.waiting_for_input").withStyle(ChatFormatting.YELLOW);
+                graphics.drawCenteredString(this.font, pressButtonLabel, this.width / 2, this.height / 2 - 10, 0xFFFFFFFF);
+            }
+            else
+            {
+                Component pressButtonLabel = Component.translatable("controllable.gui.multi_button_input").withStyle(ChatFormatting.GREEN);
+                graphics.drawCenteredString(this.font, pressButtonLabel, this.width / 2, this.height / 2 - 20, 0xFFFFFFFF);
+                
+                // Show the buttons that have been pressed
+                StringBuilder buttonNames = new StringBuilder();
+                for(int button : this.pendingButtons)
+                {
+                    if(buttonNames.length() > 0)
+                        buttonNames.append(" + ");
+                    String name = com.mrcrayfish.controllable.client.input.Buttons.getNameForButton(button);
+                    if(name != null)
+                    {
+                        buttonNames.append(Component.translatable(name).getString());
+                    }
+                }
+                graphics.drawCenteredString(this.font, Component.literal(buttonNames.toString()), this.width / 2, this.height / 2 - 5, 0xFFFFFFFF);
+                
+                Component releaseLabel = Component.translatable("controllable.gui.release_to_confirm").withStyle(ChatFormatting.GRAY);
+                graphics.drawCenteredString(this.font, releaseLabel, this.width / 2, this.height / 2 + 8, 0xFFFFFFFF);
+            }
+            
             Component time = Component.literal(Integer.toString((int) Math.ceil(this.remainingTime / 20.0)));
             Component inputCancelLabel = Component.translatable("controllable.gui.input_cancel", time);
-            graphics.drawCenteredString(this.font, inputCancelLabel, this.width / 2, this.height / 2 + 3, 0xFFFFFFFF);
+            graphics.drawCenteredString(this.font, inputCancelLabel, this.width / 2, this.height / 2 + 21, 0xFFFFFFFF);
             stack.popPose();
         }
     }
@@ -188,6 +242,7 @@ public class SettingsScreen extends Screen
         if(this.tabManager.getCurrentTab() instanceof BindingsTab)
         {
             this.selectedBinding = binding;
+            this.pendingButtons.clear();
             this.remainingTime = 100;
         }
     }
@@ -197,6 +252,7 @@ public class SettingsScreen extends Screen
         if(this.selectedBinding != null && !(this.tabManager.getCurrentTab() instanceof BindingsTab))
         {
             this.selectedBinding = null;
+            this.pendingButtons.clear();
         }
         return this.selectedBinding != null;
     }
@@ -205,14 +261,35 @@ public class SettingsScreen extends Screen
     {
         if(this.selectedBinding != null)
         {
-            ButtonBinding.setButton(this.selectedBinding, index);
-            this.selectedBinding = null;
-            BindingRegistry registry = Controllable.getBindingRegistry();
-            registry.rebuildCache();
-            registry.save();
+            // Add button to pending set
+            this.pendingButtons.add(index);
+            this.remainingTime = 100; // Reset timer when new button is pressed
             return true;
         }
         return false;
+    }
+    
+    private void finalizeBinding()
+    {
+        if(this.selectedBinding != null && !this.pendingButtons.isEmpty())
+        {
+            if(this.pendingButtons.size() == 1)
+            {
+                // Single button binding
+                ButtonBinding.setButton(this.selectedBinding, this.pendingButtons.iterator().next());
+            }
+            else
+            {
+                // Multi-button binding
+                ButtonBinding.setButtons(this.selectedBinding, new java.util.TreeSet<>(this.pendingButtons));
+            }
+            
+            this.selectedBinding = null;
+            this.pendingButtons.clear();
+            BindingRegistry registry = Controllable.getBindingRegistry();
+            registry.rebuildCache();
+            registry.save();
+        }
     }
 
     public class ControllerTab extends GridLayoutTab
