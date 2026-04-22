@@ -304,6 +304,7 @@ public class SettingsScreen extends Screen
             // Controller options
             optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.controller").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.autoSelect));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.autoSelectIndex, 1.0));
             optionsList.addEntry(new TabOptionToggleItem(Config.CLIENT.client.options.virtualCursor));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.thumbstickDeadZone, 0.01));
             optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.client.options.triggerDeadZone, 0.01));

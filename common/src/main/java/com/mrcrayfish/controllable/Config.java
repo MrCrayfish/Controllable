@@ -47,6 +47,9 @@ public class Config
             @ConfigProperty(name = "autoSelect", comment = "If enabled, controller will be automatically selected on start up or when plugged in")
             public final BoolProperty autoSelect = BoolProperty.create(true);
 
+            @ConfigProperty(name = "autoSelectIndex", comment = "The index of the controller to auto-select (-1 for first available)")
+            public final DoubleProperty autoSelectIndex = DoubleProperty.create(-1.0, -1.0, 10.0);
+
             @ConfigProperty(name = "renderMiniPlayer", comment = "If enabled, the player will render in the top left corner likes Bedrock Edition")
             public final BoolProperty renderMiniPlayer = BoolProperty.create(true);
 

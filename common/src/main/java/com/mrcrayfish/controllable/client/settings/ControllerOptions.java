@@ -29,6 +29,7 @@ public class ControllerOptions
     });*/
 
     public static final ControllerSetting<Boolean> AUTO_SELECT = createToggleSetting("controllable.options.autoSelect", Config.CLIENT.client.options.autoSelect);
+    public static final ControllerSetting<Double> AUTO_SELECT_INDEX = createSliderSetting("controllable.options.autoSelectIndex", Config.CLIENT.client.options.autoSelectIndex, 1.0);
     public static final ControllerSetting<Boolean> RENDER_MINI_PLAYER = createToggleSetting("controllable.options.renderMiniPlayer", Config.CLIENT.client.options.renderMiniPlayer);
     public static final ControllerSetting<Boolean> VIRTUAL_MOUSE = createToggleSetting("controllable.options.virtualMouse", Config.CLIENT.client.options.virtualCursor);
     public static final ControllerSetting<Boolean> CONSOLE_HOTBAR = createToggleSetting("controllable.options.consoleHotbar", Config.CLIENT.client.options.consoleHotbar);
