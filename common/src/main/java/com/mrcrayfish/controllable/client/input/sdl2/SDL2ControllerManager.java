@@ -15,6 +15,7 @@ import com.mrcrayfish.controllable_sdl.jna.SdlNativeLibraryLoader;
 import com.sun.jna.Memory;
 import com.mrcrayfish.controllable_sdl.api.joystick.SDL_JoystickID;
 import com.mrcrayfish.controllable_sdl.api.rwops.SDL_RWops;
+import com.mrcrayfish.controllable_sdl.api.event.SDL_Event;
 import org.apache.commons.lang3.tuple.Pair;
 
 import org.jetbrains.annotations.Nullable;
@@ -40,6 +41,7 @@ import static com.mrcrayfish.controllable_sdl.api.hints.SdlHintsConst.*;
 import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.SDL_JoystickGetDeviceInstanceID;
 import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.SDL_NumJoysticks;
 import static com.mrcrayfish.controllable_sdl.api.rwops.SdlRWops.SDL_RWFromConstMem;
+import static com.mrcrayfish.controllable_sdl.api.event.SdlEvents.SDL_PumpEvents;
 
 /**
  * Author: MrCrayfish
@@ -214,5 +216,7 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
             String value = this.lastBackgroundInput ? "1" : "0";
             SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, value);
         }
+
+        SDL_PumpEvents();
     }
 }
