@@ -50,6 +50,7 @@ public class SDL2Controller extends Controller
     @Override
     public boolean open()
     {
+        updateControllerState();
         if(this.controller == null)
         {
             this.controller = SDL_GameControllerOpen(this.deviceIndex);
@@ -62,7 +63,7 @@ public class SDL2Controller extends Controller
     @Override
     public void close()
     {
-        if(SDL_GameControllerGetAttached(this.controller))
+        if(this.controller != null)
         {
             SDL_GameControllerClose(this.controller);
             this.controller = null;
@@ -72,7 +73,8 @@ public class SDL2Controller extends Controller
     @Override
     public boolean isOpen()
     {
-        return SDL_GameControllerGetAttached(this.controller);
+        updateControllerState();
+        return this.controller != null && SDL_GameControllerGetAttached(this.controller);
     }
 
     @Override
@@ -138,12 +140,14 @@ public class SDL2Controller extends Controller
     @Override
     public boolean supportsRumble()
     {
-        return SDL_GameControllerHasRumble(this.controller);
+        return this.controller != null && SDL_GameControllerHasRumble(this.controller);
     }
 
     @Override
     protected boolean internalRumble(float lowFrequency, float highFrequency, int timeInMs)
     {
+        if(this.controller == null)
+            return false;
         lowFrequency = Mth.clamp(lowFrequency, 0.0F, 1.0F);
         highFrequency = Mth.clamp(highFrequency, 0.0F, 1.0F);
         return SDL_GameControllerRumble(this.controller, (short) (0xFFFF * lowFrequency), (short) (0xFFFF * highFrequency), timeInMs) == 0;
@@ -216,6 +220,12 @@ public class SDL2Controller extends Controller
         if(SDL_GameControllerSetSensorEnabled(this.controller, SDL_SENSOR_GYRO, true) != 0)
             return;
         this.gyro = true;
+    }
+
+    private static void updateControllerState()
+    {
+        SDL_GameControllerUpdate();
+        SDL_JoystickUpdate();
     }
 
     @Override
