@@ -70,28 +70,47 @@ public abstract class AdaptiveControllerManager
 
     private void updateControllers()
     {
-        if(this.getRawControllerCount() == this.controllers.size())
+        Controller activeController = this.getActiveController();
+        boolean activeControllerOpen = true;
+        if(activeController instanceof MultiController multi)
+        {
+            for(Controller childController : multi.getControllers())
+            {
+                if(!childController.isOpen())
+                {
+                    activeControllerOpen = false;
+                    break;
+                }
+            }
+        }
+        else if(activeController != null)
+        {
+            activeControllerOpen = activeController.isOpen();
+        }
+
+        Map<Number, Pair<Integer, String>> currentControllers = this.createRawControllerMap();
+        if(activeControllerOpen && currentControllers.equals(this.controllers))
             return;
 
-        Map<Number, Pair<Integer, String>> oldControllers = this.controllers;
-        this.controllers = this.createRawControllerMap();
+        Map<Number, Pair<Integer, String>> oldControllers = new HashMap<>(this.controllers);
+        this.controllers = currentControllers;
 
         // Removes all connected from the old map of connected controllers
         oldControllers.keySet().removeIf(this.controllers::containsKey);
 
-        Controller activeController = this.getActiveController();
         if(activeController instanceof MultiController multi)
         {
             // If current controller is a multi, remove controllers that no longer exist
-            for(Controller childController : multi.getControllers())
+            for(Controller childController : new ArrayList<>(multi.getControllers()))
             {
-                if(oldControllers.containsKey(childController.getJid()))
+                if(!childController.isOpen() || oldControllers.containsKey(childController.getJid()) || !this.controllers.containsKey(childController.getJid()))
                 {
                     this.removeActiveController(childController);
                 }
             }
+            activeController = this.getActiveController();
         }
-        else if(activeController != null && oldControllers.containsKey(activeController.getJid()))
+        else if(activeController != null && (!activeControllerOpen || oldControllers.containsKey(activeController.getJid()) || !this.controllers.containsKey(activeController.getJid())))
         {
             this.sendControllerToast(false, activeController);
             this.setActiveController(null);

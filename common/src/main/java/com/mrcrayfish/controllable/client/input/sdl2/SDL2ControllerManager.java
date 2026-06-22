@@ -38,6 +38,7 @@ import static com.mrcrayfish.controllable_sdl.api.gamecontroller.SdlGamecontroll
 import static com.mrcrayfish.controllable_sdl.api.hints.SdlHints.SDL_SetHint;
 import static com.mrcrayfish.controllable_sdl.api.hints.SdlHintsConst.*;
 import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.SDL_JoystickGetDeviceInstanceID;
+import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.SDL_JoystickUpdate;
 import static com.mrcrayfish.controllable_sdl.api.joystick.SdlJoystick.SDL_NumJoysticks;
 import static com.mrcrayfish.controllable_sdl.api.rwops.SdlRWops.SDL_RWFromConstMem;
 
@@ -104,6 +105,7 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
     @Override
     protected int getRawControllerCount()
     {
+        updateControllerState();
         int controllerCount = 0;
         int joysticksCount = SDL_NumJoysticks();
         for(int deviceIndex = 0; deviceIndex < joysticksCount; deviceIndex++)
@@ -119,6 +121,7 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
     @Override
     protected Map<Number, Pair<Integer, String>> createRawControllerMap()
     {
+        updateControllerState();
         Map<Number, Pair<Integer, String>> controllers = new HashMap<>();
         int joysticksCount = SDL_NumJoysticks();
         for(int deviceIndex = 0; deviceIndex < joysticksCount; deviceIndex++)
@@ -137,11 +140,13 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
     @Nullable
     public Controller connectToBestGameController()
     {
+        updateControllerState();
+        int joysticksCount = SDL_NumJoysticks();
         List<DeviceInfo> lastDevices = this.getLastDevices();
         if(!lastDevices.isEmpty())
         {
             List<SDL2Controller> selectedControllers = new ArrayList<>();
-            List<SDL2Controller> availableControllers = IntStream.range(0, SDL_NumJoysticks())
+            List<SDL2Controller> availableControllers = IntStream.range(0, joysticksCount)
                 .filter(SdlGamecontroller::SDL_IsGameController)
                 .mapToObj(SDL2Controller::new)
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -169,7 +174,6 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
             }
         }
 
-        int joysticksCount = SDL_NumJoysticks();
         for(int deviceIndex = 0; deviceIndex < joysticksCount; deviceIndex++)
         {
             if(SDL_IsGameController(deviceIndex))
@@ -182,6 +186,12 @@ public class SDL2ControllerManager extends AdaptiveControllerManager
             }
         }
         return null;
+    }
+
+    private static void updateControllerState()
+    {
+        SDL_GameControllerUpdate();
+        SDL_JoystickUpdate();
     }
 
     @Override

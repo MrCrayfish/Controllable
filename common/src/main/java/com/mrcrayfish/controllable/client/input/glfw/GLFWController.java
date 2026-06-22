@@ -36,8 +36,11 @@ public class GLFWController extends Controller
     @Override
     public void close()
     {
-        this.controller.close();
-        this.controller = null;
+        if(this.controller != null)
+        {
+            this.controller.close();
+            this.controller = null;
+        }
     }
 
     @Override
