@@ -63,8 +63,9 @@ public class CameraHandler
             Vector2f delta = relative.consumeRelativePointerDelta();
             if(delta.lengthSquared() > 0)
             {
-                this.yawDelta = delta.x * 0.35F;
-                this.pitchDelta = delta.y * 0.35F;
+                float sensitivity = Config.CLIENT.options.steamController.trackpadGameSensitivity.get().floatValue();
+                this.yawDelta = delta.x * sensitivity;
+                this.pitchDelta = delta.y * sensitivity;
                 controller.updateInputTime();
                 return;
             }

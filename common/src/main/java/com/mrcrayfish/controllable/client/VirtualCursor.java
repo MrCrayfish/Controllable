@@ -336,7 +336,7 @@ public final class VirtualCursor
         if(delta.lengthSquared() <= 0)
             return false;
 
-        double cursorSpeed = Math.max(mc.getWindow().getGuiScale(), 1);
+        double cursorSpeed = Math.max(mc.getWindow().getGuiScale(), 1) * Config.CLIENT.options.steamController.trackpadMenuSensitivity.get();
         this.x += delta.x * cursorSpeed;
         this.y += delta.y * cursorSpeed;
         this.clampCursorToWindowBounds();

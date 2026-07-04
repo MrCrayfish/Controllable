@@ -382,6 +382,10 @@ public class SettingsScreen extends Screen
             advancedModeOption.setChangeCallback(aBoolean -> optionsList.rebuildList(true));
             optionsList.addEntry(advancedModeOption);
 
+            optionsList.addEntry(new TabOptionTitleItem(Component.translatable("controllable.gui.title.steam_controller").withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW)));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.steamController.trackpadMenuSensitivity, 0.05));
+            optionsList.addEntry(new TabOptionSliderItem(Config.CLIENT.options.steamController.trackpadGameSensitivity, 0.05));
+
             this.listWidget = rootHelper.addChild(new TabListWidget(optionsList));
             optionsList.finalise();
             optionsList.rebuildList(false);

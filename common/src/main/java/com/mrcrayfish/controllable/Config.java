@@ -142,6 +142,9 @@ public class Config
                 Gyro related options. (Experimental)""")
             public final Gyro gyro = new Gyro();
 
+            @ConfigProperty(name = "steamController", comment = "Steam Controller related options.")
+            public final SteamController steamController = new SteamController();
+
             @ConfigProperty(name = "advanced", comment = """
                 Advanced related options. "advancedMode" option must be enabled""")
             public final Advanced advanced = new Advanced();
@@ -167,6 +170,15 @@ public class Config
                 @ConfigProperty(name = "invertY", comment = """
                 Inverts the y-input of the gyro""")
                 public final BoolProperty invertY = BoolProperty.create(false);
+            }
+
+            public static class SteamController
+            {
+                @ConfigProperty(name = "trackpadMenuSensitivity", comment = "The Steam Controller's trackpad sensitivity when moving the cursor in menus")
+                public final DoubleProperty trackpadMenuSensitivity = DoubleProperty.create(1.0, 0.0, 5.0);
+
+                @ConfigProperty(name = "trackpadGameSensitivity", comment = "The Steam Controller's trackpad sensitivity when turning the camera in game")
+                public final DoubleProperty trackpadGameSensitivity = DoubleProperty.create(0.35, 0.0, 2.0);
             }
 
             public static class Advanced
