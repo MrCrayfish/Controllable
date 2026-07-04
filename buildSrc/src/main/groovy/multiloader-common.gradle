@@ -29,6 +29,7 @@ def getPackagesRepo() {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     exclusiveContent {
         forRepository {

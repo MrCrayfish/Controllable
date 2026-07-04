@@ -6,6 +6,7 @@ import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.gui.screens.ControllerLayoutScreen;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.input.RelativePointerController;
 import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable.client.util.MouseHooks;
 import com.mrcrayfish.controllable.client.util.ScreenHelper;
@@ -204,6 +205,9 @@ public final class VirtualCursor
         if(mc.screen == null || mc.screen instanceof ControllerLayoutScreen)
             return;
 
+        if(this.applyRelativePointerInput(controller, mc))
+            return;
+
         this.updateInputVector(controller);
 
         // If the magnitude is greater than zero, input is being given
@@ -320,6 +324,34 @@ public final class VirtualCursor
         float cursorVectorY = Math.abs(thumbstickY) >= moveThreshold ? thumbstickY : 0;
         this.inputVector.x = InputHelper.applyDeadzone(cursorVectorX, moveThreshold);
         this.inputVector.y = InputHelper.applyDeadzone(cursorVectorY, moveThreshold);
+    }
+
+    // steam controller trackpad deltas should move the cursor before thumbstick cursor input is used
+    private boolean applyRelativePointerInput(Controller controller, Minecraft mc)
+    {
+        if(!(controller instanceof RelativePointerController relative))
+            return false;
+
+        Vector2f delta = relative.consumeRelativePointerDelta();
+        if(delta.lengthSquared() <= 0)
+            return false;
+
+        double cursorSpeed = Math.max(mc.getWindow().getGuiScale(), 1);
+        this.x += delta.x * cursorSpeed;
+        this.y += delta.y * cursorSpeed;
+        this.clampCursorToWindowBounds();
+        this.setVisible(true);
+        this.snapIfNoMove = true;
+        this.mode = CursorMode.CONTROLLER;
+        controller.updateInputTime();
+
+        if(this.x != this.lastMoveX || this.y != this.lastMoveY)
+        {
+            MouseHooks.invokeMouseMoved(mc.screen, this.x, this.y, this.x - this.lastMoveX, this.y - this.lastMoveY);
+            this.lastMoveX = this.x;
+            this.lastMoveY = this.y;
+        }
+        return true;
     }
 
     /**

@@ -6,5 +6,6 @@ package com.mrcrayfish.controllable.client.input;
 public enum InputLibrary
 {
     GLFW,
-    SDL2 // Default
+    SDL2,
+    STEAM_HID
 }

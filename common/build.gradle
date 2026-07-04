@@ -21,6 +21,7 @@ dependencies {
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-gui:${jei_version}"
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-lib:${jei_version}"
     compileOnly "com.mrcrayfish:controllable-sdl:${controllable_sdl_version}"
+    compileOnly "org.hid4java:hid4java:${hid4java_version}" // gives access to hid4java to detect steam controller buttons
     //compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}"
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
     compileOnly "org.spongepowered:mixin:0.8.7"
