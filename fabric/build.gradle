@@ -20,6 +20,9 @@ dependencies {
     library include("com.mrcrayfish:controllable-sdl:${controllable_sdl_version}") {
         transitive false
     }
+    library include("org.hid4java:hid4java:${hid4java_version}") {
+        transitive false
+    }
 }
 
 sourceSets.main.resources.srcDir 'src/generated/resources'

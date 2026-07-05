@@ -5,12 +5,14 @@ import com.mrcrayfish.controllable.Config;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.ButtonBindings;
 import com.mrcrayfish.controllable.client.input.Controller;
+import com.mrcrayfish.controllable.client.input.RelativePointerController;
 import com.mrcrayfish.controllable.client.util.EventHelper;
 import com.mrcrayfish.controllable.client.util.InputHelper;
 import com.mrcrayfish.controllable.event.Value;
 import com.mrcrayfish.framework.api.event.client.FrameworkClientTickEvents;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import org.joml.Vector2f;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -54,6 +56,20 @@ public class CameraHandler
         Controller controller = Controllable.getController();
         if(controller == null)
             return;
+
+        // ingame trackpad motion turns the camera; menus use the same deltas in VirtualCursor
+        if(controller instanceof RelativePointerController relative)
+        {
+            Vector2f delta = relative.consumeRelativePointerDelta();
+            if(delta.lengthSquared() > 0)
+            {
+                float sensitivity = Config.CLIENT.options.steamController.trackpadGameSensitivity.get().floatValue();
+                this.yawDelta = delta.x * sensitivity;
+                this.pitchDelta = delta.y * sensitivity;
+                controller.updateInputTime();
+                return;
+            }
+        }
 
         float thumbstickX = InputHelper.getCombinedPressedValue(controller, ButtonBindings.LOOK_LEFT, ButtonBindings.LOOK_RIGHT);
         float thumbstickY = InputHelper.getCombinedPressedValue(controller, ButtonBindings.LOOK_UP, ButtonBindings.LOOK_DOWN);

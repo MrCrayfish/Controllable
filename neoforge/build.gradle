@@ -68,6 +68,10 @@ dependencies {
         transitive(false)
     }
 
+    library jarJar("org.hid4java:hid4java:${hid4java_version}") {
+        transitive(false)
+    }
+
 
     testImplementation "org.junit.jupiter:junit-jupiter:5.7.2"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
