@@ -18,14 +18,14 @@ public class PaperDollPlayerOverlay implements IOverlay
     public boolean isVisible()
     {
         Controller controller = Controllable.getController();
-        return !Minecraft.getInstance().options.hideGui && controller != null && (!Config.CLIENT.options.overlayTimeout.get() || controller.isBeingUsed());
+        return !Minecraft.getInstance().gui.hud.isHidden() && controller != null && (!Config.CLIENT.options.overlayTimeout.get() || controller.isBeingUsed());
     }
 
     @Override
     public void render(GuiGraphicsExtractor extractor, int mouseX, int mouseY, DeltaTracker tracker)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.player != null && mc.screen == null && Config.CLIENT.options.paperDoll.get())
+        if(mc.player != null && mc.gui.screen() == null && Config.CLIENT.options.paperDoll.get())
         {
             if(!EventHelper.postRenderMiniPlayer())
             {

@@ -53,6 +53,7 @@ dependencies {
     // JEI
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${jei_minecraft_version}-neoforge:${jei_version}"
+    runtimeOnly "mezz.jei:jei-${jei_minecraft_version}-neoforge:${jei_version}"
 
     // EMI
     //compileOnly "dev.emi:emi-neoforge:${emi_version}"

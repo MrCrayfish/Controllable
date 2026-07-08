@@ -20,10 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.tabs.GridLayoutTab;
-import net.minecraft.client.gui.components.tabs.Tab;
-import net.minecraft.client.gui.components.tabs.TabManager;
-import net.minecraft.client.gui.components.tabs.TabNavigationBar;
+import net.minecraft.client.gui.components.tabs.*;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
@@ -49,7 +46,7 @@ public class SettingsScreen extends Screen
     private final TabManager tabManager = new TabManager(this::addRenderableWidget, this::removeWidget);
     private final List<Runnable> tickers = new ArrayList<>();
     private ScreenRectangle tabArea;
-    private TabNavigationBar navigationBar;
+    private MenuTabBar navigationBar;
     private Button doneButton;
     private ButtonBinding selectedBinding;
     private int remainingTime;
@@ -78,10 +75,14 @@ public class SettingsScreen extends Screen
     protected void init()
     {
         this.tickers.clear();
-        this.navigationBar = TabNavigationBar.builder(this.tabManager, this.width).addTabs(new ControllerTab(this), new SettingsTab(), new BindingsTab()).build();
+        this.navigationBar = MenuTabBar.builder(this.tabManager, this.width)
+            .addTab(new ControllerTab(this))
+            .addTab(new SettingsTab())
+            .addTab(new BindingsTab())
+            .build();
         this.addRenderableWidget(this.navigationBar);
         this.navigationBar.selectTab(this.initialTab, false);
-        this.doneButton = this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (btn) -> this.minecraft.setScreen(this.parent)).pos((this.width - 200) / 2, this.height - 25).width(200).build());
+        this.doneButton = this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (_) -> this.minecraft.gui.setScreen(this.parent)).pos((this.width - 200) / 2, this.height - 25).width(200).build());
         this.repositionElements();
     }
 
@@ -90,8 +91,8 @@ public class SettingsScreen extends Screen
     {
         if(this.navigationBar != null)
         {
-            this.navigationBar.updateWidth(this.width);
-            this.navigationBar.arrangeElements();
+            //this.navigationBar.updateWidth(this.width);
+            this.navigationBar.arrangeElements(this.width);
             ScreenRectangle navBarArea = this.navigationBar.getRectangle();
             this.tabArea = new ScreenRectangle(0, navBarArea.height() - 1, this.width, this.height - navBarArea.height() - 30);
             this.tabManager.setTabArea(this.tabArea);
@@ -261,14 +262,14 @@ public class SettingsScreen extends Screen
                 updateConfirmation.setPositiveText(ClientHelper.join(Icons.DOWNLOAD, Component.translatable("controllable.gui.download")));
                 updateConfirmation.setNegativeText(CommonComponents.GUI_CANCEL);
                 updateConfirmation.setIcon(ConfirmationScreen.Icon.INFO);
-                mc.setScreen(updateConfirmation);
+                mc.gui.setScreen(updateConfirmation);
             }).build(), Button.builder(restoreDefaults, btn -> {
-                mc.setScreen(new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.restore_default_buttons"), result -> {
+                mc.gui.setScreen(new ConfirmationScreen(SettingsScreen.this, Component.translatable("controllable.gui.restore_default_buttons"), result -> {
                     if(result){
                         FrameworkConfigManager.FrameworkConfigImpl config = FrameworkConfigManager.getInstance().getConfig(Config.CLIENT_CONFIG_ID);
                         if(config != null) {
                             config.getAllProperties().forEach(AbstractProperty::restoreDefault);
-                            mc.setScreen(new SettingsScreen(SettingsScreen.this.parent, 1));
+                            mc.gui.setScreen(new SettingsScreen(SettingsScreen.this.parent, 1));
                             return false;
                         }
                     }
@@ -279,7 +280,7 @@ public class SettingsScreen extends Screen
             Component radialMenuLabel = ClientHelper.join(Icons.SETTINGS, Component.translatable("controllable.gui.title.radial_menu_configure"));
             optionsList.addEntry(new ButtonBindingList.OneWidgetItem(Button.builder(radialMenuLabel, button -> {
                 Controllable.getRadialMenu().load();
-                Minecraft.getInstance().setScreen(new RadialMenuConfigureScreen(SettingsScreen.this));
+                Minecraft.getInstance().gui.setScreen(new RadialMenuConfigureScreen(SettingsScreen.this));
             }).build()));
 
             // Gameplay options

@@ -62,7 +62,7 @@ public final class KeyAdapterBinding extends ButtonBinding
 
     private void handlePressed(int action, int key, int modifiers)
     {
-        Screen screen = Minecraft.getInstance().screen;
+        Screen screen = Minecraft.getInstance().gui.screen();
         if(screen != null && ClientServices.CLIENT.sendScreenInput(screen, key, action, modifiers))
             return;
         ClientServices.CLIENT.sendKeyInputEvent(key, 0, action, modifiers);

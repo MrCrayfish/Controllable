@@ -22,7 +22,7 @@ public class VirtualCursorOverlay implements IOverlay
     public boolean isVisible()
     {
         Controller controller = Controllable.getController();
-        return Minecraft.getInstance().getOverlay() == null && Minecraft.getInstance().screen != null && controller != null && controller.isUsingVirtualCursor() && Controllable.getCursor().isVisible();
+        return Minecraft.getInstance().gui.overlay() == null && Minecraft.getInstance().gui.screen() != null && controller != null && controller.isUsingVirtualCursor() && Controllable.getCursor().isVisible();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class VirtualCursorOverlay implements IOverlay
     private boolean isHoveringFilledContainerSlot()
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.screen instanceof AbstractContainerScreen<?> screen)
+        if(mc.gui.screen() instanceof AbstractContainerScreen<?> screen)
         {
             Slot slot = ClientServices.CLIENT.getSlotUnderMouse(screen);
             return slot != null && slot.hasItem();

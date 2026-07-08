@@ -111,7 +111,7 @@ public abstract class AdaptiveControllerManager
         Minecraft mc = Minecraft.getInstance();
         if(mc.player != null && controller != null)
         {
-            mc.getToastManager().addToast(new ConnectionToast(connected, controller.getName()));
+            mc.gui.toastManager().addToast(new ConnectionToast(connected, controller.getName()));
         }
     }
 
@@ -340,7 +340,7 @@ public abstract class AdaptiveControllerManager
             MoreFiles.createParentDirectories(path);
             CompletableFuture.supplyAsync(() -> {
                 Minecraft mc = Minecraft.getInstance();
-                mc.executeBlocking(() -> mc.setScreen(new PendingScreen(Component.translatable("controllable.gui.downloading_mappings"))));
+                mc.executeBlocking(() -> mc.gui.setScreen(new PendingScreen(Component.translatable("controllable.gui.downloading_mappings"))));
 
                 // Artificial delay to improve user experience.
                 try {
@@ -378,7 +378,7 @@ public abstract class AdaptiveControllerManager
                             infoScreen.setPositiveText(CommonComponents.GUI_BACK);
                             infoScreen.setNegativeText(null);
                             infoScreen.setIcon(ConfirmationScreen.Icon.INFO);
-                            mc.setScreen(infoScreen);
+                            mc.gui.setScreen(infoScreen);
                         } catch(IOException e) {
                             Constants.LOG.error("Failed to update mappings", e);
                         }

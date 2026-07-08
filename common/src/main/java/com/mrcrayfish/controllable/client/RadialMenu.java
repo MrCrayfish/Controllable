@@ -26,6 +26,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -34,6 +35,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -103,11 +105,7 @@ public class RadialMenu
                     ButtonBinding binding = Controllable.getBindingRegistry().getBindingByDescriptionKey(key);
                     if(binding != null)
                     {
-                        ChatFormatting color = ChatFormatting.getByName(colorName);
-                        if(color == null || color.getColor() == null)
-                        {
-                            color = ChatFormatting.YELLOW;
-                        }
+                        TextColor color = TextColor.parseColor(colorName).result().orElse(TextColor.YELLOW);
                         this.actions.add(new RadialMenuAction(binding, color));
                     }
                 });
@@ -132,7 +130,7 @@ public class RadialMenu
         this.actions.forEach(data -> {
             JsonObject object = new JsonObject();
             object.addProperty("key", data.getBinding().getDescription());
-            object.addProperty("color", data.getColor().name());
+            object.addProperty("color", data.getColor().serialize());
             array.add(object);
         });
         try
@@ -150,10 +148,10 @@ public class RadialMenu
     public List<RadialMenuAction> createDefaultActions()
     {
         List<RadialMenuAction> defaults = new ArrayList<>();
-        defaults.add(new RadialMenuAction(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS, ChatFormatting.BLUE));
-        defaults.add(new RadialMenuAction(ButtonBindings.ADVANCEMENTS, ChatFormatting.YELLOW));
-        defaults.add(new RadialMenuAction(ButtonBindings.SCREENSHOT, ChatFormatting.YELLOW));
-        defaults.add(new RadialMenuAction(ButtonBindings.FULLSCREEN, ChatFormatting.YELLOW));
+        defaults.add(new RadialMenuAction(ButtonBindings.OPEN_CONTROLLABLE_SETTINGS, TextColor.BLUE));
+        defaults.add(new RadialMenuAction(ButtonBindings.ADVANCEMENTS, TextColor.YELLOW));
+        defaults.add(new RadialMenuAction(ButtonBindings.SCREENSHOT, TextColor.YELLOW));
+        defaults.add(new RadialMenuAction(ButtonBindings.FULLSCREEN, TextColor.YELLOW));
         return defaults;
     }
 
@@ -272,7 +270,7 @@ public class RadialMenu
     public void onRenderEnd(GuiGraphicsExtractor graphics, DeltaTracker tracker)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.options.hideGui || mc.screen != null)
+        if(mc.gui.hud.isHidden() || mc.gui.screen() != null)
             return;
 
         if(Controllable.getController() != null)
@@ -512,7 +510,7 @@ public class RadialMenu
         {
             handler.setVisibility(false);
             handler.clearAnimation();
-            Minecraft.getInstance().setScreen(new RadialMenuConfigureScreen(null));
+            Minecraft.getInstance().gui.setScreen(new RadialMenuConfigureScreen(null));
         }
 
         @Override
@@ -549,7 +547,7 @@ public class RadialMenu
 
         public ButtonBindingItem(RadialMenuAction entry)
         {
-            super(Component.translatable(entry.getBinding().getLabelKey()).withStyle(entry.getColor()), Component.translatable(entry.getBinding().getCategory()));
+            super(Component.translatable(entry.getBinding().getLabelKey()).withColor(entry.getColor()), Component.translatable(entry.getBinding().getCategory()));
             this.entry = entry;
         }
 

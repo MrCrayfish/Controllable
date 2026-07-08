@@ -49,14 +49,14 @@ public class RadialMenuConfigureScreen extends Screen
         Component saveLabel = ClientHelper.join(Icons.SAVE, Component.translatable("controllable.gui.save"));
         footerLayout.addChild(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 100, 20, saveLabel, buttons -> {
             Controllable.getRadialMenu().setActions(this.actions);
-            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
+            Objects.requireNonNull(this.minecraft).gui.setScreen(this.parent);
         }));
         Component addLabel = ClientHelper.join(Icons.ADD, Component.translatable("controllable.gui.add_binding"));
         footerLayout.addChild(ScreenHelper.button(this.width / 2 - 50, this.height - 29, 100, 20, addLabel, buttons -> {
-            Objects.requireNonNull(this.minecraft).setScreen(new RadialMenuAddBindingsScreen(this));
+            Objects.requireNonNull(this.minecraft).gui.setScreen(new RadialMenuAddBindingsScreen(this));
         }));
         footerLayout.addChild(ScreenHelper.button(this.width / 2 + 55, this.height - 29, 100, 20, CommonComponents.GUI_CANCEL, buttons -> {
-            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
+            Objects.requireNonNull(this.minecraft).gui.setScreen(this.parent);
         }));
 
         this.layout.visitWidgets(this::addRenderableWidget);

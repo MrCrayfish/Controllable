@@ -57,7 +57,7 @@ public class ThumbstickSettingsScreen extends Screen
         //this.addWidget(this.optionsRowList);
 
         this.addRenderableWidget(ScreenHelper.button(this.width / 2 - 100, this.height - 27, 200, 20, CommonComponents.GUI_BACK, (button) -> {
-            this.minecraft.setScreen(this.layoutScreen);
+            this.minecraft.gui.setScreen(this.layoutScreen);
         }));
     }
 

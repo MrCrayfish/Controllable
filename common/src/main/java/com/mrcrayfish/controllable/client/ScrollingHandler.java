@@ -75,14 +75,14 @@ public class ScrollingHandler
             return;
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.screen != null)
+        if(mc.gui.screen() != null)
         {
             // Apply custom scrolling for abstract list widgets
-            if(this.handleAbstractListScrolling(mc.screen, controller))
+            if(this.handleAbstractListScrolling(mc.gui.screen(), controller))
                 return;
 
             // Send generic scroll events to screen
-            this.handleScreenScrolling(mc.screen, controller);
+            this.handleScreenScrolling(mc.gui.screen(), controller);
         }
     }
 

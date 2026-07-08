@@ -19,6 +19,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 
 import java.time.Duration;
 import java.util.List;
@@ -46,7 +47,7 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
         super.setupFooter(footerLayout);
         Component resetLabel = ClientHelper.join(Icons.RESET, Component.translatable("controllable.gui.restore_defaults"));
         footerLayout.addChild(ScreenHelper.button(this.width / 2 - 155, this.height - 29, 150, 20, resetLabel, (button) -> {
-            Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
+            Objects.requireNonNull(this.minecraft).gui.setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     RadialMenuConfigureScreen screen = getRadialConfigureScreen();
                     screen.getActions().clear();
@@ -61,7 +62,7 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
             }));
         }));
         footerLayout.addChild(ScreenHelper.button(this.width / 2 + 5, this.height - 29, 150, 20, CommonComponents.GUI_BACK, (button) -> {
-            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
+            Objects.requireNonNull(this.minecraft).gui.setScreen(this.parent);
         }));
     }
 
@@ -95,8 +96,8 @@ public class RadialMenuAddBindingsScreen extends ButtonBindingListMenuScreen
             this.binding = binding;
             List<RadialMenuAction> bindings = getRadialConfigureScreen().getActions();
             this.bindingButton = new ImageButton(0, 0, 20, ControllerLayoutScreen.TEXTURE, 88, 25, 10, 10, button -> {
-                bindings.add(new RadialMenuAction(this.binding, ChatFormatting.YELLOW));
-                Objects.requireNonNull(RadialMenuAddBindingsScreen.this.minecraft).setScreen(RadialMenuAddBindingsScreen.this.parent);
+                bindings.add(new RadialMenuAction(this.binding, TextColor.YELLOW));
+                Objects.requireNonNull(RadialMenuAddBindingsScreen.this.minecraft).gui.setScreen(RadialMenuAddBindingsScreen.this.parent);
                 getRadialConfigureScreen().scrollToBottomAndSelectLast();
             });
             this.bindingButton.setTooltipDelay(Duration.ofMillis(400));

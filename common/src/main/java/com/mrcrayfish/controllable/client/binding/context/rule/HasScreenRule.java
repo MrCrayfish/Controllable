@@ -22,7 +22,7 @@ public final class HasScreenRule extends ContextRule
     public boolean isActive()
     {
         Minecraft mc = Minecraft.getInstance();
-        return mc.screen != null && (this.validScreens.isEmpty() || this.validScreens.contains(mc.screen.getClass()));
+        return mc.gui.screen() != null && (this.validScreens.isEmpty() || this.validScreens.contains(mc.gui.screen().getClass()));
     }
 
     @Override

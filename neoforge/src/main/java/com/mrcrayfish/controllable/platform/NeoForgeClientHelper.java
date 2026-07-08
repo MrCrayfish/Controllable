@@ -296,7 +296,7 @@ public class NeoForgeClientHelper implements IClientHelper
     @Override
     public void openChatScreen(String s)
     {
-        Minecraft.getInstance().openChatScreen(ChatComponent.ChatMethod.MESSAGE);
+        Minecraft.getInstance().gui.openChatScreen(ChatComponent.ChatMethod.MESSAGE);
     }
 
     @Override

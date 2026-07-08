@@ -2,6 +2,7 @@ package com.mrcrayfish.controllable.client.gui;
 
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TextColor;
 
 /**
  * Author: MrCrayfish
@@ -9,9 +10,9 @@ import net.minecraft.ChatFormatting;
 public class RadialMenuAction
 {
     private final ButtonBinding binding;
-    private ChatFormatting color;
+    private TextColor color;
 
-    public RadialMenuAction(ButtonBinding binding, ChatFormatting color)
+    public RadialMenuAction(ButtonBinding binding, TextColor color)
     {
         this.binding = binding;
         this.color = color;
@@ -22,12 +23,12 @@ public class RadialMenuAction
         return binding;
     }
 
-    public ChatFormatting getColor()
+    public TextColor getColor()
     {
         return color;
     }
 
-    public void setColor(ChatFormatting color)
+    public void setColor(TextColor color)
     {
         this.color = color;
     }

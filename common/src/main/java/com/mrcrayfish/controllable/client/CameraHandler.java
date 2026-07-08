@@ -48,7 +48,7 @@ public class CameraHandler
         this.pitchDelta = 0;
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.screen != null || mc.player == null)
+        if(mc.gui.screen() != null || mc.player == null)
             return;
 
         Controller controller = Controllable.getController();
@@ -90,7 +90,7 @@ public class CameraHandler
             return;
 
         Minecraft mc = Minecraft.getInstance();
-        if(mc.player == null || mc.screen != null)
+        if(mc.player == null || mc.gui.screen() != null)
             return;
 
         // Don't turn if nothing to change

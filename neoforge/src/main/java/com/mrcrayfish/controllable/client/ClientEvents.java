@@ -68,8 +68,8 @@ public class ClientEvents
     {
         if(Config.CLIENT.options.consoleHotbar.get())
         {
-            Minecraft.getInstance().gui.leftHeight += CONSOLE_HOTBAR_OFFSET;
-            Minecraft.getInstance().gui.rightHeight += CONSOLE_HOTBAR_OFFSET;
+            Minecraft.getInstance().gui.hud.leftHeight += CONSOLE_HOTBAR_OFFSET;
+            Minecraft.getInstance().gui.hud.rightHeight += CONSOLE_HOTBAR_OFFSET;
         }
     }
 }

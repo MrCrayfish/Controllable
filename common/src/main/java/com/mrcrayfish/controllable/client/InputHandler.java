@@ -131,7 +131,7 @@ public class InputHandler
                     continue;
 
                 Minecraft mc = Minecraft.getInstance();
-                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, false);
+                Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.gui.screen(), false);
                 released.handleReleased(context);
                 return;
             }
@@ -152,7 +152,7 @@ public class InputHandler
             return false;
 
         Minecraft mc = Minecraft.getInstance();
-        Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.screen, virtual);
+        Context context = new Context(binding, controller, mc, mc.player, mc.level, mc.gui.screen(), virtual);
         Optional<Runnable> action = pressed.createPressedHandler(context);
         if(action.isEmpty())
             return false;
@@ -201,7 +201,7 @@ public class InputHandler
             return;
 
         Minecraft mc = Minecraft.getInstance();
-        Context context = new Context(virtualBinding, controller, mc, mc.player, mc.level, mc.screen, false);
+        Context context = new Context(virtualBinding, controller, mc, mc.player, mc.level, mc.gui.screen(), false);
         released.handleReleased(context);
     }
 
@@ -236,7 +236,7 @@ public class InputHandler
             ButtonBinding binding = handler.binding();
             if(!binding.isButtonDown() || !binding.getContext().isActive())
                 return true;
-            Context context = new Context(handler.binding, controller, mc, mc.player, mc.level, mc.screen, false);
+            Context context = new Context(handler.binding, controller, mc, mc.player, mc.level, mc.gui.screen(), false);
             handler.handler().handleTick(context);
             return false;
         });
@@ -256,13 +256,13 @@ public class InputHandler
             ButtonBinding binding = handler.binding();
             if(!binding.isButtonDown() || !binding.getContext().isActive())
                 return true;
-            MovementInputContext context = new MovementInputContext(handler.binding, controller, mc, mc.player, mc.level, mc.screen, false, input);
+            MovementInputContext context = new MovementInputContext(handler.binding, controller, mc, mc.player, mc.level, mc.gui.screen(), false, input);
             handler.handler().handleMovementInput(context);
             context.mutableInput().apply();
             return false;
         });
 
-        if(mc.screen == null && controller != null)
+        if(mc.gui.screen() == null && controller != null)
         {
             if((!Controllable.getRadialMenu().isVisible() || Config.CLIENT.options.radialThumbstick.get() != Thumbstick.LEFT) && !EventHelper.postMoveEvent())
             {
@@ -745,10 +745,10 @@ public class InputHandler
         if(mc.player == null)
             return;
 
-        if(!(mc.screen instanceof AbstractContainerScreen<?> screen) || !(mc.screen instanceof RecipeUpdateListener listener))
+        if(!(mc.gui.screen() instanceof AbstractContainerScreen<?> screen) || !(mc.gui.screen() instanceof RecipeUpdateListener listener))
             return;
 
-        Optional<RecipeBookComponent<?>> optional = findRecipeBookComponent(mc.screen);
+        Optional<RecipeBookComponent<?>> optional = findRecipeBookComponent(mc.gui.screen());
         if(optional.isEmpty())
             return;
 

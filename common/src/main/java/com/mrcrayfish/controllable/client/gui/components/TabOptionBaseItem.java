@@ -15,6 +15,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -117,7 +118,7 @@ public abstract class TabOptionBaseItem extends TabSelectionList.BaseItem implem
     protected static Component createTooltipMessage(AbstractProperty<?> property)
     {
         String tooltipKey = property.getTranslationKey() + ".tooltip";
-        if(I18n.exists(tooltipKey))
+        if(Language.getInstance().has(tooltipKey))
         {
             return Component.translatable(tooltipKey);
         }

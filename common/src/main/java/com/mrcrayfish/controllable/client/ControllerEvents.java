@@ -54,7 +54,7 @@ public class ControllerEvents
             Optional<AbstractWidget> btn = widgets.stream().filter(widget -> widget instanceof Button button &&
                 button.getMessage().equals(Component.translatable("options.controls"))).findFirst();
             btn.ifPresent(widget -> add.accept(new ControllerButton(widget, button -> {
-                Minecraft.getInstance().setScreen(new SettingsScreen(screen));
+                Minecraft.getInstance().gui.setScreen(new SettingsScreen(screen));
             })));
         }
     }

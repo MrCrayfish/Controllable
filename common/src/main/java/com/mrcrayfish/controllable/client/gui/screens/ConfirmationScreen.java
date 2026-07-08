@@ -53,7 +53,7 @@ public class ConfirmationScreen extends Screen
         int offset = this.negativeText != null ? 105 : 50;
         this.addRenderableWidget(Button.builder(this.positiveText, button -> {
             if(this.handler.apply(true)){
-                this.minecraft.setScreen(this.parent);
+                this.minecraft.gui.setScreen(this.parent);
             }
         }).pos(this.width / 2 - offset, this.endY + 10).size(100, 20).build());
 
@@ -61,7 +61,7 @@ public class ConfirmationScreen extends Screen
         {
             this.addRenderableWidget(Button.builder(this.negativeText, button -> {
                 if(this.handler.apply(false)) {
-                    this.minecraft.setScreen(this.parent);
+                    this.minecraft.gui.setScreen(this.parent);
                 }
             }).pos(this.width / 2 + 5, this.endY + 10).size(100, 20).build());
         }

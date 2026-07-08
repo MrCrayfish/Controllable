@@ -28,7 +28,7 @@ public class TabNavigationOverlay implements IOverlay
     {
         this.navigationBar = null;
         Minecraft mc = Minecraft.getInstance();
-        Screen screen = mc.screen;
+        Screen screen = mc.gui.screen();
         if(screen != null)
         {
             this.navigationBar = screen.children().stream().filter(e -> e instanceof TabNavigationBar).map(listener -> (TabNavigationBar) listener).findFirst().orElse(null);

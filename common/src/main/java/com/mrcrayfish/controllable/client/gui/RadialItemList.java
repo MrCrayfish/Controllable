@@ -133,10 +133,10 @@ public class RadialItemList extends AbstractSelectionList<RadialItemList.ButtonB
             });
             this.moveDownButton.setTooltip(Tooltip.create(Component.translatable("controllable.gui.shift_down")));
             this.moveDownButton.setTooltipDelay(Duration.ofMillis(400));
-            this.label = Component.translatable(data.getBinding().getLabelKey()).withStyle(data.getColor());
+            this.label = Component.translatable(data.getBinding().getLabelKey()).withColor(data.getColor());
             this.colorButton = new ColorButton(0, 0, button -> {
                 data.setColor(((ColorButton) button).getColor());
-                this.label = this.label.copy().withStyle(((ColorButton) button).getColor());
+                this.label = this.label.copy().withColor(((ColorButton) button).getColor());
             });
             this.colorButton.setColor(data.getColor());
             this.colorButton.setTooltip(Tooltip.create(Component.translatable("controllable.gui.change_color")));

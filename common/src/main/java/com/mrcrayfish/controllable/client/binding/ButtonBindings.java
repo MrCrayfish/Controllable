@@ -73,7 +73,7 @@ public class ButtonBindings
                     mc.player.sendOpenInventory();
                 } else {
                     mc.getTutorial().onOpenInventory();
-                    mc.setScreen(new InventoryScreen(mc.player));
+                    mc.gui.setScreen(new InventoryScreen(mc.player));
                 }
             }
         });
@@ -132,8 +132,8 @@ public class ButtonBindings
     public static final ButtonBinding SCREENSHOT = new ButtonBinding(-1, "key.screenshot", "key.category.minecraft.misc", GlobalContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
             Minecraft mc = context.minecraft();
-            Screenshot.grab(mc.gameDirectory, mc.getMainRenderTarget(), (component) -> {
-                mc.execute(() -> mc.gui.getChat().addClientSystemMessage(component));
+            Screenshot.grab(mc.gameDirectory, mc.gameRenderer.mainRenderTarget(), (component) -> {
+                mc.execute(() -> mc.gui.hud.getChat().addClientSystemMessage(component));
             });
         });
     }));
@@ -168,7 +168,7 @@ public class ButtonBindings
         return Optional.of(() -> {
             context.screen().ifPresent(screen -> {
                 if(screen instanceof PauseScreen) {
-                    context.minecraft().setScreen(null);
+                    context.minecraft().gui.setScreen(null);
                 }
             });
         });
@@ -271,7 +271,7 @@ public class ButtonBindings
                 // If invokeMouseClick closed the screen, and the button is the same as the jump
                 // button, the player will jump as soon as the screen is closed. To prevent this,
                 // the jump binding is simply unpressed.
-                if(context.minecraft().screen == null) {
+                if(context.minecraft().gui.screen() == null) {
                     if(ButtonBindings.JUMP.getButton() == ButtonBindings.PICKUP_ITEM.getButton()) {
                         ButtonBindings.JUMP.resetPressedState();
                     }
@@ -325,7 +325,7 @@ public class ButtonBindings
                     player.sendOverlayMessage(message);
                     mc.getNarrator().saySystemNow(message);
                 } else {
-                    mc.setScreen(new SocialInteractionsScreen());
+                    mc.gui.setScreen(new SocialInteractionsScreen());
                 }
             });
         });
@@ -334,7 +334,7 @@ public class ButtonBindings
     public static final ButtonBinding ADVANCEMENTS = new ButtonBinding(-1, "key.advancements", "key.category.minecraft.misc", InGameContext.INSTANCE, OnPressHandler.create(context -> {
         return Optional.of(() -> {
             context.player().ifPresent(player -> {
-                context.minecraft().setScreen(new AdvancementsScreen(player.connection.getAdvancements()));
+                context.minecraft().gui.setScreen(new AdvancementsScreen(player.connection.getAdvancements()));
             });
         });
     }));
@@ -409,7 +409,7 @@ public class ButtonBindings
     }));
 
     public static final ButtonBinding OPEN_CONTROLLABLE_SETTINGS = new ButtonBinding(-1, "controllable.key.open_controllable_settings", "key.category.minecraft.misc", InGameContext.INSTANCE, OnPressHandler.create(context -> {
-        return Optional.of(() -> context.minecraft().setScreen(new SettingsScreen(null, 1)));
+        return Optional.of(() -> context.minecraft().gui.setScreen(new SettingsScreen(null, 1)));
     }));
 
     public static final ButtonBinding OPEN_CHAT = new ButtonBinding(-1, "key.chat", "key.category.minecraft.multiplayer", InGameContext.INSTANCE, OnPressHandler.create(context -> {

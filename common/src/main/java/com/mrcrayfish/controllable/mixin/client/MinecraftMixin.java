@@ -93,7 +93,7 @@ public class MinecraftMixin
     private void controllable$CaptureInputWhileWaiting(int framerateLimit, Operation<Void> original)
     {
         Minecraft mc = (Minecraft) (Object) this;
-        if(framerateLimit < 40 && Config.CLIENT.options.fpsPollingFix.get() && mc.getOverlay() == null)
+        if(framerateLimit < 40 && Config.CLIENT.options.fpsPollingFix.get() && mc.gui.overlay() == null)
         {
             Controllable.getInputProcessor().queueInputsWait(framerateLimit);
         }

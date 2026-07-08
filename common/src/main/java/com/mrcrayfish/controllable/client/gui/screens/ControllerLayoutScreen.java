@@ -75,11 +75,11 @@ public class ControllerLayoutScreen extends Screen
         this.controllerButtons.add(new ControllerAxis(this, Buttons.RIGHT_THUMB_STICK, 22, 12, 0, 0, 7, 7, 5));
 
         this.doneButton = this.addRenderableWidget(Button.builder(Component.translatable("controllable.gui.save"), (button) -> {
-            Objects.requireNonNull(this.minecraft).setScreen(this.parentScreen);
+            Objects.requireNonNull(this.minecraft).gui.setScreen(this.parentScreen);
         }).pos(this.width / 2 - 154, this.height - 32).size(100, 20).build());
 
         this.addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), (button) -> {
-            Objects.requireNonNull(this.minecraft).setScreen(this.parentScreen);
+            Objects.requireNonNull(this.minecraft).gui.setScreen(this.parentScreen);
         }).pos(this.width / 2 + 54, this.height - 32).size(100, 20).build());
 
         int width = 38 * 5;
@@ -87,7 +87,7 @@ public class ControllerLayoutScreen extends Screen
         int y = this.height / 2 - 50 - 35;
 
         this.thumbstickButton = this.addRenderableWidget(new ImageButton(x + width / 2 - 10, y + 90, 20, TEXTURE, 92, 0, 16, 16, button -> {
-            Objects.requireNonNull(this.minecraft).setScreen(new ThumbstickSettingsScreen(this));
+            Objects.requireNonNull(this.minecraft).gui.setScreen(new ThumbstickSettingsScreen(this));
         }));
     }
 

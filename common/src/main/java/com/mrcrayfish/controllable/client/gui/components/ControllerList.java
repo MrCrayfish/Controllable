@@ -107,7 +107,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
             if(ScreenHelper.isMouseWithin(this.getX() + (this.width + footerWidth) / 2 - footerSubWidth, this.getBottom() + 4, footerSubWidth, 14, (int) event.x(), (int) event.y()))
             {
                 ClickEvent e = this.footerSubText.getStyle().getClickEvent();
-                SettingsScreen.handleClickEvent(e, this.minecraft, this.minecraft.screen);
+                SettingsScreen.handleClickEvent(e, this.minecraft, this.minecraft.gui.screen());
             }
         }
         return super.mouseClicked(event, doubleClick);

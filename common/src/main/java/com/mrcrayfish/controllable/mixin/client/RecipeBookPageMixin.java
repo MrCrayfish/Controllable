@@ -42,7 +42,7 @@ public class RecipeBookPageMixin
         if(controller == null || !controller.isBeingUsed() || !Config.CLIENT.options.quickCraft.get())
             return;
 
-        if(this.minecraft.screen == null || !this.overlay.isVisible())
+        if(this.minecraft.gui.screen() == null || !this.overlay.isVisible())
             return;
 
         List<AbstractWidget> recipeButtons = ClientHelper.mixinGetRecipeButtons(this.overlay);

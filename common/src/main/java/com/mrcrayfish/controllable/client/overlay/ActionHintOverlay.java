@@ -48,7 +48,7 @@ public class ActionHintOverlay implements IOverlay
     public boolean isVisible()
     {
         Controller controller = Controllable.getController();
-        return !Minecraft.getInstance().options.hideGui && controller != null && (!Config.CLIENT.options.overlayTimeout.get() || controller.isBeingUsed());
+        return !Minecraft.getInstance().gui.hud.isHidden() && controller != null && (!Config.CLIENT.options.overlayTimeout.get() || controller.isBeingUsed());
     }
 
     @Override
@@ -157,7 +157,7 @@ public class ActionHintOverlay implements IOverlay
     public void tick()
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.player == null || mc.options.hideGui)
+        if(mc.player == null || mc.gui.hud.isHidden())
             return;
 
         this.actions.clear();
@@ -168,7 +168,7 @@ public class ActionHintOverlay implements IOverlay
 
         boolean verbose = visibility == ActionVisibility.ALL;
         Map<ButtonBinding, Action> actionMap = new LinkedHashMap<>();
-        if(mc.screen instanceof AbstractContainerScreen<?> containerScreen)
+        if(mc.gui.screen() instanceof AbstractContainerScreen<?> containerScreen)
         {
             if(mc.player.inventoryMenu.getCarried().isEmpty())
             {
@@ -194,7 +194,7 @@ public class ActionHintOverlay implements IOverlay
 
             actionMap.put(ButtonBindings.CLOSE_INVENTORY, new Action(ActionDescriptions.CLOSE_INVENTORY, Action.Side.RIGHT));
         }
-        else if(mc.screen == null)
+        else if(mc.gui.screen() == null)
         {
             if(Controllable.getRadialMenu().isVisible())
             {

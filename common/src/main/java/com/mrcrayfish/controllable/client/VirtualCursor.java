@@ -201,7 +201,7 @@ public final class VirtualCursor
 
         // Don't update cursor if we're not in a screen, or we are in the layout screen
         Minecraft mc = Minecraft.getInstance();
-        if(mc.screen == null || mc.screen instanceof ControllerLayoutScreen)
+        if(mc.gui.screen() == null || mc.gui.screen() instanceof ControllerLayoutScreen)
             return;
 
         this.updateInputVector(controller);
@@ -243,7 +243,7 @@ public final class VirtualCursor
         // Send moved event to screens
         if(this.x != this.lastMoveX || this.y != this.lastMoveY)
         {
-            MouseHooks.invokeMouseMoved(mc.screen, this.x, this.y, this.x - this.lastMoveX, this.y - this.lastMoveY);
+            MouseHooks.invokeMouseMoved(mc.gui.screen(), this.x, this.y, this.x - this.lastMoveX, this.y - this.lastMoveY);
             this.lastMoveX = this.x;
             this.lastMoveY = this.y;
         }
@@ -262,7 +262,7 @@ public final class VirtualCursor
 
         // Skip updating if no screen
         Minecraft mc = Minecraft.getInstance();
-        if(mc.screen == null)
+        if(mc.gui.screen() == null)
             return;
 
         this.applyGyroInput(tracker);
@@ -299,7 +299,7 @@ public final class VirtualCursor
     private void onScreenOpened(Screen screen)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.screen != null)
+        if(mc.gui.screen() != null)
             return;
         this.renderX = this.x = this.prevX = this.lastMoveX = mc.getWindow().getScreenWidth() / 2.0;
         this.renderY = this.y = this.prevY = this.lastMoveY = mc.getWindow().getScreenHeight() / 2.0;
@@ -368,7 +368,7 @@ public final class VirtualCursor
     private boolean isHoveringContainerSlot()
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.screen instanceof AbstractContainerScreen<?> screen)
+        if(mc.gui.screen() instanceof AbstractContainerScreen<?> screen)
         {
             return ClientServices.CLIENT.getSlotUnderMouse(screen) != null;
         }
@@ -381,12 +381,12 @@ public final class VirtualCursor
     private boolean isHoveringEventListener()
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.screen == null)
+        if(mc.gui.screen() == null)
             return false;
         // Convert the position to screen space before passing off
         double cursorScreenX = this.x * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();
         double cursorScreenY = this.y * (double) mc.getWindow().getGuiScaledHeight() / (double) mc.getWindow().getHeight();
-        return ScreenHelper.findHoveredEventListenerExcludeList(mc.screen, cursorScreenX, cursorScreenY).isPresent();
+        return ScreenHelper.findHoveredEventListenerExcludeList(mc.gui.screen(), cursorScreenX, cursorScreenY).isPresent();
     }
 
     /**
@@ -411,7 +411,7 @@ public final class VirtualCursor
     private void snapToContainerSlot()
     {
         Minecraft mc = Minecraft.getInstance();
-        if(mc.player != null && mc.screen instanceof AbstractContainerScreen<?> screen)
+        if(mc.player != null && mc.gui.screen() instanceof AbstractContainerScreen<?> screen)
         {
             Slot slot = ClientServices.CLIENT.getSlotUnderMouse(screen);
             if(slot != null && slot.isActive() && (slot.hasItem() || !screen.getMenu().getCarried().isEmpty()))

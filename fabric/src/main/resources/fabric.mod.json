@@ -19,6 +19,9 @@
         ],
         "client": [
             "com.mrcrayfish.controllable.client.ClientControllableMod"
+        ],
+        "jei_mod_plugin": [
+            "com.mrcrayfish.controllable.integration.ControllableJeiPlugin"
         ]
     },
     "mixins": [

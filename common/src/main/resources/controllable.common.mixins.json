@@ -9,8 +9,8 @@
   "refmap": "controllable.refmap.json",
   "client": [
     "client.ClientRecipeBookMixin",
-    "client.GameRendererMixin",
-    "client.GuiMixin",
+      "client.GuiMixin",
+      "client.HudMixin",
     "client.LocalPlayerMixin",
     "client.MinecraftMixin",
     "client.MouseHandlerMixin",

@@ -40,16 +40,16 @@ public class RecipeBookOverlay implements IOverlay
     public void tick()
     {
         Minecraft mc = Minecraft.getInstance();
-        if(this.currentScreen != mc.screen) // TODO test 1.21.4
+        if(this.currentScreen != mc.gui.screen()) // TODO test 1.21.4
         {
             this.recipeBook = null;
-            if(mc.screen instanceof RecipeUpdateListener)
+            if(mc.gui.screen() instanceof RecipeUpdateListener)
             {
-                ScreenHelper.findRecipeBookComponent(mc.screen).ifPresent(component -> {
+                ScreenHelper.findRecipeBookComponent(mc.gui.screen()).ifPresent(component -> {
                     this.recipeBook = component;
                 });
             }
-            this.currentScreen = mc.screen;
+            this.currentScreen = mc.gui.screen();
         }
     }
 

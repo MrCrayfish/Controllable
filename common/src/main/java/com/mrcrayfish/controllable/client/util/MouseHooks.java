@@ -134,7 +134,7 @@ public class MouseHooks
     public static void invokeMouseMoved(Screen screen, double cursorX, double cursorY, double deltaX, double deltaY)
     {
         Minecraft mc = Minecraft.getInstance();
-        if(screen != null && mc.getOverlay() == null)
+        if(screen != null && mc.gui.overlay() == null)
         {
             // Send mouse moved event to screen
             double screenCursorX = cursorX * (double) mc.getWindow().getGuiScaledWidth() / (double) mc.getWindow().getWidth();

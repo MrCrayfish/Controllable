@@ -7,30 +7,33 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.TextColor;
 import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Objects;
 
 /**
  * Author: MrCrayfish
  */
 public class ColorButton extends Button
 {
-    private static final ChatFormatting[] COLORS = {
-        ChatFormatting.BLACK,
-        ChatFormatting.DARK_BLUE,
-        ChatFormatting.DARK_GREEN,
-        ChatFormatting.DARK_AQUA,
-        ChatFormatting.DARK_RED,
-        ChatFormatting.DARK_PURPLE,
-        ChatFormatting.GOLD,
-        ChatFormatting.GRAY,
-        ChatFormatting.DARK_GRAY,
-        ChatFormatting.BLUE,
-        ChatFormatting.GREEN,
-        ChatFormatting.AQUA,
-        ChatFormatting.RED,
-        ChatFormatting.LIGHT_PURPLE,
-        ChatFormatting.YELLOW,
-        ChatFormatting.WHITE
+    private static final TextColor[] COLORS = {
+        TextColor.BLACK,
+        TextColor.DARK_BLUE,
+        TextColor.DARK_GREEN,
+        TextColor.DARK_AQUA,
+        TextColor.DARK_RED,
+        TextColor.DARK_PURPLE,
+        TextColor.GOLD,
+        TextColor.GRAY,
+        TextColor.DARK_GRAY,
+        TextColor.BLUE,
+        TextColor.GREEN,
+        TextColor.AQUA,
+        TextColor.RED,
+        TextColor.LIGHT_PURPLE,
+        TextColor.YELLOW,
+        TextColor.WHITE
     };
 
     private int index = 14;
@@ -40,7 +43,7 @@ public class ColorButton extends Button
         super(x, y, 20, 20, CommonComponents.EMPTY, onPress, DEFAULT_NARRATION);
     }
 
-    public void setColor(ChatFormatting color)
+    public void setColor(TextColor color)
     {
         int index = ArrayUtils.indexOf(COLORS, color);
         if(index != -1)
@@ -49,7 +52,7 @@ public class ColorButton extends Button
         }
     }
 
-    public ChatFormatting getColor()
+    public TextColor getColor()
     {
         return COLORS[this.index];
     }
@@ -66,6 +69,6 @@ public class ColorButton extends Button
     {
         this.extractDefaultSprite(extractor);
         extractor.fill(this.getX() + 4, this.getY() + 4, this.getX() + 16, this.getY() + 16, 0xFF000000);
-        extractor.fill(this.getX() + 5, this.getY() + 5, this.getX() + 15, this.getY() + 15, COLORS[this.index].getColor() + 0xFF000000);
+        extractor.fill(this.getX() + 5, this.getY() + 5, this.getX() + 15, this.getY() + 15, COLORS[this.index].getValue() + 0xFF000000);
     }
 }

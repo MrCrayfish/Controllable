@@ -28,6 +28,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import org.lwjgl.glfw.GLFW;
 
 import java.time.Duration;
@@ -63,11 +64,11 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         Component addKeybind = ClientHelper.join(Icons.KEY_CAP, Component.translatable("controllable.gui.add_key_bind"));
         Component restoreDefaults = ClientHelper.join(Icons.RESET, Component.translatable("controllable.gui.restore_defaults"));
         this.addEntry(new TwoWidgetItem(Button.builder(addKeybind, btn -> {
-            this.minecraft.setScreen(new SelectKeyBindingScreen(this.settingsScreen, () -> {
+            this.minecraft.gui.setScreen(new SelectKeyBindingScreen(this.settingsScreen, () -> {
                 this.repopulateBindings(false);
             }));
         }).build(), Button.builder(restoreDefaults, btn -> {
-            this.minecraft.setScreen(new ConfirmationScreen(this.settingsScreen, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
+            this.minecraft.gui.setScreen(new ConfirmationScreen(this.settingsScreen, Component.translatable("controllable.gui.reset_selected_bindings"), result -> {
                 if(result) {
                     BindingRegistry registry = Controllable.getBindingRegistry();
                     registry.getBindings().forEach(ButtonBinding::resetMappedButton);
@@ -175,7 +176,7 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
         public void extractContent(GuiGraphicsExtractor extractor, int mouseX, int mouseY, boolean hovered, float partialTick)
         {
             this.updateTooltip(extractor, mouseX, mouseY);
-            this.setLabelColor(this.binding.isConflictingContext() ? ChatFormatting.RED.getColor() : ChatFormatting.WHITE.getColor());
+            this.setLabelColor(this.binding.isConflictingContext() ? TextColor.RED.getValue() : TextColor.WHITE.getValue());
             super.extractContent(extractor, mouseX, mouseY, hovered, partialTick);
             this.bindingButton.setTooltip(ClientHelper.createListTooltip(this.getBindingTooltip(this.binding)));
             this.bindingButton.setTooltipDelay(Duration.ofMillis(400));

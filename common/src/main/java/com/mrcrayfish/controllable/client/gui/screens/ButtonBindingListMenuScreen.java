@@ -74,7 +74,7 @@ public abstract class ButtonBindingListMenuScreen extends ListMenuScreen
                 {
                     Component addKeybind = ClientHelper.join(Icons.KEY_CAP, Component.translatable("controllable.gui.add_key_bind"));
                     items.add(new OneWidgetItem(Button.builder(addKeybind, btn -> {
-                        this.minecraft.setScreen(new SelectKeyBindingScreen(this, this::rebuildItems));
+                        this.minecraft.gui.setScreen(new SelectKeyBindingScreen(this, this::rebuildItems));
                     }).build()));
                 }
             }

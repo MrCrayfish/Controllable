@@ -9,6 +9,7 @@ import com.mrcrayfish.controllable.mixin.client.jei.PageNavigationMixin;
 import mezz.jei.common.util.ImmutableRect2i;
 import mezz.jei.gui.PageNavigation;
 import mezz.jei.gui.elements.IconButton;
+import mezz.jei.gui.overlay.IIngredientListOverlayContents;
 import mezz.jei.gui.overlay.IngredientGrid;
 import mezz.jei.gui.overlay.IngredientGridWithNavigation;
 import mezz.jei.gui.overlay.IngredientListRenderer;
@@ -30,7 +31,7 @@ public class JeiSupport
             if(runtime.getIngredientListOverlay().isListDisplayed())
             {
                 // JEI just needs getters, and I wouldn't have to do this mess
-                IngredientGridWithNavigation ingredientGridWithNavigation = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).controllableGetContents();
+                IIngredientListOverlayContents ingredientGridWithNavigation = ((IngredientListOverlayMixin) runtime.getIngredientListOverlay()).controllableGetContents();
                 IngredientGrid ingredientGrid = ((IngredientGridWithNavigationMixin) ingredientGridWithNavigation).controllableGetIngredientGrid();
                 IngredientListRenderer ingredientListRenderer = ((IngredientGridMixin) ingredientGrid).controllableGetIngredientListRenderer();
 

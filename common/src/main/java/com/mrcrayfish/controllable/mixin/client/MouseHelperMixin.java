@@ -41,7 +41,7 @@ public abstract class MouseHelperMixin
     private void controllableBeforeUpdateLook(CallbackInfo ci)
     {
         Minecraft minecraft = Minecraft.getInstance();
-        if(minecraft.screen != null)
+        if(minecraft.gui.screen() != null)
         {
             if(Math.abs(this.accumulatedDX) > 0 || Math.abs(this.accumulatedDY) > 0)
             {

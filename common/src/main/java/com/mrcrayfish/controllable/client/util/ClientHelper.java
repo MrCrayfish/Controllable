@@ -91,14 +91,14 @@ public class ClientHelper
     public static boolean isChatVisible()
     {
         Minecraft mc = Minecraft.getInstance();
-        List<GuiMessage.Line> messages = ClientServices.CLIENT.getChatTrimmedMessages(mc.gui.getChat());
-        return mc.screen == null && messages.stream().anyMatch(chatLine -> mc.gui.getGuiTicks() - chatLine.addedTime() < 200);
+        List<GuiMessage.Line> messages = ClientServices.CLIENT.getChatTrimmedMessages(mc.gui.hud.getChat());
+        return mc.gui.screen() == null && messages.stream().anyMatch(chatLine -> mc.gui.hud.getGuiTicks() - chatLine.addedTime() < 200);
     }
 
     public static boolean isSubtitleShowing()
     {
         Minecraft mc = Minecraft.getInstance();
-        return mc.options.showSubtitles().get() && mc.screen == null;
+        return mc.options.showSubtitles().get() && mc.gui.screen() == null;
     }
 
     public static List<AbstractWidget> mixinGetRecipeButtons(OverlayRecipeComponent overlay)

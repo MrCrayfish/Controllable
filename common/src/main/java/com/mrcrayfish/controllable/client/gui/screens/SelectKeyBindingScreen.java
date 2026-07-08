@@ -42,7 +42,7 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
         super.setupFooter(footerLayout);
         Component resetLabel = ClientHelper.join(Icons.RESET, Component.translatable("controllable.gui.reset"));
         this.resetButton = footerLayout.addChild(Button.builder(resetLabel, button -> {
-            Objects.requireNonNull(this.minecraft).setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_keybinds"), result -> {
+            Objects.requireNonNull(this.minecraft).gui.setScreen(new ConfirmationScreen(this, Component.translatable("controllable.gui.reset_keybinds"), result -> {
                 if(result) {
                     List<KeyAdapterBinding> copy = new ArrayList<>(Controllable.getBindingRegistry().getKeyAdapters().values());
                     copy.forEach(binding -> {
@@ -57,7 +57,7 @@ public class SelectKeyBindingScreen extends KeyBindingListMenuScreen
         }).size(150, 20).build());
         footerLayout.addChild(Button.builder(CommonComponents.GUI_DONE, button -> {
             this.callback.run();
-            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
+            Objects.requireNonNull(this.minecraft).gui.setScreen(this.parent);
         }).size(150, 20).build());
         this.updateButtons();
     }

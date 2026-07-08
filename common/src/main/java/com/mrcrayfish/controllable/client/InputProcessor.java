@@ -86,7 +86,7 @@ public class InputProcessor
     {
         boolean state = newStates.getState(index);
 
-        Screen screen = Minecraft.getInstance().screen;
+        Screen screen = Minecraft.getInstance().gui.screen();
         if(screen instanceof ControllerLayoutScreen)
         {
             ((ControllerLayoutScreen) screen).processButton(index, newStates);
