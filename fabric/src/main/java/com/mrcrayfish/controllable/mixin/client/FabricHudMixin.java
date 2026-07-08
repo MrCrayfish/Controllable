@@ -4,16 +4,16 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mrcrayfish.controllable.Config;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.Hud;
 import org.joml.Matrix3x2fStack;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
  * Author: MrCrayfish
  */
-@Mixin(Gui.class)
-public class FabricGuiMixin
+@Mixin(Hud.class)
+public class FabricHudMixin
 {
     @WrapMethod(method = "extractHotbarAndDecorations")
     private void consoleHotbarOffsetHead(GuiGraphicsExtractor extractor, DeltaTracker tracker, Operation<Void> original)

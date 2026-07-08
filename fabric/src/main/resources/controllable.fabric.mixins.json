@@ -6,7 +6,7 @@
     "compatibilityLevel": "JAVA_21",
     "refmap": "controllable.refmap.json",
     "client": [
-        "client.FabricGuiMixin",
+        "client.FabricHudMixin",
         "client.FabricKeyMappingMixin",
         "client.FabricMinecraftMixin",
         "client.FabricRecipeBookPageMixin"
