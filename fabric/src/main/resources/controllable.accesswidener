@@ -21,7 +21,6 @@ accessible field net/minecraft/client/gui/screens/recipebook/OverlayRecipeCompon
 accessible method net/minecraft/client/Minecraft startUseItem ()V
 accessible method net/minecraft/client/Minecraft startAttack ()Z
 accessible method net/minecraft/client/Minecraft pickBlockOrEntity ()V
-accessible method net/minecraft/client/Minecraft openChatScreen (Lnet/minecraft/client/gui/components/ChatComponent$ChatMethod;)V
 accessible method net/minecraft/client/player/LocalPlayer canStartSprinting ()Z
 accessible class net/minecraft/client/gui/screens/recipebook/OverlayRecipeComponent$OverlayRecipeButton
 accessible class net/minecraft/client/gui/components/AbstractSelectionList$Entry
