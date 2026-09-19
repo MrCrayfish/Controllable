@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MouseHandlerMixin
 {
     @Inject(method = "onMove", at = @At(value = "HEAD"))
-    private void controllableOnMouseMoved(long windowId, double mouseX, double mouseY, CallbackInfo ci)
+    private void controllableOnMouseMoved(long windowId, double mouseX, double mouseY, double deltaX, double deltaY, CallbackInfo ci)
     {
         if(windowId == Minecraft.getInstance().getWindow().handle())
         {

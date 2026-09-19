@@ -23,7 +23,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -214,7 +214,7 @@ public class ControllerList extends TabSelectionList<ControllerList.ControllerEn
         @Override
         public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick)
         {
-            if(event.button() == GLFW.GLFW_MOUSE_BUTTON_1)
+            if(event.button() == InputConstants.MOUSE_BUTTON_LEFT)
             {
                 this.connect();
                 minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WOODEN_BUTTON_CLICK_ON, 1.75F));

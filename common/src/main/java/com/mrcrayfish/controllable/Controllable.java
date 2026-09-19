@@ -11,7 +11,6 @@ import com.mrcrayfish.controllable.client.VirtualCursor;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.input.AdaptiveControllerManager;
 import com.mrcrayfish.controllable.client.input.Controller;
-import com.mrcrayfish.controllable.client.input.glfw.GLFWControllerManager;
 import com.mrcrayfish.controllable.client.input.sdl2.SDL2ControllerManager;
 import com.mrcrayfish.controllable.util.Utils;
 import org.jetbrains.annotations.Nullable;
@@ -110,8 +109,8 @@ public class Controllable
 
     private static AdaptiveControllerManager createManager()
     {
+        // 26.3 dropped GLFW (migrated to SDL) — only the SDL2 backend remains
         return switch (Config.CLIENT.inputLibrary.get()) {
-            case GLFW -> new GLFWControllerManager();
             case SDL2 -> new SDL2ControllerManager();
         };
     }

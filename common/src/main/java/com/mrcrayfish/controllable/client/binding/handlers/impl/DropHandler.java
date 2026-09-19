@@ -3,6 +3,7 @@ package com.mrcrayfish.controllable.client.binding.handlers.impl;
 import com.mrcrayfish.controllable.client.binding.handlers.TickingHandler;
 import com.mrcrayfish.controllable.client.binding.handlers.action.BindingReleased;
 import com.mrcrayfish.controllable.client.binding.handlers.action.context.Context;
+import net.minecraft.util.Prediction;
 
 import java.util.Optional;
 
@@ -31,7 +32,7 @@ public final class DropHandler extends TickingHandler implements BindingReleased
                 this.dropped = true;
                 context.player().ifPresent(player -> {
                     if(!player.isSpectator()) {
-                        player.drop(true);
+                        player.drop(player.getMainHandItem(), true, Prediction.PREDICTED);
                     }
                 });
             }
@@ -58,7 +59,7 @@ public final class DropHandler extends TickingHandler implements BindingReleased
             {
                 this.dropped = true;
                 context.player().ifPresent(player -> {
-                    player.drop(false);
+                    player.drop(player.getMainHandItem(), false, Prediction.PREDICTED);
                 });
                 context.controller().updateInputTime();
                 return true;

@@ -49,7 +49,6 @@ import net.minecraft.world.level.block.entity.BannerPattern;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -773,7 +772,7 @@ public class InputHandler
                 if(menu.getCarried().isEmpty()) {
                     MouseHooks.sendMouseClickEvent(screen, InputConstants.MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
                 } else {
-                    MouseHooks.sendMouseReleasedEvent(screen, GLFW.GLFW_MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
+                    MouseHooks.sendMouseReleasedEvent(screen, InputConstants.MOUSE_BUTTON_LEFT, screenLeft + slot.x + 8, screenTop + slot.y + 8);
                 }
             });
         }

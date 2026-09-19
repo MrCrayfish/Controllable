@@ -22,7 +22,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -158,7 +158,7 @@ public class ControllerLayoutScreen extends Screen
     @Override
     public boolean keyPressed(KeyEvent event)
     {
-        if(event.key() == GLFW.GLFW_KEY_ESCAPE && this.configureButton != -1)
+        if(event.key() == InputConstants.KEY_ESCAPE && this.configureButton != -1)
         {
             this.configureButton = -1;
             return true;

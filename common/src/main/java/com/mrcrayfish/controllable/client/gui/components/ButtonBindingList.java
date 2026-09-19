@@ -29,7 +29,6 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
-import org.lwjgl.glfw.GLFW;
 
 import java.time.Duration;
 import java.util.*;
@@ -116,10 +115,10 @@ public class ButtonBindingList extends TabSelectionList<TabSelectionList.BaseIte
             this.binding = binding;
             this.tooltip.setDelay(Duration.ofMillis(400));
             this.bindingButton = new ButtonBindingButton(0, 0, binding, button -> {
-                if(button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+                if(button == InputConstants.MOUSE_BUTTON_LEFT) {
                     ButtonBindingList.this.settingsScreen.setSelectedBinding(this.binding);
                     return true;
-                } else if(button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+                } else if(button == InputConstants.MOUSE_BUTTON_RIGHT) {
                     ButtonBinding.setButton(this.binding, -1);
                     BindingRegistry registry = Controllable.getBindingRegistry();
                     registry.rebuildCache();

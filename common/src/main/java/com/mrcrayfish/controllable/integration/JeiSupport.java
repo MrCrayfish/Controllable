@@ -9,10 +9,10 @@ import com.mrcrayfish.controllable.mixin.client.jei.PageNavigationMixin;
 import mezz.jei.common.util.ImmutableRect2i;
 import mezz.jei.gui.PageNavigation;
 import mezz.jei.gui.elements.IconButton;
-import mezz.jei.gui.overlay.IIngredientListOverlayContents;
-import mezz.jei.gui.overlay.IngredientGrid;
-import mezz.jei.gui.overlay.IngredientGridWithNavigation;
-import mezz.jei.gui.overlay.IngredientListRenderer;
+import mezz.jei.gui.overlay.ingredients.IIngredientListOverlayContents;
+import mezz.jei.gui.overlay.ingredients.IngredientGrid;
+import mezz.jei.gui.overlay.ingredients.IngredientGridWithNavigation;
+import mezz.jei.gui.overlay.ingredients.IngredientListRenderer;
 
 import java.util.ArrayList;
 import java.util.List;

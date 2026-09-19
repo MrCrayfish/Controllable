@@ -33,7 +33,6 @@ import net.neoforged.neoforge.client.gui.CreativeTabsScreenPage;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Map;
@@ -48,8 +47,8 @@ public class NeoForgeClientHelper implements IClientHelper
     @Override
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
-        KeyEvent event = new KeyEvent(key, GLFW.glfwGetKeyScancode(key), modifiers);
-        if(action == GLFW.GLFW_RELEASE)
+        KeyEvent event = new KeyEvent(key, 0, modifiers);
+        if(action == 0) // 0 = key release (was GLFW.GLFW_RELEASE)
         {
             if(!ClientHooks.onScreenKeyReleasedPre(screen, event))
             {
@@ -60,7 +59,7 @@ public class NeoForgeClientHelper implements IClientHelper
             }
             return true;
         }
-        else if(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT)
+        else if(action == 1 || action == 2) // 1 = press, 2 = repeat (was GLFW.GLFW_PRESS/GLFW.GLFW_REPEAT)
         {
             screen.afterKeyboardAction();
             if(!ClientHooks.onScreenKeyPressedPre(screen, event))
@@ -120,7 +119,7 @@ public class NeoForgeClientHelper implements IClientHelper
     @Override
     public Slot getSlotUnderMouse(AbstractContainerScreen<?> screen)
     {
-        return screen.getSlotUnderMouse();
+        return screen.getHoveredSlot();
     }
 
     @Override
@@ -187,13 +186,13 @@ public class NeoForgeClientHelper implements IClientHelper
     @Override
     public int getScreenTop(AbstractContainerScreen<?> screen)
     {
-        return screen.getGuiTop();
+        return screen.getTopPos();
     }
 
     @Override
     public int getScreenLeft(AbstractContainerScreen<?> screen)
     {
-        return screen.getGuiLeft();
+        return screen.getLeftPos();
     }
 
     @Override
@@ -339,8 +338,8 @@ public class NeoForgeClientHelper implements IClientHelper
         int height = 32;
         int x = guiLeft + width * column;
         int y = guiTop;
-        x = tab.isAlignedRight() ? guiLeft + screen.getXSize() - width * (6 - column) : (column > 0 ? x + column : x);
-        y = topRow ? y - width : y + (screen.getYSize() - 4);
+        x = tab.isAlignedRight() ? guiLeft + screen.getImageWidth() - width * (6 - column) : (column > 0 ? x + column : x);
+        y = topRow ? y - width : y + (screen.getImageHeight() - 4);
         return new BasicNavigationPoint(x + width / 2.0, y + height / 2.0);
     }
 }

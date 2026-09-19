@@ -5,6 +5,6 @@ package com.mrcrayfish.controllable.client.input;
  */
 public enum InputLibrary
 {
-    GLFW,
+    // GLFW removed: Minecraft 26.3 migrated its input layer from GLFW to SDL
     SDL2 // Default
 }

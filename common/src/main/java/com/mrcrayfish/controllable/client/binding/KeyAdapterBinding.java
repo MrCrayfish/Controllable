@@ -5,7 +5,6 @@ import com.mrcrayfish.controllable.platform.ClientServices;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import org.lwjgl.glfw.GLFW;
 
 /**
  * A special binding that translates button presses to key presses. This binding does not need to be
@@ -46,12 +45,12 @@ public final class KeyAdapterBinding extends ButtonBinding
         {
             this.updateKeyBindPressTime();
             int key = ClientServices.CLIENT.getKeyValue(this.keyMapping);
-            this.handlePressed(GLFW.GLFW_PRESS, key, 0);
+            this.handlePressed(1, key, 0); // 1 = key press (was GLFW.GLFW_PRESS)
         }
         else if(wasPressed && !pressed)
         {
             int key = ClientServices.CLIENT.getKeyValue(this.keyMapping);
-            this.handlePressed(GLFW.GLFW_RELEASE, key, 0);
+            this.handlePressed(0, key, 0); // 0 = key release (was GLFW.GLFW_RELEASE)
         }
     }
 

@@ -36,7 +36,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +45,8 @@ public class FabricClientHelper implements IClientHelper
     @Override
     public boolean sendScreenInput(Screen screen, int key, int action, int modifiers)
     {
-        KeyEvent event = new KeyEvent(key, GLFW.glfwGetKeyScancode(key), modifiers);
-        if(action == GLFW.GLFW_RELEASE)
+        KeyEvent event = new KeyEvent(key, 0, modifiers);
+        if(action == 0) // 0 = key release (was GLFW.GLFW_RELEASE)
         {
             if(!ScreenKeyboardEvents.allowKeyRelease(screen).invoker().allowKeyRelease(screen, event))
                 return true;
@@ -56,7 +55,7 @@ public class FabricClientHelper implements IClientHelper
             ScreenKeyboardEvents.beforeKeyRelease(screen).invoker().beforeKeyRelease(screen, event);
             if(Controllable.isArchitecturyLoaded())
             {
-                if(ArchitecturySupport.sendScreenKeyReleased(screen, key, event.scancode(), modifiers))
+                if(ArchitecturySupport.sendScreenKeyReleased(screen, key, 0, modifiers))
                 {
                     handled = true;
                 }
@@ -68,7 +67,7 @@ public class FabricClientHelper implements IClientHelper
             ScreenKeyboardEvents.afterKeyRelease(screen).invoker().afterKeyRelease(screen, event);
             return handled;
         }
-        else if(action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT)
+        else if(action == 1 || action == 2) // 1 = press, 2 = repeat (was GLFW.GLFW_PRESS/GLFW.GLFW_REPEAT)
         {
             screen.afterKeyboardAction();
 
@@ -79,7 +78,7 @@ public class FabricClientHelper implements IClientHelper
             ScreenKeyboardEvents.beforeKeyPress(screen).invoker().beforeKeyPress(screen, event);
             if(Controllable.isArchitecturyLoaded())
             {
-                if(ArchitecturySupport.sendScreenKeyPressed(screen, key, event.scancode(), modifiers))
+                if(ArchitecturySupport.sendScreenKeyPressed(screen, key, 0, modifiers))
                 {
                     handled = true;
                 }

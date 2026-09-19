@@ -58,8 +58,8 @@ dependencies {
     // EMI
     //compileOnly "dev.emi:emi-neoforge:${emi_version}"
 
-    // Roughly Enough Items
-    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
+    // Roughly Enough Items — no 26.3 artifact yet, integration disabled in this patch build
+    //compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
 
     // AppleSkin
     //rumtimeOnly "squeek.appleskin:appleskin-neoforge:mc1.21.3-3.0.6"
